@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers\Master;
+
+use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\Department;
+use Illuminate\Http\Request;
+
+class DepartmentController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Department::with('company');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('code', 'like', "%$search%");
+            });
+        }
+
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        $departments = $query->latest()->paginate(50)->withQueryString();
+        $companies = Company::all();
+
+        return view('pages.master.departments.index', compact('departments', 'companies'));
+    }
+
+    public function create()
+    {
+        $companies = Company::all();
+        return view('pages.master.departments.create', compact('companies'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:10|unique:departments,code',
+            'company_id' => 'required|exists:companies,id',
+            'description' => 'nullable|string',
+        ]);
+
+        Department::create($validated);
+
+        if ($request->has('create_another')) {
+            return redirect()->route('departments.create')->with('success', 'Department created successfully. Add another one.');
+        }
+
+        return redirect()->route('departments.index')->with('success', 'Department created successfully.');
+    }
+
+    public function edit(Department $department)
+    {
+        $companies = Company::all();
+        return view('pages.master.departments.edit', compact('department', 'companies'));
+    }
+
+    public function update(Request $request, Department $department)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:10|unique:departments,code,' . $department->id,
+            'company_id' => 'required|exists:companies,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $department->update($validated);
+
+        return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
+    }
+
+    public function destroy(Department $department)
+    {
+        $department->delete();
+        return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:departments,id',
+        ]);
+
+        Department::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('departments.index')->with('success', 'Selected departments deleted successfully.');
+    }
+}
