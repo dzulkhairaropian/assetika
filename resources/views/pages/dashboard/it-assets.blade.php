@@ -430,7 +430,7 @@
                                         <td class="px-4 py-3.5">
                                             <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400 truncate">{{ $checkout->asset->name ?? 'Unknown' }}</span>
                                             <span class="text-[10px] text-gray-400 dark:text-gray-500 truncate block mt-0.5">
-                                                {{ optional(optional($checkout->asset->product)->brand)->name ?? 'No Brand' }} • {{ optional($checkout->asset->product)->name ?? 'No Product' }}
+                                                {{ optional(optional($checkout->asset)->product)->brand->name ?? 'No Brand' }} • {{ optional(optional($checkout->asset)->product)->name ?? 'No Product' }}
                                             </span>
                                         </td>
                                         <td class="px-4 py-3.5 text-brand-600 dark:text-brand-400 font-bold text-theme-sm">
@@ -443,7 +443,7 @@
                                                 </div>
                                                 <div class="flex flex-col min-w-0">
                                                     <span class="text-gray-700 text-theme-sm dark:text-gray-350 font-semibold truncate leading-tight">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</span>
-                                                    <span class="text-[10px] text-gray-400 dark:text-gray-500 truncate block mt-0.5 leading-tight">{{ optional($checkout->asset->department)->name ?? 'No Dept' }}</span>
+                                                    <span class="text-[10px] text-gray-400 dark:text-gray-500 truncate block mt-0.5 leading-tight">                                                {{ optional(optional($checkout->asset)->department)->name ?? 'No Dept' }}</span>
                                                 </div>
                                             </div>
                                         </td>
