@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6" x-data="{
@@ -28,7 +28,7 @@
             <form action="{{ route('consumables.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search consumables..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900">
@@ -72,7 +72,7 @@
             </form>
 
             <a href="{{ route('consumables.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                <i data-lucide="plus" class="w-4 h-4"></i>
+                <i data-feather="plus" class="w-4 h-4"></i>
                 Add Consumable
             </a>
         </div>
@@ -90,7 +90,7 @@
             class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10 mb-4"
             style="display: none;">
             <div class="flex items-center gap-2">
-                <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                 <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
                     <span x-text="selectedConsumables.length"></span> items selected.
                 </span>
@@ -98,7 +98,7 @@
             <div class="flex items-center gap-4">
                 <button @click="const ids = selectedConsumables.map(c => c.id).join(','); window.location.href = `{{ route('consumables.bulk-checkout') }}?ids=${ids}`;" 
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <i data-feather="log-out" class="w-4 h-4"></i>
                     Checkout Selected
                 </button>
             </div>
@@ -189,7 +189,7 @@
                                     @php
                                         $color = 'success';
                                         $statusText = 'In Stock';
-                                         $icon = 'circle-check';
+                                         $icon = 'check-circle';
                                         if ($consumable->quantity <= 0) {
                                             $color = 'error';
                                             $statusText = 'Out of Stock';
@@ -199,7 +199,7 @@
                                             $statusText = 'Low Stock';
                                             $icon = 'alert-circle';
                                         }
-                                        $iconHtml = new \Illuminate\Support\HtmlString("<i data-lucide='{$icon}' class='w-3 h-3'></i>");
+                                        $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusText }}</x-ui.badge>
                                 </td>
@@ -209,28 +209,28 @@
                                 <td class="px-4 sm:px-6 py-3.5">
                                     <div class="flex items-center gap-3 text-gray-500">
                                         <a href="{{ route('consumables.restock', $consumable) }}" class="hover:text-success-500 transition-colors" title="Restock">
-                                            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                            <i data-feather="plus-circle" class="w-5 h-5"></i>
                                         </a>
 
                                         @if($consumable->quantity > 0)
                                             <a href="{{ route('consumables.checkout', $consumable) }}" class="hover:text-brand-500 transition-colors" title="Checkout">
-                                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                                                <i data-feather="log-out" class="w-5 h-5"></i>
                                             </a>
                                         @else
                                             <span class="text-gray-300 dark:text-gray-700 cursor-not-allowed" title="Out of Stock">
-                                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                                                <i data-feather="log-out" class="w-5 h-5"></i>
                                             </span>
                                         @endif
 
                                         <a href="{{ route('consumables.edit', $consumable) }}" class="hover:text-brand-500 transition-colors" title="Edit">
-                                            <i data-lucide="edit-3" class="w-5 h-5"></i>
+                                            <i data-feather="edit-3" class="w-5 h-5"></i>
                                         </a>
 
                                         <form action="{{ route('consumables.destroy', $consumable) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this consumable?')" class="inline-flex">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="hover:text-error-500 transition-colors" title="Delete">
-                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                                <i data-feather="trash-2" class="w-5 h-5"></i>
                                             </button>
                                         </form>
                                     </div>

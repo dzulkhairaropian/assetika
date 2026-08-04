@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="grid grid-cols-12 gap-4 md:gap-6 min-w-0">
@@ -22,7 +22,7 @@
                             <h3 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $lowStockConsumables->count() }}</h3>
                         </div>
                         <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-warning-50 text-warning-600 dark:bg-warning-500/10 dark:text-warning-400">
-                            <i data-lucide="package-x" class="h-5 w-5"></i>
+                            <i data-feather="package" class="h-5 w-5"></i>
                         </div>
                     </div>
                     <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Items at or below minimum threshold.</p>
@@ -35,7 +35,7 @@
                             <h3 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $brokenDisposal }}</h3>
                         </div>
                         <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
-                            <i data-lucide="circle-off" class="h-5 w-5"></i>
+                            <i data-feather="x-circle" class="h-5 w-5"></i>
                         </div>
                     </div>
                     <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Assets marked as broken or retired.</p>
@@ -48,7 +48,7 @@
                             <h3 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $assetsOlderThan4Years->count() }}</h3>
                         </div>
                         <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
-                            <i data-lucide="hourglass" class="h-5 w-5"></i>
+                            <i data-feather="clock" class="h-5 w-5"></i>
                         </div>
                     </div>
                     <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Assets approaching lifecycle replacement.</p>
@@ -381,7 +381,7 @@
                         @empty
                             <div class="flex flex-col items-center justify-center py-12 text-center">
                                 <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3 dark:bg-gray-800">
-                                    <i data-lucide="package" class="w-6 h-6 text-gray-400"></i>
+                                    <i data-feather="package" class="w-6 h-6 text-gray-400"></i>
                                 </div>
                                 <p class="text-gray-500 dark:text-gray-400 font-medium">No consumables in inventory</p>
                                 <p class="text-xs text-gray-400 mt-1">Add consumables to track levels.</p>
@@ -396,7 +396,7 @@
                         <a href="{{ route('consumables.index') }}"
                            class="text-xs font-semibold text-brand-500 hover:text-brand-600 dark:hover:text-brand-400 inline-flex items-center gap-1">
                             Manage All Consumables
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            <i data-feather="arrow-right" class="w-3.5 h-3.5"></i>
                         </a>
                     </div>
                 @endif
@@ -411,7 +411,7 @@
                     <div class="flex items-center justify-between mb-4 px-5 pt-5 sm:px-6">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Asset Checkouts</h3>
                         <a href="{{ route('assets.index') }}" class="text-xs font-bold text-brand-500 hover:text-brand-600 dark:hover:text-brand-400 inline-flex items-center gap-0.5">
-                            View Assets <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                            View Assets <i data-feather="chevron-right" class="w-3 h-3"></i>
                         </a>
                     </div>
                     <div class="flex-1 overflow-y-auto overflow-x-auto scrollbar-custom relative min-h-0 pr-1">
@@ -480,7 +480,7 @@
                     <div class="flex items-center justify-between mb-4 px-5 pt-5 sm:px-6">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Consumable Checkouts</h3>
                         <a href="{{ route('consumable-transactions.index') }}" class="text-xs font-bold text-brand-500 hover:text-brand-600 dark:hover:text-brand-400 inline-flex items-center gap-0.5">
-                            View Transactions <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                            View Transactions <i data-feather="chevron-right" class="w-3 h-3"></i>
                         </a>
                     </div>
                     <div class="max-w-full overflow-x-auto h-80 overflow-y-auto scrollbar-custom relative pr-1">
@@ -543,7 +543,7 @@
                     <div class="flex items-center justify-between mb-4 px-5 pt-5 sm:px-6">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Assets Older Than 4 Years</h3>
                         <a href="{{ route('assets.index') }}" class="text-xs font-bold text-brand-500 hover:text-brand-600 dark:hover:text-brand-400 inline-flex items-center gap-0.5">
-                            View Assets <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                            View Assets <i data-feather="chevron-right" class="w-3 h-3"></i>
                         </a>
                     </div>
                     <div class="max-w-full overflow-x-auto h-80 overflow-y-auto scrollbar-custom relative pr-1">

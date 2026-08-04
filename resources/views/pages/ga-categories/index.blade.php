@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -8,7 +8,7 @@
             <form action="{{ route('ga-categories.index') }}" method="GET" class="flex items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search categories..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
@@ -19,7 +19,7 @@
             </form>
 
             <a href="{{ route('ga-categories.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                <i data-lucide="plus" class="w-4 h-4"></i>
+                <i data-feather="plus" class="w-4 h-4"></i>
                 Add Category
             </a>
         </div>
@@ -70,13 +70,13 @@
                                 <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-sm font-medium">
                                     <div class="flex items-center gap-3 text-gray-500">
                                         <a href="{{ route('ga-categories.edit', $category) }}" class="hover:text-brand-500 transition-colors">
-                                            <i data-lucide="edit-3" class="w-5 h-5"></i>
+                                            <i data-feather="edit-3" class="w-5 h-5"></i>
                                         </a>
                                         <form action="{{ route('ga-categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?')" class="inline-flex">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="hover:text-error-500 transition-colors">
-                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                                <i data-feather="trash-2" class="w-5 h-5"></i>
                                             </button>
                                         </form>
                                     </div>

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -28,7 +28,7 @@
                         <div class="w-full space-y-4 border-t border-gray-100 dark:border-gray-800 pt-6">
                             <div class="flex items-center gap-3 text-sm">
                                 <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400">
-                                    <i data-lucide="mail" class="w-4 h-4"></i>
+                                    <i data-feather="mail" class="w-4 h-4"></i>
                                 </span>
                                 <div class="flex flex-col">
                                     <span class="text-xs text-gray-400 uppercase tracking-wider">Email</span>
@@ -37,7 +37,7 @@
                             </div>
                             <div class="flex items-center gap-3 text-sm">
                                 <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400">
-                                    <i data-lucide="phone" class="w-4 h-4"></i>
+                                    <i data-feather="phone" class="w-4 h-4"></i>
                                 </span>
                                 <div class="flex flex-col">
                                     <span class="text-xs text-gray-400 uppercase tracking-wider">Phone</span>
@@ -46,7 +46,7 @@
                             </div>
                             <div class="flex items-center gap-3 text-sm">
                                 <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400">
-                                    <i data-lucide="building" class="w-4 h-4"></i>
+                                    <i data-feather="home" class="w-4 h-4"></i>
                                 </span>
                                 <div class="flex flex-col">
                                     <span class="text-xs text-gray-400 uppercase tracking-wider">Department</span>
@@ -68,7 +68,7 @@
                         <!-- Section: Personal Information -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                                <i data-lucide="user" class="w-5 h-5 text-brand-500"></i>
+                                <i data-feather="user" class="w-5 h-5 text-brand-500"></i>
                                 Personal Information
                             </h3>
                             <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -106,7 +106,7 @@
                         <!-- Section: Organization Details -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                                <i data-lucide="building" class="w-5 h-5 text-brand-500"></i>
+                                <i data-feather="home" class="w-5 h-5 text-brand-500"></i>
                                 Organization Details
                             </h3>
                             <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -205,7 +205,7 @@
                         <!-- Section: Security Settings -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                                <i data-lucide="lock" class="w-5 h-5 text-brand-500"></i>
+                                <i data-feather="lock" class="w-5 h-5 text-brand-500"></i>
                                 Security Settings
                             </h3>
                             <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">

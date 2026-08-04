@@ -113,11 +113,11 @@ window.addEventListener('resize', checkMobile);">
 
     <x-common.footer />
 
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.feather) {
+                feather.replace();
             }
         });
     </script>

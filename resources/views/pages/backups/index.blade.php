@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -17,7 +17,7 @@
             <div class="lg:col-span-1 space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2">
-                        <i data-lucide="clock" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="clock" class="w-5 h-5 text-brand-500"></i>
                         Backup Schedules
                     </h3>
 
@@ -83,7 +83,7 @@
                         </div>
 
                         <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <i data-feather="save" class="w-4 h-4"></i>
                             Save Schedule
                         </button>
                     </form>
@@ -95,7 +95,7 @@
                 <!-- Manual Actions Card -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="play" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="play" class="w-5 h-5 text-brand-500"></i>
                         Manual Backup
                     </h3>
                     <p class="text-sm text-gray-500 mb-5">
@@ -107,7 +107,7 @@
                             @csrf
                             <input type="hidden" name="type" value="db">
                             <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                                <i data-lucide="database" class="w-4 h-4 text-brand-500"></i>
+                                <i data-feather="database" class="w-4 h-4 text-brand-500"></i>
                                 Backup Database Only
                             </button>
                         </form>
@@ -116,7 +116,7 @@
                             @csrf
                             <input type="hidden" name="type" value="full">
                             <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                                <i data-lucide="archive" class="w-4 h-4"></i>
+                                <i data-feather="archive" class="w-4 h-4"></i>
                                 Backup Application & Database
                             </button>
                         </form>
@@ -127,7 +127,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
                     <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
                         <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 flex items-center gap-2">
-                            <i data-lucide="history" class="w-5 h-5 text-brand-500"></i>
+                            <i data-feather="rotate-cw" class="w-5 h-5 text-brand-500"></i>
                             Backup History
                         </h3>
                         <span class="text-xs text-gray-500">{{ count($backups) }} files found</span>
@@ -158,13 +158,13 @@
                                         <td class="px-5 py-4 text-sm text-right">
                                             <div class="flex items-center justify-end gap-3 text-gray-500">
                                                 <a href="{{ route('backups.download', $backup['name']) }}" class="hover:text-brand-500 transition-colors" title="Download">
-                                                    <i data-lucide="download" class="w-5 h-5"></i>
+                                                    <i data-feather="download" class="w-5 h-5"></i>
                                                 </a>
                                                 <form action="{{ route('backups.destroy', $backup['name']) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this backup file?')" class="inline-flex">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="hover:text-error-500 transition-colors" title="Delete">
-                                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                                        <i data-feather="trash-2" class="w-5 h-5"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -175,7 +175,7 @@
                                         <td colspan="4" class="px-5 py-12 text-center">
                                             <div class="flex flex-col items-center justify-center space-y-2">
                                                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                                    <i data-lucide="archive" class="w-6 h-6"></i>
+                                                    <i data-feather="archive" class="w-6 h-6"></i>
                                                 </div>
                                                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">No Backups Found</h4>
                                                 <p class="text-xs text-gray-500">Trigger a manual backup or wait for schedule.</p>

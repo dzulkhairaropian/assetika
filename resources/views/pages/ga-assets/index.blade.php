@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6" x-data="{ 
@@ -28,7 +28,7 @@
             <form action="{{ route('ga-assets.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search assets..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
@@ -57,7 +57,7 @@
             </form>
 
             <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                <i data-lucide="plus" class="w-4 h-4"></i>
+                <i data-feather="plus" class="w-4 h-4"></i>
                 Add GA Asset
             </a>
         </div>
@@ -80,7 +80,7 @@
             class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
-                <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                 <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
                     <span x-text="selectedAssets.length"></span> assets selected.
                 </span>
@@ -93,12 +93,12 @@
                 </div>
                 <button @click="printBulkLabels(selectedAssets, document.getElementById('labelCopies').value)" 
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <i data-feather="printer" class="w-4 h-4"></i>
                     Print QR Labels
                 </button>
                 <button @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }" 
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
                     Delete Selected
                 </button>
             </div>
@@ -167,7 +167,7 @@
                                 <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                                            <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                            <i data-feather="briefcase" class="w-5 h-5"></i>
                                         </div>
                                         <div class="flex flex-col">
                                             <span class="text-sm font-semibold text-gray-700 text-theme-sm dark:text-gray-450">{{ $asset->name }}</span>
@@ -181,7 +181,7 @@
                                          $statusName = optional($statusObject)->name;
                                          $statusColor = optional($statusObject)->color;
                                          $statusIcon = optional($statusObject)->icon;
-                                         $iconHtml = $statusIcon ? new \Illuminate\Support\HtmlString("<i data-lucide='{$statusIcon}' class='w-3 h-3'></i>") : null;
+                                         $iconHtml = $statusIcon ? new \Illuminate\Support\HtmlString("<i data-feather='{$statusIcon}' class='w-3 h-3'></i>") : null;
                                      @endphp
                                      <x-ui.badge :color="$statusColor" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                                 </td>
@@ -214,16 +214,16 @@
                                 <td class="px-4 sm:px-6 py-3.5 text-sm font-medium">
                                     <div class="flex items-center gap-3 text-gray-500">
                                         <a href="{{ route('ga-assets.show', $asset) }}" class="hover:text-brand-500 transition-colors" title="View Details">
-                                            <i data-lucide="eye" class="w-5 h-5"></i>
+                                            <i data-feather="eye" class="w-5 h-5"></i>
                                         </a>
                                         <a href="{{ route('ga-assets.edit', $asset) }}" class="hover:text-brand-500 transition-colors" title="Edit">
-                                            <i data-lucide="edit-3" class="w-5 h-5"></i>
+                                            <i data-feather="edit-3" class="w-5 h-5"></i>
                                         </a>
                                         <form action="{{ route('ga-assets.destroy', $asset) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this asset?')" class="inline-flex">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="hover:text-error-500 transition-colors" title="Delete">
-                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                                <i data-feather="trash-2" class="w-5 h-5"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -234,7 +234,7 @@
                                 <td colspan="7" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-lucide="package" class="w-6 h-6"></i>
+                                            <i data-feather="package" class="w-6 h-6"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No assets found</p>
                                         <p class="text-xs text-gray-450 dark:text-gray-550">Try adjusting your search filters.</p>

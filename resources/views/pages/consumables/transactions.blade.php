@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -8,7 +8,7 @@
             <form action="{{ route('consumable-transactions.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by product..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900">
@@ -27,7 +27,7 @@
             </form>
             <div>
                 <a href="{{ route('consumable-transactions.export', request()->query()) }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                    <i data-lucide="download" class="w-4 h-4 text-gray-500"></i>
+                    <i data-feather="download" class="w-4 h-4 text-gray-500"></i>
                     Export Excel
                 </a>
             </div>
@@ -67,7 +67,7 @@
                                             // Ambil objek Status untuk 'Restock' atau 'Checkout'
                                             $transactionStatusName = $tx->isRestock() ? 'Restock' : 'Checkout';
                                             $transactionStatus = \App\Models\Status::where('name', $transactionStatusName)->first();
-                                            $iconHtml = optional($transactionStatus)->icon ? new \Illuminate\Support\HtmlString("<i data-lucide='" . optional($transactionStatus)->icon . "' class='w-3 h-3'></i>") : null;
+                                            $iconHtml = optional($transactionStatus)->icon ? new \Illuminate\Support\HtmlString("<i data-feather='" . optional($transactionStatus)->icon . "' class='w-3 h-3'></i>") : null;
                                         @endphp
                                         @if($transactionStatus)
                                             <x-ui.badge :color="optional($transactionStatus)->color" variant="light" size="sm" :startIcon="$iconHtml">
@@ -115,7 +115,7 @@
                                 <td class="px-4 sm:px-6 py-3.5 text-center">
                                     @if($tx->evidence_file_path)
                                         <a href="{{ $tx->getEvidenceUrl() }}" target="_blank" class="inline-block text-brand-500 hover:text-brand-600" title="View Evidence">
-                                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                                            <i data-feather="file-text" class="w-5 h-5"></i>
                                         </a>
                                     @else
                                         <span class="text-gray-300 dark:text-gray-700">-</span>

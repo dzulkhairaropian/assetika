@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6" x-data="{ activeTab: 'details', checkoutOpen: false, checkinOpen: false, maintOpen: false }">
@@ -13,7 +13,7 @@
             <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-4">
                     <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                        <i data-lucide="briefcase" class="h-8 w-8"></i>
+                        <i data-feather="briefcase" class="h-8 w-8"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -21,7 +21,7 @@
                              @php
                                    $color = optional($asset->statusObject)->color;
                                    $icon = optional($asset->statusObject)->icon;
-                                   $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-lucide='{$icon}' class='w-3 h-3'></i>") : null;
+                                   $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
                                    $statusName = optional($asset->statusObject)->name;
                                @endphp
                                <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
@@ -32,24 +32,24 @@
 
                 <div class="flex flex-wrap items-center gap-3">
                     <a href="{{ route('ga-assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                        <i data-lucide="edit-3" class="h-4 w-4"></i>
+                        <i data-feather="edit-3" class="h-4 w-4"></i>
                         Edit
                     </a>
                     
                     @if($asset->status === 'Available')
                         <button type="button" @click="checkoutOpen = true" class="inline-flex items-center justify-center gap-2 rounded-lg bg-success-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-success-600">
-                            <i data-lucide="log-out" class="h-4 w-4"></i>
+                            <i data-feather="log-out" class="h-4 w-4"></i>
                             Checkout
                         </button>
                     @elseif(in_array($asset->status, ['Deployed', 'In Use', 'In Repair']))
                         <button type="button" @click="checkinOpen = true" class="inline-flex items-center justify-center gap-2 rounded-lg bg-warning-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-warning-600">
-                            <i data-lucide="log-in" class="h-4 w-4"></i>
+                            <i data-feather="log-in" class="h-4 w-4"></i>
                             Checkin
                         </button>
                     @endif
                     
                     <button type="button" @click="maintOpen = true" class="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600">
-                        <i data-lucide="wrench" class="h-4 w-4"></i>
+                        <i data-feather="tool" class="h-4 w-4"></i>
                         Maintenance
                     </button>
                 </div>
@@ -66,7 +66,7 @@
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                    <i data-lucide="user" class="h-5 w-5"></i>
+                                    <i data-feather="user" class="h-5 w-5"></i>
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ $asset->currentHolder->name }}</p>
@@ -88,7 +88,7 @@
                     @else
                         <div class="flex flex-col items-center justify-center py-6 text-center">
                             <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-300">
-                                <i data-lucide="user-minus" class="h-6 w-6"></i>
+                                <i data-feather="user-minus" class="h-6 w-6"></i>
                             </div>
                             <p class="text-sm text-gray-400 italic">Not currently assigned</p>
                         </div>
@@ -157,7 +157,7 @@
                             <!-- Product Info -->
                             <div>
                                 <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                    <i data-lucide="package" class="h-5 w-5 text-brand-500"></i>
+                                    <i data-feather="package" class="h-5 w-5 text-brand-500"></i>
                                     Product Information
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -175,7 +175,7 @@
                             <!-- Financial Data -->
                             <div>
                                 <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                    <i data-lucide="dollar-sign" class="h-5 w-5 text-brand-500"></i>
+                                    <i data-feather="dollar-sign" class="h-5 w-5 text-brand-500"></i>
                                     Financial Data
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -203,7 +203,7 @@
                         @if($asset->vehicle)
                             <div x-show="activeTab === 'vehicle'" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1">
                                 <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                    <i data-lucide="car" class="h-5 w-5 text-brand-500"></i>
+                                    <i data-feather="truck" class="h-5 w-5 text-brand-500"></i>
                                     Vehicle Technical Data
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

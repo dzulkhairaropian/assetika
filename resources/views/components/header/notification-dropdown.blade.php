@@ -1,4 +1,4 @@
-{{-- Notification Dropdown Component --}}
+﻿{{-- Notification Dropdown Component --}}
 @php
     $notifications = auth()->user() ? auth()->user()->unreadNotifications->take(8) : collect();
     $unreadCount = auth()->user() ? auth()->user()->unreadNotifications->count() : 0;
@@ -33,7 +33,7 @@
         </span>
 
         <!-- Bell Icon -->
-        <i data-lucide="bell" class="w-5 h-5"></i>
+        <i data-feather="bell" class="w-5 h-5"></i>
     </button>
 
     <!-- Dropdown Start -->
@@ -93,7 +93,7 @@
                             @php
                                 $iconName = $notification->data['icon'] ?? 'bell';
                             @endphp
-                            <i data-lucide="{{ $iconName }}" class="w-5 h-5"></i>
+                            <i data-feather="{{ $iconName }}" class="w-5 h-5"></i>
                         </div>
 
                         <div class="block">
@@ -114,7 +114,7 @@
             @empty
                 <li class="flex flex-col items-center justify-center p-8 text-center text-gray-400 dark:text-gray-500 h-full my-auto">
                     <div class="p-3 bg-gray-50 dark:bg-white/[0.03] rounded-full mb-3">
-                        <i data-lucide="bell-off" class="w-8 h-8 opacity-60"></i>
+                        <i data-feather="bell-off" class="w-8 h-8 opacity-60"></i>
                     </div>
                     <p class="text-sm font-medium">No new notifications</p>
                     <p class="text-xs mt-1 text-gray-400">We will notify you when something happens.</p>

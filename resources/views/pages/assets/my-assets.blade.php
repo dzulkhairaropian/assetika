@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -56,14 +56,14 @@
                                             default => 'gray'
                                         };
                                         $icon = match($statusName) {
-                                             'Ready to Deploy', 'Available', 'Ready' => 'circle-check',
+                                             'Ready to Deploy', 'Available', 'Ready' => 'check-circle',
                                             'Deployed', 'In Use', 'Borrowed' => 'user',
                                             'Broken' => 'x-circle',
-                                            'In Repair', 'Service' => 'wrench',
+                                            'In Repair', 'Service' => 'tool',
                                             'Archived', 'Retired' => 'archive',
                                             default => 'help-circle'
                                         };
-                                        $iconHtml = new \Illuminate\Support\HtmlString("<i data-lucide='{$icon}' class='w-3 h-3'></i>");
+                                        $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName ?? 'Assigned' }}</x-ui.badge>
                                 </td>

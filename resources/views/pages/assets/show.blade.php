@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     @php
@@ -27,7 +27,7 @@
 
         @if($isAged)
             <div class="flex items-center gap-3 rounded-2xl border border-error-200 bg-error-50 p-4 text-error-800 dark:border-error-900/30 dark:bg-error-500/10 dark:text-error-400">
-                <i data-lucide="alert-triangle" class="h-5 w-5 shrink-0"></i>
+                <i data-feather="alert-triangle" class="h-5 w-5 shrink-0"></i>
                 <div class="text-sm">
                     <strong>Aging Alert:</strong> This asset is {{ $ageDisplay }} (Released on {{ $asset->release_date->format('d M Y') }}). It has reached or exceeded its 4-year lifecycle since release and may require replacement or retirement.
                 </div>
@@ -39,7 +39,7 @@
             <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-4">
                     <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                        <i data-lucide="laptop" class="h-8 w-8"></i>
+                        <i data-feather="monitor" class="h-8 w-8"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -55,15 +55,15 @@
                                     default => 'gray'
                                 };
                                 $icon = match($statusName) {
-                                    'Ready', 'Ready to Deploy', 'Available' => 'circle-check',
+                                    'Ready', 'Ready to Deploy', 'Available' => 'check-circle',
                                     'Deployed', 'In Use', 'Borrowed' => 'user',
                                     'Broken' => 'x-circle',
-                                    'In Repair', 'Service' => 'wrench',
+                                    'In Repair', 'Service' => 'tool',
                                     'Archived', 'Retired' => 'archive',
                                     'Draft' => 'file-text',
                                     default => 'help-circle'
                                 };
-                                $iconHtml = new \Illuminate\Support\HtmlString("<i data-lucide='{$icon}' class='w-3 h-3'></i>");
+                                $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
                             @endphp
                             <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                             @if($yearsOld !== null)
@@ -78,25 +78,25 @@
 
                 <div class="flex flex-wrap items-center gap-3">
                     <button @click="showQrModal = true" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                        <i data-lucide="qr-code" class="h-4 w-4"></i>
+                        <i data-feather="crosshair" class="h-4 w-4"></i>
                         QR Label
                     </button>
                     <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                        <i data-lucide="edit-3" class="h-4 w-4"></i>
+                        <i data-feather="edit-3" class="h-4 w-4"></i>
                         Edit
                     </a>
                     @if($asset->isCurrentlyCheckedOut())
                         <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-warning-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-warning-600">
-                            <i data-lucide="log-in" class="h-4 w-4"></i>
+                            <i data-feather="log-in" class="h-4 w-4"></i>
                             Check-in
                         </a>
                         <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600">
-                            <i data-lucide="wrench" class="h-4 w-4"></i>
+                            <i data-feather="tool" class="h-4 w-4"></i>
                             Maintenance
                         </a>
                     @else
                         <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-success-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-success-600">
-                            <i data-lucide="log-out" class="h-4 w-4"></i>
+                            <i data-feather="log-out" class="h-4 w-4"></i>
                             Check-out
                         </a>
 
@@ -106,13 +106,13 @@
                             @endphp
                             @if($activeMaintenance)
                                 <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                                    <i data-lucide="circle-check" class="h-4 w-4"></i>
+                                    <i data-feather="check-circle" class="h-4 w-4"></i>
                                     Complete Maintenance
                                 </a>
                             @endif
                         @else
                             <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600">
-                                <i data-lucide="wrench" class="h-4 w-4"></i>
+                                <i data-feather="tool" class="h-4 w-4"></i>
                                 Maintenance
                             </a>
                         @endif
@@ -131,7 +131,7 @@
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                    <i data-lucide="user" class="h-5 w-5"></i>
+                                    <i data-feather="user" class="h-5 w-5"></i>
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ $asset->currentCheckout->checkedOutToUser->name ?? '-' }}</p>
@@ -156,7 +156,7 @@
                     @else
                         <div class="flex flex-col items-center justify-center py-6 text-center">
                             <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-300">
-                                <i data-lucide="user-minus" class="h-6 w-6"></i>
+                                <i data-feather="user-minus" class="h-6 w-6"></i>
                             </div>
                             <p class="text-sm text-gray-400 italic">Not currently assigned</p>
                         </div>
@@ -214,7 +214,7 @@
                             <!-- Product Info -->
                             <div>
                                 <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                    <i data-lucide="package" class="h-5 w-5 text-brand-500"></i>
+                                    <i data-feather="package" class="h-5 w-5 text-brand-500"></i>
                                     Product Information
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -244,7 +244,7 @@
                             <!-- Technical Specs -->
                             <div>
                                 <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                    <i data-lucide="cpu" class="h-5 w-5 text-brand-500"></i>
+                                    <i data-feather="cpu" class="h-5 w-5 text-brand-500"></i>
                                     Technical Specifications
                                 </h4>
                                 <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/20">
@@ -255,7 +255,7 @@
                             <!-- Financial Data -->
                             <div>
                                 <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                    <i data-lucide="dollar-sign" class="h-5 w-5 text-brand-500"></i>
+                                    <i data-feather="dollar-sign" class="h-5 w-5 text-brand-500"></i>
                                     Financial Data
                                 </h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -284,7 +284,7 @@
                             @if($asset->notes)
                                 <div>
                                     <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
-                                        <i data-lucide="file-text" class="h-5 w-5 text-brand-500"></i>
+                                        <i data-feather="file-text" class="h-5 w-5 text-brand-500"></i>
                                         Notes
                                     </h4>
                                     <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/20 text-sm text-gray-600 dark:text-gray-400 italic">
@@ -333,7 +333,7 @@
                                                 </td>
                                                 <td class="py-4">
                                                     <a href="{{ route('assets.bast', [$asset, $history]) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-500 hover:text-brand-600 transition-colors">
-                                                        <i data-lucide="file-down" class="h-4 w-4"></i>
+                                                        <i data-feather="download-cloud" class="h-4 w-4"></i>
                                                         BAST
                                                     </a>
                                                 </td>
@@ -403,7 +403,7 @@
                                                 <td colspan="5" class="px-6 py-12 text-center">
                                                     <div class="flex flex-col items-center justify-center space-y-2">
                                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                                            <i data-lucide="wrench" class="h-6 w-6"></i>
+                                                            <i data-feather="tool" class="h-6 w-6"></i>
                                                         </div>
                                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No maintenance history found</p>
                                                     </div>
@@ -438,7 +438,7 @@
                 <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white/90">Asset QR Label</h3>
                     <button @click="showQrModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i data-lucide="x" class="h-5 w-5"></i>
+                        <i data-feather="x" class="h-5 w-5"></i>
                     </button>
                 </div>
 

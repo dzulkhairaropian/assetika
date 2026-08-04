@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -7,7 +7,7 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
             <div class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-800">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-success-50 text-success-500 dark:bg-success-500/10">
-                    <i data-lucide="circle-check" class="h-6 w-6"></i>
+                    <i data-feather="check-circle" class="h-6 w-6"></i>
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-gray-800 dark:text-white/90">Complete Maintenance</h2>
@@ -46,7 +46,7 @@
                 <!-- Section: Completion Details -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                         Completion Details
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">

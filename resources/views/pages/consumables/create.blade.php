@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -15,7 +15,7 @@
                 <!-- Section: General Information -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                         General Information
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">

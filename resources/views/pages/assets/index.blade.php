@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6" x-data="{
@@ -101,7 +101,7 @@
             <form action="{{ route('assets.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search assets..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900">
@@ -164,11 +164,11 @@
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('assets.export', request()->query()) }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                    <i data-lucide="download" class="w-4 h-4 text-gray-500"></i>
+                    <i data-feather="download" class="w-4 h-4 text-gray-500"></i>
                     Export Excel
                 </a>
                 <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <i data-feather="plus" class="w-4 h-4"></i>
                     Add Asset
                 </a>
             </div>
@@ -192,7 +192,7 @@
             class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
-                <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                 <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
                     <span x-text="selectedAssets.length"></span> assets selected.
                 </span>
@@ -205,17 +205,17 @@
                 </div>
                 <button @click="printBulkLabels(selectedAssets, document.getElementById('labelCopies').value)"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <i data-feather="printer" class="w-4 h-4"></i>
                     Print QR Labels
                 </button>
                 <button @click="exportSelectedAssets(selectedAssets)"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <i data-feather="download" class="w-4 h-4"></i>
                     Export Selected
                 </button>
                 <button @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
                     Delete Selected
                 </button>
             </div>
@@ -299,15 +299,15 @@
                                          $statusName = optional($asset->status)->name;
                                          $statusColor = optional($asset->status)->color;
                                          $icon = match($statusName) {
-                                             'Ready', 'Ready to Deploy', 'Available' => 'circle-check',
+                                             'Ready', 'Ready to Deploy', 'Available' => 'check-circle',
                                              'Deployed', 'In Use', 'Borrowed' => 'user',
                                              'Broken' => 'x-circle',
-                                             'In Repair', 'Service' => 'wrench',
+                                             'In Repair', 'Service' => 'tool',
                                              'Archived', 'Retired' => 'archive',
                                              'Draft' => 'file-text',
                                              default => 'help-circle'
                                          };
-                                         $iconHtml = new \Illuminate\Support\HtmlString("<i data-lucide='{$icon}' class='w-3 h-3'></i>");
+                                         $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
                                      @endphp
                                      <x-ui.badge :color="$statusColor" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                                 </td>
@@ -328,19 +328,19 @@
                                 <td class="px-4 sm:px-6 py-3.5">
                                     <div class="flex items-center gap-3 text-gray-500">
                                         <a href="{{ route('assets.show', $asset) }}" class="hover:text-brand-500 transition-colors" title="View Details">
-                                            <i data-lucide="eye" class="w-5 h-5"></i>
+                                            <i data-feather="eye" class="w-5 h-5"></i>
                                         </a>
                                         <a href="{{ route('assets.edit', $asset) }}" class="hover:text-brand-500 transition-colors" title="Edit">
-                                            <i data-lucide="edit-3" class="w-5 h-5"></i>
+                                            <i data-feather="edit-3" class="w-5 h-5"></i>
                                         </a>
 
                                         @if($asset->isCurrentlyCheckedOut())
                                             <a href="{{ route('assets.checkin', $asset) }}" class="hover:text-warning-500 transition-colors" title="Check-in">
-                                                <i data-lucide="log-in" class="w-5 h-5"></i>
+                                                <i data-feather="log-in" class="w-5 h-5"></i>
                                             </a>
                                         @else
                                             <a href="{{ route('assets.checkout', $asset) }}" class="hover:text-success-500 transition-colors" title="Check-out">
-                                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                                                <i data-feather="log-out" class="w-5 h-5"></i>
                                             </a>
                                         @endif
 
@@ -348,7 +348,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="hover:text-error-500 transition-colors" title="Delete">
-                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                                <i data-feather="trash-2" class="w-5 h-5"></i>
                                             </button>
                                         </form>
                                     </div>

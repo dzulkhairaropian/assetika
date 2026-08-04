@@ -213,7 +213,7 @@ class AssetController extends Controller
             if (empty($validated['status_id']) || $isDraft) {
                 $draftStatus = Status::firstOrCreate(
                     ['name' => 'Draft'],
-                    ['color' => 'gray', 'icon' => 'lucide-file-text']
+                    ['color' => 'gray', 'icon' => 'file-text']
                 );
                 $validated['status_id'] = $draftStatus->id;
             }
@@ -306,7 +306,7 @@ class AssetController extends Controller
 
             $draftStatus = Status::firstOrCreate(
                 ['name' => 'Draft'],
-                ['color' => 'gray', 'icon' => 'lucide-file-text']
+                ['color' => 'gray', 'icon' => 'file-text']
             );
             $validated['status_id'] = $draftStatus->id;
         } else {

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -15,7 +15,7 @@
                 <!-- Section: General Information -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                         General Information
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -143,7 +143,7 @@
                                 <input type="text" name="serial_number" value="{{ old('serial_number') }}" placeholder="Enter serial number" required
                                     class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                                 <button type="button" onclick="generateSN()" class="inline-flex items-center justify-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                                    <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+                                    <i data-feather="shuffle" class="w-3.5 h-3.5"></i>
                                     Generate
                                 </button>
                             </div>
@@ -186,7 +186,7 @@
                 <!-- Section: Network Information -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="wifi" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="wifi" class="w-5 h-5 text-brand-500"></i>
                         Network Information
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -215,7 +215,7 @@
                 <!-- Section: Software Licenses -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="key" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="key" class="w-5 h-5 text-brand-500"></i>
                         Software Licenses
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -244,7 +244,7 @@
                 <!-- Section: Technical Specifications -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="cpu" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="cpu" class="w-5 h-5 text-brand-500"></i>
                         Technical Specifications
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -295,7 +295,7 @@
                 <!-- Section: Financial Information -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
-                        <i data-lucide="dollar-sign" class="w-5 h-5 text-brand-500"></i>
+                        <i data-feather="dollar-sign" class="w-5 h-5 text-brand-500"></i>
                         Financial Information
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">

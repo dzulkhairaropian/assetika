@@ -1,4 +1,4 @@
-<header
+﻿<header
     class="sticky top-0 flex w-full bg-white border-b border-gray-200 z-[99999] dark:border-gray-800 dark:bg-gray-900 transition-colors duration-300"
     x-data="{
         isApplicationMenuOpen: false,
@@ -14,7 +14,7 @@
                 class="hidden xl:flex items-center justify-center w-10 h-10 text-gray-500 hover:text-brand-500 hover:bg-gray-50 border border-gray-200 rounded-xl dark:border-gray-800 dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/[0.03] transition-all duration-200"
                 :class="{ 'bg-gray-100 dark:bg-white/[0.03]': !$store.sidebar.isExpanded }"
                 @click="$store.sidebar.toggleExpanded()" aria-label="Toggle Sidebar">
-                <i data-lucide="menu" class="w-5 h-5"></i>
+                <i data-feather="menu" class="w-5 h-5"></i>
             </button>
 
             <!-- Mobile Menu Toggle Button (visible below xl) -->
@@ -22,7 +22,7 @@
                 class="flex xl:hidden items-center justify-center w-10 h-10 text-gray-500 hover:text-brand-500 hover:bg-gray-50 border border-gray-200 rounded-xl dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] transition-all duration-200"
                 :class="{ 'bg-gray-100 dark:bg-white/[0.03]': $store.sidebar.isMobileOpen }"
                 @click="$store.sidebar.toggleMobileOpen()" aria-label="Toggle Mobile Menu">
-                <i data-lucide="menu" class="w-5 h-5"></i>
+                <i data-feather="menu" class="w-5 h-5"></i>
             </button>
 
             <!-- Logo (mobile only) -->
@@ -36,7 +36,7 @@
             <!-- Application Menu Toggle (mobile only) -->
             <button @click="toggleApplicationMenu()"
                 class="flex items-center justify-center w-10 h-10 text-gray-500 rounded-xl hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-850 xl:hidden transition-all duration-200">
-                <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                <i data-feather="more-vertical" class="w-5 h-5"></i>
             </button>
         </div>
 
@@ -51,10 +51,10 @@
                     @click="$store.theme.toggle()"
                     aria-label="Toggle dark mode">
                     <span class="dark:hidden">
-                        <i data-lucide="moon" class="w-5 h-5 text-gray-500"></i>
+                        <i data-feather="moon" class="w-5 h-5 text-gray-500"></i>
                     </span>
                     <span class="hidden dark:block">
-                        <i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>
+                        <i data-feather="sun" class="w-5 h-5 text-yellow-500"></i>
                     </span>
                 </button>
 

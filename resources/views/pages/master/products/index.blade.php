@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -8,7 +8,7 @@
             <form action="{{ route('products.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900">
@@ -36,7 +36,7 @@
             </form>
 
             <a href="{{ route('products.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                <i data-lucide="plus" class="w-4 h-4"></i>
+                <i data-feather="plus" class="w-4 h-4"></i>
                 Add Product
             </a>
         </div>
@@ -151,7 +151,7 @@
                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5">
                                     @php
-                                        $tagIcon = new \Illuminate\Support\HtmlString('<i data-lucide="tag" class="w-3 h-3"></i>');
+                                        $tagIcon = new \Illuminate\Support\HtmlString('<i data-feather="tag" class="w-3 h-3"></i>');
                                     @endphp
                                     <x-ui.badge color="primary" variant="light" size="sm" :startIcon="$tagIcon">
                                         {{ $product->brand->name ?? 'No Brand' }}
@@ -160,7 +160,7 @@
                                 <td class="px-4 sm:px-6 py-3.5">
                                     <div class="flex flex-col items-start gap-1">
                                         @php
-                                            $pkgIcon = new \Illuminate\Support\HtmlString('<i data-lucide="package" class="w-3 h-3"></i>');
+                                            $pkgIcon = new \Illuminate\Support\HtmlString('<i data-feather="package" class="w-3 h-3"></i>');
                                         @endphp
                                         <x-ui.badge color="light" variant="light" size="sm" :startIcon="$pkgIcon">
                                             {{ $product->category->name ?? '-' }}

@@ -114,7 +114,7 @@ class Consumable extends Model
      */
     public function getStatusIconAttribute(): string
     {
-        return $this->status?->icon ?? 'lucide-info';
+        return $this->status?->icon ?? 'info';
     }
 
     /**

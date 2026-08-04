@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -8,7 +8,7 @@
             <form action="{{ route('asset-transactions.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                 <div class="relative flex items-center">
                     <span class="absolute left-3 text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i data-feather="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search tag, serial, product..."
                         class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900">
@@ -27,7 +27,7 @@
             </form>
             <div>
                 <a href="{{ route('asset-transactions.export', request()->query()) }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                    <i data-lucide="download" class="w-4 h-4 text-gray-500"></i>
+                    <i data-feather="download" class="w-4 h-4 text-gray-500"></i>
                     Export Excel
                 </a>
             </div>
@@ -77,7 +77,7 @@
                                         // Ambil objek Status dari database
                                         $transactionStatus = \App\Models\Status::where('name', $transactionStatusName)->first();
                                         // Buat HTML untuk ikon jika ada
-                                        $iconHtml = optional($transactionStatus)->icon ? new \Illuminate\Support\HtmlString("<i data-lucide='" . optional($transactionStatus)->icon . "' class='w-3 h-3'></i>") : null;
+                                        $iconHtml = optional($transactionStatus)->icon ? new \Illuminate\Support\HtmlString("<i data-feather='" . optional($transactionStatus)->icon . "' class='w-3 h-3'></i>") : null;
                                     @endphp
                                     @if($transactionStatus)
                                         <x-ui.badge :color="optional($transactionStatus)->color" variant="light" size="sm" :startIcon="$iconHtml">
@@ -86,9 +86,9 @@
                                     @else
                                         {{-- Fallback ke badge statis jika Status tidak ditemukan --}}
                                         @if($tx->checked_in_at)
-                                            <x-ui.badge color="success" variant="light" size="sm" :startIcon="new \Illuminate\Support\HtmlString('<i data-lucide=\'rotate-ccw\' class=\'w-3 h-3\'></i>')">Returned</x-ui.badge>
+                                            <x-ui.badge color="success" variant="light" size="sm" :startIcon="new \Illuminate\Support\HtmlString('<i data-feather=\'rotate-ccw\' class=\'w-3 h-3\'></i>')">Returned</x-ui.badge>
                                         @else
-                                            <x-ui.badge color="primary" variant="light" size="sm" :startIcon="new \Illuminate\Support\HtmlString('<i data-lucide=\'check-circle\' class=\'w-3 h-3\'></i>')">Active Checkout</x-ui.badge>
+                                            <x-ui.badge color="primary" variant="light" size="sm" :startIcon="new \Illuminate\Support\HtmlString('<i data-feather=\'check-circle\' class=\'w-3 h-3\'></i>')">Active Checkout</x-ui.badge>
                                         @endif
                                     @endif
                                 </td>
@@ -109,7 +109,7 @@
                                 <td class="px-4 sm:px-6 py-3.5 text-center">
                                     @if($tx->asset)
                                         <a href="{{ route('assets.bast', [$tx->asset->id, $tx->id]) }}" target="_blank" class="inline-flex items-center gap-1 text-brand-500 hover:text-brand-600" title="Download BAST PDF">
-                                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                                            <i data-feather="file-text" class="w-5 h-5"></i>
                                             <span class="text-xs font-semibold uppercase">PDF</span>
                                         </a>
                                     @else
