@@ -47,10 +47,8 @@
                             @php
                                 $statusName = optional($asset->status)->name;
                                 $color = optional($asset->status)->color ?? 'gray';
-                                $icon = optional($asset->status)->icon;
-                                $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
                             @endphp
-                            <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
+                            <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
                             @if($yearsOld !== null)
                                 <x-ui.badge :color="$isAged ? 'error' : 'gray'" variant="light" size="sm">
                                     {{ $ageDisplay }}

@@ -5,6 +5,7 @@
     'color' => 'primary',
     'startIcon' => null,
     'endIcon' => null,
+    'featherIcon' => null,
 ])
 
 @php
@@ -59,6 +60,12 @@
 @endphp
 
 <span class="{{ $baseStyles }} {{ $sizeClass }} {{ $isCustomStyle ? '' : $colorStyles }} {{ $attributes->get('class') }}" style="{{ $isCustomStyle ? $colorStyles : '' }}" {{ $attributes->except('class') }}>
+    @if($featherIcon)
+        <span class="flex shrink-0">
+            <i data-feather="{{ $featherIcon }}" class="w-3 h-3"></i>
+        </span>
+    @endif
+
     @if($startIcon)
         <span class="flex shrink-0">
             {!! $startIcon !!}

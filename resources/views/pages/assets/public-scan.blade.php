@@ -4,8 +4,6 @@
     @php
         $statusName = $asset->status->name ?? 'Unknown';
         $color = $asset->status->color ?? 'gray';
-        $icon = $asset->status->icon;
-        $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
         $holderName = $asset->currentCheckout->checkedOutToUser->name ?? '-';
         $holderEmail = $asset->currentCheckout->checkedOutToUser->email ?? '-';
         $holderInitial = strtoupper(substr($holderName !== '-' ? $holderName : 'N', 0, 1));
@@ -26,7 +24,7 @@
                         <div class="min-w-0 space-y-4">
                             <div class="flex flex-wrap items-center gap-3">
                                 <span class="inline-flex rounded bg-white/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-white">{{ $asset->asset_tag }}</span>
-                                <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
+                                <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$asset->status->icon">{{ $statusName }}</x-ui.badge>
                             </div>
 
                             <div class="space-y-1">

@@ -38,7 +38,7 @@
             </button>
 
             <!-- Desktop actions (always visible on xl+) -->
-            <div class="hidden xl:flex items-center gap-2 sm:gap-3">
+            <div class="hidden xl:flex items-center gap-5 sm:gap-6 lg:gap-8">
                 <!-- Theme Toggle -->
                 <button
                     class="flex items-center justify-center w-10 h-10 text-gray-500 bg-white border border-gray-200 rounded-xl hover:text-brand-500 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-white transition-all duration-200 shrink-0"

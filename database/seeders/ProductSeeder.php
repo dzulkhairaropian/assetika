@@ -13,7 +13,9 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         $itAsset = MasterCategory::where('name', 'IT Asset')->first();
-        $consumable = MasterCategory::where('name', 'Consumable')->first();
+        $consumable = MasterCategory::where('name', 'IT Consumable')->first();
+        $gaAsset = MasterCategory::where('name', 'GA Asset')->first();
+        $gaConsumable = MasterCategory::where('name', 'GA Consumable')->first();
 
         // Brands
         $apple = Brand::where('code', 'APL')->first();

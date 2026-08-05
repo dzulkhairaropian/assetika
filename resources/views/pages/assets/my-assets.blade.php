@@ -48,10 +48,8 @@
                                     @php
                                         $statusName = optional($asset->status)->name;
                                         $color = optional($asset->status)->color ?? 'gray';
-                                        $icon = optional($asset->status)->icon;
-                                        $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
                                     @endphp
-                                    <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName ?? 'Assigned' }}</x-ui.badge>
+                                    <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName ?? 'Assigned' }}</x-ui.badge>
                                 </td>
                                 <td class="px-6 py-4 text-theme-sm text-gray-600 dark:text-gray-400">
                                     @if($asset->currentCheckout)

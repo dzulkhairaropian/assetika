@@ -50,13 +50,25 @@
 
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Icon (Lucide class)
+                            Icon (Feather Icons)
                         </label>
                         <input type="text" id="status-icon" name="icon" value="{{ old('icon', $status->icon) }}" placeholder="e.g., check-circle"
                             class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                         <div class="mt-2 flex flex-wrap gap-1.5">
                             @foreach([
-                                'check-circle', 'user', 'x-circle', 'tool', 'archive', 'file-text', 'help-circle', 'info', 'plus', 'edit-3', 'trash-2', 'eye', 'log-in', 'log-out', 'download', 'search', 'database', 'package', 'key', 'cpu', 'wifi', 'dollar-sign', 'bell', 'alert-triangle', 'monitor', 'crosshair'
+                                'check-circle', 'x-circle', 'alert-circle', 'alert-triangle',
+                                'user', 'user-check', 'users', 'bookmark',
+                                'refresh-cw', 'loader', 'clock',
+                                'check', 'x', 'thumbs-up',
+                                'tool', 'settings', 'monitor',
+                                'file-text', 'archive', 'package',
+                                'trash-2', 'help-circle', 'info',
+                                'log-in', 'log-out', 'eye',
+                                'download', 'search', 'database',
+                                'key', 'cpu', 'wifi',
+                                'dollar-sign', 'bell', 'plus',
+                                'edit-3', 'crosshair', 'activity',
+                                'pen-tool'
                             ] as $iconName)
                                 <button type="button" onclick="document.getElementById('status-icon').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
                                     <i data-feather="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
@@ -73,17 +85,17 @@
                             class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                         <div class="mt-2 flex flex-wrap gap-1.5">
                             @foreach([
-                                'primary' => '#0d6efd',
-                                'secondary' => '#6c757d',
-                                'success' => '#198754',
-                                'danger' => '#dc3545',
-                                'warning' => '#ffc107',
-                                'info' => '#0dcaf0',
-                                'light' => '#f8f9fa',
-                                'dark' => '#212529',
+                                'primary' => '#3B82F6',
+                                'secondary' => '#6B7280',
+                                'success' => '#10B981',
+                                'danger' => '#EF4444',
+                                'warning' => '#F59E0B',
+                                'info' => '#0EA5E9',
+                                'light' => '#D1D5DB',
+                                'dark' => '#374151',
                             ] as $name => $hex)
                                 <button type="button" onclick="document.getElementById('status-color').value = '{{ $name }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
-                                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $hex }}"></span>
+                                    <span class="w-3 h-3 rounded-full" style="background-color: {{ $hex }}"></span>
                                     {{ $name }}
                                 </button>
                             @endforeach

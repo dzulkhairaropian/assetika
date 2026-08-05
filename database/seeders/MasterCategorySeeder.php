@@ -11,8 +11,11 @@ class MasterCategorySeeder extends Seeder
     {
         $masters = [
             ['name' => 'IT Asset'],
-            ['name' => 'Consumable'],
+            ['name' => 'IT Consumable'],
+            ['name' => 'IT Request'],
             ['name' => 'GA Asset'],
+            ['name' => 'GA Consumable'],
+            ['name' => 'GA Request'],
         ];
 
         foreach ($masters as $master) {

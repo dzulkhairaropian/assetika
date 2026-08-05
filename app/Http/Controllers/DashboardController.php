@@ -102,11 +102,18 @@ class DashboardController extends Controller
             }),
             'colors' => $statuses->map(function($status) {
                 return match($status->name) {
-                    'Ready to Deploy', 'In Stock', 'Fulfilled', 'Available', 'Completed' => '#10B981', // Success (Emerald)
-                    'Deployed', 'Borrowed', 'Assigned', 'In Progress', 'Reserved' => '#3B82F6', // Info (Blue)
-                    'Service', 'Low Stock', 'Pending', 'Draft', 'Maintenance' => '#F59E0B', // Warning (Amber)
-                    'Broken', 'Out of Stock', 'Declined', 'Retired', 'Lost', 'Rejected' => '#EF4444', // Danger (Red)
-                    default => '#98A2B3' // Default Grey
+                    'Ready to Deploy' => '#10B981',
+                    'Deployed' => '#3B82F6',
+                    'Borrowed' => '#8B5CF6',
+                    'Service' => '#F59E0B',
+                    'Draft' => '#06B6D4',
+                    'Broken' => '#EF4444',
+                    'Retired' => '#6B7280',
+                    'In Stock', 'Fulfilled', 'Available', 'Completed' => '#10B981',
+                    'Assigned', 'In Progress', 'Reserved' => '#3B82F6',
+                    'Low Stock', 'Pending', 'Maintenance' => '#F59E0B',
+                    'Out of Stock', 'Declined', 'Lost', 'Rejected' => '#EF4444',
+                    default => '#98A2B3'
                 };
             })
         ];

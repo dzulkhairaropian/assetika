@@ -56,11 +56,11 @@ class ConsumableController extends Controller
         $consumables = $query->latest()->paginate(50)->withQueryString();
         
         $products = Product::whereHas('masterCategory', function($q) {
-            $q->where('name', 'Consumable');
+            $q->where('name', 'IT Consumable');
         })->get();
 
         $categories = Category::whereHas('masterCategory', function($q) {
-            $q->where('name', 'Consumable');
+            $q->where('name', 'IT Consumable');
         })->orderBy('name')->get();
 
         $brands = Brand::orderBy('name')->get();
@@ -73,7 +73,7 @@ class ConsumableController extends Controller
         // Consumables are products with master categories that are consumables
         $products = Product::with(['brand', 'category'])
             ->whereHas('masterCategory', function($q) {
-                $q->where('name', 'Consumable');
+                $q->where('name', 'IT Consumable');
             })->get();
         return view('pages.consumables.create', compact('products'));
     }
@@ -101,7 +101,7 @@ class ConsumableController extends Controller
     {
         $products = Product::with(['brand', 'category'])
             ->whereHas('masterCategory', function($q) {
-                $q->where('name', 'Consumable');
+                $q->where('name', 'IT Consumable');
             })->get();
         return view('pages.consumables.edit', compact('consumable', 'products'));
     }

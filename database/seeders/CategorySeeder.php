@@ -11,7 +11,7 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $itAsset = MasterCategory::where('name', 'IT Asset')->first();
-        $consumable = MasterCategory::where('name', 'Consumable')->first();
+        $consumable = MasterCategory::where('name', 'IT Consumable')->first();
 
         $categories = [
             ['code' => 'NB', 'name' => 'Notebook/Laptop', 'master_id' => $itAsset?->id],
