@@ -59,26 +59,24 @@
     @mouseenter="if (!$store.sidebar.isExpanded) $store.sidebar.setHovered(true)"
     @mouseleave="$store.sidebar.setHovered(false)">
     <!-- Logo Section -->
-    <div class="h-16 flex items-center"
+    <div class="flex items-center gap-2 pt-8 pb-7"
         :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
         'xl:justify-center' :
-        'justify-start'">
+        'justify-between'">
         <a href="/">
-            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="dark:hidden" src="/images/assetika.png" alt="Logo" width="150" height="40" />
-            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="hidden dark:block" src="/images/assetika.png" alt="Logo" width="150"
-                height="40" />
-            <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
-                src="/images/favicon_assetika.png" alt="Logo" width="32" height="32" />
+            <span class="logo" :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:hidden' : ''">
+                <img class="dark:hidden" src="/images/assetika.png" alt="Logo" width="150" height="40" />
+                <img class="hidden dark:block" src="/images/assetika.png" alt="Logo" width="150" height="40" />
+            </span>
 
+            <img class="logo-icon" :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:block' : 'hidden'" src="/images/favicon_assetika.png" alt="Logo" width="32" height="32" />
         </a>
     </div>
 
     <!-- Navigation Menu -->
     <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar flex-grow">
         <nav class="mb-6">
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-6">
                 @foreach ($menuGroups as $groupIndex => $menuGroup)
                     <div>
                         <!-- Menu Group Title -->
