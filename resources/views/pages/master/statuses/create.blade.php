@@ -23,7 +23,7 @@
 
                     </h3>
 
-                    
+
                 <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
