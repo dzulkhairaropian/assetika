@@ -17,13 +17,15 @@
 
     $variants = [
         'light' => [
-            'primary' => 'bg-blue-50 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400',
-            'success' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-500',
-            'error' => 'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-500',
-            'warning' => 'bg-yellow-50 text-yellow-600 dark:bg-yellow-500/15 dark:text-orange-400',
-            'info' => 'bg-sky-50 text-sky-500 dark:bg-sky-500/15 dark:text-sky-500',
-            'light' => 'bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80',
-            'dark' => 'bg-gray-500 text-white dark:bg-white/5 dark:text-white',
+            'primary'   => 'bg-blue-50 text-blue-500 dark:bg-blue-500/15 dark:text-blue-400',
+            'secondary' => 'bg-gray-100 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
+            'success'   => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-500',
+            'danger'    => 'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-500',
+            'error'     => 'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-500',
+            'warning'   => 'bg-yellow-50 text-yellow-600 dark:bg-yellow-500/15 dark:text-orange-400',
+            'info'      => 'bg-sky-50 text-sky-500 dark:bg-sky-500/15 dark:text-sky-500',
+            'light'     => 'bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80',
+            'dark'      => 'bg-gray-500 text-white dark:bg-gray-700 dark:text-white',
         ],
         'solid' => [
             'primary' => 'bg-blue-500 text-white dark:text-white',

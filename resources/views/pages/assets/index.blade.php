@@ -298,16 +298,8 @@
                                      @php
                                          $statusName = optional($asset->status)->name;
                                          $statusColor = optional($asset->status)->color;
-                                         $icon = match($statusName) {
-                                             'Ready', 'Ready to Deploy', 'Available' => 'check-circle',
-                                             'Deployed', 'In Use', 'Borrowed' => 'user',
-                                             'Broken' => 'x-circle',
-                                             'In Repair', 'Service' => 'tool',
-                                             'Archived', 'Retired' => 'archive',
-                                             'Draft' => 'file-text',
-                                             default => 'help-circle'
-                                         };
-                                         $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
+                                         $statusIcon = optional($asset->status)->icon;
+                                         $iconHtml = $statusIcon ? new \Illuminate\Support\HtmlString("<i data-feather='{$statusIcon}' class='w-3 h-3'></i>") : null;
                                      @endphp
                                      <x-ui.badge :color="$statusColor" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                                 </td>

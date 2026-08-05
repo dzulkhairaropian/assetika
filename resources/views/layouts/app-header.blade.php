@@ -1,73 +1,92 @@
-﻿<header
+<header
     class="sticky top-0 flex w-full bg-white border-b border-gray-200 z-[99999] dark:border-gray-800 dark:bg-gray-900 transition-colors duration-300"
-    x-data="{
-        isApplicationMenuOpen: false,
-        toggleApplicationMenu() {
-            this.isApplicationMenuOpen = !this.isApplicationMenuOpen;
-        }
-    }">
-    <div class="flex flex-col items-center justify-between grow xl:flex-row xl:px-6 w-full">
-        <div class="flex items-center justify-between w-full gap-2 px-4 py-3 border-b border-gray-100 dark:border-gray-800/50 sm:gap-4 xl:justify-normal xl:border-b-0 xl:px-0 lg:py-4">
-            
-            <!-- Desktop Sidebar Toggle Button (visible on xl and up) -->
+    x-data="{ isApplicationMenuOpen: false }">
+    <div class="flex items-center justify-between w-full px-4 xl:px-6 h-16">
+
+        <!-- Left: Hamburger + Logo -->
+        <div class="flex items-center gap-3">
+            <!-- Desktop Sidebar Toggle -->
             <button
-                class="hidden xl:flex items-center justify-center w-10 h-10 text-gray-500 hover:text-brand-500 hover:bg-gray-50 border border-gray-200 rounded-xl dark:border-gray-800 dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/[0.03] transition-all duration-200"
+                class="hidden xl:flex items-center justify-center w-10 h-10 text-gray-500 hover:text-brand-500 hover:bg-gray-50 border border-gray-200 rounded-xl dark:border-gray-800 dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/[0.03] transition-all duration-200 shrink-0"
                 :class="{ 'bg-gray-100 dark:bg-white/[0.03]': !$store.sidebar.isExpanded }"
                 @click="$store.sidebar.toggleExpanded()" aria-label="Toggle Sidebar">
                 <i data-feather="menu" class="w-5 h-5"></i>
             </button>
 
-            <!-- Mobile Menu Toggle Button (visible below xl) -->
+            <!-- Mobile Sidebar Toggle -->
             <button
-                class="flex xl:hidden items-center justify-center w-10 h-10 text-gray-500 hover:text-brand-500 hover:bg-gray-50 border border-gray-200 rounded-xl dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] transition-all duration-200"
+                class="flex xl:hidden items-center justify-center w-10 h-10 text-gray-500 hover:text-brand-500 hover:bg-gray-50 border border-gray-200 rounded-xl dark:border-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] transition-all duration-200 shrink-0"
                 :class="{ 'bg-gray-100 dark:bg-white/[0.03]': $store.sidebar.isMobileOpen }"
                 @click="$store.sidebar.toggleMobileOpen()" aria-label="Toggle Mobile Menu">
                 <i data-feather="menu" class="w-5 h-5"></i>
             </button>
 
             <!-- Logo (mobile only) -->
-            <a href="/" class="xl:hidden flex items-center gap-2">
-                <img class="dark:hidden h-7" src="/images/assetika.png" alt="Logo" />
-                <img class="hidden dark:block h-7" src="/images/assetika.png" alt="Logo" />
+            <a href="/" class="xl:hidden flex items-center">
+                <img class="h-7" src="/images/assetika.png" alt="Logo" />
             </a>
-
-
-
-            <!-- Application Menu Toggle (mobile only) -->
-            <button @click="toggleApplicationMenu()"
-                class="flex items-center justify-center w-10 h-10 text-gray-500 rounded-xl hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-850 xl:hidden transition-all duration-200">
-                <i data-feather="more-vertical" class="w-5 h-5"></i>
-            </button>
         </div>
 
-        <!-- Application Menu (mobile) and Right Side Actions (desktop) -->
-        <div :class="isApplicationMenuOpen ? 'flex' : 'hidden'"
-            class="items-center justify-between w-full gap-4 px-4 py-3 xl:flex shadow-theme-md xl:justify-end xl:px-0 xl:shadow-none bg-white dark:bg-gray-900 xl:bg-transparent border-t border-gray-150 dark:border-gray-800 xl:border-0">
-            <div class="flex items-center gap-3 w-full xl:w-auto xl:justify-end">
-                
-                <!-- Theme Toggle Button -->
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Mobile app-menu toggle -->
+            <button
+                class="flex xl:hidden items-center justify-center w-10 h-10 text-gray-500 rounded-xl hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-all duration-200 shrink-0"
+                @click="isApplicationMenuOpen = !isApplicationMenuOpen"
+                aria-label="Toggle Application Menu">
+                <i data-feather="more-vertical" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Desktop actions (always visible on xl+) -->
+            <div class="hidden xl:flex items-center gap-2 sm:gap-3">
+                <!-- Theme Toggle -->
                 <button
-                    class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-xl hover:text-brand-500 hover:bg-gray-50 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-white h-10 w-10 transition-all duration-200"
-                    @click="$store.theme.toggle()"
-                    aria-label="Toggle dark mode">
-                    <span class="dark:hidden">
-                        <i data-feather="moon" class="w-5 h-5 text-gray-500"></i>
-                    </span>
-                    <span class="hidden dark:block">
-                        <i data-feather="sun" class="w-5 h-5 text-yellow-500"></i>
-                    </span>
+                    class="flex items-center justify-center w-10 h-10 text-gray-500 bg-white border border-gray-200 rounded-xl hover:text-brand-500 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-white transition-all duration-200 shrink-0"
+                    @click="$store.theme.toggle()" aria-label="Toggle dark mode">
+                    <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
+                    <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5 text-yellow-500"></i></span>
                 </button>
 
                 <!-- Notification Dropdown -->
-                <div class="relative">
-                    <x-header.notification-dropdown />
-                </div>
+                <x-header.notification-dropdown />
 
-                <div class="h-6 w-px bg-gray-200 dark:bg-gray-800 hidden sm:block"></div>
+                <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
 
                 <!-- User Dropdown -->
-                <div class="relative">
-                    <x-header.user-dropdown />
+                <x-header.user-dropdown />
+            </div>
+
+            <!-- Mobile actions (shown when isApplicationMenuOpen) -->
+            <div
+                x-show="isApplicationMenuOpen"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="absolute top-16 right-0 left-0 z-50 flex flex-col gap-0 bg-white dark:bg-gray-900 border-t border-b border-gray-200 dark:border-gray-800 shadow-lg xl:hidden"
+                style="display: none;"
+                @click.outside="isApplicationMenuOpen = false">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Quick Actions</span>
+                    <div class="flex items-center gap-2">
+                        <!-- Theme Toggle mobile -->
+                        <button
+                            class="flex items-center justify-center w-10 h-10 text-gray-500 bg-white border border-gray-200 rounded-xl hover:text-brand-500 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-white transition-all duration-200 shrink-0"
+                            @click="$store.theme.toggle()" aria-label="Toggle dark mode">
+                            <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
+                            <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5 text-yellow-500"></i></span>
+                        </button>
+
+                        <!-- Notification mobile -->
+                        <x-header.notification-dropdown />
+
+                        <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+                        <!-- User mobile -->
+                        <x-header.user-dropdown />
+                    </div>
                 </div>
             </div>
         </div>

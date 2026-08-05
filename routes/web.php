@@ -26,12 +26,19 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\GaDashboardController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Auth\PasswordResetController;
+
 Route::middleware('guest')->group(function () {
     Route::get('signin', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('signin', [LoginController::class, 'login']);
     
     Route::get('signup', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('signup', [RegisterController::class, 'register']);
+
+    Route::get('forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+    Route::post('forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 });
 
 Route::get('scan/asset/{asset}', [AssetController::class, 'publicScan'])->name('assets.public-scan');

@@ -46,24 +46,9 @@
                             <h2 class="text-xl font-bold text-gray-800 dark:text-white/90">{{ $asset->asset_tag }}</h2>
                             @php
                                 $statusName = optional($asset->status)->name;
-                                $color = match($statusName) {
-                                    'Ready', 'Ready to Deploy', 'Available' => 'success',
-                                    'Deployed', 'In Use', 'Borrowed' => 'primary',
-                                    'Broken' => 'error',
-                                    'In Repair', 'Service' => 'warning',
-                                    'Archived', 'Retired' => 'gray',
-                                    default => 'gray'
-                                };
-                                $icon = match($statusName) {
-                                    'Ready', 'Ready to Deploy', 'Available' => 'check-circle',
-                                    'Deployed', 'In Use', 'Borrowed' => 'user',
-                                    'Broken' => 'x-circle',
-                                    'In Repair', 'Service' => 'tool',
-                                    'Archived', 'Retired' => 'archive',
-                                    'Draft' => 'file-text',
-                                    default => 'help-circle'
-                                };
-                                $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
+                                $color = optional($asset->status)->color ?? 'gray';
+                                $icon = optional($asset->status)->icon;
+                                $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
                             @endphp
                             <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                             @if($yearsOld !== null)

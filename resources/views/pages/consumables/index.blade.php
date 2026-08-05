@@ -187,19 +187,13 @@
                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5">
                                     @php
-                                        $color = 'success';
                                         $statusText = 'In Stock';
-                                         $icon = 'check-circle';
-                                        if ($consumable->quantity <= 0) {
-                                            $color = 'error';
-                                            $statusText = 'Out of Stock';
-                                            $icon = 'x-circle';
-                                        } elseif ($consumable->quantity <= $consumable->low_threshold) {
-                                            $color = 'warning';
-                                            $statusText = 'Low Stock';
-                                            $icon = 'alert-circle';
-                                        }
-                                        $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
+                                        if ($consumable->quantity <= 0) { $statusText = 'Out of Stock'; }
+                                        elseif ($consumable->quantity <= $consumable->low_threshold) { $statusText = 'Low Stock'; }
+                                        $stockStatus = \App\Models\Status::where('name', $statusText)->first();
+                                        $color = optional($stockStatus)->color ?? 'success';
+                                        $icon = optional($stockStatus)->icon;
+                                        $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusText }}</x-ui.badge>
                                 </td>

@@ -55,13 +55,14 @@ class GaAsset extends Model
 
         if ($path === "") {
             return null;
+        }
+
+        return Storage::disk("public")->url($path);
+    }
+
     public function getStatusObjectAttribute()
     {
         return \App\Models\Status::where('name', $this->status)->first();
-    }
-}
-
-        return Storage::disk("public")->url($path);
     }
 
     public function setRetirementEvidencePathAttribute($value): void

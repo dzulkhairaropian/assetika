@@ -4,10 +4,7 @@
     <div class="relative z-1 bg-white p-6 sm:p-0 dark:bg-gray-900">
         <div class="relative flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row dark:bg-gray-900">
             <!-- Form -->
-            <div class="flex w-full flex-1 flex-col justify-between h-full py-8 lg:w-1/2">
-                <!-- Top Spacer -->
-                <div></div>
-
+            <div class="flex w-full flex-1 flex-col items-center justify-center py-8 lg:w-1/2">
                 <div class="mx-auto flex w-full max-w-md flex-col justify-center">
                     <div>
                         <div class="mb-5 sm:mb-8">
@@ -83,7 +80,7 @@
                                                 Keep me logged in
                                             </label>
                                         </div>
-                                        <a href="/reset-password" class="text-brand-500 hover:text-brand-600 dark:text-brand-400 text-sm">
+                                        <a href="{{ route('password.request') }}" class="text-brand-500 hover:text-brand-600 dark:text-brand-400 text-sm">
                                             Forgot password?
                                         </a>
                                     </div>
@@ -105,11 +102,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Footer -->
-                <div class="text-center text-xs text-gray-400 dark:text-gray-500 pb-8">
-                    <p>&copy; {{ date('Y') }} <span class="font-semibold text-brand-500">Assetika</span></p>
-                </div>
             </div>
 
             <div class="bg-brand-950 relative hidden h-full w-full items-center lg:grid lg:w-1/2 dark:bg-white/5">
@@ -126,6 +118,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Dark/Light Toggle -->
+        <div class="fixed z-50 hidden bottom-6 right-6 sm:block">
+            <button
+                class="inline-flex items-center justify-center text-white transition-colors rounded-full size-14 bg-brand-500 hover:bg-brand-600"
+                @click="$store.theme.toggle()"
+                aria-label="Toggle dark mode">
+                <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
+                <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5"></i></span>
+            </button>
         </div>
     </div>
 @endsection

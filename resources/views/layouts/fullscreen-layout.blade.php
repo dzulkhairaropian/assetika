@@ -111,8 +111,6 @@ window.addEventListener('resize', checkMobile);">
 
     @yield('content')
 
-    <x-common.footer />
-
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

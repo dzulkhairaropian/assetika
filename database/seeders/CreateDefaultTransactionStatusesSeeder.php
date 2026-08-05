@@ -8,33 +8,26 @@ use Illuminate\Database\Seeder;
 
 class CreateDefaultTransactionStatusesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $this->createStatus('Restock', 'Consumable', '#198754', 'arrow-down-circle'); // Success
-        $this->createStatus('Checkout', 'Consumable', '#0d6efd', 'arrow-up-circle'); // Primary
-        $this->createStatus('Checked Out', 'IT Asset', '#0d6efd', 'arrow-up-circle'); // Primary
-        $this->createStatus('Returned', 'IT Asset', '#198754', 'arrow-down-circle'); // Success
-    }
+        $statuses = [
+            ['name' => 'Restock',    'master_category' => 'Consumable', 'color' => 'success', 'icon' => 'download'],
+            ['name' => 'Checkout',   'master_category' => 'Consumable', 'color' => 'warning', 'icon' => 'shopping-cart'],
+            ['name' => 'Checked Out','master_category' => 'IT Asset',   'color' => 'primary', 'icon' => 'log-out'],
+            ['name' => 'Returned',   'master_category' => 'IT Asset',   'color' => 'success', 'icon' => 'log-in'],
+        ];
 
-    private function createStatus(string $name, ?string $masterCategoryName, string $color, string $icon)
-    {
-        $masterCategory = null;
-        if ($masterCategoryName) {
-            $masterCategory = MasterCategory::where('name', $masterCategoryName)->first();
+        foreach ($statuses as $status) {
+            $masterCategory = MasterCategory::where('name', $status['master_category'])->first();
+
+            Status::firstOrCreate(
+                ['name' => $status['name']],
+                [
+                    'master_category_id' => $masterCategory->id ?? null,
+                    'color' => $status['color'],
+                    'icon' => $status['icon'],
+                ]
+            );
         }
-
-        Status::firstOrCreate(
-            ['name' => $name],
-            [
-                'master_category_id' => $masterCategory->id ?? null,
-                'color' => $color,
-                'icon' => $icon,
-            ]
-        );
     }
 }

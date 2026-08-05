@@ -47,23 +47,9 @@
                                 <td class="px-6 py-4">
                                     @php
                                         $statusName = optional($asset->status)->name;
-                                        $color = match($statusName) {
-                                            'Ready to Deploy', 'Available', 'Ready' => 'success',
-                                            'Deployed', 'In Use', 'Borrowed' => 'primary',
-                                            'Broken' => 'error',
-                                            'In Repair', 'Service' => 'warning',
-                                            'Archived', 'Retired' => 'gray',
-                                            default => 'gray'
-                                        };
-                                        $icon = match($statusName) {
-                                             'Ready to Deploy', 'Available', 'Ready' => 'check-circle',
-                                            'Deployed', 'In Use', 'Borrowed' => 'user',
-                                            'Broken' => 'x-circle',
-                                            'In Repair', 'Service' => 'tool',
-                                            'Archived', 'Retired' => 'archive',
-                                            default => 'help-circle'
-                                        };
-                                        $iconHtml = new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>");
+                                        $color = optional($asset->status)->color ?? 'gray';
+                                        $icon = optional($asset->status)->icon;
+                                        $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName ?? 'Assigned' }}</x-ui.badge>
                                 </td>

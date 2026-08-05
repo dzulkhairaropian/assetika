@@ -5,10 +5,14 @@
         <div class="flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row dark:bg-gray-900">
             <!-- Form -->
             <div class="flex w-full flex-1 flex-col justify-between h-full py-8 lg:w-1/2">
-                <!-- Top Spacer -->
-                <div></div>
-
-                <div class="mx-auto flex w-full max-w-md flex-col justify-center">
+                <div class="mx-auto w-full max-w-md pt-10">
+                    <a href="{{ route('login') }}"
+                        class="inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                        <i data-feather="arrow-left" class="w-4 h-4"></i>
+                        Back to Sign In
+                    </a>
+                </div>
+                <div class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
                     <div class="mb-5 sm:mb-8">
                         <h1 class="text-title-sm sm:text-title-md mb-2 font-semibold text-gray-800 dark:text-white/90">
                             Sign Up
@@ -78,18 +82,6 @@
                                         <p class="mt-1 text-xs text-error-500">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                <!-- Checkbox / Terms -->
-                                <div class="flex items-center">
-                                    <label for="terms" class="flex cursor-pointer items-start text-sm font-normal text-gray-700 select-none dark:text-gray-400">
-                                        <input type="checkbox" name="terms" id="terms" required class="mt-1 mr-3 h-5 w-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                                            By creating an account you agree to the
-                                            <span class="text-gray-800 dark:text-white">Terms and Conditions</span>
-                                            and our
-                                            <span class="text-gray-800 dark:text-white">Privacy Policy</span>
-                                        </p>
-                                    </label>
-                                </div>
                                 <!-- Button -->
                                 <div>
                                     <button type="submit"
@@ -107,11 +99,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Footer -->
-                <div class="text-center text-xs text-gray-400 dark:text-gray-500 pb-8">
-                    <p>&copy; {{ date('Y') }} <span class="font-semibold text-brand-500">Assetika</span></p>
-                </div>
             </div>
             <div class="bg-brand-950 relative hidden h-full w-full items-center lg:grid lg:w-1/2 dark:bg-white/5">
                 <div class="z-1 flex items-center justify-center">
@@ -127,6 +114,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Dark/Light Toggle -->
+        <div class="fixed z-50 hidden bottom-6 right-6 sm:block">
+            <button
+                class="inline-flex items-center justify-center text-white transition-colors rounded-full size-14 bg-brand-500 hover:bg-brand-600"
+                @click="$store.theme.toggle()"
+                aria-label="Toggle dark mode">
+                <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
+                <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5"></i></span>
+            </button>
         </div>
     </div>
 @endsection
