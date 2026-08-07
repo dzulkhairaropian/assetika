@@ -18,4 +18,9 @@ class GaMaintenanceLog extends Model
     {
         return $this->belongsTo(GaAsset::class, 'asset_id');
     }
+
+    public function maintenanceType()
+    {
+        return $this->belongsTo(MaintenanceType::class, 'maintenance_type_id');
+    }
 }

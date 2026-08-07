@@ -10,6 +10,7 @@ class AssetMaintenance extends Model
 {
     protected $fillable = [
         'asset_id',
+        'maintenance_type_id',
         'service_provider',
         'start_date',
         'completion_date',
@@ -28,6 +29,11 @@ class AssetMaintenance extends Model
     public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class);
+    }
+
+    public function maintenanceType(): BelongsTo
+    {
+        return $this->belongsTo(MaintenanceType::class);
     }
 
     public function getEvidenceUrlAttribute()

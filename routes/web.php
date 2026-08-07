@@ -11,6 +11,18 @@ use App\Http\Controllers\Master\StatusController;
 use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\OperatingSystemController;
 use App\Http\Controllers\Master\ProductController;
+use App\Http\Controllers\Master\CustomFieldController;
+use App\Http\Controllers\Master\FieldsetController;
+use App\Http\Controllers\Master\DepreciationController;
+use App\Http\Controllers\Master\EulaController;
+use App\Http\Controllers\Master\MaintenanceTypeController;
+use App\Http\Controllers\ComponentController;
+use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\KitController;
+use App\Http\Controllers\AssetLabelController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -70,6 +82,14 @@ Route::middleware('auth')->group(function () {
     Route::post('vendors/bulk-delete', [VendorController::class, 'bulkDestroy'])->name('vendors.bulk-delete');
     Route::post('operating-systems/bulk-delete', [OperatingSystemController::class, 'bulkDestroy'])->name('operating-systems.bulk-delete');
     Route::post('products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
+    Route::post('custom-fields/bulk-delete', [CustomFieldController::class, 'bulkDestroy'])->name('custom-fields.bulk-delete');
+    Route::post('fieldsets/bulk-delete', [FieldsetController::class, 'bulkDestroy'])->name('fieldsets.bulk-delete');
+    Route::post('components/bulk-delete', [ComponentController::class, 'bulkDestroy'])->name('components.bulk-delete');
+    Route::post('licenses/bulk-delete', [LicenseController::class, 'bulkDestroy'])->name('licenses.bulk-delete');
+    Route::post('kits/bulk-delete', [KitController::class, 'bulkDestroy'])->name('kits.bulk-delete');
+    Route::post('depreciations/bulk-delete', [DepreciationController::class, 'bulkDestroy'])->name('depreciations.bulk-delete');
+    Route::post('eulas/bulk-delete', [EulaController::class, 'bulkDestroy'])->name('eulas.bulk-delete');
+    Route::post('maintenance-types/bulk-delete', [MaintenanceTypeController::class, 'bulkDestroy'])->name('maintenance-types.bulk-delete');
 
     Route::resource('companies', CompanyController::class);
     Route::resource('departments', DepartmentController::class);
@@ -82,6 +102,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('vendors', VendorController::class);
     Route::resource('operating-systems', OperatingSystemController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('custom-fields', CustomFieldController::class);
+    Route::resource('fieldsets', FieldsetController::class);
+    Route::resource('depreciations', DepreciationController::class);
+    Route::resource('eulas', EulaController::class);
+    Route::resource('maintenance-types', MaintenanceTypeController::class);
 
     // Consumable Management Routes
     Route::get('consumables/bulk-checkout', [ConsumableController::class, 'bulkCheckoutForm'])->name('consumables.bulk-checkout');
@@ -102,6 +127,9 @@ Route::middleware('auth')->group(function () {
     Route::get('assets/export', [AssetController::class, 'export'])->name('assets.export');
     Route::get('my-assets', [AssetController::class, 'myAssets'])->name('assets.my-assets');
     Route::post('assets/bulk-delete', [AssetController::class, 'bulkDestroy'])->name('assets.bulk-delete');
+    Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
+    Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');
+    Route::post('assets/bulk-checkout', [AssetController::class, 'bulkCheckout'])->name('assets.bulk-checkout.process');
     Route::resource('assets', AssetController::class);
     Route::get('asset-transactions/export', [\App\Http\Controllers\AssetTransactionController::class, 'export'])->name('asset-transactions.export');
     Route::get('asset-transactions', [\App\Http\Controllers\AssetTransactionController::class, 'index'])->name('asset-transactions.index');
@@ -116,6 +144,46 @@ Route::middleware('auth')->group(function () {
         Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
         Route::post('maintenance/{maintenance}/complete', [AssetManagementController::class, 'processCompleteMaintenance'])->name('assets.maintenance.complete.process');
     });
+
+    // Component Management
+    Route::resource('components', ComponentController::class);
+    Route::post('components/{component}/checkout', [ComponentController::class, 'checkout'])->name('components.checkout');
+    Route::post('components/{component}/checkin/{asset}', [ComponentController::class, 'checkin'])->name('components.checkin');
+
+    // License Management
+    Route::resource('licenses', LicenseController::class);
+    Route::post('licenses/{license}/checkout', [LicenseController::class, 'checkout'])->name('licenses.checkout');
+    Route::post('licenses/{license}/checkin/{seat}', [LicenseController::class, 'checkin'])->name('licenses.checkin');
+
+    // Kit Management
+    Route::resource('kits', KitController::class);
+    Route::get('kits/{kit}/checkout-form', [KitController::class, 'checkoutForm'])->name('kits.checkout-form');
+    Route::post('kits/{kit}/checkout', [KitController::class, 'checkout'])->name('kits.checkout');
+
+    // Labels
+    Route::get('labels', [AssetLabelController::class, 'index'])->name('labels.index');
+    Route::post('labels/generate', [AssetLabelController::class, 'generate'])->name('labels.generate');
+    Route::get('labels/{asset}/print', [AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
+
+    // Reports
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/activity', [ReportController::class, 'activity'])->name('reports.activity');
+    Route::get('reports/assets', [ReportController::class, 'assets'])->name('reports.assets');
+    Route::get('reports/depreciation', [ReportController::class, 'depreciation'])->name('reports.depreciation');
+    Route::get('reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
+
+    // Import
+    Route::get('import', [ImportController::class, 'index'])->name('import.index');
+    Route::post('import/preview', [ImportController::class, 'preview'])->name('import.preview');
+    Route::post('import/process', [ImportController::class, 'process'])->name('import.process');
+    Route::get('import/template/{type}', [ImportController::class, 'downloadTemplate'])->name('import.template');
+
+    // Stock Count / Audit
+    Route::resource('stock-counts', StockCountController::class);
+    Route::get('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'addAssets'])->name('stock-counts.add-assets');
+    Route::post('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'processAddAssets'])->name('stock-counts.process-add-assets');
+    Route::post('stock-counts/{stockCount}/complete', [StockCountController::class, 'markComplete'])->name('stock-counts.complete');
+    Route::post('stock-counts/{stockCount}/items/{item}/verify', [StockCountController::class, 'verifyItem'])->name('stock-counts.items.verify');
 
     // Profile Routes
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');

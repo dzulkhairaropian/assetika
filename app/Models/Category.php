@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Category extends Model
 {
@@ -18,5 +19,10 @@ class Category extends Model
     public function masterCategory()
     {
         return $this->belongsTo(MasterCategory::class, 'master_category_id');
+    }
+
+    public function fieldsets(): BelongsToMany
+    {
+        return $this->belongsToMany(Fieldset::class, 'category_fieldset')->withTimestamps();
     }
 }

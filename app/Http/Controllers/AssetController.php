@@ -10,6 +10,9 @@ use App\Models\OperatingSystem;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\Category;
+use App\Models\Department;
+use App\Models\Location;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 use App\Exports\AssetsExport;
@@ -180,8 +183,16 @@ class AssetController extends Controller
         $operatingSystems = OperatingSystem::all();
         $departments = Department::all();
         $locations = Location::all();
-        
-        return view('pages.assets.create', compact('products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations'));
+
+        // Pre-load fieldsets for JS-driven dynamic rendering
+        $fieldsets = \App\Models\Fieldset::with('customFields')->get()->keyBy('id');
+        $categoryFieldsets = \App\Models\Category::with('fieldsets.customFields')->get()
+            ->mapWithKeys(fn($c) => [$c->id => $c->fieldsets]);
+
+        return view('pages.assets.create', compact(
+            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations',
+            'fieldsets', 'categoryFieldsets'
+        ));
     }
     public function store(Request $request)
     {
@@ -247,7 +258,12 @@ class AssetController extends Controller
             ]);
         }
 
-        Asset::create($validated);
+        $asset = Asset::create($validated);
+
+        // Sync custom field values
+        if ($request->has('custom_fields')) {
+            $asset->syncCustomFields($request->custom_fields);
+        }
 
         if ($request->has('create_another')) {
             return redirect()->route('assets.create')->with('success', 'Asset created successfully. Add another one.');
@@ -276,7 +292,16 @@ class AssetController extends Controller
         $departments = Department::all();
         $locations = Location::all();
 
-        return view('pages.assets.edit', compact('asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations'));
+        $asset->load('customFieldValues');
+
+        $fieldsets = \App\Models\Fieldset::with('customFields')->get()->keyBy('id');
+        $categoryFieldsets = \App\Models\Category::with('fieldsets.customFields')->get()
+            ->mapWithKeys(fn($c) => [$c->id => $c->fieldsets]);
+
+        return view('pages.assets.edit', compact(
+            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations',
+            'fieldsets', 'categoryFieldsets'
+        ));
     }
 
     public function update(Request $request, Asset $asset)
@@ -343,6 +368,11 @@ class AssetController extends Controller
 
         $asset->update($validated);
 
+        // Sync custom field values
+        if ($request->has('custom_fields')) {
+            $asset->syncCustomFields($request->custom_fields);
+        }
+
         return redirect()->route('assets.index')->with('success', $isDraft ? 'Asset saved as draft successfully.' : 'Asset updated successfully.');
     }
 
@@ -362,6 +392,70 @@ class AssetController extends Controller
         Asset::whereIn('id', $request->ids)->delete();
 
         return redirect()->route('assets.index')->with('success', 'Selected assets deleted successfully.');
+    }
+
+    public function bulkEdit(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:assets,id',
+            'status_id' => 'nullable|exists:statuses,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'vendor_id' => 'nullable|exists:vendors,id',
+        ]);
+
+        $data = array_filter($request->only(['status_id', 'department_id', 'location_id', 'vendor_id']));
+
+        if (empty($data)) {
+            return back()->with('error', 'No changes selected.');
+        }
+
+        Asset::whereIn('id', $request->ids)->update($data);
+
+        return redirect()->route('assets.index')->with('success', count($request->ids) . ' assets updated successfully.');
+    }
+
+    public function bulkCheckoutForm(Request $request)
+    {
+        $request->validate(['ids' => 'required|array']);
+        $assets = Asset::whereIn('id', $request->ids)->get();
+        $users = User::orderBy('name')->get();
+        $departments = Department::all();
+        $locations = Location::all();
+
+        return view('pages.assets.bulk-checkout', compact('assets', 'users', 'departments', 'locations'));
+    }
+
+    public function bulkCheckout(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:assets,id',
+            'checked_out_to_user_id' => 'required|exists:users,id',
+            'notes' => 'nullable|string',
+        ]);
+
+        $assets = Asset::whereIn('id', $request->ids)
+            ->whereNull('current_checkout_id')
+            ->get();
+
+        $count = 0;
+        foreach ($assets as $asset) {
+            $checkout = $asset->checkouts()->create([
+                'checked_out_to_user_id' => $request->checked_out_to_user_id,
+                'checked_out_by_user_id' => auth()->id(),
+                'checked_out_at' => now(),
+                'checkout_notes' => $request->notes,
+            ]);
+            $asset->update([
+                'assigned_to_user_id' => $request->checked_out_to_user_id,
+                'current_checkout_id' => $checkout->id,
+            ]);
+            $count++;
+        }
+
+        return redirect()->route('assets.index')->with('success', "{$count} assets checked out. " . ($assets->count() < count($request->ids) ? 'Some were already checked out.' : ''));
     }
 
     public function publicScan(Asset $asset)

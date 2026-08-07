@@ -1,0 +1,37 @@
+- generic [ref=f3e4]:
+  - generic [ref=f3e5]:
+    - generic [ref=f3e8]:
+      - generic [ref=f3e9]:
+        - heading "Sign In" [level=1] [ref=f3e10]
+        - paragraph [ref=f3e11]: Enter your email and password to sign in!
+      - generic [ref=f3e12]:
+        - generic [ref=f3e14]:
+          - generic [ref=f3e15]:
+            - generic [ref=f3e16]: Email*
+            - textbox "info@gmail.com" [ref=f3e17]
+          - generic [ref=f3e18]:
+            - generic [ref=f3e19]: Password*
+            - generic [ref=f3e20]:
+              - textbox "Enter your password" [ref=f3e21]
+              - generic [ref=f3e22] [cursor=pointer]
+          - generic [ref=f3e25]:
+            - generic [ref=f3e27] [cursor=pointer]:
+              - checkbox "Keep me logged in" [ref=f3e29]
+              - text: Keep me logged in
+            - link "Forgot password?" [ref=f3e34] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/forgot-password
+          - button "Sign In" [ref=f3e36] [cursor=pointer]
+        - paragraph [ref=f3e38]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=f3e39] [cursor=pointer]:
+            - /url: http://127.0.0.1:8000/signup
+    - generic [ref=f3e41]:
+      - generic:
+        - img "grid" [ref=f3e43]
+        - img "grid" [ref=f3e45]
+      - generic [ref=f3e46]:
+        - link [ref=f3e47] [cursor=pointer]:
+          - /url: /
+          - img "Logo" [ref=f3e48]
+        - paragraph [ref=f3e49]: Modern and Centralized Business Asset Management System
+  - button "Toggle dark mode" [ref=f3e51] [cursor=pointer]

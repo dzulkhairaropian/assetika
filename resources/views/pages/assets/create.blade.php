@@ -353,6 +353,8 @@
                     </div>
                 </div>
 
+                @include('pages.assets.partials.custom-fields')
+
                 <div class="flex items-center justify-end gap-3 mt-6">
                     <a href="{{ route('assets.index') }}" class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
                         Cancel

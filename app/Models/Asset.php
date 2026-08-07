@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Traits\HasCustomFields;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -11,7 +13,7 @@ use Illuminate\Support\Carbon;
 
 class Asset extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasCustomFields;
     protected $table = 'assets';
 
     protected $fillable = [
@@ -282,5 +284,31 @@ class Asset extends Model
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function components(): BelongsToMany
+    {
+        return $this->belongsToMany(Component::class, 'component_asset')
+            ->withPivot(['qty', 'checked_out_at'])
+            ->withTimestamps();
+    }
+
+    public function depreciation()
+    {
+        return $this->belongsTo(Depreciation::class);
+    }
+
+    public function getBookValueAttribute(): ?float
+    {
+        if (!$this->purchase_cost || !$this->depreciation || !$this->purchase_date) {
+            return $this->purchase_cost ? (float) $this->purchase_cost : null;
+        }
+
+        $months = $this->depreciation->months;
+        $perMonth = (float) $this->purchase_cost / $months;
+        $elapsed = $this->purchase_date->diffInMonths(now());
+        $depreciated = $perMonth * min($elapsed, $months);
+
+        return max(0, (float) $this->purchase_cost - $depreciated);
     }
 }

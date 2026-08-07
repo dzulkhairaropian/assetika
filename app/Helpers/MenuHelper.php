@@ -25,6 +25,21 @@ class MenuHelper
                         'icon' => 'user-assets',
                         'path' => '/my-assets',
                     ],
+                    [
+                        'name' => 'Reports',
+                        'icon' => 'components',
+                        'path' => '/reports',
+                    ],
+                    [
+                        'name' => 'Import',
+                        'icon' => 'components',
+                        'path' => '/import',
+                    ],
+                    [
+                        'name' => 'Labels',
+                        'icon' => 'components',
+                        'path' => '/labels',
+                    ],
                 ],
             ],
             [
@@ -71,12 +86,37 @@ class MenuHelper
                         'path' => '/ga-categories',
                     ],
                     [
+                        'name' => 'Components',
+                        'icon' => 'components',
+                        'path' => '/components',
+                    ],
+                    [
+                        'name' => 'Licenses',
+                        'icon' => 'license',
+                        'path' => '/licenses',
+                    ],
+                    [
+                        'name' => 'Kits',
+                        'icon' => 'kit',
+                        'path' => '/kits',
+                    ],
+                    [
                         'name' => 'Consumables',
                         'icon' => 'consumables',
                         'subItems' => [
                             ['name' => 'Inventory', 'path' => '/consumables'],
                             ['name' => 'Transactions', 'path' => '/consumable-transactions'],
                         ],
+                    ],
+                    [
+                        'name' => 'Depreciations',
+                        'icon' => 'catalog',
+                        'path' => '/depreciations',
+                    ],
+                    [
+                        'name' => 'Audit/Opname',
+                        'icon' => 'support',
+                        'path' => '/stock-counts',
                     ],
                 ],
             ],
@@ -100,6 +140,9 @@ class MenuHelper
                             ['name' => 'Products', 'path' => '/products'],
                             ['name' => 'Master Categories', 'path' => '/master-categories'],
                             ['name' => 'Categories', 'path' => '/categories'],
+                            ['name' => 'Custom Fields', 'path' => '/custom-fields'],
+                            ['name' => 'Fieldsets', 'path' => '/fieldsets'],
+                            ['name' => 'EULA Templates', 'path' => '/eulas'],
                             ['name' => 'Brands', 'path' => '/brands'],
                             ['name' => 'Operating Systems', 'path' => '/operating-systems'],
                         ],
@@ -110,6 +153,7 @@ class MenuHelper
                         'subItems' => [
                             ['name' => 'Statuses', 'path' => '/statuses'],
                             ['name' => 'Vendors', 'path' => '/vendors'],
+                            ['name' => 'Maintenance Types', 'path' => '/maintenance-types'],
                         ],
                     ],
                 ],
@@ -150,6 +194,9 @@ class MenuHelper
             'access' => '<i data-feather="shield" class="w-6 h-6"></i>',
             'backup' => '<i data-feather="database" class="w-6 h-6"></i>',
             'ticket' => '<i data-feather="file-text" class="w-6 h-6"></i>',
+            'components' => '<i data-feather="cpu" class="w-6 h-6"></i>',
+            'license' => '<i data-feather="key" class="w-6 h-6"></i>',
+            'kit' => '<i data-feather="box" class="w-6 h-6"></i>',
             'ticket-config' => '<i data-feather="settings" class="w-6 h-6"></i>',
             default => '<i data-feather="circle" class="w-6 h-6"></i>'
         };
