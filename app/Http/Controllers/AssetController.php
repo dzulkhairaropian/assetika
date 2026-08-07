@@ -152,7 +152,9 @@ class AssetController extends Controller
         ];
 
         $assets = $query->latest()->paginate(50)->withQueryString();
-        $statuses = Status::all();
+        $statuses = Status::whereHas('masterCategory', function($q) {
+            $q->where('name', 'IT Asset');
+        })->get();
         $departments = Department::all();
         $locations = Location::all();
         $products = Product::whereHas('masterCategory', function($q) {
