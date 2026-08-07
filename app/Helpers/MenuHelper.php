@@ -25,6 +25,11 @@ class MenuHelper
                         'icon' => 'user-assets',
                         'path' => '/my-assets',
                     ],
+                    [
+                        'name' => 'Request Item',
+                        'icon' => 'kit',
+                        'path' => '/requestable-assets',
+                    ],
                 ],
             ],
             [
@@ -102,6 +107,11 @@ class MenuHelper
                         'name' => 'Audit / Opname',
                         'icon' => 'support',
                         'path' => '/stock-counts',
+                    ],
+                    [
+                        'name' => 'Asset Requests',
+                        'icon' => 'ticket',
+                        'path' => '/asset-requests',
                     ],
                 ],
             ],

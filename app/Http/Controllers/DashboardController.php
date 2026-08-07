@@ -301,6 +301,18 @@ class DashboardController extends Controller
             ->limit(3)
             ->get();
 
+        // Financial Metrics
+        $totalPurchaseCost = Asset::whereNotNull('purchase_cost')->sum('purchase_cost');
+        $allAssetsWithDepr = Asset::with('depreciation')->whereNotNull('purchase_cost')->get();
+        $totalBookValue = $allAssetsWithDepr->sum(fn($a) => $a->bookValue ?? $a->purchase_cost);
+        $totalDepreciated = max(0, $totalPurchaseCost - $totalBookValue);
+
+        // Alert Metrics
+        $lowStockComponents = \App\Models\Component::whereRaw('qty <= min_qty')->get();
+        $expiringLicenses = \App\Models\License::whereNotNull('expiration_date')
+            ->where('expiration_date', '<=', now()->addDays(30))
+            ->get();
+
         return view('pages.dashboard.it-assets', compact(
             'totalAssets',
             'totalAssetsTrend',
@@ -332,7 +344,12 @@ class DashboardController extends Controller
             'assetsByLocation',
             'assetsByCategory',
             'service',
-            'serviceTrend'
+            'serviceTrend',
+            'totalPurchaseCost',
+            'totalBookValue',
+            'totalDepreciated',
+            'lowStockComponents',
+            'expiringLicenses'
         ));
     }
 }

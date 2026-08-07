@@ -121,6 +121,25 @@
             </div>
         </div>
 
+        <!-- Financial & Asset Value Overview Card -->
+        <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Total Purchase Cost</p>
+                <h4 class="mt-2 text-xl font-bold text-gray-800 dark:text-white/90">Rp {{ number_format($totalPurchaseCost, 0, ',', '.') }}</h4>
+                <p class="mt-2 text-xs text-gray-400">Sum of initial asset acquisition costs</p>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Current Book Value</p>
+                <h4 class="mt-2 text-xl font-bold text-brand-500">Rp {{ number_format($totalBookValue, 0, ',', '.') }}</h4>
+                <p class="mt-2 text-xs text-gray-400">Net asset value after straight-line depreciation</p>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Total Depreciated</p>
+                <h4 class="mt-2 text-xl font-bold text-error-500">Rp {{ number_format($totalDepreciated, 0, ',', '.') }}</h4>
+                <p class="mt-2 text-xs text-gray-400">Accumulated depreciation loss to date</p>
+            </div>
+        </div>
+
         <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 min-w-0">
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
                 <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Top Location</p>

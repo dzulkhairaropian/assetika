@@ -23,6 +23,7 @@ use App\Http\Controllers\AssetLabelController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\StockCountController;
+use App\Http\Controllers\AssetRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -184,6 +185,12 @@ Route::middleware('auth')->group(function () {
     Route::post('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'processAddAssets'])->name('stock-counts.process-add-assets');
     Route::post('stock-counts/{stockCount}/complete', [StockCountController::class, 'markComplete'])->name('stock-counts.complete');
     Route::post('stock-counts/{stockCount}/items/{item}/verify', [StockCountController::class, 'verifyItem'])->name('stock-counts.items.verify');
+
+    // Self-Service Requests
+    Route::get('requestable-assets', [AssetRequestController::class, 'catalog'])->name('requestable-assets.catalog');
+    Route::post('requestable-assets', [AssetRequestController::class, 'store'])->name('asset-requests.store');
+    Route::get('asset-requests', [AssetRequestController::class, 'index'])->name('asset-requests.index');
+    Route::post('asset-requests/{assetRequest}/process', [AssetRequestController::class, 'process'])->name('asset-requests.process');
 
     // Profile Routes
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');

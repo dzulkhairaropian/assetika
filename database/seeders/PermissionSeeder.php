@@ -30,6 +30,7 @@ class PermissionSeeder extends Seeder
             'import' => ['view'],
             'maintenance-types' => ['view', 'create', 'edit', 'delete'],
             'stock-counts' => ['view', 'create', 'edit', 'delete'],
+            'asset-requests' => ['view', 'create', 'edit', 'delete'],
             'consumables' => ['view', 'create', 'edit', 'delete', 'restock', 'checkout'],
             'companies' => ['view', 'create', 'edit', 'delete'],
             'departments' => ['view', 'create', 'edit', 'delete'],
