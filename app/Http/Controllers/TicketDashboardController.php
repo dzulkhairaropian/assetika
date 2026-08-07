@@ -206,11 +206,17 @@ class TicketDashboardController extends Controller
     private function statusColor(string $color): string
     {
         return match ($color) {
-            'info' => '#465FFF',
-            'warning' => '#F79009',
-            'success' => '#12B76A',
-            'danger' => '#F04438',
-            'gray' => '#667085',
+            'primary'   => '#465FFF',
+            'secondary' => '#667085',
+            'success'   => '#12B76A',
+            'danger'    => '#F04438',
+            'error'     => '#F04438',
+            'warning'   => '#F79009',
+            'info'      => '#0BA5EC',
+            'light'     => '#E4E7EC',
+            'dark'      => '#1D2939',
+            'gray'      => '#667085',
+            'orange'    => '#FB6514',
             default => '#667085',
         };
     }

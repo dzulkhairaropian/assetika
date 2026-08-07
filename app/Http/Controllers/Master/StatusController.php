@@ -12,32 +12,33 @@ class StatusController extends Controller
 {
     private function convertColorNameToHex(string $colorName): string
     {
-        // Peta warna yang komprehensif dari nama ke heksadesimal Tailadmin
         $colorMap = [
-            'primary' => '#0d6efd',
-            'secondary' => '#6c757d',
-            'success' => '#198754',
-            'danger' => '#dc3545',
-            'warning' => '#ffc107',
-            'info' => '#0dcaf0',
-            'light' => '#f8f9fa',
-            'dark' => '#212529',
-            // Tambahan alias untuk warna umum agar lebih fleksibel
-            'red' => '#dc3545',
-            'blue' => '#0d6efd',
-            'green' => '#198754',
-            'yellow' => '#ffc107',
-            'grey' => '#6c757d', // Alias untuk secondary
+            'primary'   => '#465FFF',
+            'secondary' => '#667085',
+            'success'   => '#12B76A',
+            'danger'    => '#F04438',
+            'error'     => '#F04438',
+            'warning'   => '#F79009',
+            'info'      => '#0BA5EC',
+            'light'     => '#E4E7EC',
+            'dark'      => '#1D2939',
+            'gray'      => '#667085',
+            'orange'    => '#FB6514',
+            'blue-light' => '#0BA5EC',
+            'red'       => '#F04438',
+            'blue'      => '#0BA5EC',
+            'green'     => '#12B76A',
+            'yellow'    => '#F79009',
+            'grey'      => '#667085',
         ];
 
         $normalizedColorName = Str::lower($colorName);
 
-        // Jika warna sudah dalam format hex, kembalikan saja
         if (preg_match('/^#[a-f0-9]{6}$/i', $colorName)) {
             return $colorName;
         }
 
-        return $colorMap[$normalizedColorName] ?? '#98A2B3'; // Default to a neutral grey if not found
+        return $colorMap[$normalizedColorName] ?? '#667085';
     }
 
     public function index(Request $request)

@@ -90,14 +90,15 @@
                             class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                         <div class="mt-2 flex flex-wrap gap-1.5">
                             @foreach([
-                                'primary' => '#3B82F6',
-                                'secondary' => '#6B7280',
-                                'success' => '#10B981',
-                                'danger' => '#EF4444',
-                                'warning' => '#F59E0B',
-                                'info' => '#0EA5E9',
-                                'light' => '#D1D5DB',
-                                'dark' => '#374151',
+                                'primary' => '#465FFF',
+                                'secondary' => '#667085',
+                                'success' => '#12B76A',
+                                'danger' => '#F04438',
+                                'warning' => '#F79009',
+                                'info' => '#0BA5EC',
+                                'light' => '#E4E7EC',
+                                'dark' => '#1D2939',
+                                'orange' => '#FB6514',
                             ] as $name => $hex)
                                 <button type="button" onclick="document.getElementById('status-color').value = '{{ $name }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
                                     <span class="w-3 h-3 rounded-full" style="background-color: {{ $hex }}"></span>
