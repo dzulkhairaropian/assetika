@@ -171,7 +171,9 @@ class AssetController extends Controller
             ->whereHas('masterCategory', function($q) {
                 $q->where('name', 'IT Asset');
             })->get();
-        $statuses = Status::all();
+        $statuses = Status::whereHas('masterCategory', function($q) {
+            $q->where('name', 'IT Asset');
+        })->get();
         $vendors = Vendor::all();
         $operatingSystems = OperatingSystem::all();
         $departments = Department::all();
@@ -264,7 +266,9 @@ class AssetController extends Controller
             ->whereHas('masterCategory', function($q) {
                 $q->where('name', 'IT Asset');
             })->get();
-        $statuses = Status::all();
+        $statuses = Status::whereHas('masterCategory', function($q) {
+            $q->where('name', 'IT Asset');
+        })->get();
         $vendors = Vendor::all();
         $operatingSystems = OperatingSystem::all();
         $departments = Department::all();
