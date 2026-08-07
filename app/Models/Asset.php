@@ -300,13 +300,13 @@ class Asset extends Model
 
     public function getBookValueAttribute(): ?float
     {
-        if (!$this->purchase_cost || !$this->depreciation || !$this->purchase_date) {
+        if (!$this->purchase_cost || !$this->depreciation || !$this->release_date) {
             return $this->purchase_cost ? (float) $this->purchase_cost : null;
         }
 
         $months = $this->depreciation->months;
         $perMonth = (float) $this->purchase_cost / $months;
-        $elapsed = $this->purchase_date->diffInMonths(now());
+        $elapsed = $this->release_date->diffInMonths(now());
         $depreciated = $perMonth * min($elapsed, $months);
 
         return max(0, (float) $this->purchase_cost - $depreciated);

@@ -8,7 +8,7 @@ class MenuHelper
     {
         return [
             [
-                'title' => 'Menu',
+                'title' => 'Dashboard',
                 'items' => [
                     [
                         'name' => 'Dashboard',
@@ -24,21 +24,6 @@ class MenuHelper
                         'name' => 'My Assets',
                         'icon' => 'user-assets',
                         'path' => '/my-assets',
-                    ],
-                    [
-                        'name' => 'Reports',
-                        'icon' => 'components',
-                        'path' => '/reports',
-                    ],
-                    [
-                        'name' => 'Import',
-                        'icon' => 'components',
-                        'path' => '/import',
-                    ],
-                    [
-                        'name' => 'Labels',
-                        'icon' => 'components',
-                        'path' => '/labels',
                     ],
                 ],
             ],
@@ -65,7 +50,7 @@ class MenuHelper
                 ],
             ],
             [
-                'title' => 'Assets Management',
+                'title' => 'Asset Management',
                 'items' => [
                     [
                         'name' => 'IT Assets',
@@ -114,7 +99,7 @@ class MenuHelper
                         'path' => '/depreciations',
                     ],
                     [
-                        'name' => 'Audit/Opname',
+                        'name' => 'Audit / Opname',
                         'icon' => 'support',
                         'path' => '/stock-counts',
                     ],
@@ -159,6 +144,26 @@ class MenuHelper
                 ],
             ],
             [
+                'title' => 'Reports & Tools',
+                'items' => [
+                    [
+                        'name' => 'Reports',
+                        'icon' => 'report',
+                        'path' => '/reports',
+                    ],
+                    [
+                        'name' => 'Label Generator',
+                        'icon' => 'label',
+                        'path' => '/labels',
+                    ],
+                    [
+                        'name' => 'Import Data',
+                        'icon' => 'upload',
+                        'path' => '/import',
+                    ],
+                ],
+            ],
+            [
                 'title' => 'System',
                 'items' => [
                     [
@@ -198,7 +203,10 @@ class MenuHelper
             'license' => '<i data-feather="key" class="w-6 h-6"></i>',
             'kit' => '<i data-feather="box" class="w-6 h-6"></i>',
             'ticket-config' => '<i data-feather="settings" class="w-6 h-6"></i>',
-            default => '<i data-feather="circle" class="w-6 h-6"></i>'
+            'report' => '<i data-feather="bar-chart-2" class="w-6 h-6"></i>',
+            'label' => '<i data-feather="tag" class="w-6 h-6"></i>',
+            'upload' => '<i data-feather="upload" class="w-6 h-6"></i>',
+            default => '<i data-feather="circle" class="w-6 h-6"></i>',
         };
     }
 }

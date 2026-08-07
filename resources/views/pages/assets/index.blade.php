@@ -214,6 +214,21 @@
                                     <option value="2-3" {{ request('aging') == '2-3' ? 'selected' : '' }}>2 - 3 Years</option>
                                     <option value="3-4" {{ request('aging') == '3-4' ? 'selected' : '' }}>3 - 4 Years</option>
                                     <option value="4+" {{ request('aging') == '4+' ? 'selected' : '' }}>&gt; 4 Years</option>
+                                    <option value="fully_depreciated" {{ request('aging') == 'fully_depreciated' ? 'selected' : '' }}>Fully Depreciated</option>
+                                    <option value="no_depreciation" {{ request('aging') == 'no_depreciation' ? 'selected' : '' }}>No Depreciation</option>
+                                    <option value="warranty_expired" {{ request('aging') == 'warranty_expired' ? 'selected' : '' }}>Warranty Expired</option>
+                                    <option value="warranty_30d" {{ request('aging') == 'warranty_30d' ? 'selected' : '' }}>Warranty Expiring (30 Days)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Depreciation Profile</label>
+                                <select name="depreciation_id"
+                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                    <option value="">All Profiles</option>
+                                    @foreach($depreciations as $depr)
+                                        <option value="{{ $depr->id }}" {{ request('depreciation_id') == $depr->id ? 'selected' : '' }}>{{ $depr->name }} ({{ $depr->months }}m)</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -315,8 +330,10 @@
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset Tag / Name</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Product / Serial</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Holder</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Actions</th>
+                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Depreciation / Value</th>
+                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Holder</th>
+                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Age</th>
+                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
@@ -361,15 +378,46 @@
                                             {{ $asset->product?->brand?->name ?? '-' }} {{ $asset->product?->model ?? '' }}
                                         </span>
                                         <span class="text-xs text-gray-500">S/N: {{ $asset->serial_number ?? '-' }}</span>
+                                        @if($asset->warranty_expiry_date)
+                                            @if($asset->warranty_expiry_date->isPast())
+                                                <span class="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-error-50 px-2 py-0.5 text-[10px] font-medium text-error-700 dark:bg-error-500/10 dark:text-error-400">
+                                                    Warranty Expired
+                                                </span>
+                                            @elseif($asset->warranty_expiry_date->diffInDays() <= 30)
+                                                <span class="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                                    Warranty Expiring ({{ $asset->warranty_expiry_date->diffInDays() }}d)
+                                                </span>
+                                            @endif
+                                        @endif
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
-                                     @php
-                                         $statusName = optional($asset->status)->name;
-                                         $statusColor = optional($asset->status)->color;
-                                     @endphp
-                                     <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
-                                </td>
+                                 <td class="px-4 sm:px-6 py-3.5">
+                                      @php
+                                          $statusName = optional($asset->status)->name;
+                                          $statusColor = optional($asset->status)->color;
+                                      @endphp
+                                      <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
+                                 </td>
+                                 <td class="px-4 sm:px-6 py-3.5">
+                                     <div class="flex flex-col">
+                                         @if($asset->depreciation)
+                                             <span class="text-xs font-semibold {{ $asset->bookValue == 0 ? 'text-error-500' : 'text-gray-700 dark:text-gray-300' }}">
+                                                 Rp {{ number_format($asset->bookValue, 0, ',', '.') }}
+                                             </span>
+                                             @if($asset->bookValue == 0)
+                                                 <span class="inline-flex items-center gap-1 text-[10px] font-medium text-error-600 dark:text-error-400">
+                                                     Fully Depreciated
+                                                 </span>
+                                             @else
+                                                 <span class="text-[10px] text-gray-400">
+                                                     {{ $asset->depreciation->name }}
+                                                 </span>
+                                             @endif
+                                         @else
+                                             <span class="text-xs text-gray-400 italic">No Depr. Profile</span>
+                                         @endif
+                                     </div>
+                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5">
                                     @if($asset->isCurrentlyCheckedOut())
                                         <div class="flex flex-col">
@@ -382,6 +430,19 @@
                                         </div>
                                     @else
                                         <span class="text-theme-sm text-gray-400 italic">Not Assigned</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 sm:px-6 py-3.5">
+                                    @php
+                                        $startDate = $asset->release_date ?? $asset->purchase_date;
+                                        $ageYears = $startDate ? (int) floor($startDate->diffInDays(now()) / 365.25) : null;
+                                    @endphp
+                                    @if($ageYears !== null)
+                                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $ageYears >= 4 ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' : ($ageYears >= 2 ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400') }}">
+                                            {{ $ageYears }}y old {{ $ageYears >= 4 ? '(Review)' : '' }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-gray-400 italic">-</span>
                                     @endif
                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5">

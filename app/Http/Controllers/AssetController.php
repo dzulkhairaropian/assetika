@@ -10,8 +10,6 @@ use App\Models\OperatingSystem;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\Category;
-use App\Models\Department;
-use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -26,7 +24,7 @@ class AssetController extends Controller
 
     public function index(Request $request)
     {
-        $query = Asset::with(['product.category', 'status', 'assignedToUser', 'department']);
+        $query = Asset::with(['product.category', 'status', 'assignedToUser', 'department', 'depreciation']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -57,6 +55,10 @@ class AssetController extends Controller
             $query->whereHas('product', function($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             });
+        }
+
+        if ($request->filled('depreciation_id')) {
+            $query->where('depreciation_id', $request->depreciation_id);
         }
 
         if ($request->filled('aging')) {
@@ -134,6 +136,22 @@ class AssetController extends Controller
                                 });
                         });
                         break;
+                    case 'fully_depreciated':
+                        $q->whereHas('depreciation', function($sub) use ($now) {
+                            $sub->whereRaw('TIMESTAMPDIFF(MONTH, assets.release_date, ?) >= depreciations.months', [$now->format('Y-m-d')]);
+                        });
+                        break;
+                    case 'no_depreciation':
+                        $q->whereNull('depreciation_id');
+                        break;
+                    case 'warranty_expired':
+                        $q->whereNotNull('warranty_expiry_date')
+                          ->where('warranty_expiry_date', '<', $now->format('Y-m-d'));
+                        break;
+                    case 'warranty_30d':
+                        $q->whereNotNull('warranty_expiry_date')
+                          ->whereBetween('warranty_expiry_date', [$now->format('Y-m-d'), $now->copy()->addDays(30)->format('Y-m-d')]);
+                        break;
                 }
             });
         }
@@ -166,8 +184,9 @@ class AssetController extends Controller
         $categories = Category::whereHas('masterCategory', function($q) {
             $q->where('name', 'IT Asset');
         })->get();
+        $depreciations = \App\Models\Depreciation::all();
 
-        return view('pages.assets.index', compact('assets', 'statuses', 'departments', 'locations', 'products', 'categories', 'inventorySummary'));
+        return view('pages.assets.index', compact('assets', 'statuses', 'departments', 'locations', 'products', 'categories', 'depreciations', 'inventorySummary'));
     }
 
     public function create()
@@ -183,6 +202,7 @@ class AssetController extends Controller
         $operatingSystems = OperatingSystem::all();
         $departments = Department::all();
         $locations = Location::all();
+        $depreciations = \App\Models\Depreciation::all();
 
         // Pre-load fieldsets for JS-driven dynamic rendering
         $fieldsets = \App\Models\Fieldset::with('customFields')->get()->keyBy('id');
@@ -190,7 +210,7 @@ class AssetController extends Controller
             ->mapWithKeys(fn($c) => [$c->id => $c->fieldsets]);
 
         return view('pages.assets.create', compact(
-            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations',
+            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
             'fieldsets', 'categoryFieldsets'
         ));
     }
@@ -223,6 +243,7 @@ class AssetController extends Controller
                 'notes' => 'nullable|string',
                 'asset_tag' => 'nullable|string|unique:assets,asset_tag',
                 'device_name' => 'nullable|string',
+                'depreciation_id' => 'nullable|exists:depreciations,id',
             ]);
 
             if (empty($validated['status_id']) || $isDraft) {
@@ -253,6 +274,7 @@ class AssetController extends Controller
                 'release_date' => 'required|date',
                 'warranty_expiry_date' => 'nullable|date',
                 'purchase_cost' => 'nullable|numeric',
+                'depreciation_id' => 'nullable|exists:depreciations,id',
                 'invoice_number' => 'nullable|string',
                 'notes' => 'nullable|string',
             ]);
@@ -291,6 +313,7 @@ class AssetController extends Controller
         $operatingSystems = OperatingSystem::all();
         $departments = Department::all();
         $locations = Location::all();
+        $depreciations = \App\Models\Depreciation::all();
 
         $asset->load('customFieldValues');
 
@@ -299,7 +322,7 @@ class AssetController extends Controller
             ->mapWithKeys(fn($c) => [$c->id => $c->fieldsets]);
 
         return view('pages.assets.edit', compact(
-            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations',
+            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
             'fieldsets', 'categoryFieldsets'
         ));
     }
@@ -333,6 +356,7 @@ class AssetController extends Controller
                 'notes' => 'nullable|string',
                 'asset_tag' => 'nullable|string|unique:assets,asset_tag,' . $asset->id,
                 'device_name' => 'nullable|string',
+                'depreciation_id' => 'nullable|exists:depreciations,id',
             ]);
 
             $draftStatus = Status::firstOrCreate(
@@ -361,6 +385,7 @@ class AssetController extends Controller
                 'release_date' => 'required|date',
                 'warranty_expiry_date' => 'nullable|date',
                 'purchase_cost' => 'nullable|numeric',
+                'depreciation_id' => 'nullable|exists:depreciations,id',
                 'invoice_number' => 'nullable|string',
                 'notes' => 'nullable|string',
             ]);

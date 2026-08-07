@@ -166,6 +166,48 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Depreciation & Value Card -->
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">Depreciation & Value</h3>
+                    @if($asset->depreciation && $asset->purchase_cost && $asset->release_date)
+                        @php
+                            $totalMonths = $asset->depreciation->months;
+                            $elapsedMonths = (int) $asset->release_date->diffInMonths(now());
+                            $percent = min(100, (int) round(($elapsedMonths / $totalMonths) * 100));
+                            $remainingMonths = max(0, $totalMonths - $elapsedMonths);
+                        @endphp
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Profile</span>
+                                <span class="font-medium text-gray-800 dark:text-white/90">{{ $asset->depreciation->name }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Release Date</span>
+                                <span class="font-medium text-gray-800 dark:text-white/90">{{ $asset->release_date->format('d M Y') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Original Cost</span>
+                                <span class="font-medium text-gray-800 dark:text-white/90">Rp {{ number_format($asset->purchase_cost, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Book Value</span>
+                                <span class="font-bold {{ $asset->bookValue == 0 ? 'text-error-500' : 'text-brand-500' }}">Rp {{ number_format($asset->bookValue, 0, ',', '.') }}</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+                                    <span>{{ $percent }}% depreciated</span>
+                                    <span>{{ $remainingMonths > 0 ? $remainingMonths . ' months left' : 'Fully Depreciated' }}</span>
+                                </div>
+                                <div class="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                    <div class="h-full {{ $percent >= 100 ? 'bg-error-500' : 'bg-brand-500' }}" style="width: {{ $percent }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-xs text-gray-400 italic">No depreciation profile assigned or missing release date/cost.</div>
+                    @endif
+                </div>
             </div>
 
             <!-- Main Content -->
