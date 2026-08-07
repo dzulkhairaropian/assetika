@@ -125,4 +125,19 @@ class User extends Authenticatable
             ->where('type', 'checkout')
             ->orderBy('transaction_date', 'desc');
     }
+
+    public function createdTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'created_by_id');
+    }
+
+    public function assignedTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'assigned_to_id');
+    }
+
+    public function requestedTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'requester_user_id');
+    }
 }

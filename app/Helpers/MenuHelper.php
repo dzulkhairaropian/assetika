@@ -28,6 +28,28 @@ class MenuHelper
                 ],
             ],
             [
+                'title' => 'Support Ticketing',
+                'items' => [
+                    [
+                        'name' => 'Tickets',
+                        'icon' => 'ticket',
+                        'path' => '/ticket-dashboard',
+                    ],
+                    [
+                        'name' => 'Ticketing Data',
+                        'icon' => 'ticket-config',
+                        'subItems' => [
+                            ['name' => 'Priorities', 'path' => '/admin/priorities'],
+                            ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
+                            ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
+                            ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
+                            ['name' => 'Labels', 'path' => '/admin/labels'],
+                            ['name' => 'Sources', 'path' => '/admin/sources'],
+                        ],
+                    ],
+                ],
+            ],
+            [
                 'title' => 'Assets Management',
                 'items' => [
                     [
@@ -127,6 +149,8 @@ class MenuHelper
             'support' => '<i data-feather="help-circle" class="w-6 h-6"></i>',
             'access' => '<i data-feather="shield" class="w-6 h-6"></i>',
             'backup' => '<i data-feather="database" class="w-6 h-6"></i>',
+            'ticket' => '<i data-feather="file-text" class="w-6 h-6"></i>',
+            'ticket-config' => '<i data-feather="settings" class="w-6 h-6"></i>',
             default => '<i data-feather="circle" class="w-6 h-6"></i>'
         };
     }

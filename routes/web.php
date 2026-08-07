@@ -24,6 +24,13 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssetManagementController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\GaDashboardController;
+use App\Http\Controllers\TicketDashboardController;
+use App\Http\Controllers\Admin\PriorityController;
+use App\Http\Controllers\Admin\LabelController;
+use App\Http\Controllers\Admin\SourceController;
+use App\Http\Controllers\Admin\TicketStatusController;
+use App\Http\Controllers\Admin\TicketTypeController;
+use App\Http\Controllers\Admin\SlaStatusController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -49,6 +56,7 @@ Route::get('asset/{asset}', [AssetController::class, 'publicScan'])->name('asset
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('ga-dashboard', [GaDashboardController::class, 'index'])->name('ga-dashboard');
+    Route::get('ticket-dashboard', [TicketDashboardController::class, 'index'])->name('ticket-dashboard');
     
     // Master Data Routes
     Route::post('companies/bulk-delete', [CompanyController::class, 'bulkDestroy'])->name('companies.bulk-delete');
@@ -135,6 +143,22 @@ Route::middleware('auth')->group(function () {
     Route::get('backups/download/{fileName}', [BackupController::class, 'download'])->name('backups.download');
     Route::delete('backups/{fileName}', [BackupController::class, 'destroy'])->name('backups.destroy');
     Route::post('backups/settings', [BackupController::class, 'updateSettings'])->name('backups.settings');
+
+    // Admin Bulk Delete Routes (must be before resource routes)
+    Route::post('admin/priorities/bulk-delete', [PriorityController::class, 'bulkDestroy'])->name('admin.priorities.bulk-delete');
+    Route::post('admin/labels/bulk-delete', [LabelController::class, 'bulkDestroy'])->name('admin.labels.bulk-delete');
+    Route::post('admin/sources/bulk-delete', [SourceController::class, 'bulkDestroy'])->name('admin.sources.bulk-delete');
+    Route::post('admin/ticket-types/bulk-delete', [TicketTypeController::class, 'bulkDestroy'])->name('admin.ticket-types.bulk-delete');
+    Route::post('admin/ticket-statuses/bulk-delete', [TicketStatusController::class, 'bulkDestroy'])->name('admin.ticket-statuses.bulk-delete');
+    Route::post('admin/sla-statuses/bulk-delete', [SlaStatusController::class, 'bulkDestroy'])->name('admin.sla-statuses.bulk-delete');
+
+    // Admin CRUD Routes (Ticketing)
+    Route::resource('admin/priorities', PriorityController::class, ['names' => 'admin.priorities']);
+    Route::resource('admin/labels', LabelController::class, ['names' => 'admin.labels']);
+    Route::resource('admin/sources', SourceController::class, ['names' => 'admin.sources']);
+    Route::resource('admin/ticket-types', TicketTypeController::class, ['names' => 'admin.ticket-types']);
+    Route::resource('admin/ticket-statuses', TicketStatusController::class, ['names' => 'admin.ticket-statuses']);
+    Route::resource('admin/sla-statuses', SlaStatusController::class, ['names' => 'admin.sla-statuses']);
     
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
