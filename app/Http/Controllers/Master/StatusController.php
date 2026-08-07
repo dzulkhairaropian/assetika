@@ -6,41 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Status;
 use App\Models\MasterCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class StatusController extends Controller
 {
-    private function convertColorNameToHex(string $colorName): string
-    {
-        $colorMap = [
-            'primary'   => '#465FFF',
-            'secondary' => '#667085',
-            'success'   => '#12B76A',
-            'danger'    => '#F04438',
-            'error'     => '#F04438',
-            'warning'   => '#F79009',
-            'info'      => '#0BA5EC',
-            'light'     => '#E4E7EC',
-            'dark'      => '#1D2939',
-            'gray'      => '#667085',
-            'orange'    => '#FB6514',
-            'blue-light' => '#0BA5EC',
-            'red'       => '#F04438',
-            'blue'      => '#0BA5EC',
-            'green'     => '#12B76A',
-            'yellow'    => '#F79009',
-            'grey'      => '#667085',
-        ];
-
-        $normalizedColorName = Str::lower($colorName);
-
-        if (preg_match('/^#[a-f0-9]{6}$/i', $colorName)) {
-            return $colorName;
-        }
-
-        return $colorMap[$normalizedColorName] ?? '#667085';
-    }
-
     public function index(Request $request)
     {
         $query = Status::with('masterCategory');
@@ -96,15 +64,10 @@ class StatusController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'icon' => 'nullable|string|max:255',
-            'color' => 'nullable|string|max:50', // Tetap string, konversi setelah validasi
+            'color' => 'nullable|string|max:50',
             'master_category_id' => 'required|exists:master_categories,id',
             'description' => 'nullable|string',
         ]);
-
-        // Konversi nama warna ke heksadesimal sebelum disimpan
-        if (isset($validated['color'])) {
-            $validated['color'] = $this->convertColorNameToHex($validated['color']);
-        }
 
         $status->update($validated);
 
