@@ -270,7 +270,7 @@ class TicketController extends Controller
         $comment = TicketComment::create([
             'ticket_id' => $ticket->id,
             'user_id' => auth()->id(),
-            'comment' => $validated['comment'],
+            'body' => $validated['comment'],
             'is_internal' => $request->boolean('is_internal'),
         ]);
 

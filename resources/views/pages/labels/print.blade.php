@@ -197,8 +197,8 @@
             <p class="text-xs text-gray-500">Layout Grid 3 Columns • Format A4 • Total {{ count($assets) }} item(s)</p>
         </div>
         <div class="flex items-center gap-3">
-            <button onclick="window.close()" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Close</button>
-            <button onclick="window.print()" class="rounded-lg bg-brand-500 hover:bg-brand-600 px-5 py-2 text-xs font-semibold text-white shadow-xs">
+            <button onclick="window.close()" class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Close</button>
+            <button onclick="window.print()" class="rounded-lg bg-blue-600 hover:bg-blue-700 px-5 py-2 text-xs font-bold text-white shadow-md">
                 Print Labels
             </button>
         </div>

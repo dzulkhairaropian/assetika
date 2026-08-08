@@ -115,7 +115,7 @@
                                 </span>
                                 <span class="text-[11px] text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
                             </div>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $comment->comment }}</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $comment->body ?? $comment->comment }}</p>
 
                             @if($comment->attachments->count() > 0)
                                 <div class="mt-3 pt-2 border-t border-gray-100 dark:border-gray-800/60 flex flex-wrap gap-2">

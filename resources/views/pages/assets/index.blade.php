@@ -245,17 +245,17 @@
                     <input type="number" id="labelCopies" min="1" max="10" value="1"
                         class="w-16 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1.5 text-center text-xs font-semibold text-gray-800 dark:text-white">
                 </div>
-                <button @click="submitBulkLabels()"
+                <button type="button" @click="submitBulkLabels()"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
                     <i data-feather="printer" class="w-4 h-4"></i>
                     Print Labels
                 </button>
-                <button @click="exportSelectedAssets(selectedAssets)"
+                <button type="button" @click="exportSelectedAssets(selectedAssets)"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
                     <i data-feather="download" class="w-4 h-4"></i>
                     Export Selected
                 </button>
-                <button @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
                     <i data-feather="trash-2" class="w-4 h-4"></i>
                     Delete Selected
