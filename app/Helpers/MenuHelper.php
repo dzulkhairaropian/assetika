@@ -36,9 +36,14 @@ class MenuHelper
                 'title' => 'Support Ticketing',
                 'items' => [
                     [
-                        'name' => 'Tickets',
-                        'icon' => 'ticket',
+                        'name' => 'Ticket Dashboard',
+                        'icon' => 'dashboard',
                         'path' => '/ticket-dashboard',
+                    ],
+                    [
+                        'name' => 'All Tickets',
+                        'icon' => 'ticket',
+                        'path' => '/tickets',
                     ],
                     [
                         'name' => 'Ticketing Data',

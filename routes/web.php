@@ -70,6 +70,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('ga-dashboard', [GaDashboardController::class, 'index'])->name('ga-dashboard');
     Route::get('ticket-dashboard', [TicketDashboardController::class, 'index'])->name('ticket-dashboard');
+    Route::post('tickets/{ticket}/comment', [\App\Http\Controllers\TicketController::class, 'comment'])->name('tickets.comment');
+    Route::resource('tickets', \App\Http\Controllers\TicketController::class);
     
     // Master Data Routes
     Route::post('companies/bulk-delete', [CompanyController::class, 'bulkDestroy'])->name('companies.bulk-delete');

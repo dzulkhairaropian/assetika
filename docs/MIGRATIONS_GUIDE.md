@@ -121,6 +121,7 @@ Tabel di bawah adalah referensi urutan file migrasi yang telah dibuat di proyek 
 | 21 | `2026_08_07_000016_create_maintenance_types_table.php` | **High Pri**: Maintenance Types |
 | 22 | `2026_08_07_000017_add_maintenance_type_to_maintenance_tables.php` | **High Pri**: Maintenance Type FK |
 | 23 | `2026_08_07_000018_create_stock_counts_table.php` | **High Pri**: Stock Count / Audit Opname |
+| 24 | `2026_08_07_000019_create_asset_requests_table.php` | **High Pri**: User Self-Service Asset Requests |
 
 ---
 
