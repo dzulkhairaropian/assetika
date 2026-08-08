@@ -38,9 +38,10 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                                 @foreach($section['items'] as $item)
+                                    @php $itemName = $section['key'] === 'consumables' ? ($item->product?->name ?? 'Consumable') : $item->name; @endphp
                                     <tr>
-                                        <td class="px-4 py-2"><input type="checkbox" name="{{ $section['key'] }}[{{ $loop->index }}][id]" value="{{ $item->{$section['idField']} }}" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500"></td>
-                                        <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-400">{{ $item->{$section['nameField']} }}</td>
+                                        <td class="px-4 py-2"><input type="checkbox" name="{{ $section['key'] }}[{{ $loop->index }}][id]" value="{{ $item->id }}" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500"></td>
+                                        <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-400">{{ $itemName }}</td>
                                         <td class="px-4 py-2"><input type="number" name="{{ $section['key'] }}[{{ $loop->index }}][qty]" value="1" min="1" class="h-8 w-16 rounded border border-gray-300 bg-white px-2 text-xs dark:border-gray-700 dark:bg-gray-900"></td>
                                     </tr>
                                 @endforeach

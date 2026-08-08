@@ -2,6 +2,44 @@
 @section('content')
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Maintenance Types" />
+
+    <!-- Stat Card Header -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                    <i data-feather="tool" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Total Service Types</span>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $maintenanceTypes->total() }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
+                    <i data-feather="settings" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Classification</span>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Preventive / Repair</h4>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10">
+                    <i data-feather="activity" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Maintenance System</span>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Asset Health Tracker</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <form action="{{ route('maintenance-types.index') }}" method="GET" class="flex items-center gap-3">
             <div class="relative flex items-center"><span class="absolute left-3 text-gray-400"><i data-feather="search" class="w-4 h-4"></i></span><input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900"></div>

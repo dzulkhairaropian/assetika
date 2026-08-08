@@ -55,7 +55,7 @@ class MenuHelper
                 ],
             ],
             [
-                'title' => 'Asset Management',
+                'title' => 'IT Asset Management',
                 'items' => [
                     [
                         'name' => 'IT Assets',
@@ -64,16 +64,6 @@ class MenuHelper
                             ['name' => 'Inventory', 'path' => '/assets'],
                             ['name' => 'Transactions', 'path' => '/asset-transactions'],
                         ],
-                    ],
-                    [
-                        'name' => 'GA Assets',
-                        'icon' => 'ga-assets',
-                        'path' => '/ga-assets',
-                    ],
-                    [
-                        'name' => 'GA Categories',
-                        'icon' => 'catalog',
-                        'path' => '/ga-categories',
                     ],
                     [
                         'name' => 'Components',
@@ -112,6 +102,21 @@ class MenuHelper
                         'name' => 'Asset Requests',
                         'icon' => 'ticket',
                         'path' => '/asset-requests',
+                    ],
+                ],
+            ],
+            [
+                'title' => 'General Affairs (GA)',
+                'items' => [
+                    [
+                        'name' => 'GA Assets',
+                        'icon' => 'ga-assets',
+                        'path' => '/ga-assets',
+                    ],
+                    [
+                        'name' => 'GA Categories',
+                        'icon' => 'catalog',
+                        'path' => '/ga-categories',
                     ],
                 ],
             ],

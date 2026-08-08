@@ -2,6 +2,44 @@
 @section('content')
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Depreciations" />
+
+    <!-- Stat Card Header -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                    <i data-feather="trending-down" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Total Profiles</span>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $depreciations->total() }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
+                    <i data-feather="clock" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Method</span>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Straight-Line</h4>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10">
+                    <i data-feather="percent" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Rate Basis</span>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Monthly Cost Basis</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <form action="{{ route('depreciations.index') }}" method="GET" class="flex items-center gap-3">
             <div class="relative flex items-center"><span class="absolute left-3 text-gray-400"><i data-feather="search" class="w-4 h-4"></i></span>

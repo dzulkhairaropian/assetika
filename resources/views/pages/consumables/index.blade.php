@@ -24,6 +24,43 @@
     }">
         <x-common.page-breadcrumb pageTitle="Consumable Management" />
 
+        <!-- Stat Card Header -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                        <i data-feather="package" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Total Consumables</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $consumables->total() }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
+                        <i data-feather="box" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Inventory Stock</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $consumables->sum('quantity') }} Items</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-500 dark:bg-amber-500/10">
+                        <i data-feather="alert-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Low Stock Threshold</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Auto Alert</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('consumables.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
                 <div class="relative flex items-center">

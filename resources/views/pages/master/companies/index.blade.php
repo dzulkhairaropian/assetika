@@ -4,6 +4,43 @@
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Companies" />
 
+        <!-- Stat Card Header -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                        <i data-feather="columns" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Total Entities</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $companies->total() }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
+                        <i data-feather="globe" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Scope</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Multi-Company Org</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10">
+                        <i data-feather="check-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Status</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Active Hierarchy</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('companies.index') }}" method="GET" class="flex items-center gap-3">
                 <div class="relative flex items-center">

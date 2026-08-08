@@ -4,6 +4,43 @@
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Components" />
 
+        <!-- Stat Card Header -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                        <i data-feather="cpu" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Total Component Types</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $components->total() }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
+                        <i data-feather="hard-drive" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Total Units in Stock</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $components->sum('qty') }} Qty</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10">
+                        <i data-feather="link-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Sub-item Attachment</span>
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Asset Mapped</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('components.index') }}" method="GET" class="flex items-center gap-3">
                 <div class="relative flex items-center">

@@ -32,7 +32,7 @@ class KitController extends Controller
         $assets = Asset::orderBy('device_name')->get();
         $licenses = License::orderBy('name')->get();
         $components = Component::orderBy('name')->get();
-        $consumables = Consumable::orderBy('name')->get();
+        $consumables = Consumable::with('product')->get();
 
         return view('pages.kits.create', compact('assets', 'licenses', 'components', 'consumables'));
     }
@@ -107,7 +107,7 @@ class KitController extends Controller
         $assets = Asset::orderBy('device_name')->get();
         $licenses = License::orderBy('name')->get();
         $components = Component::orderBy('name')->get();
-        $consumables = Consumable::orderBy('name')->get();
+        $consumables = Consumable::with('product')->get();
 
         return view('pages.kits.edit', compact('kit', 'assets', 'licenses', 'components', 'consumables'));
     }
