@@ -51,5 +51,34 @@ class TicketLookupSeeder extends Seeder
             ['name' => 'Network', 'slug' => 'network', 'color' => '#F59E0B', 'sort_order' => 3, 'is_active' => 1],
             ['name' => 'Access', 'slug' => 'access', 'color' => '#10B981', 'sort_order' => 4, 'is_active' => 1],
         ], ['slug'], ['name', 'color', 'sort_order', 'is_active']);
+
+        // Seed Ticket Categories & Subcategories
+        $categoriesData = [
+            'Hardware' => ['Laptop / Notebook', 'Desktop PC', 'Printer / Scanner', 'Monitor / Display', 'Peripherals (Mouse/Keyboard/Dock)'],
+            'Software' => ['Operating System', 'Office / Productivity', 'ERP / CRM Software', 'Specialized Design/Dev Software', 'Antivirus / Security'],
+            'Network & Internet' => ['Wi-Fi / Wireless Connection', 'LAN / Ethernet Cable', 'VPN Access', 'Internet Slow/Down', 'Firewall / Port Request'],
+            'Account & Access' => ['Active Directory / Domain', 'Email / Mailbox', 'Password Reset', 'Access Right / Permission', '2FA / Multi-Factor Auth'],
+        ];
+
+        foreach ($categoriesData as $catName => $subs) {
+            $catId = DB::table('ticket_categories')->insertGetId([
+                'name' => $catName,
+                'code' => strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $catName), 0, 8)),
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            foreach ($subs as $subName) {
+                DB::table('ticket_subcategories')->insert([
+                    'ticket_category_id' => $catId,
+                    'name' => $subName,
+                    'code' => strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $subName), 0, 8)),
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
     }
 }

@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\Attachment;
-use App\Models\Category;
+use App\Models\TicketCategory;
+use App\Models\TicketSubcategory;
 use App\Models\Label;
 use App\Models\Priority;
 use App\Models\SlaStatus;
@@ -25,7 +26,7 @@ class TicketController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Ticket::with(['category', 'priority', 'status', 'slaStatus', 'assignedTo', 'requesterUser']);
+        $query = Ticket::with(['ticketCategory', 'ticketSubcategory', 'priority', 'status', 'slaStatus', 'assignedTo', 'requesterUser']);
 
         if ($search = $request->string('search')->trim()->toString()) {
             $query->where(function ($q) use ($search): void {
@@ -54,7 +55,7 @@ class TicketController extends Controller
     {
         $users = User::all();
         $ticketTypes = TicketType::all();
-        $categories = Category::all();
+        $ticketCategories = TicketCategory::where('is_active', true)->with('subcategories')->get();
         $priorities = Priority::all();
         $labels = Label::all();
         $sources = Source::all();
@@ -65,7 +66,7 @@ class TicketController extends Controller
         return view('pages.tickets.form', compact(
             'users',
             'ticketTypes',
-            'categories',
+            'ticketCategories',
             'priorities',
             'labels',
             'sources',
@@ -80,7 +81,8 @@ class TicketController extends Controller
         $data = $request->validate([
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
             'requester_user_id' => ['required', 'exists:users,id'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
+            'ticket_subcategory_id' => ['nullable', 'exists:ticket_subcategories,id'],
             'priority_id' => ['nullable', 'exists:priorities,id'],
             'label_id' => ['nullable', 'exists:labels,id'],
             'source_id' => ['nullable', 'exists:sources,id'],
@@ -145,7 +147,7 @@ class TicketController extends Controller
     {
         $ticket->load([
             'ticketType', 'requesterUser', 'requesterCompany', 'requesterDepartment',
-            'category', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
+            'ticketCategory', 'ticketSubcategory', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
             'status', 'slaStatus', 'asset', 'attachments', 'comments.user', 'comments.attachments', 'histories.user'
         ]);
 
@@ -156,7 +158,7 @@ class TicketController extends Controller
     {
         $users = User::all();
         $ticketTypes = TicketType::all();
-        $categories = Category::all();
+        $ticketCategories = TicketCategory::where('is_active', true)->with('subcategories')->get();
         $priorities = Priority::all();
         $labels = Label::all();
         $sources = Source::all();
@@ -168,7 +170,7 @@ class TicketController extends Controller
             'ticket',
             'users',
             'ticketTypes',
-            'categories',
+            'ticketCategories',
             'priorities',
             'labels',
             'sources',
@@ -183,7 +185,8 @@ class TicketController extends Controller
         $data = $request->validate([
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
             'requester_user_id' => ['required', 'exists:users,id'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
+            'ticket_subcategory_id' => ['nullable', 'exists:ticket_subcategories,id'],
             'priority_id' => ['nullable', 'exists:priorities,id'],
             'label_id' => ['nullable', 'exists:labels,id'],
             'source_id' => ['nullable', 'exists:sources,id'],

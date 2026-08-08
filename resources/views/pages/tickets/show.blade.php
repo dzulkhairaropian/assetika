@@ -147,7 +147,12 @@
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Category</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->category?->name ?? '-' }}</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">
+                            {{ $ticket->ticketCategory?->name ?? '-' }}
+                            @if($ticket->ticketSubcategory)
+                                <span class="text-gray-400 font-normal">({{ $ticket->ticketSubcategory->name }})</span>
+                            @endif
+                        </span>
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Assigned To</span>

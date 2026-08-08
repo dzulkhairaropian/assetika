@@ -55,6 +55,7 @@ class MenuHelper
                             ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
                             ['name' => 'Labels', 'path' => '/admin/labels'],
                             ['name' => 'Sources', 'path' => '/admin/sources'],
+                            ['name' => 'Categories & Subcategories', 'path' => '/admin/ticket-categories'],
                         ],
                     ],
                 ],

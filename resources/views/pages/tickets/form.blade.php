@@ -1,7 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    selectedCategory: '{{ old('ticket_category_id', $ticket?->ticket_category_id) }}',
+    selectedSubcategory: '{{ old('ticket_subcategory_id', $ticket?->ticket_subcategory_id) }}',
+    categories: {{ json_encode($ticketCategories) }},
+    get subcategories() {
+        if (!this.selectedCategory) return [];
+        const cat = this.categories.find(c => c.id == this.selectedCategory);
+        return cat ? cat.subcategories : [];
+    }
+}">
     <x-common.page-breadcrumb pageTitle="{{ $ticket ? 'Edit Ticket #' . $ticket->request_id : 'Create New Ticket' }}" />
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
@@ -34,6 +43,28 @@
                     </select>
                 </div>
 
+                <!-- ITSM Ticket Category -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ITSM Category</label>
+                    <select name="ticket_category_id" x-model="selectedCategory" @change="selectedSubcategory = ''" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                        <option value="">Select Category</option>
+                        <template x-for="cat in categories" :key="cat.id">
+                            <option :value="cat.id" x-text="cat.name" :selected="cat.id == selectedCategory"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- ITSM Ticket Subcategory -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ITSM Subcategory</label>
+                    <select name="ticket_subcategory_id" x-model="selectedSubcategory" :disabled="!selectedCategory" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                        <option value="">Select Subcategory</option>
+                        <template x-for="sub in subcategories" :key="sub.id">
+                            <option :value="sub.id" x-text="sub.name" :selected="sub.id == selectedSubcategory"></option>
+                        </template>
+                    </select>
+                </div>
+
                 <!-- Priority -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
@@ -56,19 +87,8 @@
                     </select>
                 </div>
 
-                <!-- Category -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                    <select name="category_id" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                        <option value="">Select Category</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id', $ticket?->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
                 <!-- Linked IT Asset -->
-                <div>
+                <div class="sm:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Linked Asset (ITAM)</label>
                     <select name="asset_id" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                         <option value="">No Asset Linked</option>

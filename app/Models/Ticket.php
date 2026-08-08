@@ -25,6 +25,8 @@ class Ticket extends Model
         'requester_department_id',
         'asset_id',
         'category_id',
+        'ticket_category_id',
+        'ticket_subcategory_id',
         'priority_id',
         'label_id',
         'source_id',
@@ -82,6 +84,16 @@ class Ticket extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function ticketCategory(): BelongsTo
+    {
+        return $this->belongsTo(TicketCategory::class, 'ticket_category_id');
+    }
+
+    public function ticketSubcategory(): BelongsTo
+    {
+        return $this->belongsTo(TicketSubcategory::class, 'ticket_subcategory_id');
     }
 
     public function priority(): BelongsTo

@@ -230,6 +230,13 @@ Route::middleware('auth')->group(function () {
     Route::post('admin/sla-statuses/bulk-delete', [SlaStatusController::class, 'bulkDestroy'])->name('admin.sla-statuses.bulk-delete');
 
     // Admin CRUD Routes (Ticketing)
+    Route::get('admin/ticket-categories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'index'])->name('admin.ticket-categories.index');
+    Route::post('admin/ticket-categories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'storeCategory'])->name('admin.ticket-categories.store');
+    Route::delete('admin/ticket-categories/{category}', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'destroyCategory'])->name('admin.ticket-categories.destroy');
+    Route::post('admin/ticket-subcategories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'storeSubcategory'])->name('admin.ticket-subcategories.store');
+    Route::delete('admin/ticket-subcategories/{subcategory}', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'destroySubcategory'])->name('admin.ticket-subcategories.destroy');
+    Route::get('api/ticket-categories/{category}/subcategories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'getSubcategories'])->name('api.ticket-categories.subcategories');
+
     Route::resource('admin/priorities', PriorityController::class, ['names' => 'admin.priorities']);
     Route::resource('admin/labels', LabelController::class, ['names' => 'admin.labels']);
     Route::resource('admin/sources', SourceController::class, ['names' => 'admin.sources']);
