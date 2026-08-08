@@ -31,15 +31,36 @@ class AssetLabelController extends Controller
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:assets,id',
+            'quantities' => 'nullable|array',
         ]);
 
-        $assets = Asset::whereIn('id', $request->ids)->with('product.category')->get();
+        $assetsRaw = Asset::whereIn('id', $request->ids)->with(['product.category', 'department.company'])->get();
+        
+        $quantities = $request->input('quantities', []);
+        $assets = collect();
+
+        foreach ($assetsRaw as $asset) {
+            $qty = isset($quantities[$asset->id]) ? (int) $quantities[$asset->id] : 1;
+            $qty = max(1, min(50, $qty)); // limit max 50 copies per asset
+            for ($i = 0; $i < $qty; $i++) {
+                $assets->push($asset);
+            }
+        }
 
         return view('pages.labels.print', compact('assets'));
     }
 
-    public function generateSingle(Asset $asset)
+    public function generateSingle(Request $request, Asset $asset)
     {
-        return view('pages.labels.print', ['assets' => collect([$asset->load('product.category')])]);
+        $qty = (int) $request->input('copies', 1);
+        $qty = max(1, min(50, $qty));
+
+        $assets = collect();
+        $asset->load(['product.category', 'department.company']);
+        for ($i = 0; $i < $qty; $i++) {
+            $assets->push($asset);
+        }
+
+        return view('pages.labels.print', compact('assets'));
     }
 }

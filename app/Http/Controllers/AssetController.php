@@ -296,7 +296,11 @@ class AssetController extends Controller
 
     public function show(Asset $asset)
     {
-        $asset->load(['product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location', 'checkoutHistory.checkedOutToUser']);
+        $asset->load([
+            'product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location', 
+            'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType', 
+            'tickets.status', 'tickets.priority', 'tickets.assignedTo'
+        ]);
         return view('pages.assets.show', compact('asset'));
     }
 
