@@ -35,15 +35,16 @@
         /* Grid layout for A4 Sheet: 3 Columns x N Rows */
         .label-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2.5mm 2mm;
-            justify-start: start;
+            grid-template-columns: repeat(3, 68mm);
+            gap: 2.5mm 3mm;
+            justify-content: start;
             align-content: start;
         }
 
-        /* Fixed Dimensions Label Card (68mm x 38mm) to fit all text cleanly */
+        /* Fixed Dimensions Label Card (68mm x 38mm) */
         .label-card {
-            width: 100%;
+            width: 68mm;
+            max-width: 68mm;
             height: 38mm;
             border: 1px dashed #94a3b8; /* Cutting line guide */
             box-sizing: border-box;
@@ -261,9 +262,9 @@
                     </div>
                 </div>
 
-                <!-- Footer: Clean Copyright Text -->
+                <!-- Footer: Clean Hardcoded Copyright Text -->
                 <div class="label-footer">
-                    <span>© {{ date('Y') }} {{ config('app.name', 'Assetika') }} | ITSM System</span>
+                    <span>© {{ date('Y') }} Assetika | ITSM System</span>
                     <span>Do Not Remove</span>
                 </div>
             </div>
