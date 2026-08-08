@@ -60,10 +60,10 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
-                    <button @click="showQrModal = true" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                        <i data-feather="crosshair" class="h-4 w-4"></i>
-                        QR Label
-                    </button>
+                    <a href="{{ route('labels.print-single', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
+                        <i data-feather="printer" class="h-4 w-4"></i>
+                        Print Label Sticker
+                    </a>
                     <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
                         <i data-feather="edit-3" class="h-4 w-4"></i>
                         Edit
@@ -229,6 +229,16 @@
                             :class="activeTab === 'maintenance' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
                             class="border-b-2 px-4 py-4 text-sm font-medium transition-all">
                             Maintenance History
+                        </button>
+                        <button @click="activeTab = 'tickets'"
+                            :class="activeTab === 'tickets' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+                            class="border-b-2 px-4 py-4 text-sm font-medium transition-all flex items-center gap-2">
+                            Support Tickets
+                            @if($asset->tickets->count() > 0)
+                                <span class="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                    {{ $asset->tickets->count() }}
+                                </span>
+                            @endif
                         </button>
                     </div>
 
@@ -434,15 +444,70 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                         @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tickets History Tab -->
+                        <div x-show="activeTab === 'tickets'" class="space-y-4" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="border-b border-gray-100 dark:border-gray-800">
+                                        <tr>
+                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Ticket ID</th>
+                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Requester</th>
+                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Problem Summary</th>
+                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Priority</th>
+                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Status</th>
+                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
+                                        @forelse($asset->tickets as $t)
+                                            <tr>
+                                                <td class="py-4 font-mono font-medium text-brand-600 dark:text-brand-400">
+                                                    <a href="{{ route('tickets.show', $t) }}" class="hover:underline">#{{ $t->request_id }}</a>
+                                                </td>
+                                                <td class="py-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    {{ $t->requester_name ?? '-' }}
+                                                </td>
+                                                <td class="py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title="{{ $t->problem_description }}">
+                                                    {{ Str::limit($t->problem_description, 50) }}
+                                                </td>
+                                                <td class="py-4">
+                                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+                                                        {{ $t->priority?->name ?? 'Normal' }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-4">
+                                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                                                        {{ $t->status?->name ?? 'Open' }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-4 text-right">
+                                                    <a href="{{ route('tickets.show', $t) }}" class="text-xs font-medium text-brand-500 hover:underline">
+                                                        View Ticket
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="px-6 py-12 text-center">
+                                                    <div class="flex flex-col items-center justify-center space-y-2">
+                                                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
+                                                            <i data-feather="life-buoy" class="h-6 w-6"></i>
+                                                        </div>
+                                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No support tickets reported for this asset</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- QR Label Modal -->
         <div x-show="showQrModal"
