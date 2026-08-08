@@ -20,6 +20,37 @@
                 this.selectedAssets.push(asset);
             }
             this.selectAll = this.selectedAssets.length === document.querySelectorAll('.asset-checkbox').length;
+        },
+        submitBulkLabels() {
+            const copies = document.getElementById('labelCopies') ? document.getElementById('labelCopies').value : 1;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("labels.generate") }}';
+            form.target = '_blank';
+            
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            this.selectedAssets.forEach(a => {
+                const inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = 'ids[]';
+                inputId.value = a.id;
+                form.appendChild(inputId);
+
+                const inputQty = document.createElement('input');
+                inputQty.type = 'hidden';
+                inputQty.name = 'quantities[' + a.id + ']';
+                inputQty.value = copies;
+                form.appendChild(inputQty);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         }
     }">
         <x-common.page-breadcrumb pageTitle="Asset Management" />
@@ -214,10 +245,10 @@
                     <input type="number" id="labelCopies" min="1" max="10" value="1"
                         class="w-16 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1.5 text-center text-xs font-semibold text-gray-800 dark:text-white">
                 </div>
-                <button @click="printBulkLabels(selectedAssets, document.getElementById('labelCopies').value)"
+                <button @click="submitBulkLabels()"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
                     <i data-feather="printer" class="w-4 h-4"></i>
-                    Print QR Labels
+                    Print Labels
                 </button>
                 <button @click="exportSelectedAssets(selectedAssets)"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">

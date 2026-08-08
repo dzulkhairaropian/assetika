@@ -37,70 +37,88 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 2.5mm 2mm;
-            justify-content: start;
+            justify-start: start;
             align-content: start;
         }
 
-        /* Industrial Asset Label Sticker Dimensions (68mm x 34mm) */
+        /* Fixed Dimensions Label Card (68mm x 38mm) to fit all text cleanly */
         .label-card {
             width: 100%;
-            height: 34mm;
-            border: 1px dashed #94a3b8; /* Panduan pemotongan cutter */
+            height: 38mm;
+            border: 1px dashed #94a3b8; /* Cutting line guide */
             box-sizing: border-box;
             background: #ffffff;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: space-between;
             overflow: hidden;
             page-break-inside: avoid;
             border-radius: 4px;
         }
 
         .label-header {
-            background-color: #047857; /* Emerald Dark Solid Green */
+            background-color: #465fff; /* TailAdmin Brand Blue */
             color: #ffffff;
-            text-align: center;
-            padding: 2px 3px;
+            padding: 3px 6px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            gap: 6px;
             line-height: 1.1;
+            flex-shrink: 0;
+            min-height: 24px;
+        }
+
+        .label-header-logo {
+            height: 18px;
+            max-width: 50px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
             flex-shrink: 0;
         }
 
+        .label-header-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            min-width: 0;
+            flex: 1;
+        }
+
         .label-header-sub {
-            font-size: 5.5pt;
+            font-size: 5pt;
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            opacity: 0.9;
+            opacity: 0.95;
+            white-space: nowrap;
         }
 
         .label-header-title {
-            font-size: 6.5pt;
+            font-size: 5.5pt;
             font-weight: 800;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.01em;
             text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 98%;
+            line-height: 1.1;
+            max-width: 100%;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .label-body {
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 2px 5px;
+            gap: 6px;
+            padding: 4px 6px;
             background: #ffffff;
             overflow: hidden;
         }
 
         .qr-container {
-            width: 21mm;
-            height: 21mm;
+            width: 22mm;
+            height: 22mm;
             flex-shrink: 0;
             background: #ffffff;
             padding: 1px;
@@ -123,36 +141,49 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 1px;
-            overflow: hidden;
-        }
-
-        .info-row {
-            display: flex;
-            align-items: baseline;
             gap: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .info-label {
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6pt;
+            line-height: 1.25;
+        }
+
+        .info-table td {
+            padding: 0.5px 0;
+            vertical-align: top;
+        }
+
+        .info-table td.lbl {
             font-size: 5pt;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.02em;
-            flex-shrink: 0;
-            width: 22px;
+            width: 26px;
+            white-space: nowrap;
         }
 
-        .info-val {
-            font-size: 6.5pt;
+        .info-table td.val {
             font-weight: 600;
             color: #0f172a;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .label-footer {
+            background-color: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 2px 6px;
+            font-size: 4.5pt;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 500;
+            line-height: 1;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -161,13 +192,13 @@
     <!-- Top Action Bar (No Print) -->
     <div class="no-print mb-4 flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <div>
-            <h1 class="text-base font-bold text-gray-800">Sticker Label Print Preview ({{ count($assets) }} Units)</h1>
-            <p class="text-xs text-gray-500">Format Grid 3 Kolom A4 • Font Official Assetika (Outfit) • Presisi & Rapih • QR Code Scannable</p>
+            <h1 class="text-base font-bold text-gray-800">Asset Label Print Preview</h1>
+            <p class="text-xs text-gray-500">Layout Grid 3 Columns • Format A4 • Total {{ count($assets) }} item(s)</p>
         </div>
         <div class="flex items-center gap-3">
             <button onclick="window.close()" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Close</button>
-            <button onclick="window.print()" class="rounded-lg bg-emerald-600 px-5 py-2 text-xs font-semibold text-white hover:bg-emerald-700 shadow-xs">
-                🖨️ Print Now (Epson L3250 / A4)
+            <button onclick="window.print()" class="rounded-lg bg-brand-500 hover:bg-brand-600 px-5 py-2 text-xs font-semibold text-white shadow-xs">
+                Print Labels
             </button>
         </div>
     </div>
@@ -184,48 +215,56 @@
                 $deptName = optional($asset->department)->name ?? '-';
             @endphp
             <div class="label-card">
-                <!-- Header 2 Baris: "PROPERTY OF" lalu "NAMA PERUSAHAAN" -->
+                <!-- Header 2 Baris + Multi-Company Dynamic Logo -->
                 <div class="label-header">
-                    <span class="label-header-sub">PROPERTY OF</span>
-                    <span class="label-header-title" title="{{ $companyName }}">{{ $companyName }}</span>
+                    @php
+                        $company = optional($asset->department)->company;
+                        $companyLogo = $company?->logo ? Storage::url($company->logo) : '/images/diastikalogo.png';
+                    @endphp
+                    <img src="{{ $companyLogo }}" alt="Logo" class="label-header-logo" onerror="this.style.display='none'">
+                    <div class="label-header-text">
+                        <span class="label-header-sub">PROPERTY OF</span>
+                        <span class="label-header-title" title="{{ $companyName }}">{{ $companyName }}</span>
+                    </div>
                 </div>
 
-                <!-- Body Area: QR Code + Structured Metadata -->
+                <!-- Body Area: QR Code + Clean Table Metadata -->
                 <div class="label-body">
                     <!-- High-Res Smartphone Scannable QR Code -->
                     <div class="qr-container" id="qr-box-{{ $idx }}" data-url="{{ $scanUrl }}"></div>
 
-                    <!-- Clean Structured Information -->
+                    <!-- Clean Structured Information Table -->
                     <div class="info-container">
-                        <!-- Asset Tag -->
-                        <div class="font-extrabold text-[10pt] leading-none text-slate-900 truncate mb-0.5" title="{{ $asset->asset_tag }}">
+                        <!-- Asset Tag Header -->
+                        <div class="font-extrabold text-[10pt] leading-tight text-slate-900 mb-1">
                             {{ $asset->asset_tag }}
                         </div>
 
-                        <!-- Device Name -->
-                        <div class="info-row">
-                            <span class="info-label">Name</span>
-                            <span class="info-val font-bold text-slate-900" title="{{ $deviceName }}">{{ $deviceName }}</span>
-                        </div>
-
-                        <!-- Serial Number -->
-                        <div class="info-row">
-                            <span class="info-label">S/N</span>
-                            <span class="info-val text-[6pt]">{{ $serialNum }}</span>
-                        </div>
-
-                        <!-- Category -->
-                        <div class="info-row">
-                            <span class="info-label">Cat</span>
-                            <span class="info-val text-[6pt] text-slate-600">{{ $categoryName }}</span>
-                        </div>
-
-                        <!-- Department -->
-                        <div class="info-row">
-                            <span class="info-label">Dept</span>
-                            <span class="info-val text-[6pt] text-slate-600">{{ $deptName }}</span>
-                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td class="lbl">Name</td>
+                                <td class="val font-bold text-slate-900">{{ $deviceName }}</td>
+                            </tr>
+                            <tr>
+                                <td class="lbl">S/N</td>
+                                <td class="val font-mono text-[5.5pt]">{{ $serialNum }}</td>
+                            </tr>
+                            <tr>
+                                <td class="lbl">Cat</td>
+                                <td class="val text-slate-600">{{ $categoryName }}</td>
+                            </tr>
+                            <tr>
+                                <td class="lbl">Dept</td>
+                                <td class="val text-slate-600">{{ $deptName }}</td>
+                            </tr>
+                        </table>
                     </div>
+                </div>
+
+                <!-- Footer: Clean Copyright Text -->
+                <div class="label-footer">
+                    <span>© {{ date('Y') }} {{ config('app.name', 'Assetika') }} | ITSM System</span>
+                    <span>Do Not Remove</span>
                 </div>
             </div>
         @endforeach
