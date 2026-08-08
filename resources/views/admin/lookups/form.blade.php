@@ -80,11 +80,47 @@
 
             <div class="space-y-6 lg:col-span-4">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
-                    <h3 class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">Settings</h3>
+                    <h3 class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">Appearance</h3>
                     <div class="space-y-4">
                         <div>
+                            <label for="icon-input" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Feather Icon</label>
+                            <input type="text" id="icon-input" name="icon" value="{{ old('icon', $item?->icon) }}" placeholder="e.g. alert-circle" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 focus:border-brand-500 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                            <div class="mt-2 flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                                @foreach([
+                                    'alert-circle', 'alert-triangle', 'check-circle', 'clock',
+                                    'file-text', 'help-circle', 'info', 'loader', 'lock',
+                                    'refresh-cw', 'shield', 'star', 'tag', 'thumbs-up',
+                                    'tool', 'user', 'users', 'x-circle', 'zap'
+                                ] as $i)
+                                    <button type="button" onclick="document.getElementById('icon-input').value = '{{ $i }}'" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400">
+                                        <i data-feather="{{ $i }}" class="w-3 h-3"></i> {{ $i }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div>
                             <label for="color" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Color</label>
-                            <input type="color" name="color" id="color" value="{{ old('color', $item?->color ?? '#000000') }}" class="h-11 w-full cursor-pointer rounded-lg border border-gray-300 bg-transparent px-2 dark:border-gray-700 dark:bg-gray-900" />
+                            <div class="flex items-center gap-2">
+                                <input type="color" name="color" id="color" value="{{ old('color', $item?->color ?? '#3B82F6') }}" class="h-11 w-14 cursor-pointer rounded-lg border border-gray-300 bg-transparent p-1 dark:border-gray-700 dark:bg-gray-900" />
+                                <input type="text" id="color-text" name="color_hex" value="{{ old('color', $item?->color ?? '#3B82F6') }}" onchange="document.getElementById('color').value = this.value" class="h-11 flex-1 rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                            </div>
+                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                @foreach([
+                                    '#EF4444' => 'Red',
+                                    '#F59E0B' => 'Amber',
+                                    '#10B981' => 'Green',
+                                    '#3B82F6' => 'Blue',
+                                    '#6366F1' => 'Indigo',
+                                    '#8B5CF6' => 'Purple',
+                                    '#EC4899' => 'Pink',
+                                    '#6B7280' => 'Gray',
+                                ] as $hex => $name)
+                                    <button type="button" onclick="document.getElementById('color').value = '{{ $hex }}'; document.getElementById('color-text').value = '{{ $hex }}';" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400">
+                                        <span class="w-3 h-3 rounded-full" style="background-color: {{ $hex }}"></span>
+                                        {{ $name }}
+                                    </button>
+                                @endforeach
+                            </div>
                         </div>
                         <div>
                             <label for="sort_order" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Sort Order</label>
