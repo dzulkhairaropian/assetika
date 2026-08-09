@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::get('ga-dashboard', [GaDashboardController::class, 'index'])->name('ga-dashboard');
     Route::get('ticket-dashboard', [TicketDashboardController::class, 'index'])->name('ticket-dashboard');
     Route::post('tickets/{ticket}/comment', [\App\Http\Controllers\TicketController::class, 'comment'])->name('tickets.comment');
+    Route::post('tickets/bulk-delete', [\App\Http\Controllers\TicketController::class, 'bulkDestroy'])->name('tickets.bulk-delete');
     Route::resource('tickets', \App\Http\Controllers\TicketController::class);
     
     // Master Data Routes

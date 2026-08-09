@@ -95,9 +95,19 @@ class TicketController extends Controller
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
 
-        $data['request_id'] = 'REQ-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -4));
-        $data['request_date'] = now()->toDateString();
-        $data['request_time'] = now();
+        $now = now();
+        $ticketType = !empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
+        $requestCode = strtoupper($ticketType?->code ?: 'REQ');
+        $dailySequence = str_pad(
+            (string) (Ticket::whereDate('created_at', $now->toDateString())->count() + 1),
+            3,
+            '0',
+            STR_PAD_LEFT
+        );
+
+        $data['request_id'] = $requestCode . '-' . $now->format('ymd') . '-' . $dailySequence;
+        $data['request_date'] = $now->toDateString();
+        $data['request_time'] = $now;
 
         $requester = User::find($data['requester_user_id']);
         if ($requester) {
@@ -321,5 +331,17 @@ class TicketController extends Controller
         $ticket->delete();
 
         return redirect()->route('tickets.index')->with('success', 'Ticket deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:tickets,id'],
+        ]);
+
+        Ticket::whereIn('id', $data['ids'])->delete();
+
+        return redirect()->route('tickets.index')->with('success', 'Selected tickets deleted successfully.');
     }
 }

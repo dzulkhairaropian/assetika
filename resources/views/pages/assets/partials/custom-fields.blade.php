@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const categoryFieldsets = @json($categoryFieldsets);
     const fieldsets = @json($fieldsets);
     const productCategories = @json($productCategories);
-    const existingValues = @json($asset?->customFieldValues?->pluck('value', 'custom_field_id') ?? []);
+    const existingValues = @json(isset($asset) ? ($asset->customFieldValues?->pluck('value', 'custom_field_id') ?? []) : []);
     const productSelect = document.querySelector('select[name="product_id"]');
     const container = document.getElementById('custom-fields-container');
 

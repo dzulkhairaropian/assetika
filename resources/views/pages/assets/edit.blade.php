@@ -8,14 +8,15 @@
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <form action="{{ route('assets.update', $asset) }}" method="POST" class="space-y-8">
-                @csrf
-                @method('PUT')
+        <form action="{{ route('assets.update', $asset) }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
+            @csrf
+            @method('PUT')
 
-                <!-- Section: General Information -->
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-8">
+                    <!-- Section: General Information -->
+                    <div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                         General Information
                     </h3>
@@ -167,9 +168,8 @@
                             <div class="flex items-center gap-2">
                                 <input type="text" name="serial_number" value="{{ old('serial_number', $asset->serial_number) }}" placeholder="Enter serial number" required
                                     class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                <button type="button" onclick="generateSN()" class="inline-flex items-center justify-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                                    <i data-feather="shuffle" class="w-3.5 h-3.5"></i>
-                                    Generate
+                                <button type="button" onclick="generateSN()" title="Generate Random Serial Number" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 shadow-theme-xs transition hover:bg-gray-50 hover:text-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-brand-400">
+                                    <i data-feather="shuffle" class="w-4 h-4"></i>
                                 </button>
                             </div>
                             @error('serial_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
@@ -206,11 +206,9 @@
                     </div>
                 </div>
 
-                <hr class="border-gray-200 dark:border-gray-800">
-
                 <!-- Section: Network Information -->
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                <div class="pt-2">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="wifi" class="w-5 h-5 text-brand-500"></i>
                         Network Information
                     </h3>
@@ -235,11 +233,9 @@
                     </div>
                 </div>
 
-                <hr class="border-gray-200 dark:border-gray-800">
-
                 <!-- Section: Software Licenses -->
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                <div class="pt-2">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="key" class="w-5 h-5 text-brand-500"></i>
                         Software Licenses
                     </h3>
@@ -317,13 +313,18 @@
 
                 <hr class="border-gray-200 dark:border-gray-800">
 
+                @include('pages.assets.partials.custom-fields')
+                </div>
+            </div>
+
+            <div class="space-y-6">
                 <!-- Section: Financial Information -->
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white/90">
                         <i data-feather="dollar-sign" class="w-5 h-5 text-brand-500"></i>
                         Financial Information
                     </h3>
-                    <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                    <div class="space-y-4">
                         <div>
                             <x-form.date-picker
                                 id="purchase_date"
@@ -381,7 +382,7 @@
                             @error('invoice_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="lg:col-span-2">
+                        <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                 Notes
                             </label>
@@ -392,21 +393,25 @@
                     </div>
                 </div>
 
-                @include('pages.assets.partials.custom-fields')
-
-                <div class="flex items-center justify-end gap-3 mt-6">
-                    <a href="{{ route('assets.index') }}" class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
-                        Cancel
-                    </a>
-                    <button type="submit" name="is_draft" value="1" formnovalidate class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] transition">
-                        Save as Draft
-                    </button>
-                    <button type="submit" class="inline-flex justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition">
-                        Update Asset
-                    </button>
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white/90">
+                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        Actions
+                    </h3>
+                    <div class="space-y-3">
+                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            Update Asset
+                        </button>
+                        <button type="submit" name="is_draft" value="1" formnovalidate class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+                            Save as Draft
+                        </button>
+                        <a href="{{ route('assets.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            Cancel
+                        </a>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 @endsection
 
@@ -414,7 +419,7 @@
 <script>
     function generateSN() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let sn = 'SN-';
+        let sn = 'DUMMY-SN-';
         for (let i = 0; i < 8; i++) sn += chars.charAt(Math.floor(Math.random() * chars.length));
         document.querySelector('input[name="serial_number"]').value = sn;
     }

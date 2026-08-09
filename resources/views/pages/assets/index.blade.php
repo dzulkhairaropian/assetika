@@ -396,7 +396,7 @@
                                         $ageYears = $startDate ? (int) floor($startDate->diffInDays(now()) / 365.25) : null;
                                     @endphp
                                     @if($ageYears !== null)
-                                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $ageYears >= 4 ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' : ($ageYears >= 2 ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400') }}">
+                                        <span class="text-xs font-semibold {{ $ageYears >= 4 ? 'text-error-700 dark:text-error-400' : ($ageYears >= 2 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400') }}">
                                             {{ $ageYears }}y old {{ $ageYears >= 4 ? '(Review)' : '' }}
                                         </span>
                                     @else
