@@ -291,7 +291,8 @@
                              <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Depreciation / Value</th>
                              <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Holder</th>
                              <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Age</th>
-                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Actions</th>
+                              <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-end">Actions</th>
+
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
@@ -403,34 +404,58 @@
                                         <span class="text-xs text-gray-400 italic">-</span>
                                     @endif
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
-                                    <div class="flex items-center gap-3 text-gray-500">
-                                        <a href="{{ route('assets.show', $asset) }}" class="hover:text-brand-500 transition-colors" title="View Details">
-                                            <i data-feather="eye" class="w-5 h-5"></i>
-                                        </a>
-                                        <a href="{{ route('assets.edit', $asset) }}" class="hover:text-brand-500 transition-colors" title="Edit">
-                                            <i data-feather="edit-3" class="w-5 h-5"></i>
-                                        </a>
+                                <td class="px-4 sm:px-6 py-3.5 text-right">
+                                    <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+                                        <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+                                            <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                        </button>
 
-                                        @if($asset->isCurrentlyCheckedOut())
-                                            <a href="{{ route('assets.checkin', $asset) }}" class="hover:text-warning-500 transition-colors" title="Check-in">
-                                                <i data-feather="log-in" class="w-5 h-5"></i>
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="transform opacity-100 scale-100"
+                                            x-transition:leave-end="transform opacity-0 scale-95"
+                                            class="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900"
+                                            style="display: none;">
+                                            
+                                            <a href="{{ route('assets.show', $asset) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-feather="eye" class="w-4 h-4 text-gray-400"></i>
+                                                View Details
                                             </a>
-                                        @else
-                                            <a href="{{ route('assets.checkout', $asset) }}" class="hover:text-success-500 transition-colors" title="Check-out">
-                                                <i data-feather="log-out" class="w-5 h-5"></i>
-                                            </a>
-                                        @endif
 
-                                        <form action="{{ route('assets.destroy', $asset) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this asset?')" class="inline-flex">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="hover:text-error-500 transition-colors" title="Delete">
-                                                <i data-feather="trash-2" class="w-5 h-5"></i>
-                                            </button>
-                                        </form>
+                                            <a href="{{ route('assets.edit', $asset) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-feather="edit-3" class="w-4 h-4 text-gray-400"></i>
+                                                Edit
+                                            </a>
+
+                                            @if($asset->isCurrentlyCheckedOut())
+                                                <a href="{{ route('assets.checkin', $asset) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10 transition-colors">
+                                                    <i data-feather="log-in" class="w-4 h-4"></i>
+                                                    Check-in
+                                                </a>
+                                            @else
+                                                <a href="{{ route('assets.checkout', $asset) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
+                                                    <i data-feather="log-out" class="w-4 h-4"></i>
+                                                    Check-out
+                                                </a>
+                                            @endif
+
+                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                            <form action="{{ route('assets.destroy', $asset) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this asset?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
+                                                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                    Delete Asset
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
+
                             </tr>
                         @empty
                             <tr>

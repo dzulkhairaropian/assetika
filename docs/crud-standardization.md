@@ -39,11 +39,51 @@ Dokumen ini berisi standar UI/UX dan struktur Blade untuk seluruh halaman CRUD p
 - Muncul otomatis saat item dipilih (`x-show="selected.length > 0"`).
 - Berisi info jumlah terdaftar dan opsi aksi (Print, Export Selected, Delete Selected).
 
-### Tabel Data
+### Tabel Data & Action Dropdown
 - Outer card: `rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]`.
 - Header tabel: `bg-gray-50 dark:bg-gray-900 border-y border-gray-100 dark:border-white/[0.05]`.
-- Checkbox header + row menggunakan styling kustom Tailwind.
-- Status/Tag menggunakan `<x-ui.badge>` atau styling teks berwarna (contoh Age Asset: `text-xs font-semibold text-emerald-700`).
+- Checkbox header + row: `pl-6 pr-2 w-10 text-start`.
+- Header kolom Aksi: `<th class="... text-end">Actions</th>`.
+- **Kolom Aksi**: Menggunakan **Single Action Dropdown Button** (`more-vertical`) berbasis AlpineJS `x-data="{ open: false }"` dengan perataan kanan (`text-right`) agar melayang rapi di atas tabel.
+
+```blade
+<td class="px-4 sm:px-6 py-3.5 text-right">
+    <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+        <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+            <i data-feather="more-vertical" class="w-5 h-5"></i>
+        </button>
+
+        <div x-show="open"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="transform opacity-0 scale-95"
+            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="transform opacity-100 scale-100"
+            x-transition:leave-end="transform opacity-0 scale-95"
+            class="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900"
+            style="display: none;">
+            
+            <a href="{{ route('items.show', $item) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                <i data-feather="eye" class="w-4 h-4 text-gray-400"></i>
+                View Details
+            </a>
+            <a href="{{ route('items.edit', $item) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                <i data-feather="edit-3" class="w-4 h-4 text-gray-400"></i>
+                Edit
+            </a>
+            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+            <form action="{{ route('items.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</td>
+```
 
 ### Footer & Pagination Summary
 Wajib menampilkan ringkasan data di kiri dan link pagination Laravel di kanan.
