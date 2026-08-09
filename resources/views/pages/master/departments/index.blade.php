@@ -224,8 +224,13 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-800">
-                {{ $departments->links() }}
+            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Showing {{ $departments->firstItem() ?? 0 }} to {{ $departments->lastItem() ?? 0 }} of {{ $departments->total() }} results
+                    </p>
+                    {{ $departments->links() }}
+                </div>
             </div>
         </div>
     </div>

@@ -230,8 +230,13 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-800">
-                {{ $companies->links() }}
+            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Showing {{ $companies->firstItem() ?? 0 }} to {{ $companies->lastItem() ?? 0 }} of {{ $companies->total() }} results
+                    </p>
+                    {{ $companies->links() }}
+                </div>
             </div>
         </div>
     </div>

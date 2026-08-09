@@ -89,7 +89,8 @@ Wajib menampilkan ringkasan data di kiri dan link pagination Laravel di kanan.
                 <i data-feather="save" class="w-5 h-5 text-brand-500"></i> Actions
             </h3>
             <div class="space-y-3">
-                <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-600">Save</button>
+                <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-600">Save / Create</button>
+                <button type="submit" name="create_another" value="1" class="inline-flex w-full justify-center rounded-lg border border-brand-500 bg-white px-4 py-2.5 text-sm font-medium text-brand-500 transition hover:bg-brand-50">Create & Create New</button>
                 <a href="..." class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700">Cancel</a>
             </div>
         </div>
@@ -176,6 +177,7 @@ Gunakan AlpineJS `x-data="{ activeTab: 'details' }"` pada container utama untuk 
 2. **Create / Edit**:
    - [ ] Menggunakan layout 2-kolom (`xl:grid-cols-[minmax(0,1.75fr)_380px]`).
    - [ ] Memisahkan field pendukung & tombol aksi di sidebar kanan.
+   - [ ] Menyediakan tombol `Create & Create New` (`name="create_another" value="1"`) pada form Create untuk mempercepat input berulang.
    - [ ] Mengatur spacing sub-section (`space-y-8`, `pt-2`, `border-b`) agar judul form tidak berdempetan.
    - [ ] Menyesuaikan helper inline button ke style icon-only (`h-11 w-11`).
    - [ ] Menjaga null safety pada partial blade.

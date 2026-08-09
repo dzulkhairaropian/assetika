@@ -4,127 +4,129 @@
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Edit Status" />
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <form action="{{ route('statuses.update', $status) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <!-- Section: General Information -->
+        <form action="{{ route('statuses.update', $status) }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
+            @csrf
+            @method('PUT')
 
-                <div>
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                            <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                            General Information
+                        </h3>
 
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Status Name <span class="text-error-500">*</span>
+                                </label>
+                                <input type="text" name="name" value="{{ old('name', $status->name) }}" placeholder="e.g., Active" required
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
 
-                        <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                            <div x-data="{ selectedId: '{{ old('master_category_id', $status->master_category_id) }}' }">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Master Category <span class="text-error-500">*</span>
+                                </label>
+                                <input type="hidden" name="master_category_id" :value="selectedId" required />
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($masterCategories as $master)
+                                        <button type="button" @click="selectedId = '{{ $master->id }}'"
+                                            :class="selectedId == '{{ $master->id }}' ? 'bg-brand-500 text-white border-brand-500' : 'bg-transparent text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'"
+                                            class="inline-flex justify-center rounded-lg border px-4 py-2 text-sm font-medium transition">
+                                            {{ $master->name }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                                @error('master_category_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
 
-                        General Information
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Icon (Feather Icons)
+                                </label>
+                                <input type="text" id="status-icon" name="icon" value="{{ old('icon', $status->icon) }}" placeholder="e.g., check-circle"
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                <div class="mt-2 flex flex-wrap gap-1.5">
+                                    @foreach([
+                                        'check-circle', 'x-circle', 'alert-circle', 'alert-triangle',
+                                        'user', 'user-check', 'users', 'bookmark',
+                                        'refresh-cw', 'loader', 'clock',
+                                        'check', 'x', 'thumbs-up',
+                                        'tool', 'settings', 'monitor',
+                                        'file-text', 'archive', 'package',
+                                        'trash-2', 'help-circle', 'info',
+                                        'log-in', 'log-out', 'eye',
+                                        'download', 'search', 'database',
+                                        'key', 'cpu', 'wifi',
+                                        'dollar-sign', 'bell', 'plus',
+                                        'edit-3', 'crosshair', 'activity',
+                                        'pen-tool'
+                                    ] as $iconName)
+                                        <button type="button" onclick="document.getElementById('status-icon').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
+                                            <i data-feather="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
 
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Color (Hex / Theme)
+                                </label>
+                                <input type="text" id="status-color" name="color" value="{{ old('color', $status->color) }}" placeholder="e.g., #RRGGBB or success"
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                <div class="mt-2 flex flex-wrap gap-1.5">
+                                    @foreach([
+                                        'primary' => '#465FFF',
+                                        'secondary' => '#667085',
+                                        'success' => '#12B76A',
+                                        'danger' => '#F04438',
+                                        'warning' => '#F79009',
+                                        'info' => '#0BA5EC',
+                                        'light' => '#E4E7EC',
+                                        'dark' => '#1D2939',
+                                        'orange' => '#FB6514',
+                                    ] as $name => $hex)
+                                        <button type="button" onclick="document.getElementById('status-color').value = '{{ $name }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
+                                            <span class="w-3 h-3 rounded-full" style="background-color: {{ $hex }}"></span>
+                                            {{ $name }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-2">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Description
+                                </label>
+                                <textarea name="description" rows="3" placeholder="Enter description"
+                                    class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">{{ old('description', $status->description) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white/90">
+                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        Actions
                     </h3>
-
-
-                <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                    <div>
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Status Name <span class="text-error-500">*</span>
-                        </label>
-                        <input type="text" name="name" value="{{ old('name', $status->name) }}" placeholder="e.g., Active" required
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                        @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div x-data="{ selectedId: '{{ old('master_category_id', $status->master_category_id) }}' }">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Master Category <span class="text-error-500">*</span>
-                        </label>
-                        <input type="hidden" name="master_category_id" :value="selectedId" required />
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($masterCategories as $master)
-                                <button type="button" @click="selectedId = '{{ $master->id }}'"
-                                    :class="selectedId == '{{ $master->id }}' ? 'bg-brand-500 text-white border-brand-500' : 'bg-transparent text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'"
-                                    class="inline-flex justify-center rounded-lg border px-4 py-2 text-sm font-medium transition">
-                                    {{ $master->name }}
-                                </button>
-                            @endforeach
-                        </div>
-                        @error('master_category_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div>
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Icon (Feather Icons)
-                        </label>
-                        <input type="text" id="status-icon" name="icon" value="{{ old('icon', $status->icon) }}" placeholder="e.g., check-circle"
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                        <div class="mt-2 flex flex-wrap gap-1.5">
-                            @foreach([
-                                'check-circle', 'x-circle', 'alert-circle', 'alert-triangle',
-                                'user', 'user-check', 'users', 'bookmark',
-                                'refresh-cw', 'loader', 'clock',
-                                'check', 'x', 'thumbs-up',
-                                'tool', 'settings', 'monitor',
-                                'file-text', 'archive', 'package',
-                                'trash-2', 'help-circle', 'info',
-                                'log-in', 'log-out', 'eye',
-                                'download', 'search', 'database',
-                                'key', 'cpu', 'wifi',
-                                'dollar-sign', 'bell', 'plus',
-                                'edit-3', 'crosshair', 'activity',
-                                'pen-tool'
-                            ] as $iconName)
-                                <button type="button" onclick="document.getElementById('status-icon').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
-                                    <i data-feather="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Color (Hex / Theme)
-                        </label>
-                        <input type="text" id="status-color" name="color" value="{{ old('color', $status->color) }}" placeholder="e.g., #RRGGBB or success"
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                        <div class="mt-2 flex flex-wrap gap-1.5">
-                            @foreach([
-                                'primary' => '#465FFF',
-                                'secondary' => '#667085',
-                                'success' => '#12B76A',
-                                'danger' => '#F04438',
-                                'warning' => '#F79009',
-                                'info' => '#0BA5EC',
-                                'light' => '#E4E7EC',
-                                'dark' => '#1D2939',
-                                'orange' => '#FB6514',
-                            ] as $name => $hex)
-                                <button type="button" onclick="document.getElementById('status-color').value = '{{ $name }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
-                                    <span class="w-3 h-3 rounded-full" style="background-color: {{ $hex }}"></span>
-                                    {{ $name }}
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-2">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Description
-                        </label>
-                        <textarea name="description" rows="3" placeholder="Enter description"
-                            class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">{{ old('description', $status->description) }}</textarea>
+                    <div class="space-y-3">
+                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            Update Status
+                        </button>
+                        <a href="{{ route('statuses.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            Cancel
+                        </a>
                     </div>
                 </div>
-
-                </div>
-
-
-
-                <div class="flex items-center justify-end gap-3 mt-6">
-                    <a href="{{ route('statuses.index') }}" class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
-                        Cancel
-                    </a>
-                    <button type="submit" class="inline-flex justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition">
-                        Update Status
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 @endsection
+
