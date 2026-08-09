@@ -148,10 +148,10 @@
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto">
                 <table class="w-full">
-                    <thead class="border-y border-t border-gray-100 bg-gray-50 px-6 py-3.5 dark:border-white/[0.05] dark:bg-gray-900">
+                    <thead class="border-y border-t border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
                         <tr>
-                            <th class="px-4 py-3 w-12 text-center">
-                                <div class="flex justify-center items-center">
+                            <th class="py-3 pl-6 pr-2 w-10 text-start">
+                                <div class="flex items-center">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
                                             <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -167,7 +167,7 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="px-4 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Ticket Key</th>
+                            <th class="py-3 pl-2 pr-6 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Ticket Key</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Requester</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Summary</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Priority</th>
@@ -186,8 +186,8 @@
                                 $slaIcon = $isOverdue ? 'alert-circle' : 'check-circle';
                             @endphp
                             <tr class="border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="px-4 py-3.5 text-center">
-                                    <div class="flex justify-center items-center">
+                                <td class="py-3.5 pl-6 pr-2 text-start">
+                                    <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
                                             <div class="relative">
                                                 <input type="checkbox"
@@ -207,7 +207,7 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3.5">
+                                <td class="py-3.5 pl-2 pr-6">
                                     <a href="{{ route('tickets.show', $ticket) }}" class="font-mono text-theme-sm font-medium text-brand-600 dark:text-brand-400">{{ $ticket->request_id }}</a>
                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5">

@@ -160,10 +160,10 @@
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
             <div class="max-w-full overflow-x-auto">
                 <table class="w-full">
-                    <thead class="px-6 py-3.5 border-t border-gray-100 border-y bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
+                    <thead class="border-y border-t border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
                         <tr>
-                            <th class="px-4 py-3 w-12 text-center">
-                                <div class="flex justify-center items-center">
+                            <th class="py-3 pl-6 pr-2 w-10 text-start">
+                                <div class="flex items-center">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
                                             <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -179,7 +179,7 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset</th>
+                            <th class="py-3 pl-2 pr-6 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Category</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Value (Rp)</th>
@@ -190,8 +190,8 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($assets as $asset)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="px-4 py-3.5 text-center">
-                                    <div class="flex justify-center items-center">
+                                <td class="py-3.5 pl-6 pr-2 text-start">
+                                    <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
                                             <div class="relative">
                                                 <input type="checkbox" 
@@ -217,7 +217,7 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
+                                <td class="py-3.5 pl-2 pr-6 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
                                             <i data-feather="briefcase" class="w-5 h-5"></i>

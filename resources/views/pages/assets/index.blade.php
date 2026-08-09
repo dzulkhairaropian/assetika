@@ -266,10 +266,10 @@
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto">
                 <table class="w-full">
-                    <thead class="px-6 py-3.5 border-t border-gray-100 border-y bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
+                    <thead class="border-y border-t border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
                         <tr>
-                            <th class="px-4 py-3 w-12 text-center">
-                                <div class="flex justify-center items-center">
+                            <th class="py-3 pl-6 pr-2 w-10 text-start">
+                                <div class="flex items-center">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
                                             <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -285,7 +285,7 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset Tag / Name</th>
+                            <th class="py-3 pl-2 pr-6 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset Tag / Name</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Product / Serial</th>
                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
                              <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Depreciation / Value</th>
@@ -297,8 +297,8 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($assets as $asset)
                             <tr class="border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="px-4 py-3.5 text-center">
-                                    <div class="flex justify-center items-center">
+                                <td class="py-3.5 pl-6 pr-2 text-start">
+                                    <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
                                             <div class="relative">
                                                 <input type="checkbox"
@@ -324,7 +324,7 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="py-3.5 pl-2 pr-6">
                                     <div class="flex flex-col">
                                         <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">{{ $asset->asset_tag }}</span>
                                         <span class="text-xs text-gray-500">{{ $asset->device_name }}</span>
