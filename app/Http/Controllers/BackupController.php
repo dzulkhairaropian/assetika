@@ -34,7 +34,7 @@ class BackupController extends Controller
 
     public function index()
     {
-        $backupName = config('backup.backup.name', env('APP_NAME', 'laravel-backup'));
+        $backupName = config('backup.backup.name', env('BACKUP_NAME', 'laravel-backup'));
         $disk = Storage::disk('local');
         
         $backups = [];
@@ -101,7 +101,7 @@ class BackupController extends Controller
     {
         // Safe check
         $fileName = basename($fileName);
-        $backupName = config('backup.backup.name', env('APP_NAME', 'laravel-backup'));
+        $backupName = config('backup.backup.name', env('BACKUP_NAME', 'laravel-backup'));
         $filePath = $backupName . '/' . $fileName;
 
         if (Storage::disk('local')->exists($filePath)) {
@@ -114,7 +114,7 @@ class BackupController extends Controller
     public function destroy($fileName)
     {
         $fileName = basename($fileName);
-        $backupName = config('backup.backup.name', env('APP_NAME', 'laravel-backup'));
+        $backupName = config('backup.backup.name', env('BACKUP_NAME', 'laravel-backup'));
         $filePath = $backupName . '/' . $fileName;
 
         if (Storage::disk('local')->exists($filePath)) {
