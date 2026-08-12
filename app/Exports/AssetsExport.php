@@ -28,7 +28,11 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             'product.category',
             'status',
             'assignedToUser',
-            'operatingSystem'
+            'operatingSystem',
+            'department.company',
+            'location',
+            'vendor',
+            'depreciation'
         ]);
 
         if (!empty($this->filters['search'])) {
@@ -36,25 +40,16 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             $query->where(function($q) use ($search) {
                 $q->where('asset_tag', 'like', "%$search%")
                   ->orWhere('serial_number', 'like', "%$search%")
-                  ->orWhere('device_name', 'like', "%$search%");
+                  ->orWhere('device_name', 'like', "%$search%")
+                  ->orWhere('product_number', 'like', "%$search%");
             });
         }
 
-        if (!empty($this->filters['status_id'])) {
-            $query->where('status_id', $this->filters['status_id']);
-        }
-
-        if (!empty($this->filters['department_id'])) {
-            $query->where('department_id', $this->filters['department_id']);
-        }
-
-        if (!empty($this->filters['location_id'])) {
-            $query->where('location_id', $this->filters['location_id']);
-        }
-
-        if (!empty($this->filters['product_id'])) {
-            $query->where('product_id', $this->filters['product_id']);
-        }
+        if (!empty($this->filters['status_id'])) $query->where('status_id', $this->filters['status_id']);
+        if (!empty($this->filters['department_id'])) $query->where('department_id', $this->filters['department_id']);
+        if (!empty($this->filters['location_id'])) $query->where('location_id', $this->filters['location_id']);
+        if (!empty($this->filters['product_id'])) $query->where('product_id', $this->filters['product_id']);
+        if (!empty($this->filters['vendor_id'])) $query->where('vendor_id', $this->filters['vendor_id']);
 
         if (!empty($this->filters['category_id'])) {
             $query->whereHas('product', function($q) {
@@ -62,9 +57,19 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             });
         }
 
-        if (!empty($this->filters['ids'])) {
-            $query->whereIn('id', $this->filters['ids']);
+        if (!empty($this->filters['brand_id'])) {
+            $query->whereHas('product', function($q) {
+                $q->where('brand_id', $this->filters['brand_id']);
+            });
         }
+
+        if (!empty($this->filters['ids'])) $query->whereIn('id', $this->filters['ids']);
+
+        if (!empty($this->filters['purchase_from'])) $query->whereDate('purchase_date', '>=', $this->filters['purchase_from']);
+        if (!empty($this->filters['purchase_to'])) $query->whereDate('purchase_date', '<=', $this->filters['purchase_to']);
+
+        if (!empty($this->filters['cost_min'])) $query->where('purchase_cost', '>=', $this->filters['cost_min']);
+        if (!empty($this->filters['cost_max'])) $query->where('purchase_cost', '<=', $this->filters['cost_max']);
 
         if (!empty($this->filters['aging'])) {
             $aging = $this->filters['aging'];
@@ -72,79 +77,34 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             $query->where(function($q) use ($aging, $now) {
                 switch($aging) {
                     case '0-1':
-                        $q->where(function($sub) use ($now) {
-                            $sub->where('purchase_date', '>', $now->copy()->subYear())
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->where('release_date', '>', $now->copy()->subYear());
-                                })
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereNull('release_date')
-                                         ->where('created_at', '>', $now->copy()->subYear());
-                                });
-                        });
+                        $q->where('purchase_date', '>', $now->copy()->subYear())
+                          ->orWhere('release_date', '>', $now->copy()->subYear());
                         break;
                     case '1-2':
-                        $q->where(function($sub) use ($now) {
-                            $sub->whereBetween('purchase_date', [$now->copy()->subYears(2), $now->copy()->subYear()])
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereBetween('release_date', [$now->copy()->subYears(2), $now->copy()->subYear()]);
-                                })
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereNull('release_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(2), $now->copy()->subYear()]);
-                                });
-                        });
+                        $q->whereBetween('purchase_date', [$now->copy()->subYears(2), $now->copy()->subYear()])
+                          ->orWhereBetween('release_date', [$now->copy()->subYears(2), $now->copy()->subYear()]);
                         break;
                     case '2-3':
-                        $q->where(function($sub) use ($now) {
-                            $sub->whereBetween('purchase_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)])
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereBetween('release_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
-                                })
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereNull('release_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
-                                });
-                        });
+                        $q->whereBetween('purchase_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)])
+                          ->orWhereBetween('release_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
                         break;
                     case '3-4':
-                        $q->where(function($sub) use ($now) {
-                            $sub->whereBetween('purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)])
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereBetween('release_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
-                                })
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereNull('release_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
-                                });
-                        });
+                        $q->whereBetween('purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)])
+                          ->orWhereBetween('release_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
                         break;
                     case '4+':
-                        $q->where(function($sub) use ($now) {
-                            $sub->where('purchase_date', '<=', $now->copy()->subYears(4))
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->where('release_date', '<=', $now->copy()->subYears(4));
-                                })
-                                ->orWhere(function($sub2) use ($now) {
-                                    $sub2->whereNull('purchase_date')
-                                         ->whereNull('release_date')
-                                         ->where('created_at', '<=', $now->copy()->subYears(4));
-                                });
-                        });
+                        $q->where('purchase_date', '<=', $now->copy()->subYears(4))
+                          ->orWhere('release_date', '<=', $now->copy()->subYears(4));
+                        break;
+                    case 'warranty_expired':
+                        $q->where('warranty_expiry_date', '<', $now);
+                        break;
+                    case 'warranty_30d':
+                        $q->whereBetween('warranty_expiry_date', [$now, $now->copy()->addDays(30)]);
                         break;
                 }
             });
         }
-
 
         return $query->latest();
     }
@@ -154,21 +114,28 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
         return [
             'Asset Tag',
             'Device Name',
-            'Product Model',
             'Brand',
+            'Product Model',
             'Category',
             'Serial Number',
+            'Product Number',
             'Status',
+            'Department',
+            'Location',
             'Holder',
-            'Specification',
+            'Vendor',
             'Operating System',
+            'Purchase Date',
+            'Warranty Expiry',
+            'Purchase Cost',
+            'Book Value',
             'Aging',
         ];
     }
 
     public function map($asset): array
     {
-        $date = $asset->release_date;
+        $date = $asset->release_date ?? $asset->purchase_date;
         $aging = '-';
         if ($date) {
             $years = (int) $date->diffInYears(now());
@@ -186,17 +153,27 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
             }
         }
 
+        $cost = $asset->purchase_cost ? (float) $asset->purchase_cost : null;
+        $bookValue = $asset->bookValue ? (float) $asset->bookValue : null;
+
         return [
             $asset->asset_tag,
             $asset->device_name ?? '-',
+            optional($asset->product->brand)->name ?? '-',
             optional($asset->product)->model ?? '-',
-            optional(optional($asset->product)->brand)->name ?? '-',
             optional(optional($asset->product)->category)->name ?? '-',
             $asset->serial_number ?? '-',
+            $asset->product_number ?? '-',
             optional($asset->status)->name ?? '-',
+            (optional(optional($asset->department)->company)->code ?? '') . ' ' . (optional($asset->department)->name ?? '-'),
+            optional($asset->location)->name ?? '-',
             optional($asset->assignedToUser)->name ?? '-',
-            $asset->specification ?? '-',
+            optional($asset->vendor)->name ?? '-',
             optional($asset->operatingSystem)->name ?? '-',
+            $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : '-',
+            $asset->warranty_expiry_date ? $asset->warranty_expiry_date->format('Y-m-d') : '-',
+            $cost ? 'Rp ' . number_format($cost, 0, ',', '.') : '-',
+            $bookValue ? 'Rp ' . number_format($bookValue, 0, ',', '.') : '-',
             $aging,
         ];
     }

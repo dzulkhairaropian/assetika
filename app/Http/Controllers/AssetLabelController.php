@@ -32,16 +32,18 @@ class AssetLabelController extends Controller
             'ids' => 'required|array',
             'ids.*' => 'exists:assets,id',
             'quantities' => 'nullable|array',
+            'copies' => 'nullable|integer|min:1|max:10',
         ]);
 
         $assetsRaw = Asset::whereIn('id', $request->ids)->with(['product.category', 'department.company'])->get();
         
         $quantities = $request->input('quantities', []);
+        $multiplier = (int) $request->input('copies', 1);
         $assets = collect();
 
         foreach ($assetsRaw as $asset) {
-            $qty = isset($quantities[$asset->id]) ? (int) $quantities[$asset->id] : 1;
-            $qty = max(1, min(50, $qty)); // limit max 50 copies per asset
+            $baseQty = isset($quantities[$asset->id]) ? (int) $quantities[$asset->id] : 1;
+            $qty = max(1, min(50, $baseQty * $multiplier)); // limit max 50 copies per asset
             for ($i = 0; $i < $qty; $i++) {
                 $assets->push($asset);
             }

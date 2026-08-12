@@ -459,7 +459,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -475,75 +475,18 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-800">
-                {{ $assets->links() }}
+            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Showing {{ $assets->firstItem() ?? 0 }} to {{ $assets->lastItem() ?? 0 }} of {{ $assets->total() }} results
+                    </p>
+                    {{ $assets->links() }}
+                </div>
             </div>
         </div>
-    </div>
-
-    <script>
-        function printBulkLabels(assets, copies) {
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
-            printWindow.document.write('<html><head><title>Print Asset Labels</title>');
-            printWindow.document.write('<style>');
-            printWindow.document.write('body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #fff; margin: 0; }');
-            printWindow.document.write('.label-grid { display: grid; grid-template-columns: repeat(auto-fill, 330px); gap: 12px; justify-content: start; }');
-            printWindow.document.write('.label-card { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb; width: 330px !important; max-width: 330px !important; box-sizing: border-box; page-break-inside: avoid; }');
-            printWindow.document.write('.h-24 { height: 96px; } .w-24 { width: 96px; }');
-            printWindow.document.write('.shrink-0 { flex-shrink: 0; }');
-            printWindow.document.write('.bg-white { background-color: white; padding: 6px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; }');
-            printWindow.document.write('.space-y-1 > * + * { margin-top: 4px; }');
-            printWindow.document.write('.text-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; font-weight: 700; margin: 0; }');
-            printWindow.document.write('.text-sm { font-size: 13px; font-weight: 700; color: #1f2937; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }');
-            printWindow.document.write('.text-xs { font-size: 11px; font-weight: 600; color: #4b5563; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }');
-            printWindow.document.write('.text-xs.font-medium { font-weight: 500; color: #6b7280; }');
-            printWindow.document.write('img { max-width: 100%; height: auto; display: block; }');
-            printWindow.document.write('@media print { body { padding: 0; } .label-card { page-break-inside: avoid; width: 330px !important; max-width: 330px !important; } }');
-            printWindow.document.write('</style></head><body>');
-            printWindow.document.write('<div class="label-grid">');
-
-            assets.forEach(asset => {
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(asset.url)}`;
-                for (let i = 0; i < copies; i++) {
-                    printWindow.document.write(`
-                        <div class="label-card">
-                            <div class="bg-white h-24 w-24 shrink-0">
-                                <img src="${qrUrl}" alt="QR Code">
-                            </div>
-                            <div class="space-y-1" style="flex: 1; min-width: 0;">
-                                <div>
-                                    <p class="text-label">Asset Tag</p>
-                                    <p class="text-sm">${asset.tag}</p>
-                                </div>
-                                <div>
-                                    <p class="text-label">Serial Number</p>
-                                    <p class="text-xs">${asset.sn}</p>
-                                </div>
-                                <div>
-                                    <p class="text-label">Company</p>
-                                    <p class="text-xs font-medium">${asset.company}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                }
-            });
- 
-             printWindow.document.write('</div></body></html>');
-             printWindow.document.close();
- 
-             printWindow.onload = function() {
-                 printWindow.print();
-                 printWindow.close();
-             };
-         }
-
-        function exportSelectedAssets(assets) {
-            if (!assets.length) return;
-
-            const url = new URL('{{ route('assets.export') }}', window.location.origin);
-            assets.forEach(asset => url.searchParams.append('ids[]', asset.id));
-            window.location.href = url.toString();
-        }
-     </script>
+</div>
 @endsection
+
+@push('scripts')
+@vite('resources/js/asset-labels.js')
+@endpush

@@ -5,160 +5,161 @@
 
         <!-- Dashboard Header -->
         <div class="col-span-12 min-w-0">
-            <x-common.page-breadcrumb pageTitle="IT Support Dashboard" />
-            <h2 class="mt-4 text-2xl font-bold text-gray-800 dark:text-white/90">
-                Hi, {{ $userName }}!
-                <span class="block text-base font-normal text-gray-500 dark:text-gray-400">{{ $randomGreeting }}</span>
-            </h2>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <x-common.page-breadcrumb pageTitle="IT Support Dashboard" />
+                    <h2 class="mt-3 text-2xl font-bold text-gray-800 dark:text-white">
+                        Hi, {{ $userName }}! 👋
+                        <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
+                    </h2>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <a href="{{ route('tickets.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <i data-feather="plus" class="w-4 h-4"></i> New Ticket
+                    </a>
+                    <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 transition">
+                        <i data-feather="list" class="w-4 h-4"></i> All Tickets
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Metrics Widgets Row 1 -->
         <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 min-w-0">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Total Tickets</p>
-                        <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $totalTickets }}</h4>
-                    </div>
-                    @php $trendColor = $totalTicketsTrend >= 0 ? 'success' : 'error'; @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-{{ $trendColor }}-50 px-2.5 py-0.5 text-xs font-medium text-{{ $trendColor }}-700 dark:bg-{{ $trendColor }}-500/10 dark:text-{{ $trendColor }}-400">
-                        @if($totalTicketsTrend >= 0)<i data-feather="trending-up" class="w-3 h-3"></i>+@else<i data-feather="trending-down" class="w-3 h-3"></i>@endif{{ abs($totalTicketsTrend) }}%
-                    </span>
-                </div>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">All support tickets ever created</p>
-            </div>
+            @php $totalTicketsTrendColor = $totalTicketsTrend >= 0 ? 'success' : 'error'; @endphp
+            <x-common.stat-card
+                title="Total Tickets"
+                :value="$totalTickets"
+                :trend="$totalTicketsTrend"
+                :trendColor="$totalTicketsTrendColor"
+                description="All support tickets ever created"
+            />
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Open Tickets</p>
-                        <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $openTickets }}</h4>
-                    </div>
-                    @php $trendColor = $openTicketsTrend <= 0 ? 'success' : 'error'; @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-{{ $trendColor }}-50 px-2.5 py-0.5 text-xs font-medium text-{{ $trendColor }}-700 dark:bg-{{ $trendColor }}-500/10 dark:text-{{ $trendColor }}-400">
-                        @if($openTicketsTrend >= 0)<i data-feather="trending-up" class="w-3 h-3"></i>+@else<i data-feather="trending-down" class="w-3 h-3"></i>@endif{{ abs($openTicketsTrend) }}%
-                    </span>
-                </div>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Active tickets needing attention</p>
-            </div>
+            @php $openTicketsTrendColor = $openTicketsTrend <= 0 ? 'success' : 'error'; @endphp
+            <x-common.stat-card
+                title="Open Tickets"
+                :value="$openTickets"
+                :trend="$openTicketsTrend"
+                :trendColor="$openTicketsTrendColor"
+                description="Active tickets needing attention"
+            />
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Resolved</p>
-                        <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $resolved }}</h4>
-                    </div>
-                    @php $trendColor = $resolvedTrend >= 0 ? 'success' : 'error'; @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-{{ $trendColor }}-50 px-2.5 py-0.5 text-xs font-medium text-{{ $trendColor }}-700 dark:bg-{{ $trendColor }}-500/10 dark:text-{{ $trendColor }}-400">
-                        @if($resolvedTrend >= 0)<i data-feather="trending-up" class="w-3 h-3"></i>+@else<i data-feather="trending-down" class="w-3 h-3"></i>@endif{{ abs($resolvedTrend) }}%
-                    </span>
-                </div>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Closed tickets this month</p>
-            </div>
+            @php $resolvedTrendColor = $resolvedTrend >= 0 ? 'success' : 'error'; @endphp
+            <x-common.stat-card
+                title="Resolved"
+                :value="$resolved"
+                :trend="$resolvedTrend"
+                :trendColor="$resolvedTrendColor"
+                description="Closed tickets this month"
+            />
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Unassigned</p>
-                        <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $unassigned }}</h4>
-                    </div>
-                    @php $trendColor = $unassignedTrend <= 0 ? 'success' : 'error'; @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-{{ $trendColor }}-50 px-2.5 py-0.5 text-xs font-medium text-{{ $trendColor }}-700 dark:bg-{{ $trendColor }}-500/10 dark:text-{{ $trendColor }}-400">
-                        @if($unassignedTrend >= 0)<i data-feather="trending-up" class="w-3 h-3"></i>+@else<i data-feather="trending-down" class="w-3 h-3"></i>@endif{{ abs($unassignedTrend) }}%
-                    </span>
-                </div>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Tickets without IT staff assigned</p>
-            </div>
+            @php $unassignedTrendColor = $unassignedTrend <= 0 ? 'success' : 'error'; @endphp
+            <x-common.stat-card
+                title="Unassigned"
+                :value="$unassigned"
+                :trend="$unassignedTrend"
+                :trendColor="$unassignedTrendColor"
+                description="Tickets without IT staff assigned"
+            />
         </div>
 
         <!-- Quick Stats Row -->
         <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-3 min-w-0">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">My Tickets</p>
-                <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $myTickets }}</h4>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">{{ $myOpenTickets }} open</p>
-            </div>
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Avg Resolution Time</p>
-                <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ round($avgResolution, 1) }} hrs</h4>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Time from open to closed</p>
-            </div>
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Resolution Rate</p>
-                @php $rate = $totalTickets > 0 ? round(($resolved / $totalTickets) * 100, 1) : 0; @endphp
-                <h4 class="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $rate }}%</h4>
-                <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">Tickets resolved vs total</p>
-            </div>
+            <x-common.stat-card
+                title="My Tickets"
+                :value="$myTickets"
+                description="{{ $myOpenTickets }} open"
+            />
+            @php $avgResolution = round($avgResolution, 1); @endphp
+            <x-common.stat-card
+                title="Avg Resolution Time"
+                value="{{ $avgResolution }} hrs"
+                description="Time from open to closed"
+            />
+            @php $rate = $totalTickets > 0 ? round(($resolved / $totalTickets) * 100, 1) : 0; @endphp
+            <x-common.stat-card
+                title="Resolution Rate"
+                value="{{ $rate }}%"
+                description="Tickets resolved vs total"
+            />
         </div>
 
         <!-- Charts Row 1: Trend + Status -->
         <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-2 min-w-0">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Ticket Trend (Last 6 Months)</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Ticket Trend (Last 6 Months)</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Monthly ticket creation volume</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div id="ticketTrendChart" class="h-80"></div>
             </div>
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Tickets by Status</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Tickets by Status</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Current distribution across ticket lifecycle</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div id="ticketStatusChart" class="h-80"></div>
             </div>
         </div>
 
         <!-- Charts Row 2: Category + Priority + Type -->
         <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-3 min-w-0">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Top Categories</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Top Categories</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Most ticket-prone categories</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div id="ticketCategoryChart" class="h-72"></div>
             </div>
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">By Priority</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">By Priority</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Urgency breakdown</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div id="ticketPriorityChart" class="h-72"></div>
             </div>
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">By Type</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">By Type</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Ticket classification</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div id="ticketTypeChart" class="h-72"></div>
             </div>
         </div>
 
         <!-- Charts Row 3: Requesters + Workload -->
         <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-2 min-w-0">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Top Requesters</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Top Requesters</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Users with most ticket submissions</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div id="ticketRequesterChart" class="h-72"></div>
             </div>
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 min-w-0 overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">IT Staff Workload</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">IT Staff Workload</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Open tickets per assigned staff</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
                 <div class="space-y-3">
                     @forelse($workload as $row)
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 dark:text-white text-theme-sm truncate">{{ $staffNames[$row->assigned_to_id] ?? 'Unknown' }}</p>
-                                <div class="mt-1.5 h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800">
-                                    @php $maxWl = $workload->max('count') ?: 1; $pct = ($row->count / $maxWl) * 100; @endphp
-                                    <div class="h-2 rounded-full bg-brand-500" style="width: {{ $pct }}%"></div>
-                                </div>
+                        @php $maxWl = $workload->max('count') ?: 1; $pct = ($row->count / $maxWl) * 100; @endphp
+                        <div class="group">
+                            <div class="flex items-center justify-between text-sm mb-1.5">
+                                <span class="truncate font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                    <span class="flex h-6 w-6 items-center justify-center rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                        <i data-feather="user" class="w-3 h-3"></i>
+                                    </span>
+                                    {{ $staffNames[$row->assigned_to_id] ?? 'Unknown' }}
+                                </span>
+                                <span class="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 shrink-0">{{ $row->count }}</span>
                             </div>
-                            <span class="rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 shrink-0">{{ $row->count }}</span>
+                            <div class="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400 transition-all duration-700 ease-out" style="width: {{ $pct }}%"></div>
+                            </div>
                         </div>
                     @empty
                         <div class="flex flex-col items-center justify-center py-8 text-center">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 mb-3">
+                                <i data-feather="users" class="w-5 h-5 text-gray-400"></i>
+                            </div>
                             <p class="text-gray-500 dark:text-gray-400 font-medium">No workload data</p>
                             <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Assign tickets to see staff load</p>
                         </div>
@@ -169,52 +170,63 @@
 
         <!-- Unassigned + Problem Assets Row -->
         <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-2 min-w-0">
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="px-5 pt-5 sm:px-6 sm:pt-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Unassigned Tickets</h3>
-                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Open tickets without IT staff</p>
-                </div>
-                <div class="overflow-x-auto mt-4">
-                    <table class="min-w-full">
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                            @forelse($unassignedTickets as $ticket)
-                                <tr>
-                                    <td class="py-3 pl-5 sm:pl-6 pr-4">
-                                        <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">#{{ $ticket->request_id }}</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($ticket->requester_name, 20) }}</p>
-                                    </td>
-                                    <td class="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{{ $ticket->category?->name }}</td>
-                                    <td class="py-3 pr-4">
-                                        <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500">{{ $ticket->priority?->name ?? '-' }}</span>
-                                    </td>
-                                    <td class="py-3 pr-5 sm:pr-6 text-right text-xs text-gray-400 dark:text-gray-500">{{ $ticket->created_at->format('M d') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="py-8 text-center text-gray-400 dark:text-gray-500">All tickets assigned</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <x-common.dashboard-table
+                title="Unassigned Tickets"
+                description="Open tickets without IT staff"
+                :headers="['Ticket', 'Category', 'Priority', 'Date']"
+            >
+                @forelse($unassignedTickets as $ticket)
+                    <tr>
+                        <td class="py-3 pl-5 sm:pl-6 pr-4">
+                            <p class="font-medium text-brand-600 text-theme-sm dark:text-brand-400">#{{ $ticket->request_id }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($ticket->requester_name, 20) }}</p>
+                        </td>
+                        <td class="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{{ $ticket->category?->name ?? '-' }}</td>
+                        <td class="py-3 pr-4">
+                            <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500">{{ $ticket->priority?->name ?? '-' }}</span>
+                        </td>
+                        <td class="py-3 pr-5 sm:pr-6 text-xs text-gray-400 dark:text-gray-500">{{ $ticket->created_at->format('M d') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-gray-400 dark:text-gray-500">All tickets assigned</td>
+                    </tr>
+                @endforelse
+            </x-common.dashboard-table>
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Top Problem Assets</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Top Problem Assets</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Assets with most ticket reports</p>
-                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                @php $paMax = $problemAssets->max('count') ?: 1; @endphp
                 <div class="space-y-3">
                     @forelse($problemAssets as $row)
-                        @php $asset = $assetDetails[$row->asset_id] ?? null; @endphp
-                        <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-100 p-3 dark:border-gray-800">
-                            <div class="min-w-0">
-                                <p class="font-medium text-gray-900 dark:text-white text-theme-sm truncate">{{ $asset?->asset_tag ?? 'Unknown' }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $asset?->device_name ?? '-' }}</p>
+                        @php
+                            $asset = $assetDetails[$row->asset_id] ?? null;
+                            $paPct = min(100, round(($row->count / $paMax) * 100));
+                        @endphp
+                        <div class="group">
+                            <div class="flex items-center justify-between text-sm mb-1.5">
+                                <span class="truncate font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                    <span class="flex h-6 w-6 items-center justify-center rounded-md bg-error-50 text-error-600 dark:bg-error-500/10 dark:text-error-400">
+                                        <i data-feather="hard-drive" class="w-3 h-3"></i>
+                                    </span>
+                                    <span class="truncate">
+                                        <span class="block">{{ $asset?->asset_tag ?? 'Unknown' }}</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $asset?->device_name ?? '-' }}</span>
+                                    </span>
+                                </span>
+                                <span class="rounded-full bg-error-50 px-2.5 py-0.5 text-xs font-semibold text-error-600 dark:bg-error-500/15 dark:text-error-400 shrink-0">{{ $row->count }}</span>
                             </div>
-                            <span class="rounded-full bg-error-50 px-3 py-1 text-sm font-semibold text-error-600 dark:bg-error-500/15 dark:text-error-400 shrink-0">{{ $row->count }}</span>
+                            <div class="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                <div class="h-full rounded-full bg-gradient-to-r from-error-500 to-error-400 transition-all duration-700 ease-out" style="width: {{ $paPct }}%"></div>
+                            </div>
                         </div>
                     @empty
                         <div class="flex flex-col items-center justify-center py-8 text-center">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 mb-3">
+                                <i data-feather="monitor" class="w-5 h-5 text-gray-400"></i>
+                            </div>
                             <p class="text-gray-500 dark:text-gray-400 font-medium">No asset ticket data</p>
                             <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Asset reports will appear here</p>
                         </div>
@@ -224,80 +236,73 @@
         </div>
 
         <!-- Recent Tickets Table -->
-        <div class="col-span-12 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="px-5 pt-5 sm:px-6 sm:pt-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Tickets</h3>
-                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Latest support ticket activity</p>
-                    </div>
-                    <a href="/tickets" class="inline-flex items-center gap-1.5 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400">
-                        View All <i data-feather="arrow-right" class="w-4 h-4"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="overflow-x-auto mt-4">
-                <table class="min-w-full">
-                    <thead>
-                        <tr class="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/[0.02]">
-                            <th class="py-3 pl-5 sm:pl-6 pr-4 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">ID</span></th>
-                            <th class="py-3 pr-4 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Requester</span></th>
-                            <th class="py-3 pr-4 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Category</span></th>
-                            <th class="py-3 pr-4 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Priority</span></th>
-                            <th class="py-3 pr-4 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</span></th>
-                            <th class="py-3 pr-4 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Assigned To</span></th>
-                            <th class="py-3 pr-5 sm:pr-6 text-left"><span class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Created</span></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                        @forelse($recentTickets as $ticket)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
-                                <td class="py-3.5 pl-5 sm:pl-6 pr-4"><p class="font-medium text-brand-600 text-theme-sm dark:text-brand-400">#{{ $ticket->request_id }}</p></td>
-                                <td class="py-3.5 pr-4"><p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->requester_name }}</p></td>
-                                <td class="py-3.5 pr-4"><p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->category?->name ?? '-' }}</p></td>
-                                <td class="py-3.5 pr-4">
-                                    @php
-                                        $pColor = $ticket->priority?->color ?? 'gray';
-                                        $pClasses = [
-                                            'danger' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
-                                            'warning' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500',
-                                            'success' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
-                                            'info' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
-                                            'gray' => 'bg-gray-50 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
-                                        ];
-                                    @endphp
-                                    <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium {{ $pClasses[$pColor] ?? $pClasses['gray'] }}">{{ $ticket->priority?->name ?? '-' }}</span>
-                                </td>
-                                <td class="py-3.5 pr-4">
-                                    @php
-                                        $sColor = $ticket->status?->color ?? 'gray';
-                                        $sClasses = [
-                                            'info' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
-                                            'warning' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500',
-                                            'success' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
-                                            'danger' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
-                                            'gray' => 'bg-gray-50 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
-                                        ];
-                                    @endphp
-                                    <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium {{ $sClasses[$sColor] ?? $sClasses['gray'] }}">{{ $ticket->status?->name ?? '-' }}</span>
-                                </td>
-                                <td class="py-3.5 pr-4"><p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</p></td>
-                                <td class="py-3.5 pr-5 sm:pr-6"><p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->created_at->format('M d, H:i') }}</p></td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <i data-feather="file-text" class="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3"></i>
-                                        <p class="text-gray-500 dark:text-gray-400 font-medium">No tickets yet</p>
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Start by creating your first support ticket</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+        <div class="col-span-12 min-w-0">
+            <x-common.dashboard-table
+                title="Recent Tickets"
+                description="Latest support ticket activity"
+                :headers="['ID', 'Requester', 'Category', 'Priority', 'Status', 'Assigned To', 'Created']"
+                :footerLink="route('tickets.index')"
+                footerText="View All Tickets"
+            >
+                @forelse($recentTickets as $ticket)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
+                        <td class="py-3.5 pl-5 sm:pl-6 pr-4">
+                            <p class="font-medium text-brand-600 text-theme-sm dark:text-brand-400">#{{ $ticket->request_id }}</p>
+                        </td>
+                        <td class="py-3.5 pr-4">
+                            <div class="flex items-center gap-2">
+                                <div class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 font-semibold text-xs shrink-0">{{ strtoupper(substr($ticket->requester_name ?? 'N', 0, 1)) }}</div>
+                                <span class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->requester_name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-3.5 pr-4">
+                            <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->category?->name ?? '-' }}</p>
+                        </td>
+                        <td class="py-3.5 pr-4">
+                            @php
+                                $pColor = $ticket->priority?->color ?? 'gray';
+                                $pClasses = [
+                                    'danger' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
+                                    'warning' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500',
+                                    'success' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
+                                    'info' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
+                                    'gray' => 'bg-gray-50 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
+                                ];
+                            @endphp
+                            <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium {{ $pClasses[$pColor] ?? $pClasses['gray'] }}">{{ $ticket->priority?->name ?? '-' }}</span>
+                        </td>
+                        <td class="py-3.5 pr-4">
+                            @php
+                                $sColor = $ticket->status?->color ?? 'gray';
+                                $sClasses = [
+                                    'info' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
+                                    'warning' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500',
+                                    'success' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
+                                    'danger' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
+                                    'gray' => 'bg-gray-50 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
+                                ];
+                            @endphp
+                            <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium {{ $sClasses[$sColor] ?? $sClasses['gray'] }}">{{ $ticket->status?->name ?? '-' }}</span>
+                        </td>
+                        <td class="py-3.5 pr-4">
+                            <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</p>
+                        </td>
+                        <td class="py-3.5 pr-5 sm:pr-6">
+                            <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->created_at->format('M d, H:i') }}</p>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="py-12 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <i data-feather="file-text" class="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3"></i>
+                                <p class="text-gray-500 dark:text-gray-400 font-medium">No tickets yet</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Start by creating your first support ticket</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-common.dashboard-table>
         </div>
 
     </div>
@@ -306,84 +311,14 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const fontFamily = "Outfit, sans-serif";
-
-        // Trend Area Chart
-        const trendOptions = {
-            series: [{ name: 'Tickets', data: @json($trendChart['data']) }],
-            chart: { fontFamily, type: 'area', height: 320, toolbar: { show: false } },
-            colors: ['#465FFF'],
-            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1, stops: [0, 90, 100] } },
-            stroke: { curve: 'smooth', width: 3 },
-            xaxis: { categories: @json($trendChart['labels']), labels: { style: { fontFamily } } },
-            yaxis: { labels: { style: { fontFamily } } },
-            dataLabels: { enabled: false },
-            grid: { borderColor: '#e5e7eb', strokeDashArray: 4 },
-        };
-        new ApexCharts(document.querySelector("#ticketTrendChart"), trendOptions).render();
-
-        // Status Donut
-        const statusOptions = {
-            series: @json($chartStatusData['data']),
-            chart: { fontFamily, type: 'donut', height: 320 },
-            labels: @json($chartStatusData['labels']),
-            colors: @json($chartStatusData['colors']),
-            legend: { position: 'bottom', fontFamily },
-            plotOptions: { pie: { donut: { size: '65%', labels: { show: true, name: { show: true }, value: { show: true, fontSize: '20px', fontWeight: 'bold' }, total: { show: true, label: 'Total', formatter: w => w.globals.seriesTotals.reduce((a, b) => a + b, 0) } } } } },
-            dataLabels: { enabled: false },
-        };
-        new ApexCharts(document.querySelector("#ticketStatusChart"), statusOptions).render();
-
-        // Category Donut
-        const categoryOptions = {
-            series: @json($categoryChart['data']),
-            chart: { fontFamily, type: 'donut', height: 288 },
-            labels: @json($categoryChart['labels']),
-            colors: ['#465FFF', '#00F5D4', '#FF9F1C', '#FF5400', '#7209B7'],
-            legend: { position: 'bottom', fontFamily },
-            plotOptions: { pie: { donut: { size: '65%', labels: { show: true, name: { show: true }, value: { show: true }, total: { show: true, label: 'Total' } } } } },
-            dataLabels: { enabled: false },
-        };
-        new ApexCharts(document.querySelector("#ticketCategoryChart"), categoryOptions).render();
-
-        // Priority Horizontal Bar
-        const priorityOptions = {
-            series: [{ name: 'Tickets', data: @json($priorityChart['data']) }],
-            chart: { fontFamily, type: 'bar', height: 288, toolbar: { show: false } },
-            colors: ['#F79009'],
-            plotOptions: { bar: { borderRadius: 6, horizontal: true, barHeight: '60%' } },
-            xaxis: { categories: @json($priorityChart['labels']), labels: { style: { fontFamily } } },
-            yaxis: { labels: { style: { fontFamily } } },
-            dataLabels: { enabled: false },
-            grid: { borderColor: '#e5e7eb', strokeDashArray: 4 },
-        };
-        new ApexCharts(document.querySelector("#ticketPriorityChart"), priorityOptions).render();
-
-        // Type Donut
-        const typeOptions = {
-            series: @json($typeChart['data']),
-            chart: { fontFamily, type: 'donut', height: 288 },
-            labels: @json($typeChart['labels']),
-            colors: ['#00F5D4', '#7209B7', '#465FFF', '#FF5400', '#FF9F1C'],
-            legend: { position: 'bottom', fontFamily },
-            plotOptions: { pie: { donut: { size: '65%', labels: { show: true, name: { show: true }, value: { show: true }, total: { show: true, label: 'Total' } } } } },
-            dataLabels: { enabled: false },
-        };
-        new ApexCharts(document.querySelector("#ticketTypeChart"), typeOptions).render();
-
-        // Requester Horizontal Bar
-        const requesterOptions = {
-            series: [{ name: 'Tickets', data: @json($requesterChart['data']) }],
-            chart: { fontFamily, type: 'bar', height: 288, toolbar: { show: false } },
-            colors: ['#12B76A'],
-            plotOptions: { bar: { borderRadius: 6, horizontal: true, barHeight: '60%' } },
-            xaxis: { categories: @json($requesterChart['labels']), labels: { style: { fontFamily } } },
-            yaxis: { labels: { style: { fontFamily } } },
-            dataLabels: { enabled: false },
-            grid: { borderColor: '#e5e7eb', strokeDashArray: 4 },
-        };
-        new ApexCharts(document.querySelector("#ticketRequesterChart"), requesterOptions).render();
-    });
+    window.ticketChartData = {
+        trendChart: @json($trendChart),
+        chartStatusData: @json($chartStatusData),
+        categoryChart: @json($categoryChart),
+        priorityChart: @json($priorityChart),
+        typeChart: @json($typeChart),
+        requesterChart: @json($requesterChart),
+    };
 </script>
+@vite('resources/js/ticket-charts.js')
 @endpush

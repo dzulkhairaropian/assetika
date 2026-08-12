@@ -208,12 +208,91 @@ Gunakan AlpineJS `x-data="{ activeTab: 'details' }"` pada container utama untuk 
 
 ---
 
-## 4. Checklist Penerapan CRUD Baru
+## 4. Ekstraksi JavaScript (Shared / Utilities)
+
+Dilarang menulis fungsi JS utility inline panjang (seperti label generator/printer, export Excel) di dalam Blade agar views lebih bersih.
+
+- **Lokasi file**: Pindahkan fungsi-fungsi logic JavaScript ke `resources/js/*` (misal: `resources/js/asset-labels.js`).
+- **Mendaftarkan Module**: Setiap file JS mandiri harus ditambahkan di array `input` dalam `vite.config.js`.
+- **Memuat Module**: Di dalam blade gunakan `@push('scripts')` lalu load menggunakan `@vite('resources/js/namafile.js')`.
+- **Pemanggilan**: Agar fungsi diekspor dapat dipanggil oleh atribut event HTML inline (seperti `onclick`), pastikan untuk melempar referensi ke scope window (`window.functionName = functionName`) di file JS, atau konversi panggilan menjadi *AlpineJS function* jika memungkinkan.
+
+---
+
+## 5. Halaman Dashboard (Dashboard Page)
+
+### Layout Utama & Wrapper
+- Gunakan `<div class="grid grid-cols-12 gap-4 md:gap-6 min-w-0">` sebagai container utama halaman dashboard.
+
+### Dashboard Header
+- Buat header di dalam card rounded wrapper yang menyatu dengan sapaan user dan tombol aksi cepat (*Quick Actions*).
+- **Kiri**: Breadcrumb halaman + Sapaan user dengan emoji + Kalimat greeting dinamis.
+- **Kanan**: Tombol aksi cepat seperti tambah data atau transaksi baru dengan icon.
+
+```blade
+<div class="col-span-12 min-w-0">
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <x-common.page-breadcrumb pageTitle="Dashboard Title" />
+            <h2 class="mt-3 text-2xl font-bold text-gray-800 dark:text-white">
+                Hi, {{ $userName }}! 👋
+                <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
+            </h2>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+            {{-- Tombol Quick Actions --}}
+        </div>
+    </div>
+</div>
+```
+
+### Stat Cards (Metrics Widgets)
+- Menggunakan komponen shared `x-common.stat-card`.
+- Tambahkan efek hover shadow, transisi smooth, dan *subtle glow gradient background* sesuai warna status/trend untuk estetika.
+- Format nominal keuangan harus menggunakan Rupiah terformat rapi (`Rp {{ number_format($val, 0, ',', '.') }}`).
+
+### Chart Card & Pemisahan Script JS
+- **Card Wrapper**: Gunakan `overflow-hidden shadow-theme-xs bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800`.
+- **Ekstraksi JS**: Dilarang menulis inline JS ApexCharts/ChartJS panjang di dalam Blade.
+- **Mekanisme Data Transfer**: Inject data visualisasi via global object `window.chartData` di script tag Blade, lalu muat file skrip JS terpisah menggunakan `@vite('resources/js/dashboard-charts.js')`.
+- File skrip baru wajib didaftarkan pada entry point `vite.config.js`.
+
+```blade
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    window.chartData = {
+        total: {{ $total }},
+        chart: @json($chartData)
+    };
+</script>
+@vite('resources/js/dashboard-charts.js')
+@endpush
+```
+
+### Progress List Card (Top Locations / Categories / Staff Load)
+- Representasi data terpopuler atau workload dalam bentuk daftar vertikal dengan visualisasi *bar progress* linear mini.
+- Gunakan persentase relatif terhadap nilai maksimal agar panjang bar proporsional.
+
+```blade
+<div class="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+    <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400 transition-all duration-700 ease-out" style="width: {{ $percent }}%"></div>
+</div>
+```
+
+### Dashboard Table Component
+- Gunakan komponen `x-common.dashboard-table` untuk menampilkan data transaksi/aktivitas terbaru.
+- Batasi tinggi baris data (maksimal 5 row) dan sertakan tombol "View All / Manage" di footer tabel jika koleksi data tidak kosong.
+
+---
+
+## 5. Checklist Penerapan CRUD & Dashboard Baru
 
 1. **Index**:
    - [ ] Menggunakan Topbar Search + Dropdown Filter + Badge Active.
    - [ ] Menyediakan Bulk Action Bar jika fitur hapus/cetak banyak tersedia.
    - [ ] Menggunakan pagination footer dengan `Showing X to Y of Z results`.
+   - [ ] Ekstraksi JS kompleks ke utility file terpisah via `@vite` & `vite.config.js`.
 2. **Create / Edit**:
    - [ ] Menggunakan layout 2-kolom (`xl:grid-cols-[minmax(0,1.75fr)_380px]`).
    - [ ] Memisahkan field pendukung & tombol aksi di sidebar kanan.
@@ -225,3 +304,10 @@ Gunakan AlpineJS `x-data="{ activeTab: 'details' }"` pada container utama untuk 
    - [ ] Menggunakan Header Card dengan Icon Besar + Badges + Action Buttons.
    - [ ] Menggunakan layout split `grid-cols-1 lg:grid-cols-3` (Sidebar 1 kolom, Main Tab 2 kolom).
    - [ ] Menggunakan AlpineJS Tabbed Navigation untuk memisahkan Detail vs Log/History/Tickets.
+   - [ ] Ekstraksi JS cetak barcode / utility ke file terpisah.
+4. **Dashboard**:
+   - [ ] Menggunakan layout grid container 12-kolom (`grid-cols-12`).
+   - [ ] Memisahkan skrip visualisasi charts ke file JS eksternal via `@vite` & `vite.config.js`.
+   - [ ] Menggunakan component `x-common.stat-card` untuk widgets metrik.
+   - [ ] Menggunakan component `x-common.dashboard-table` untuk tabel preview dashboard.
+   - [ ] Menyediakan visualisasi progress bar linear untuk data peringkat / workload staff.

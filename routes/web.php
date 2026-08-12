@@ -173,6 +173,7 @@ Route::middleware('auth')->group(function () {
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/activity', [ReportController::class, 'activity'])->name('reports.activity');
     Route::get('reports/assets', [ReportController::class, 'assets'])->name('reports.assets');
+    Route::get('reports/assets/export', [ReportController::class, 'exportAssets'])->name('reports.assets.export');
     Route::get('reports/depreciation', [ReportController::class, 'depreciation'])->name('reports.depreciation');
     Route::get('reports/custom', [ReportController::class, 'custom'])->name('reports.custom');
 

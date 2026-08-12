@@ -22,7 +22,7 @@
         }
     @endphp
 
-    <div class="space-y-6" x-data="{ activeTab: 'details', showQrModal: false }">
+    <div class="space-y-6" x-data="{ activeTab: 'details' }">
         <x-common.page-breadcrumb pageTitle="Asset Details" />
 
         @if($isAged)
@@ -107,6 +107,14 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <!-- Sidebar Info -->
             <div class="space-y-6 lg:col-span-1">
+                <!-- QR Code Preview -->
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">Asset QR Code</h3>
+                    <div class="flex items-center justify-center rounded-xl border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/20">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(url("/asset/{$asset->id}")) }}" alt="QR Code" class="h-32 w-32 object-contain bg-white p-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                    </div>
+                </div>
+
                 <!-- Current Assignment -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
                     <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">Current Assignment</h3>
@@ -509,113 +517,13 @@
                             </div>
                         </div>
 
-        <!-- QR Label Modal -->
-        <div x-show="showQrModal"
-            class="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto"
-            style="display: none;"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0">
-            <!-- Backdrop -->
-            <div @click="showQrModal = false"
-                class="fixed inset-0 bg-gray-900/50 backdrop-blur-xs"></div>
-
-            <!-- Modal Content -->
-            <div class="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900 transition-all z-10 m-4">
-                <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
-                    <h3 class="text-lg font-bold text-gray-800 dark:text-white/90">Asset QR Label</h3>
-                    <button @click="showQrModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i data-feather="x" class="h-5 w-5"></i>
-                    </button>
-                </div>
-
-                <!-- Printable Area -->
-                <div class="p-1">
-                    <div id="printableLabel" style="width: 330px; max-width: 330px; box-sizing: border-box;" class="print-label-card mx-auto flex items-center gap-5 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02] text-left">
-                        <!-- Left: QR Code -->
-                        <div class="flex h-28 w-28 shrink-0 items-center justify-center rounded-lg bg-white p-2 shadow-sm border border-gray-100 dark:border-gray-800">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode(url("/asset/{$asset->id}")) }}"
-                                alt="Asset QR Code"
-                                class="h-full w-full object-contain">
-                        </div>
-
-                        <!-- Right: Asset Info -->
-                        <div class="space-y-1.5 flex-1 min-w-0">
-                            <div>
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 block">Asset Tag</span>
-                                <p class="text-sm font-bold text-gray-800 dark:text-white/90 truncate">{{ $asset->asset_tag }}</p>
-                            </div>
-                            <div>
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 block">Serial Number</span>
-                                <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">{{ $asset->serial_number ?? '-' }}</p>
-                            </div>
-                            <div>
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 block">Company</span>
-                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">{{ optional(optional($asset->department)->company)->name ?? '-' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Copies Input -->
-                <div class="mt-4 flex items-center justify-between gap-4 border-t border-gray-100 pt-4 dark:border-gray-800">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Copies to print:</label>
-                        <input type="number" id="detailLabelCopies" value="1" min="1" max="50"
-                            class="w-16 rounded-lg border border-gray-200 px-2 py-1 text-center text-sm dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                    </div>
-                    <div class="flex gap-2">
-                        <button @click="showQrModal = false"
-                            class="rounded-lg border border-gray-200 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800">
-                            Close
-                        </button>
-                        <button onclick="printLabel()"
-                            class="rounded-lg bg-brand-500 px-5 py-2.5 text-xs font-medium text-white hover:bg-brand-600 transition">
-                            Print Label
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <script>
-        function printLabel() {
-            const copies = parseInt(document.getElementById('detailLabelCopies').value) || 1;
-            const printContent = document.getElementById('printableLabel').outerHTML;
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
-            printWindow.document.write('<html><head><title>Print Asset Label</title>');
-            printWindow.document.write('<style>');
-            printWindow.document.write('body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #fff; margin: 0; }');
-            printWindow.document.write('.label-grid { display: grid; grid-template-columns: repeat(auto-fill, 330px); gap: 12px; justify-content: start; }');
-            printWindow.document.write('.print-label-card { display: flex; align-items: center; gap: 20px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb; width: 330px !important; max-width: 330px !important; box-sizing: border-box; page-break-inside: avoid; }');
-            printWindow.document.write('.h-28 { height: 112px; } .w-28 { width: 112px; }');
-            printWindow.document.write('.shrink-0 { flex-shrink: 0; }');
-            printWindow.document.write('.bg-white { background-color: white; padding: 8px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; }');
-            printWindow.document.write('.space-y-1\\.5 > * + * { margin-top: 6px; }');
-            printWindow.document.write('.text-\\[9px\\] { font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; font-weight: 700; margin-bottom: 2px; }');
-            printWindow.document.write('.text-sm { font-size: 14px; font-weight: 700; color: #1f2937; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }');
-            printWindow.document.write('.text-xs { font-size: 12px; font-weight: 600; color: #4b5563; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }');
-            printWindow.document.write('.text-xs.font-medium { font-weight: 500; color: #6b7280; }');
-            printWindow.document.write('img { max-width: 100%; height: auto; display: block; }');
-            printWindow.document.write('@media print { body { padding: 0; } .print-label-card { page-break-inside: avoid; width: 330px !important; max-width: 330px !important; } }');
-            printWindow.document.write('</style></head><body>');
-            printWindow.document.write('<div class="label-grid">');
-
-            for (let i = 0; i < copies; i++) {
-                printWindow.document.write(printContent);
-            }
-
-            printWindow.document.write('</div></body></html>');
-            printWindow.document.close();
-
-            printWindow.onload = function() {
-                printWindow.print();
-                printWindow.close();
-            };
-        }
-    </script>
+</div>
+</div>
 @endsection
+
+@push('scripts')
+@vite('resources/js/asset-labels.js')
+@endpush

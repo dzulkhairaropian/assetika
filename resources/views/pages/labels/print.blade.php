@@ -191,14 +191,18 @@
 <body class="bg-gray-100 p-4">
 
     <!-- Top Action Bar (No Print) -->
-    <div class="no-print mb-4 flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+    <div class="no-print mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <div>
             <h1 class="text-base font-bold text-gray-800">Asset Label Print Preview</h1>
             <p class="text-xs text-gray-500">Layout Grid 3 Columns • Format A4 • Total {{ count($assets) }} item(s)</p>
         </div>
-        <div class="flex items-center gap-3">
-            <button onclick="window.close()" class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Close</button>
-            <button onclick="window.print()" class="rounded-lg bg-blue-600 hover:bg-blue-700 px-5 py-2 text-xs font-bold text-white shadow-md">
+        <div class="flex flex-wrap items-center gap-4">
+            <button onclick="window.close()" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                Close
+            </button>
+            <button onclick="window.print()" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-5 py-2 text-xs font-bold text-white shadow-md transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 Print Labels
             </button>
         </div>
@@ -282,7 +286,7 @@
                     height: 100,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H // High Error Correction level for instant mobile scan
+                    correctLevel: QRCode.CorrectLevel.H
                 });
             });
         });
