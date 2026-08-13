@@ -63,7 +63,7 @@ class TicketController extends Controller
         $slaStatuses = SlaStatus::all();
         $assets = Asset::with('assignedToUser')->get();
 
-        return view('pages.tickets.form', compact(
+        return view('pages.tickets.create', compact(
             'users',
             'ticketTypes',
             'ticketCategories',
@@ -92,6 +92,8 @@ class TicketController extends Controller
             'asset_id' => ['nullable', 'exists:assets,id'],
             'problem_description' => ['required', 'string'],
             'internal_notes' => ['nullable', 'string'],
+            'estimated_hours' => ['nullable', 'numeric', 'min:0'],
+            'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
 
@@ -140,7 +142,7 @@ class TicketController extends Controller
             'description' => 'Ticket #' . $ticket->request_id . ' created.',
         ]);
 
-        if ($ticket->assignedTo) {
+        if ($ticket->assignedTo()->exists()) {
             $ticket->assignedTo->notify(new SystemNotification(
                 'New Ticket Assigned',
                 'Ticket #' . $ticket->request_id . ' has been assigned to you.',
@@ -176,7 +178,7 @@ class TicketController extends Controller
         $slaStatuses = SlaStatus::all();
         $assets = Asset::with('assignedToUser')->get();
 
-        return view('pages.tickets.form', compact(
+        return view('pages.tickets.edit', compact(
             'ticket',
             'users',
             'ticketTypes',
@@ -208,10 +210,10 @@ class TicketController extends Controller
             'internal_notes' => ['nullable', 'string'],
             'resolution_notes' => ['nullable', 'string'],
             'resolution_time_hours' => ['nullable', 'numeric'],
+            'estimated_hours' => ['nullable', 'numeric', 'min:0'],
+            'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
-
-        $oldStatusId = $ticket->status_id;
 
         $requester = User::find($data['requester_user_id']);
         if ($requester) {

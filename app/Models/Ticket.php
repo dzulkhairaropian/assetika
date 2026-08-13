@@ -24,7 +24,6 @@ class Ticket extends Model
         'requester_company_id',
         'requester_department_id',
         'asset_id',
-        'category_id',
         'ticket_category_id',
         'ticket_subcategory_id',
         'priority_id',
@@ -41,6 +40,8 @@ class Ticket extends Model
         'status_id',
         'sla_status_id',
         'internal_notes',
+        'estimated_hours',
+        'actual_hours',
     ];
 
     protected function casts(): array
@@ -52,6 +53,8 @@ class Ticket extends Model
             'completed_time' => 'datetime',
             'response_time_minutes' => 'integer',
             'resolution_time_hours' => 'decimal:2',
+            'estimated_hours' => 'decimal:2',
+            'actual_hours' => 'decimal:2',
         ];
     }
 

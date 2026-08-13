@@ -171,6 +171,14 @@
                         </span>
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+                        <span class="text-gray-500">Estimated Hours</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->estimated_hours ?? '0' }} hrs</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+                        <span class="text-gray-500">Actual Hours</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->actual_hours ?? '0' }} hrs</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Created At</span>
                         <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->created_at?->format('d M Y H:i') }}</span>
                     </div>
