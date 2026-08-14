@@ -24,14 +24,60 @@ class AssetController extends Controller
 
     public function index(Request $request)
     {
-        $query = Asset::with(['product.category', 'status', 'assignedToUser', 'department', 'depreciation']);
+        $query = Asset::with([
+            'product.category', 'product.brand',
+            'status', 'assignedToUser', 'department.company',
+            'location', 'vendor', 'depreciation',
+            'currentCheckout.checkedOutToUser',
+        ]);
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('asset_tag', 'like', "%$search%")
-                  ->orWhere('serial_number', 'like', "%$search%")
-                  ->orWhere('device_name', 'like', "%$search%");
+            $like = '%' . $search . '%';
+            $query->where(function($q) use ($like, $search) {
+                $q->where('asset_tag', 'like', $like)
+                  ->orWhere('serial_number', 'like', $like)
+                  ->orWhere('product_number', 'like', $like)
+                  ->orWhere('device_name', 'like', $like)
+                  ->orWhere('user_name', 'like', $like)
+                  ->orWhere('invoice_number', 'like', $like)
+                  ->orWhere('notes', 'like', $like)
+                  ->orWhere('specification', 'like', $like)
+                  ->orWhereHas('product', function($p) use ($like) {
+                      $p->where('name', 'like', $like)
+                        ->orWhereHas('brand', function($b) use ($like) {
+                            $b->where('name', 'like', $like);
+                        })
+                        ->orWhereHas('category', function($c) use ($like) {
+                            $c->where('name', 'like', $like);
+                        });
+                  })
+                  ->orWhereHas('status', function($s) use ($like) {
+                      $s->where('name', 'like', $like);
+                  })
+                  ->orWhereHas('department', function($d) use ($like) {
+                      $d->where('name', 'like', $like)
+                        ->orWhereHas('company', function($cmp) use ($like) {
+                            $cmp->where('name', 'like', $like);
+                        });
+                  })
+                  ->orWhereHas('location', function($l) use ($like) {
+                      $l->where('name', 'like', $like);
+                  })
+                  ->orWhereHas('vendor', function($v) use ($like) {
+                      $v->where('name', 'like', $like);
+                  })
+                  ->orWhereHas('depreciation', function($d) use ($like) {
+                      $d->where('name', 'like', $like);
+                  })
+                  ->orWhereHas('assignedToUser', function($u) use ($like) {
+                      $u->where('name', 'like', $like)
+                        ->orWhere('email', 'like', $like);
+                  })
+                  ->orWhereHas('currentCheckout.checkedOutToUser', function($u) use ($like) {
+                      $u->where('name', 'like', $like)
+                        ->orWhere('email', 'like', $like);
+                  });
             });
         }
 

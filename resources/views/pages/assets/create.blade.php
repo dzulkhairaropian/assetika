@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Create IT Asset" />
+        <x-common.page-breadcrumb pageTitle="Create IT Asset" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -15,7 +15,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-8">
                     <!-- Section: General Information -->
                     <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                         General Information
                     </h3>
@@ -183,7 +183,7 @@
 
                 <!-- Section: Network Information -->
                 <div class="pt-2">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="wifi" class="w-5 h-5 text-brand-500"></i>
                         Network Information
                     </h3>
@@ -210,7 +210,7 @@
 
                 <!-- Section: Software Licenses -->
                 <div class="pt-2">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="key" class="w-5 h-5 text-brand-500"></i>
                         Software Licenses
                     </h3>
@@ -237,7 +237,7 @@
 
                 <!-- Section: Technical Specifications -->
                 <div class="pt-2">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="cpu" class="w-5 h-5 text-brand-500"></i>
                         Technical Specifications
                     </h3>

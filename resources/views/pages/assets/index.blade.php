@@ -265,40 +265,69 @@
 
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto">
-                <table class="w-full">
-                    <thead class="border-y border-t border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
+                <table class="min-w-full">
+                    <thead class="border-b border-gray-100 dark:border-gray-800">
                         <tr>
-                            <th class="py-3 pl-6 pr-2 w-10 text-start">
+                            <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
-                                    <label class="flex cursor-pointer items-center select-none">
-                                        <div class="relative">
-                                            <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
-                                            <div :class="selectAll ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
-                                                class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
-                                                <span :class="selectAll ? '' : 'opacity-0'">
-                                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                    </svg>
-                                                </span>
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">
+                                        <label class="flex cursor-pointer items-center select-none">
+                                            <div class="relative">
+                                                <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
+                                                <div :class="selectAll ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
+                                                    class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
+                                                    <span :class="selectAll ? '' : 'opacity-0'">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </label>
+                                        </label>
+                                    </p>
                                 </div>
                             </th>
-                            <th class="py-3 pl-2 pr-6 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset Tag / Name</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Product / Serial</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
-                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Depreciation / Value</th>
-                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Holder</th>
-                             <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Age</th>
-                              <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-end">Actions</th>
-
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Asset Tag / Name</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Product / Serial</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Depreciation / Value</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Holder</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Age</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center justify-end">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($assets as $asset)
                             <tr class="border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="py-3.5 pl-6 pr-2 text-start">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
                                             <div class="relative">
@@ -325,13 +354,13 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="py-3.5 pl-2 pr-6">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">{{ $asset->asset_tag }}</span>
                                         <span class="text-xs text-gray-500">{{ $asset->device_name }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
                                             {{ $asset->product?->brand?->name ?? '-' }} {{ $asset->product?->model ?? '' }}
@@ -350,14 +379,14 @@
                                         @endif
                                     </div>
                                 </td>
-                                 <td class="px-4 sm:px-6 py-3.5">
+                                 <td class="px-5 py-4 sm:px-6">
                                       @php
                                           $statusName = optional($asset->status)->name;
                                           $statusColor = optional($asset->status)->color;
                                       @endphp
                                       <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
                                  </td>
-                                 <td class="px-4 sm:px-6 py-3.5">
+                                 <td class="px-5 py-4 sm:px-6">
                                      <div class="flex flex-col">
                                          @if($asset->depreciation)
                                              <span class="text-xs font-semibold {{ $asset->bookValue == 0 ? 'text-error-500' : 'text-gray-700 dark:text-gray-300' }}">
@@ -377,7 +406,7 @@
                                          @endif
                                      </div>
                                  </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     @if($asset->isCurrentlyCheckedOut())
                                         <div class="flex flex-col">
                                             <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
@@ -391,7 +420,7 @@
                                         <span class="text-theme-sm text-gray-400 italic">Not Assigned</span>
                                     @endif
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     @php
                                         $startDate = $asset->release_date ?? $asset->purchase_date;
                                         $ageYears = $startDate ? (int) floor($startDate->diffInDays(now()) / 365.25) : null;
@@ -404,7 +433,7 @@
                                         <span class="text-xs text-gray-400 italic">-</span>
                                     @endif
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5 text-right">
+                                <td class="px-5 py-4 sm:px-6 text-right">
                                     <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
                                         <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
                                             <i data-feather="more-vertical" class="w-5 h-5"></i>

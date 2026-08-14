@@ -23,7 +23,7 @@
     @endphp
 
     <div class="space-y-6" x-data="{ activeTab: 'details' }">
-        <x-common.page-breadcrumb pageTitle="Asset Details" />
+        <x-common.page-breadcrumb pageTitle="Asset Details" :items="[['label' => 'IT Assets', 'url' => route('assets.index')], ['label' => $asset->asset_tag]]" />
 
         @if($isAged)
             <div class="flex items-center gap-3 rounded-2xl border border-error-200 bg-error-50 p-4 text-error-800 dark:border-error-900/30 dark:bg-error-500/10 dark:text-error-400">

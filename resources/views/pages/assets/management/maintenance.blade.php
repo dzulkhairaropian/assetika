@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Send Asset to Maintenance" />
+        <x-common.page-breadcrumb pageTitle="Send Asset to Maintenance" :items="[['label' => 'IT Assets', 'url' => route('assets.index')], ['label' => $asset->asset_tag, 'url' => route('assets.show', $asset)]]" />
 
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
             <div class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-800">

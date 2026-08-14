@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="IT Asset Transactions History" />
+        <x-common.page-breadcrumb pageTitle="Transactions History" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('asset-transactions.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
@@ -79,16 +79,44 @@
 
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto">
-                <table class="w-full">
-                    <thead class="px-6 py-3.5 border-t border-gray-100 border-y bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Date</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset Info</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Recipient</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Handled By</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">BAST</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Notes</th>
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-100 dark:border-gray-800">
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Asset Info</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Recipient</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Handled By</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center justify-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">BAST</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Notes</p>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
@@ -102,7 +130,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         @if($tx->asset)
                                             <a href="{{ route('assets.show', $tx->asset->id) }}" class="font-medium text-brand-600 hover:text-brand-700 text-theme-sm">
@@ -114,7 +142,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     @php
                                         // Tentukan nama status transaksi
                                         $transactionStatusName = $tx->checked_in_at ? 'Returned' : 'Checked Out';
@@ -136,13 +164,13 @@
                                         @endif
                                     @endif
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col text-theme-sm">
                                         <span class="text-gray-700 dark:text-gray-400 font-medium">{{ $tx->checkedOutToUser->name ?? '-' }}</span>
                                         <span class="text-xs text-gray-500">{{ $tx->department->name ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col text-theme-sm">
                                         <span class="text-gray-700 dark:text-gray-400">Out: {{ $tx->checkedOutByUser->name ?? '-' }}</span>
                                         @if($tx->checkedInByUser)

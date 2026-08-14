@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Bulk Checkout Assets" />
+    <x-common.page-breadcrumb pageTitle="Bulk Checkout Assets" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-2">Selected Assets ({{ count($assets) }})</h3>
         <div class="flex flex-wrap gap-2 mb-6">

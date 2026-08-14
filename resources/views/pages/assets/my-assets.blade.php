@@ -2,19 +2,43 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="My Assigned Assets" />
+        <x-common.page-breadcrumb pageTitle="My Assigned Assets" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
 
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto">
-                <table class="w-full">
-                    <thead class="px-6 py-3.5 border-t border-gray-100 border-y bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset Tag / Name</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Product Details</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Serial Number</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Assigned At</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Location</th>
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-100 dark:border-gray-800">
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Asset Tag / Name</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Product Details</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Serial Number</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Assigned At</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Location</p>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">

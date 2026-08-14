@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Edit IT Asset" />
+        <x-common.page-breadcrumb pageTitle="Edit IT Asset" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
