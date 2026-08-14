@@ -11,7 +11,7 @@ class MenuHelper
                 'title' => 'Dashboard',
                 'items' => [
                     [
-                        'name' => 'Dashboard',
+                        'name' => 'Main Dashboard',
                         'icon' => 'dashboard',
                         'path' => '/',
                     ],
@@ -21,14 +21,9 @@ class MenuHelper
                         'path' => '/ga-dashboard',
                     ],
                     [
-                        'name' => 'My Assets',
-                        'icon' => 'user-assets',
-                        'path' => '/my-assets',
-                    ],
-                    [
-                        'name' => 'Request Item',
-                        'icon' => 'kit',
-                        'path' => '/requestable-assets',
+                        'name' => 'Ticket Dashboard',
+                        'icon' => 'ticket',
+                        'path' => '/ticket-dashboard',
                     ],
                 ],
             ],
@@ -36,14 +31,19 @@ class MenuHelper
                 'title' => 'Support Ticketing',
                 'items' => [
                     [
-                        'name' => 'Ticket Dashboard',
-                        'icon' => 'dashboard',
-                        'path' => '/ticket-dashboard',
-                    ],
-                    [
                         'name' => 'All Tickets',
                         'icon' => 'ticket',
                         'path' => '/tickets',
+                    ],
+                    [
+                        'name' => 'Asset Requests',
+                        'icon' => 'ticket',
+                        'path' => '/asset-requests',
+                    ],
+                    [
+                        'name' => 'Consumable Requests',
+                        'icon' => 'ticket',
+                        'path' => '/consumable-requests',
                     ],
                     [
                         'name' => 'Ticketing Data',
@@ -70,6 +70,16 @@ class MenuHelper
                             ['name' => 'Inventory', 'path' => '/assets'],
                             ['name' => 'Transactions', 'path' => '/asset-transactions'],
                         ],
+                    ],
+                    [
+                        'name' => 'My Assets',
+                        'icon' => 'user-assets',
+                        'path' => '/my-assets',
+                    ],
+                    [
+                        'name' => 'Request Item',
+                        'icon' => 'kit',
+                        'path' => '/requestable-assets',
                     ],
                     [
                         'name' => 'Components',
@@ -103,11 +113,6 @@ class MenuHelper
                         'name' => 'Audit / Opname',
                         'icon' => 'support',
                         'path' => '/stock-counts',
-                    ],
-                    [
-                        'name' => 'Asset Requests',
-                        'icon' => 'ticket',
-                        'path' => '/asset-requests',
                     ],
                 ],
             ],
