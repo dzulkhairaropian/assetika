@@ -4,7 +4,7 @@
     <div class="relative z-1 bg-white p-6 sm:p-0 dark:bg-gray-900">
         <div class="relative flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row dark:bg-gray-900">
             <!-- Form -->
-            <div class="flex w-full flex-1 flex-col justify-between h-full py-8 lg:w-1/2">
+            <div class="flex flex-col flex-1 w-full lg:w-1/2">
                 <div class="mx-auto w-full max-w-md pt-10">
                     <a href="{{ route('login') }}"
                         class="inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">

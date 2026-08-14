@@ -4,7 +4,7 @@
     <div class="relative z-1 bg-white p-6 sm:p-0 dark:bg-gray-900">
         <div class="flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row dark:bg-gray-900">
             <!-- Form -->
-            <div class="flex w-full flex-1 flex-col justify-between h-full py-8 lg:w-1/2">
+            <div class="flex flex-col flex-1 w-full lg:w-1/2">
                 <div class="mx-auto w-full max-w-md pt-10">
                     <a href="{{ route('login') }}"
                         class="inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
@@ -32,9 +32,9 @@
                                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                             First Name<span class="text-error-500">*</span>
                                         </label>
-                                        <input type="text" name="first_name" value="{{ old('first_name') }}" placeholder="Enter your first name" required
+                                        <input type="text" name="fname" value="{{ old('fname') }}" placeholder="Enter your first name" required
                                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
-                                        @error('first_name')
+                                        @error('fname')
                                             <p class="mt-1 text-xs text-error-500">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -42,9 +42,9 @@
                                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                             Last Name<span class="text-error-500">*</span>
                                         </label>
-                                        <input type="text" name="last_name" value="{{ old('last_name') }}" placeholder="Enter your last name" required
+                                        <input type="text" name="lname" value="{{ old('lname') }}" placeholder="Enter your last name" required
                                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
-                                        @error('last_name')
+                                        @error('lname')
                                             <p class="mt-1 text-xs text-error-500">{{ $message }}</p>
                                         @enderror
                                     </div>
