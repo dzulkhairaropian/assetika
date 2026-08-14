@@ -93,12 +93,7 @@
                                 <td colspan="6" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-                                                <line x1="6" y1="6" x2="6.01" y2="6"></line>
-                                                <line x1="6" y1="18" x2="6.01" y2="18"></line>
-                                            </svg>
+                                            <i data-feather="hard-drive" class="w-6 h-6"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">You don't have any assigned assets</p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">Assets assigned directly to you will appear here.</p>

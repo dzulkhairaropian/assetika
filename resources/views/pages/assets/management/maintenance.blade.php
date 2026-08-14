@@ -20,7 +20,7 @@
 
                 <!-- Section: Maintenance Details -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                         Maintenance Details
                     </h3>
@@ -94,7 +94,7 @@
 
                 <!-- Section: Handover Documentation -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="file-text" class="w-5 h-5 text-brand-500"></i>
                         Documentation
                     </h3>

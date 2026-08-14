@@ -3,7 +3,7 @@
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Bulk Checkout Assets" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-2">Selected Assets ({{ count($assets) }})</h3>
+        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-2">Selected Assets ({{ count($assets) }})</h3>
         <div class="flex flex-wrap gap-2 mb-6">
             @foreach($assets as $a)
                 <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-700 dark:border-gray-700 dark:text-gray-400">{{ $a->asset_tag }} - {{ $a->name }}</span>

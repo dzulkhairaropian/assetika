@@ -209,13 +209,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Showing {{ $masterCategories->firstItem() ?? 0 }} to {{ $masterCategories->lastItem() ?? 0 }} of {{ $masterCategories->total() }} results
-                    </p>
-                    {{ $masterCategories->links() }}
-                </div>
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+                {{ $masterCategories->links() }}
             </div>
         </div>
     </div>

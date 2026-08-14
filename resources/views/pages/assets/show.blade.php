@@ -386,9 +386,7 @@
                                                 <td colspan="5" class="px-6 py-12 text-center">
                                                     <div class="flex flex-col items-center justify-center space-y-2">
                                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                            </svg>
+                                                            <i data-feather="clock" class="w-6 h-6"></i>
                                                         </div>
                                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No movement history found</p>
                                                         <p class="text-xs text-gray-400 dark:text-gray-500">This asset has not been assigned or checked out yet.</p>

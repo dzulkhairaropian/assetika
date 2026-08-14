@@ -223,13 +223,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Showing {{ $locations->firstItem() ?? 0 }} to {{ $locations->lastItem() ?? 0 }} of {{ $locations->total() }} results
-                    </p>
-                    {{ $locations->links() }}
-                </div>
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+                {{ $locations->links() }}
             </div>
         </div>
     </div>

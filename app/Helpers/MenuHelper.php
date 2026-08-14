@@ -63,7 +63,7 @@ class MenuHelper
             [
                 'title' => 'IT Asset Management',
                 'items' => [
-                    [
+[
                         'name' => 'IT Assets',
                         'icon' => 'assets',
                         'subItems' => [

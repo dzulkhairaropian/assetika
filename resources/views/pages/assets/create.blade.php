@@ -291,7 +291,7 @@
             <div class="space-y-6">
                 <!-- Section: Financial Information -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white/90">
+                    <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
                         <i data-feather="dollar-sign" class="w-5 h-5 text-brand-500"></i>
                         Financial Information
                     </h3>
@@ -365,7 +365,7 @@
                 </div>
 
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white/90">
+                    <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
                         <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
                         Actions
                     </h3>

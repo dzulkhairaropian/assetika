@@ -55,6 +55,10 @@
     }">
         <x-common.page-breadcrumb pageTitle="Asset Management" />
 
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Manage inventory, checkouts, and asset lifecycle across your organization.
+        </p>
+
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('assets.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
                 <div class="relative flex items-center">
@@ -326,7 +330,25 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($assets as $asset)
-                            <tr class="border-b border-gray-100 dark:border-white/[0.05]">
+                            @php
+                                $statusName = strtolower(optional($asset->status)->name ?? '');
+                                $startDate = $asset->release_date ?? $asset->purchase_date;
+                                $ageYears = $startDate ? (int) floor($startDate->diffInDays(now()) / 365.25) : null;
+                                $isAged = $ageYears !== null && $ageYears >= 4;
+
+                                if (in_array($statusName, ['broken'])) {
+                                    $rowBg = 'bg-error-50/70 dark:bg-error-500/10 hover:bg-error-100/60 dark:hover:bg-error-500/15';
+                                } elseif (in_array($statusName, ['service', 'maintenance', 'in repair'])) {
+                                    $rowBg = 'bg-warning-50/70 dark:bg-warning-500/10 hover:bg-warning-100/60 dark:hover:bg-warning-500/15';
+                                } elseif (in_array($statusName, ['retired', 'disposal'])) {
+                                    $rowBg = 'bg-gray-100/70 dark:bg-white/[0.04] hover:bg-gray-200/50 dark:hover:bg-white/[0.06]';
+                                } elseif ($isAged) {
+                                    $rowBg = 'bg-error-50/60 dark:bg-error-500/10 hover:bg-error-100/60 dark:hover:bg-error-500/15';
+                                } else {
+                                    $rowBg = 'hover:bg-gray-50/50 dark:hover:bg-white/[0.02]';
+                                }
+                            @endphp
+                            <tr class="border-b border-gray-100 dark:border-white/[0.05] {{ $rowBg }}">
                                 <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
@@ -421,10 +443,6 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    @php
-                                        $startDate = $asset->release_date ?? $asset->purchase_date;
-                                        $ageYears = $startDate ? (int) floor($startDate->diffInDays(now()) / 365.25) : null;
-                                    @endphp
                                     @if($ageYears !== null)
                                         <span class="text-xs font-semibold {{ $ageYears >= 4 ? 'text-error-700 dark:text-error-400' : ($ageYears >= 2 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400') }}">
                                             {{ $ageYears }}y old {{ $ageYears >= 4 ? '(Review)' : '' }}
@@ -491,9 +509,7 @@
                                 <td colspan="8" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                            </svg>
+                                            <i data-feather="monitor" class="w-6 h-6"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No assets found</p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">Try adjusting your search or add a new asset to get started.</p>
@@ -504,13 +520,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Showing {{ $assets->firstItem() ?? 0 }} to {{ $assets->lastItem() ?? 0 }} of {{ $assets->total() }} results
-                    </p>
-                    {{ $assets->links() }}
-                </div>
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+                {{ $assets->links() }}
             </div>
         </div>
 </div>

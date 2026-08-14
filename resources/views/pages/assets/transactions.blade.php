@@ -122,7 +122,7 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($transactions as $tx)
                             <tr class="border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="px-4 sm:px-6 py-3.5 text-theme-sm text-gray-700 dark:text-gray-400 whitespace-nowrap">
+                                <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-700 dark:text-gray-400 whitespace-nowrap">
                                     <div class="flex flex-col space-y-0.5">
                                         <span>Checkout: <strong class="font-normal text-gray-900 dark:text-white">{{ $tx->checked_out_at?->format('d M Y H:i') ?? '-' }}</strong></span>
                                         @if($tx->checked_in_at)
@@ -178,7 +178,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5 text-center">
+                                <td class="px-5 py-4 sm:px-6 text-center">
                                     @if($tx->asset)
                                         <a href="{{ route('assets.bast', [$tx->asset->id, $tx->id]) }}" target="_blank" class="inline-flex items-center gap-1 text-brand-500 hover:text-brand-600" title="Download BAST PDF">
                                             <i data-feather="file-text" class="w-5 h-5"></i>
@@ -188,7 +188,7 @@
                                         <span class="text-gray-300 dark:text-gray-700">-</span>
                                     @endif
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5 text-theme-sm text-gray-500 max-w-xs truncate" title="{{ $tx->checkout_notes ?? $tx->checkin_notes }}">
+                                <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-500 max-w-xs truncate" title="{{ $tx->checkout_notes ?? $tx->checkin_notes }}">
                                     @if($tx->checkout_notes)
                                         <span class="block">Out: {{ $tx->checkout_notes }}</span>
                                     @endif
@@ -205,9 +205,7 @@
                                 <td colspan="7" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                            </svg>
+                                            <i data-feather="clipboard" class="w-6 h-6"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No transactions found</p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">IT Asset checkout and checkin records will be displayed here.</p>
@@ -218,7 +216,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-800">
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
                 {{ $transactions->links() }}
             </div>
         </div>

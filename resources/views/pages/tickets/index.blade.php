@@ -286,13 +286,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-gray-100 p-6 dark:border-gray-800">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Showing {{ $tickets->firstItem() ?? 0 }} to {{ $tickets->lastItem() ?? 0 }} of {{ $tickets->total() }} results
-                    </p>
-                    {{ $tickets->links() }}
-                </div>
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+                {{ $tickets->links() }}
             </div>
         </div>
 </div>
