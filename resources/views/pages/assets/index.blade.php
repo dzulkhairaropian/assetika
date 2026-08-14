@@ -59,6 +59,83 @@
             Manage inventory, checkouts, and asset lifecycle across your organization.
         </p>
 
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
+
+        <!-- Bulk Action Form -->
+        <form id="bulkDeleteForm" action="{{ route('assets.bulk-delete') }}" method="POST" class="hidden">
+            @csrf
+            <template x-for="asset in selectedAssets" :key="asset.id">
+                <input type="hidden" name="ids[]" :value="asset.id">
+            </template>
+        </form>
+
+        <!-- Bulk Action Bar -->
+        <div x-show="selectedAssets.length > 0"
+            x-transition
+            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
+            style="display: none;">
+            <div class="flex items-center gap-2">
+                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
+                    <span x-text="selectedAssets.length"></span> assets selected.
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs text-gray-500 dark:text-gray-400">Copies per asset:</label>
+                    <input type="number" id="labelCopies" min="1" max="10" value="1"
+                        class="w-16 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1.5 text-center text-xs font-semibold text-gray-800 dark:text-white">
+                </div>
+                <button type="button" @click="submitBulkLabels()"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
+                    <i data-feather="printer" class="w-4 h-4"></i>
+                    Print Labels
+                </button>
+                <button type="button" @click="exportSelectedAssets(selectedAssets)"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
+                    <i data-feather="download" class="w-4 h-4"></i>
+                    Export Selected
+                </button>
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    Delete Selected
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            {{-- Card Header: Tabs + Toolbar --}}
+            <div class="space-y-4 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+                @php
+                    $currentTab = request('tab');
+                    $tabFilters = array_filter(request()->except(['page', 'tab']));
+                    $tabs = [
+                        ['key' => null,       'label' => 'All Assets',      'count' => $inventorySummary['total'],      'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'ready',    'label' => 'Ready to Deploy', 'count' => $inventorySummary['ready'],      'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'deployed', 'label' => 'Deployed',        'count' => $inventorySummary['deployed'],   'icon' => 'monitor',      'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
+                        ['key' => 'service',  'label' => 'Service & Repair','count' => $inventorySummary['in_service'], 'icon' => 'tool',         'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
+                        ['key' => 'broken',   'label' => 'Broken',          'count' => $inventorySummary['broken'],     'icon' => 'alert-triangle','badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                        ['key' => 'aged',     'label' => 'Aged (≥4y)',      'count' => $inventorySummary['aged'],       'icon' => 'clock',        'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
+                    ];
+                @endphp
+                <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5">
+                    @foreach($tabs as $tab)
+                        @php
+                            $isActive = $currentTab === $tab['key'];
+                            $tabUrl = route('assets.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+                        @endphp
+                        <a href="{{ $tabUrl }}"
+                           class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all {{ $isActive ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                            <i data-feather="{{ $tab['icon'] }}" class="w-4 h-4"></i>
+                            {{ $tab['label'] }}
+                            <span class="rounded-full px-2 py-0.5 text-xs font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('assets.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
                 <div class="relative flex items-center">
@@ -219,55 +296,8 @@
                 </a>
             </div>
         </div>
-
-        @if(session('success'))
-            <x-ui.alert variant="success" message="{{ session('success') }}" />
-        @endif
-
-        <!-- Bulk Action Form -->
-        <form id="bulkDeleteForm" action="{{ route('assets.bulk-delete') }}" method="POST" class="hidden">
-            @csrf
-            <template x-for="asset in selectedAssets" :key="asset.id">
-                <input type="hidden" name="ids[]" :value="asset.id">
-            </template>
-        </form>
-
-        <!-- Bulk Action Bar -->
-        <div x-show="selectedAssets.length > 0"
-            x-transition
-            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
-            style="display: none;">
-            <div class="flex items-center gap-2">
-                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
-                <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
-                    <span x-text="selectedAssets.length"></span> assets selected.
-                </span>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <label class="text-xs text-gray-500 dark:text-gray-400">Copies per asset:</label>
-                    <input type="number" id="labelCopies" min="1" max="10" value="1"
-                        class="w-16 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1.5 text-center text-xs font-semibold text-gray-800 dark:text-white">
-                </div>
-                <button type="button" @click="submitBulkLabels()"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-feather="printer" class="w-4 h-4"></i>
-                    Print Labels
-                </button>
-                <button type="button" @click="exportSelectedAssets(selectedAssets)"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-feather="download" class="w-4 h-4"></i>
-                    Export Selected
-                </button>
-                <button type="button" @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
-                    <i data-feather="trash-2" class="w-4 h-4"></i>
-                    Delete Selected
-                </button>
-            </div>
-        </div>
 
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full">
                     <thead class="border-b border-gray-100 dark:border-gray-800">

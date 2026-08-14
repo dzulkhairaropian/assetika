@@ -4,6 +4,10 @@
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Create IT Asset" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
 
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Add a new hardware asset to your organization's inventory.
+        </p>
+
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
@@ -169,10 +173,12 @@
                         </div>
 
                         <div>
+                            <label for="release_date" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                Release Date <span class="text-error-500">*</span>
+                            </label>
                             <x-form.date-picker
                                 id="release_date"
                                 name="release_date"
-                                label="Release Date"
                                 placeholder="Select release date"
                                 defaultDate="{{ old('release_date', date('Y-m-d')) }}"
                             />
@@ -182,6 +188,7 @@
                 </div>
 
                 <!-- Section: Network Information -->
+                <hr class="border-gray-100 dark:border-gray-800">
                 <div class="pt-2">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="wifi" class="w-5 h-5 text-brand-500"></i>
@@ -209,6 +216,7 @@
                 </div>
 
                 <!-- Section: Software Licenses -->
+                <hr class="border-gray-100 dark:border-gray-800">
                 <div class="pt-2">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="key" class="w-5 h-5 text-brand-500"></i>
@@ -236,6 +244,7 @@
                 </div>
 
                 <!-- Section: Technical Specifications -->
+                <hr class="border-gray-100 dark:border-gray-800">
                 <div class="pt-2">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-feather="cpu" class="w-5 h-5 text-brand-500"></i>
@@ -284,6 +293,7 @@
                     </div>
                 </div>
 
+                <hr class="border-gray-100 dark:border-gray-800">
                 @include('pages.assets.partials.custom-fields')
                 </div>
             </div>

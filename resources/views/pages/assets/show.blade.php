@@ -25,6 +25,10 @@
     <div class="space-y-6" x-data="{ activeTab: 'details' }">
         <x-common.page-breadcrumb pageTitle="Asset Details" :items="[['label' => 'IT Assets', 'url' => route('assets.index')], ['label' => $asset->asset_tag]]" />
 
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Detailed specification, assignment history, maintenance, and support tickets for asset {{ $asset->asset_tag }}.
+        </p>
+
         @if($isAged)
             <div class="flex items-center gap-3 rounded-2xl border border-error-200 bg-error-50 p-4 text-error-800 dark:border-error-900/30 dark:bg-error-500/10 dark:text-error-400">
                 <i data-feather="alert-triangle" class="h-5 w-5 shrink-0"></i>
@@ -222,32 +226,38 @@
             <div class="lg:col-span-2">
                 <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
                     <!-- Tabs Navigation -->
-                    <div class="flex border-b border-gray-100 px-5 dark:border-gray-800">
-                        <button @click="activeTab = 'details'"
-                            :class="activeTab === 'details' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-4 py-4 text-sm font-medium transition-all">
-                            Details
-                        </button>
-                        <button @click="activeTab = 'history'"
-                            :class="activeTab === 'history' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-4 py-4 text-sm font-medium transition-all">
-                            Movement History
-                        </button>
-                        <button @click="activeTab = 'maintenance'"
-                            :class="activeTab === 'maintenance' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-4 py-4 text-sm font-medium transition-all">
-                            Maintenance History
-                        </button>
-                        <button @click="activeTab = 'tickets'"
-                            :class="activeTab === 'tickets' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-4 py-4 text-sm font-medium transition-all flex items-center gap-2">
-                            Support Tickets
-                            @if($asset->tickets->count() > 0)
-                                <span class="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
-                                    {{ $asset->tickets->count() }}
-                                </span>
-                            @endif
-                        </button>
+                    <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+                        <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5">
+                            <button @click="activeTab = 'details'"
+                                :class="activeTab === 'details' ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all">
+                                <i data-feather="file-text" class="w-4 h-4"></i>
+                                Details
+                            </button>
+                            <button @click="activeTab = 'history'"
+                                :class="activeTab === 'history' ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all">
+                                <i data-feather="activity" class="w-4 h-4"></i>
+                                Movement History
+                            </button>
+                            <button @click="activeTab = 'maintenance'"
+                                :class="activeTab === 'maintenance' ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all">
+                                <i data-feather="tool" class="w-4 h-4"></i>
+                                Maintenance History
+                            </button>
+                            <button @click="activeTab = 'tickets'"
+                                :class="activeTab === 'tickets' ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all">
+                                <i data-feather="life-buoy" class="w-4 h-4"></i>
+                                Support Tickets
+                                @if($asset->tickets->count() > 0)
+                                    <span class="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                                        {{ $asset->tickets->count() }}
+                                    </span>
+                                @endif
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Tabs Content -->
@@ -256,7 +266,7 @@
                         <div x-show="activeTab === 'details'" class="space-y-8" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1">
                             <!-- Product Info -->
                             <div>
-                                <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
+                                <h4 class="mb-5 flex items-center gap-2 text-base font-medium text-gray-800 border-b border-gray-100 pb-3 dark:border-gray-800 dark:text-white/90">
                                     <i data-feather="package" class="h-5 w-5 text-brand-500"></i>
                                     Product Information
                                 </h4>
@@ -286,7 +296,7 @@
 
                             <!-- Technical Specs -->
                             <div>
-                                <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
+                                <h4 class="mb-5 flex items-center gap-2 text-base font-medium text-gray-800 border-b border-gray-100 pb-3 dark:border-gray-800 dark:text-white/90">
                                     <i data-feather="cpu" class="h-5 w-5 text-brand-500"></i>
                                     Technical Specifications
                                 </h4>
@@ -297,7 +307,7 @@
 
                             <!-- Financial Data -->
                             <div>
-                                <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
+                                <h4 class="mb-5 flex items-center gap-2 text-base font-medium text-gray-800 border-b border-gray-100 pb-3 dark:border-gray-800 dark:text-white/90">
                                     <i data-feather="dollar-sign" class="h-5 w-5 text-brand-500"></i>
                                     Financial Data
                                 </h4>
@@ -316,7 +326,7 @@
                                     </div>
                                     <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/20">
                                         <p class="text-xs font-medium uppercase text-gray-400">Asset Aging</p>
-                                        <p class="mt-1 text-sm font-semibold {{ $isAged ? 'text-error-500 font-bold animate-pulse' : 'text-gray-700 dark:text-gray-300' }}">
+                                        <p class="mt-1 text-sm font-semibold {{ $isAged ? 'text-error-500' : 'text-gray-700 dark:text-gray-300' }}">
                                             {{ $ageDisplay }}
                                         </p>
                                     </div>
@@ -326,7 +336,7 @@
                             <!-- Notes -->
                             @if($asset->notes)
                                 <div>
-                                    <h4 class="mb-4 flex items-center gap-2 text-base font-bold text-gray-800 dark:text-white/90">
+                                    <h4 class="mb-5 flex items-center gap-2 text-base font-medium text-gray-800 border-b border-gray-100 pb-3 dark:border-gray-800 dark:text-white/90">
                                         <i data-feather="file-text" class="h-5 w-5 text-brand-500"></i>
                                         Notes
                                     </h4>
@@ -343,11 +353,11 @@
                                 <table class="w-full text-left">
                                     <thead class="border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">User / Dept</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Date Out</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Date In</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Condition</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">BAST</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">User / Dept</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date Out</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date In</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Condition</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">BAST</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
@@ -405,11 +415,11 @@
                                 <table class="w-full text-left">
                                     <thead class="border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Provider</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Start Date</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Completion Date</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Cost</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Notes</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Provider</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Start Date</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Completion Date</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cost</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Notes</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
@@ -462,12 +472,12 @@
                                 <table class="w-full text-left">
                                     <thead class="border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Ticket ID</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Requester</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Problem Summary</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Priority</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Status</th>
-                                            <th class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 text-right">Action</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ticket ID</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Requester</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Problem Summary</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Priority</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</th>
+                                            <th class="pb-3 text-right font-medium text-gray-500 text-theme-xs dark:text-gray-400">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">

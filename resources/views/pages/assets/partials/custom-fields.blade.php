@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        let html = '<div><h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">' +
+        let html = '<div><h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">' +
             '<i data-feather="list" class="w-5 h-5 text-brand-500"></i>Custom Fields</h3>';
 
         categoryFieldsets[categoryId].forEach(fs => {

@@ -29,10 +29,90 @@ resources/views/pages/master/{module}/
    </p>
    ```
 
-2. **Toolbar (Search, Filter & Direct Action)** — Ditarik **di luar** card tabel:
+2. **Unified Table Card — Semua kontrol data di satu card**:
+   Semua elemen yang berhubungan dengan data (tabs, search, filter, action button, tabel, pagination) berada **di dalam satu card**. Urutan di luar card hanya: breadcrumb, deskripsi, alert flash, dan bulk action bar.
+
+   Struktur card:
+   ```
+   Card (rounded-2xl border)
+   ├── Card Header (p-4 sm:p-5, border-b)
+   │   ├── Pill Tabs (opsional, jika ada segmentasi)
+   │   └── Toolbar (search + filter + action buttons)
+   ├── Table (overflow-x-auto)
+   └── Pagination Footer (p-4 sm:p-6, border-t)
+   ```
+
+   ```blade
+   <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+       {{-- Card Header --}}
+       <div class="space-y-4 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+           {{-- Pill Tabs (opsional) --}}
+           {{-- Toolbar --}}
+       </div>
+
+       {{-- Table --}}
+       <div class="max-w-full overflow-x-auto">
+           <table class="min-w-full">...</table>
+       </div>
+
+       {{-- Pagination Footer --}}
+       <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+           {{ $items->links() }}
+       </div>
+   </div>
+   ```
+
+3. **Pill Tabs di Card Header** (TailAdmin Pro pattern, opsional untuk modul dengan segmentasi seperti Asset):
+   - Container `inline-flex` agar lebar mengikuti isi (tidak full-width), tetap scrollable di layar kecil.
+   - Hitungan per tab dari summary controller, badge warna per segmen.
+   ```blade
+   @php
+       $currentTab = request('tab');
+       $tabFilters = array_filter(request()->except(['page', 'tab']));
+       $tabs = [
+           ['key' => null,    'label' => 'All',    'count' => $summary['total'], 'icon' => 'layers', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+           ['key' => 'active','label' => 'Active', 'count' => $summary['active'],'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+           // ... segmen lain
+       ];
+   @endphp
+   <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5">
+       @foreach($tabs as $tab)
+           @php
+               $isActive = $currentTab === $tab['key'];
+               $tabUrl = route('{module}.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+           @endphp
+           <a href="{{ $tabUrl }}"
+              class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all {{ $isActive ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+               <i data-feather="{{ $tab['icon'] }}" class="w-4 h-4"></i>
+               {{ $tab['label'] }}
+               <span class="rounded-full px-2 py-0.5 text-xs font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+           </a>
+       @endforeach
+   </div>
+   ```
+
+   Controller: hitung summary **sebelum** filter tab diterapkan, lalu terapkan filter tab:
+   ```php
+   $summary = [
+       'total'  => (clone $query)->count(),
+       'active' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'Active'))->count(),
+       // ...
+   ];
+
+   switch ($request->input('tab')) {
+       case 'active':
+           $query->whereHas('status', fn($q) => $q->where('name', 'Active'));
+           break;
+       // ...
+   }
+
+   $items = $query->latest()->paginate(50)->withQueryString();
+   ```
+
+4. **Toolbar (Search, Filter & Direct Action)** — di dalam card header, di bawah tabs:
    ```blade
    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-       <form action="{{ route('{module}.index') }}" method="GET" class="flex items-center gap-3">
+       <form action="{{ route('{module}.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
            <div class="relative flex items-center">
                <span class="absolute left-3 text-gray-400">
                    <i data-feather="search" class="w-4 h-4"></i>
@@ -45,50 +125,52 @@ resources/views/pages/master/{module}/
            @endif
        </form>
 
-       <a href="{{ route('{module}.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-           <i data-feather="plus" class="w-4 h-4"></i>
-           Add {Module}
-       </a>
+       <div class="flex items-center gap-3">
+           {{-- Export / tombol sekunder lain (opsional) --}}
+           <a href="{{ route('{module}.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+               <i data-feather="plus" class="w-4 h-4"></i>
+               Add {Module}
+           </a>
+       </div>
    </div>
    ```
 
-3. **Table Card & Header (TailAdmin Standard)**:
-   - Outer card: `overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]`
+5. **Table Header (TailAdmin Standard)**:
    - Table: `<table class="min-w-full">`
    - Header: `<thead class="border-b border-gray-100 dark:border-gray-800">` (**Tanpa** `bg-gray-50` / `border-y`)
    - Header cell format:
-     ```blade
-     <th class="px-5 py-3 sm:px-6">
-         <div class="flex items-center">
-             <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Column Title</p>
-         </div>
-     </th>
-     ```
+      ```blade
+      <th class="px-5 py-3 sm:px-6">
+          <div class="flex items-center">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Column Title</p>
+          </div>
+      </th>
+      ```
 
-4. **Table Body Cell Padding**:
+6. **Table Body Cell Padding**:
    - Standard cell: `<td class="px-5 py-4 sm:px-6">`
    - Actions cell: `<td class="px-5 py-4 sm:px-6 text-right">`
 
-5. **Action Icons (Right Column)**:
+7. **Action Icons (Right Column)**:
    - Gunakan Feather Icon dengan hover color TailAdmin:
-     ```blade
-     <div class="flex items-center justify-end gap-3 text-gray-500">
-         <a href="{{ route('{module}.show', $item) }}" class="transition-colors hover:text-brand-500" title="View">
-             <i data-feather="eye" class="w-5 h-5"></i>
-         </a>
-         <a href="{{ route('{module}.edit', $item) }}" class="transition-colors hover:text-brand-500" title="Edit">
-             <i data-feather="edit-3" class="w-5 h-5"></i>
-         </a>
-         <form action="{{ route('{module}.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
-             @csrf @method('DELETE')
-             <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
-                 <i data-feather="trash-2" class="w-5 h-5"></i>
-             </button>
-         </form>
-     </div>
-     ```
+      ```blade
+      <div class="flex items-center justify-end gap-3 text-gray-500">
+          <a href="{{ route('{module}.show', $item) }}" class="transition-colors hover:text-brand-500" title="View">
+              <i data-feather="eye" class="w-5 h-5"></i>
+          </a>
+          <a href="{{ route('{module}.edit', $item) }}" class="transition-colors hover:text-brand-500" title="Edit">
+              <i data-feather="edit-3" class="w-5 h-5"></i>
+          </a>
+          <form action="{{ route('{module}.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
+              @csrf @method('DELETE')
+              <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
+                  <i data-feather="trash-2" class="w-5 h-5"></i>
+              </button>
+          </form>
+      </div>
+      ```
 
-6. **Empty State Table Row**:
+8. **Empty State Table Row**:
    ```blade
    @empty
        <tr>
@@ -105,13 +187,34 @@ resources/views/pages/master/{module}/
    @endforelse
    ```
 
-7. **Footer Pagination**:
-   - **Cukup panggil `{{ $items->links() }}` saja** di dalam container border-t, **tidak perlu** menambahkan `<p>Showing ...</p>` manual karena `vendor/pagination/tailwind.blade.php` sudah merendernya otomatis.
+9. **Row Highlighting Berbasis Kondisi** (opsional, referensi: `pages/assets/index.blade.php`):
+   - Hitung kondisi di awal loop `@forelse`, terapkan class background ke `<tr>`.
+   - Prioritas: **status > kondisi lain** (mis. aging).
    ```blade
-   <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
-       {{ $items->links() }}
-   </div>
+   @forelse($items as $item)
+       @php
+           $statusName = strtolower(optional($item->status)->name ?? '');
+           if (in_array($statusName, ['broken'])) {
+               $rowBg = 'bg-error-50/70 dark:bg-error-500/10 hover:bg-error-100/60 dark:hover:bg-error-500/15';
+           } elseif (in_array($statusName, ['service', 'maintenance', 'in repair'])) {
+               $rowBg = 'bg-warning-50/70 dark:bg-warning-500/10 hover:bg-warning-100/60 dark:hover:bg-warning-500/15';
+           } else {
+               $rowBg = 'hover:bg-gray-50/50 dark:hover:bg-white/[0.02]';
+           }
+       @endphp
+       <tr class="border-b border-gray-100 dark:border-white/[0.05] {{ $rowBg }}">
+           ...
+       </tr>
+   @endforelse
    ```
+
+10. **Footer Pagination**:
+    - **Cukup panggil `{{ $items->links() }}` saja** di dalam container border-t, **tidak perlu** menambahkan `<p>Showing ...</p>` manual karena `vendor/pagination/tailwind.blade.php` sudah merendernya otomatis.
+    ```blade
+    <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+        {{ $items->links() }}
+    </div>
+    ```
 
 ---
 
@@ -120,12 +223,22 @@ resources/views/pages/master/{module}/
 ### A. Layout Grid (Split Layout)
 Gunakan layout 2 kolom responsif: `grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]`
 
+**Deskripsi di bawah judul** — wajib ada, sama seperti halaman index. Kalimat menjelaskan apa yang dilakukan form ini:
+- Create: *"Add a new {item} to your organization's {context}."*
+- Edit: *"Update information, status, or assignment for {item} {identifier}."*
+
+**Divider antar section** — setiap section form di dalam card utama dipisahkan dengan `<hr class="border-gray-100 dark:border-gray-800">` agar batas antar kelompok field jelas.
+
 ```blade
 @extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Create {Module}" :items="[['label' => '{Modules}', 'url' => route('{module}.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Add a new {item} to your organization's {context}.
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -146,6 +259,17 @@ Gunakan layout 2 kolom responsif: `grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380
                         <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                             <!-- Form Input Fields -->
                         </div>
+                    </div>
+
+                    {{-- Divider antar section --}}
+                    <hr class="border-gray-100 dark:border-gray-800">
+
+                    <div class="pt-2">
+                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                            <i data-feather="box" class="w-5 h-5 text-brand-500"></i>
+                            Next Section
+                        </h3>
+                        <!-- Fields section berikutnya -->
                     </div>
                 </div>
             </div>
@@ -639,7 +763,7 @@ Setiap modul Master Data yang distandarisasi harus memenuhi checklist ini:
 ### Frontend — Index Page
 - [ ] Breadcrumb hierarkis (`Home > Master Data > [Modul]`)
 - [ ] Sub-header description singkat di bawah breadcrumb
-- [ ] Toolbar Search & Action di luar tabel
+- [ ] Toolbar Search & Action di dalam card header (di bawah tabs jika ada)
 - [ ] Filter dropdown dengan badge counter (jika > 1 filter)
 - [ ] Header tabel TailAdmin (`border-b`, tanpa `bg-gray-50`, padding `px-5 py-3 sm:px-6` + `<p>` wrapper)
 - [ ] Cell body padding `px-5 py-4 sm:px-6`
@@ -650,8 +774,10 @@ Setiap modul Master Data yang distandarisasi harus memenuhi checklist ini:
 - [ ] Status menggunakan `<x-ui.badge>`
 
 ### Frontend — Form Pages
+- [ ] Sub-header description di bawah judul (apa yang dilakukan form ini)
 - [ ] Split layout 2 kolom (`1.75fr + 380px`)
 - [ ] Section header `text-base font-medium` dengan icon + border-b
+- [ ] Divider `<hr>` antar section form
 - [ ] Input styling TailAdmin (`h-11 rounded-lg shadow-theme-xs`)
 - [ ] Right sidebar Actions (Save / Save & Create Another / Cancel)
 - [ ] Error message per field (`@error`)

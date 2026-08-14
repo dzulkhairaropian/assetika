@@ -202,6 +202,19 @@ class AssetController extends Controller
             });
         }
 
+        $now = \Carbon\Carbon::now();
+        $now4 = $now->copy()->subYears(4);
+        // Matches the pink-row logic in index.blade.php: startDate = release_date ?? purchase_date
+        $agedScope = function($q) use ($now4) {
+            $q->where(function($sub) use ($now4) {
+                $sub->where('release_date', '<=', $now4)
+                    ->orWhere(function($s2) use ($now4) {
+                        $s2->whereNull('release_date')
+                           ->where('purchase_date', '<=', $now4);
+                    });
+            });
+        };
+
         $inventorySummary = [
             'total' => (clone $query)->count(),
             'ready' => (clone $query)->whereHas('status', function($q) {
@@ -210,13 +223,41 @@ class AssetController extends Controller
             'deployed' => (clone $query)->whereHas('status', function($q) {
                 $q->whereIn('name', ['Deployed', 'In Use', 'Borrowed']);
             })->count(),
-            'broken' => (clone $query)->whereHas('status', function($q) {
-                $q->where('name', 'Broken');
-            })->count(),
             'in_service' => (clone $query)->whereHas('status', function($q) {
-                $q->where('name', 'Service');
+                $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']);
             })->count(),
+            'broken' => (clone $query)->whereHas('status', function($q) {
+                $q->whereIn('name', ['Broken']);
+            })->count(),
+            'aged' => (clone $query)->where($agedScope)->count(),
         ];
+
+        // Tab quick filter
+        switch ($request->input('tab')) {
+            case 'ready':
+                $query->whereHas('status', function($q) {
+                    $q->whereIn('name', ['Ready', 'Ready to Deploy', 'Available']);
+                });
+                break;
+            case 'deployed':
+                $query->whereHas('status', function($q) {
+                    $q->whereIn('name', ['Deployed', 'In Use', 'Borrowed']);
+                });
+                break;
+            case 'service':
+                $query->whereHas('status', function($q) {
+                    $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']);
+                });
+                break;
+            case 'broken':
+                $query->whereHas('status', function($q) {
+                    $q->whereIn('name', ['Broken']);
+                });
+                break;
+            case 'aged':
+                $query->where($agedScope);
+                break;
+        }
 
         $assets = $query->latest()->paginate(50)->withQueryString();
         $statuses = Status::whereHas('masterCategory', function($q) {
