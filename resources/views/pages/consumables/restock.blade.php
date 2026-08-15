@@ -2,7 +2,11 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Restock Consumable" />
+        <x-common.page-breadcrumb pageTitle="Restock Consumable" :items="[['label' => 'Consumables', 'url' => route('consumables.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process restock.blade
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />

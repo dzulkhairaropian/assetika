@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6" x-data="{
@@ -24,156 +24,9 @@
     }">
         <x-common.page-breadcrumb pageTitle="Consumable Management" />
 
-        <!-- Stat Card Header -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                        <i data-feather="package" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Total Consumables</span>
-                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $consumables->total() }}</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
-                        <i data-feather="box" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Inventory Stock</span>
-                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $consumables->sum('quantity') }} Items</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-500 dark:bg-amber-500/10">
-                        <i data-feather="alert-circle" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Low Stock Threshold</span>
-                        <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Auto Alert</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <form action="{{ route('consumables.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
-                <div class="relative flex items-center">
-                    <span class="absolute left-3 text-gray-400">
-                        <i data-feather="search" class="w-4 h-4"></i>
-                    </span>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search consumables..."
-                        class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900">
-                </div>
-
-                @php
-                    $activeCount = 0;
-                    if (request('product_id')) $activeCount++;
-                    if (request('category_id')) $activeCount++;
-                    if (request('brand_id')) $activeCount++;
-                    if (request('status')) $activeCount++;
-                @endphp
-
-                <div class="relative" @click.away="filterOpen = false">
-                    <button type="button" @click="filterOpen = !filterOpen"
-                        class="relative inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition">
-                        <svg class="stroke-current fill-white dark:fill-gray-900" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.29004 5.90393H17.7067" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M17.7075 14.0961H2.29085" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M12.0826 3.33331C13.5024 3.33331 14.6534 4.48431 14.6534 5.90414C14.6534 7.32398 13.5024 8.47498 12.0826 8.47498C10.6627 8.47498 9.51172 7.32398 9.51172 5.90415C9.51172 4.48432 10.6627 3.33331 12.0826 3.33331Z" fill="" stroke="" stroke-width="1.5" />
-                            <path d="M7.91745 11.525C6.49762 11.525 5.34662 12.676 5.34662 14.0959C5.34661 15.5157 6.49762 16.6667 7.91745 16.6667C9.33728 16.6667 10.4883 15.5157 10.4883 14.0959C10.4883 12.676 9.33728 11.525 7.91745 11.525Z" fill="" stroke="" stroke-width="1.5" />
-                        </svg>
-                        Filters
-                        @if($activeCount > 0)
-                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
-                        @endif
-                    </button>
-
-                    <div x-show="filterOpen"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute left-0 top-full z-50 mt-2 w-[480px] rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
-                        style="display: none;">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-sm font-semibold text-gray-800 dark:text-white/90">Filter Options</h4>
-                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Product</label>
-                                <select name="product_id"
-                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                    <option value="">All Products</option>
-                                    @foreach($products as $prod)
-                                        <option value="{{ $prod->id }}" {{ request('product_id') == $prod->id ? 'selected' : '' }}>{{ $prod->brand->name ?? '' }} - {{ $prod->model }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Category</label>
-                                <select name="category_id"
-                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                    <option value="">All Categories</option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Brand</label>
-                                <select name="brand_id"
-                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                    <option value="">All Brands</option>
-                                    @foreach($brands as $br)
-                                        <option value="{{ $br->id }}" {{ request('brand_id') == $br->id ? 'selected' : '' }}>{{ $br->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
-                                <select name="status"
-                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                    <option value="">All Statuses</option>
-                                    <option value="in_stock" {{ request('status') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
-                                    <option value="low_stock" {{ request('status') === 'low_stock' ? 'selected' : '' }}>Low Stock</option>
-                                    <option value="out_of_stock" {{ request('status') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
-                            <a href="{{ route('consumables.index') }}" class="text-sm text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400 transition">
-                                Clear All Filters
-                            </a>
-                            <button type="submit" @click="filterOpen = false"
-                                class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 transition">
-                                Apply Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-            <a href="{{ route('consumables.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                <i data-feather="plus" class="w-4 h-4"></i>
-                Add Consumable
-            </a>
-        </div>
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Manage consumable items (ink, paper, cables) and stock levels.
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -183,9 +36,9 @@
         @endif
 
         <!-- Bulk Action Bar -->
-        <div x-show="selectedConsumables.length > 0" 
+        <div x-show="selectedConsumables.length > 0"
             x-transition
-            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10 mb-4"
+            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
@@ -194,7 +47,7 @@
                 </span>
             </div>
             <div class="flex items-center gap-4">
-                <button @click="const ids = selectedConsumables.map(c => c.id).join(','); window.location.href = `{{ route('consumables.bulk-checkout') }}?ids=${ids}`;" 
+                <button type="button" @click="const ids = selectedConsumables.map(c => c.id).join(','); window.location.href = `{{ route('consumables.bulk-checkout') }}?ids=${ids}`;"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
                     <i data-feather="log-out" class="w-4 h-4"></i>
                     Checkout Selected
@@ -203,11 +56,126 @@
         </div>
 
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            {{-- Card Header: Toolbar --}}
+            <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <form action="{{ route('consumables.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3 text-gray-400">
+                                <i data-feather="search" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search consumables..."
+                                class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        </div>
+
+                        @php
+                            $activeCount = 0;
+                            if (request('product_id')) $activeCount++;
+                            if (request('category_id')) $activeCount++;
+                            if (request('brand_id')) $activeCount++;
+                            if (request('status')) $activeCount++;
+                        @endphp
+
+                        <div class="relative" @click.away="filterOpen = false">
+                            <button type="button" @click="filterOpen = !filterOpen"
+                                class="relative inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition">
+                                <i data-feather="sliders" class="w-4 h-4"></i>
+                                Filters
+                                @if($activeCount > 0)
+                                    <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
+                                @endif
+                            </button>
+
+                            <div x-show="filterOpen"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 top-full z-50 mt-2 w-[480px] rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+                                style="display: none;">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white/90">Filter Options</h4>
+                                    <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <i data-feather="x" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Product</label>
+                                        <select name="product_id"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Products</option>
+                                            @foreach($products as $prod)
+                                                <option value="{{ $prod->id }}" {{ request('product_id') == $prod->id ? 'selected' : '' }}>{{ $prod->brand->name ?? '' }} - {{ $prod->model }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Category</label>
+                                        <select name="category_id"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Categories</option>
+                                            @foreach($categories as $cat)
+                                                <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Brand</label>
+                                        <select name="brand_id"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Brands</option>
+                                            @foreach($brands as $br)
+                                                <option value="{{ $br->id }}" {{ request('brand_id') == $br->id ? 'selected' : '' }}>{{ $br->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
+                                        <select name="status"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Statuses</option>
+                                            <option value="in_stock" {{ request('status') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
+                                            <option value="low_stock" {{ request('status') === 'low_stock' ? 'selected' : '' }}>Low Stock</option>
+                                            <option value="out_of_stock" {{ request('status') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                    <a href="{{ route('consumables.index') }}" class="text-sm text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400 transition">
+                                        Clear All Filters
+                                    </a>
+                                    <button type="submit" @click="filterOpen = false"
+                                        class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 transition">
+                                        Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('consumables.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            <i data-feather="plus" class="w-4 h-4"></i>
+                            Add Consumable
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Table --}}
             <div class="max-w-full overflow-x-auto">
-                <table class="w-full">
-                    <thead class="border-y border-t border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
+                <table class="min-w-full">
+                    <thead class="border-b border-gray-100 dark:border-gray-800">
                         <tr>
-                            <th class="py-3 pl-6 pr-2 w-10 text-start">
+                            <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
@@ -224,23 +192,47 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="py-3 pl-2 pr-6 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Product</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Category / Brand</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Qty / Threshold</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Purchase Cost</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Actions</th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Product</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Category / Brand</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Qty / Threshold</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Purchase Cost</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center justify-end">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($consumables as $consumable)
-                            <tr class="border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="py-3.5 pl-6 pr-2 text-start">
+                            <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
                                             <div class="relative">
-                                                <input type="checkbox" 
-                                                    :checked="selectedConsumables.some(c => c.id === {{ $consumable->id }})" 
+                                                <input type="checkbox"
+                                                    :checked="selectedConsumables.some(c => c.id === {{ $consumable->id }})"
                                                     @click="toggleConsumable({
                                                         id: {{ $consumable->id }}
                                                     })"
@@ -248,7 +240,7 @@
                                                     data-consumable="{{ json_encode(['id' => $consumable->id]) }}"
                                                     {{ $consumable->quantity <= 0 ? 'disabled' : '' }}>
                                                 <div :class="selectedConsumables.some(c => c.id === {{ $consumable->id }}) ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
-                                                    class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition {{ $consumable->quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-105 dark:bg-gray-800' : '' }}">
+                                                    class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition {{ $consumable->quantity <= 0 ? 'opacity-50 cursor-not-allowed' : '' }}">
                                                     <span :class="selectedConsumables.some(c => c.id === {{ $consumable->id }}) ? '' : 'opacity-0'">
                                                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -259,7 +251,7 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="py-3.5 pl-2 pr-6">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
                                             {{ optional($consumable->product)->name }}
@@ -267,7 +259,7 @@
                                         <span class="text-xs text-gray-500">Model: {{ optional($consumable->product)->product_type ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
                                             {{ optional(optional($consumable->product)->category)->name ?? '-' }}
@@ -275,7 +267,7 @@
                                         <span class="text-xs text-gray-500">Brand: {{ optional(optional($consumable->product)->brand)->name ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
                                         <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
                                             {{ $consumable->quantity }} items
@@ -283,7 +275,7 @@
                                         <span class="text-xs text-gray-500">Min: {{ $consumable->low_threshold }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     @php
                                         $statusText = 'In Stock';
                                         if ($consumable->quantity <= 0) { $statusText = 'Out of Stock'; }
@@ -295,11 +287,11 @@
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusText }}</x-ui.badge>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5 text-theme-sm text-gray-700 dark:text-gray-400">
-                                    Rp {{ number_format($consumable->purchase_cost, 2, ',', '.') }}
+                                <td class="px-5 py-4 sm:px-6">
+                                    <span class="text-theme-sm text-gray-700 dark:text-gray-400">Rp {{ number_format($consumable->purchase_cost, 2, ',', '.') }}</span>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
-                                    <div class="flex items-center gap-3 text-gray-500">
+                                <td class="px-5 py-4 sm:px-6">
+                                    <div class="flex items-center justify-end gap-3 text-gray-500">
                                         <a href="{{ route('consumables.restock', $consumable) }}" class="hover:text-success-500 transition-colors" title="Restock">
                                             <i data-feather="plus-circle" class="w-5 h-5"></i>
                                         </a>
@@ -333,9 +325,7 @@
                                 <td colspan="7" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                            </svg>
+                                            <i data-feather="package" class="w-6 h-6"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No consumables found</p>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">Try adjusting your search or add a new consumable item.</p>
@@ -346,7 +336,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-800">
+
+            {{-- Pagination Footer --}}
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
                 {{ $consumables->links() }}
             </div>
         </div>

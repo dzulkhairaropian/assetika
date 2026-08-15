@@ -1,8 +1,16 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Bulk Checkout Consumables" />
+        <x-common.page-breadcrumb pageTitle="Bulk Checkout Consumables" :items="[['label' => 'Consumables', 'url' => route('consumables.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process bulk checkout.blade
+        </p>
+
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
 
         @if(session('error'))
             <x-ui.alert variant="error" message="{{ session('error') }}" />
@@ -24,7 +32,7 @@
 
                 <!-- Section: Assignment Target -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="user" class="w-5 h-5 text-brand-500"></i>
                         Assignment Target
                     </h3>
@@ -57,7 +65,7 @@
 
                 <!-- Section: Consumables & Quantities -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="package" class="w-5 h-5 text-brand-500"></i>
                         Select Quantities
                     </h3>

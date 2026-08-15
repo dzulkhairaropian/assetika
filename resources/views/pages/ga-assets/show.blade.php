@@ -1,8 +1,12 @@
-ï»¿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6" x-data="{ activeTab: 'details', checkoutOpen: false, checkinOpen: false, maintOpen: false }">
-        <x-common.page-breadcrumb pageTitle="General Affairs Asset Details" />
+        <x-common.page-breadcrumb pageTitle="General Affairs Asset Details" :items="[['label' => 'GA Assets', 'url' => route('ga-assets.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process show.blade
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -26,7 +30,7 @@
                                @endphp
                                <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $asset->name }} â€¢ {{ $asset->brand }} {{ $asset->model }} â€¢ Qty: {{ $asset->qty }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $asset->name }} • {{ $asset->brand }} {{ $asset->model }} • Qty: {{ $asset->qty }}</p>
                     </div>
                 </div>
 

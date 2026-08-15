@@ -1,7 +1,15 @@
 @extends('layouts.app')
 @section('content')
 <div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Add Assets to Stock Count" />
+    <x-common.page-breadcrumb pageTitle="Add Assets to Stock Count" :items="[['label' => 'Stock Audits', 'url' => route('stock-counts.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process add assets.blade
+        </p>
+
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
         <form action="{{ route('stock-counts.process-add-assets', $stockCount) }}" method="POST">@csrf
             <h4 class="text-sm font-semibold mb-3">Select Assets to Audit</h4>

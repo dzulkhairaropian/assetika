@@ -2,14 +2,18 @@
 
 @section('content')
 <div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="License Detail" />
+    <x-common.page-breadcrumb pageTitle="License Detail" :items="[['label' => 'Licenses', 'url' => route('licenses.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process show.blade
+        </p>
 
     @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
     @if(session('error')) <x-ui.alert variant="error" message="{{ session('error') }}" /> @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 lg:col-span-1">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                 <i data-feather="key" class="w-5 h-5 text-brand-500"></i> License Info
             </h3>
             <dl class="space-y-3">
@@ -28,7 +32,7 @@
         </div>
 
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 lg:col-span-2">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                 <i data-feather="users" class="w-5 h-5 text-brand-500"></i> Seat Assignments
             </h3>
 

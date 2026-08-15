@@ -2,11 +2,15 @@
 @section('content')
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Import Data" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Bulk import assets, users, and master data from spreadsheets.
+        </p>
     @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
     @if(session('error')) <x-ui.alert variant="error" message="{{ session('error') }}" /> @endif
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Upload CSV File</h3>
+        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4">Upload CSV File</h3>
         <form action="{{ route('import.preview') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 items-end">

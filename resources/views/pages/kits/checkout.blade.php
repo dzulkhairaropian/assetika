@@ -2,11 +2,19 @@
 
 @section('content')
 <div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Checkout Kit: {{ $kit->name }}" />
+    <x-common.page-breadcrumb pageTitle="Checkout Kit: {{ $kit->name }}" :items="[['label' => 'Kits', 'url' => route('kits.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process checkout.blade
+        </p>
+
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-2">Items in this Kit</h3>
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-2">Items in this Kit</h3>
             <ul class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                 @forelse($kit->assets as $asset) <li class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-blue-500"></span> {{ $asset->name }} ({{ $asset->asset_tag }}) x{{ $asset->pivot->qty }}</li> @endforeach
                 @forelse($kit->licenses as $license) <li class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-green-500"></span> {{ $license->name }} x{{ $license->pivot->qty }}</li> @endforeach

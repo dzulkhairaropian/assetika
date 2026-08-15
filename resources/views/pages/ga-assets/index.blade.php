@@ -1,155 +1,58 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6" x-data="{ 
-        selectedAssets: [],
+    <div class="space-y-6" x-data="{
+        selectedItems: [],
         selectAll: false,
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
-                this.selectedAssets = Array.from(document.querySelectorAll('.asset-checkbox')).map(el => JSON.parse(el.dataset.asset));
+                this.selectedItems = Array.from(document.querySelectorAll('.row-checkbox')).map(el => JSON.parse(el.dataset.asset));
             } else {
-                this.selectedAssets = [];
+                this.selectedItems = [];
             }
         },
-        toggleAsset(asset) {
-            const index = this.selectedAssets.findIndex(a => a.id === asset.id);
+        toggleItem(asset) {
+            const index = this.selectedItems.findIndex(a => a.id === asset.id);
             if (index > -1) {
-                this.selectedAssets.splice(index, 1);
+                this.selectedItems.splice(index, 1);
             } else {
-                this.selectedAssets.push(asset);
+                this.selectedItems.push(asset);
             }
-            this.selectAll = this.selectedAssets.length === document.querySelectorAll('.asset-checkbox').length;
+            this.selectAll = this.selectedItems.length === document.querySelectorAll('.row-checkbox').length;
         }
     }">
         <x-common.page-breadcrumb pageTitle="General Affairs Asset Management" />
 
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <form action="{{ route('ga-assets.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
-                <div class="relative flex items-center">
-                    <span class="absolute left-3 text-gray-400">
-                        <i data-feather="search" class="w-4 h-4"></i>
-                    </span>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search assets..."
-                        class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                </div>
-
-                @php
-                    $activeCount = 0;
-                    if (request('category_id')) $activeCount++;
-                    if (request('status')) $activeCount++;
-                @endphp
-
-                <div class="relative" @click.away="filterOpen = false">
-                    <button type="button" @click="filterOpen = !filterOpen"
-                        class="relative inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition">
-                        <svg class="stroke-current fill-white dark:fill-gray-900" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.29004 5.90393H17.7067" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M17.7075 14.0961H2.29085" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M12.0826 3.33331C13.5024 3.33331 14.6534 4.48431 14.6534 5.90414C14.6534 7.32398 13.5024 8.47498 12.0826 8.47498C10.6627 8.47498 9.51172 7.32398 9.51172 5.90415C9.51172 4.48432 10.6627 3.33331 12.0826 3.33331Z" fill="" stroke="" stroke-width="1.5" />
-                            <path d="M7.91745 11.525C6.49762 11.525 5.34662 12.676 5.34662 14.0959C5.34661 15.5157 6.49762 16.6667 7.91745 16.6667C9.33728 16.6667 10.4883 15.5157 10.4883 14.0959C10.4883 12.676 9.33728 11.525 7.91745 11.525Z" fill="" stroke="" stroke-width="1.5" />
-                        </svg>
-                        Filters
-                        @if($activeCount > 0)
-                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
-                        @endif
-                    </button>
-
-                    <div x-show="filterOpen"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute left-0 top-full z-50 mt-2 w-[480px] rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
-                        style="display: none;">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-sm font-semibold text-gray-800 dark:text-white/90">Filter Options</h4>
-                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Category</label>
-                                <select name="category_id"
-                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                    <option value="">All Categories</option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
-                                <select name="status"
-                                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                    <option value="">All Statuses</option>
-                                    <option value="Available" {{ request('status') == 'Available' ? 'selected' : '' }}>Available</option>
-                                    <option value="Deployed" {{ request('status') == 'Deployed' ? 'selected' : '' }}>Deployed</option>
-                                    <option value="In Repair" {{ request('status') == 'In Repair' ? 'selected' : '' }}>In Repair</option>
-                                    <option value="Disposed" {{ request('status') == 'Disposed' ? 'selected' : '' }}>Disposed</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
-                            <a href="{{ route('ga-assets.index') }}" class="text-sm text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400 transition">
-                                Clear All Filters
-                            </a>
-                            <button type="submit" @click="filterOpen = false"
-                                class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 transition">
-                                Apply Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-            <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600">
-                <i data-feather="plus" class="w-4 h-4"></i>
-                Add GA Asset
-            </a>
-        </div>
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Manage General Affairs assets (furniture, vehicles, appliances).
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
 
-        <!-- Bulk Action Form -->
+        <!-- Bulk Delete Form -->
         <form id="bulkDeleteForm" action="{{ route('ga-assets.bulk-delete') }}" method="POST" class="hidden">
             @csrf
-            <template x-for="asset in selectedAssets" :key="asset.id">
+            <template x-for="asset in selectedItems" :key="asset.id">
                 <input type="hidden" name="ids[]" :value="asset.id">
             </template>
         </form>
 
         <!-- Bulk Action Bar -->
-        <div x-show="selectedAssets.length > 0" 
+        <div x-show="selectedItems.length > 0"
             x-transition
             class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
                 <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
-                    <span x-text="selectedAssets.length"></span> assets selected.
+                    <span x-text="selectedItems.length"></span> items selected.
                 </span>
             </div>
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <label class="text-xs text-gray-500 dark:text-gray-400">Copies per asset:</label>
-                    <input type="number" id="labelCopies" min="1" max="10" value="1" 
-                        class="w-16 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1.5 text-center text-xs font-semibold text-gray-800 dark:text-white">
-                </div>
-                <button @click="printBulkLabels(selectedAssets, document.getElementById('labelCopies').value)" 
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-brand-600">
-                    <i data-feather="printer" class="w-4 h-4"></i>
-                    Print QR Labels
-                </button>
-                <button @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }" 
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
                     <i data-feather="trash-2" class="w-4 h-4"></i>
                     Delete Selected
@@ -157,12 +60,102 @@
             </div>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            {{-- Card Header: Toolbar --}}
+            <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <form action="{{ route('ga-assets.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3 text-gray-400">
+                                <i data-feather="search" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search assets..."
+                                class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        </div>
+
+                        @php
+                            $activeCount = 0;
+                            if (request('category_id')) $activeCount++;
+                            if (request('status')) $activeCount++;
+                        @endphp
+
+                        <div class="relative" @click.away="filterOpen = false">
+                            <button type="button" @click="filterOpen = !filterOpen"
+                                class="relative inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition">
+                                <i data-feather="sliders" class="w-4 h-4"></i>
+                                Filters
+                                @if($activeCount > 0)
+                                    <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
+                                @endif
+                            </button>
+
+                            <div x-show="filterOpen"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 top-full z-50 mt-2 w-[480px] rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+                                style="display: none;">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white/90">Filter Options</h4>
+                                    <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <i data-feather="x" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Category</label>
+                                        <select name="category_id"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Categories</option>
+                                            @foreach($gaCategories as $cat)
+                                                <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
+                                        <select name="status"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Statuses</option>
+                                            @foreach($statuses as $status)
+                                                <option value="{{ $status->id }}" {{ request('status') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                    <a href="{{ route('ga-assets.index') }}" class="text-sm text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400 transition">
+                                        Clear All Filters
+                                    </a>
+                                    <button type="submit" @click="filterOpen = false"
+                                        class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 transition">
+                                        Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            <i data-feather="plus" class="w-4 h-4"></i>
+                            Add GA Asset
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Table --}}
             <div class="max-w-full overflow-x-auto">
-                <table class="w-full">
-                    <thead class="border-y border-t border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-gray-900">
+                <table class="min-w-full">
+                    <thead class="border-b border-gray-100 dark:border-gray-800">
                         <tr>
-                            <th class="py-3 pl-6 pr-2 w-10 text-start">
+                            <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
@@ -179,35 +172,44 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="py-3 pl-2 pr-6 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Asset</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Status</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Category</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Value (Rp)</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Assigned To</th>
-                            <th class="px-6 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400 text-start">Actions</th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Asset Name / Tag</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Category</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Holder</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center justify-end">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                         @forelse($assets as $asset)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors border-b border-gray-100 dark:border-white/[0.05]">
-                                <td class="py-3.5 pl-6 pr-2 text-start">
+                            <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center">
                                         <label class="flex cursor-pointer items-center select-none">
                                             <div class="relative">
-                                                <input type="checkbox" 
-                                                    :checked="selectedAssets.some(a => a.id === {{ $asset->id }})" 
-                                                    @click="toggleAsset({
-                                                        id: {{ $asset->id }}, 
-                                                        tag: '{{ $asset->asset_code }}', 
-                                                        sn: '{{ $asset->serial_number ?? '-' }}', 
-                                                        company: 'General Affairs',
-                                                        url: '{{ route('ga-assets.show', $asset) }}'
-                                                    })" 
-                                                    class="asset-checkbox sr-only"
-                                                    data-asset='{"id":{{ $asset->id }},"tag":"{{ $asset->asset_code }}","sn":"{{ $asset->serial_number ?? "-" }}","company":"General Affairs","url":"{{ route("ga-assets.show", $asset) }}"}'>
-                                                <div :class="selectedAssets.some(a => a.id === {{ $asset->id }}) ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
+                                                <input type="checkbox" :checked="selectedItems.some(a => a.id === {{ $asset->id }})" @click="toggleItem({ id: {{ $asset->id }} })" class="row-checkbox sr-only" data-asset='{"id":{{ $asset->id }}}'>
+                                                <div :class="selectedItems.some(a => a.id === {{ $asset->id }}) ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
                                                     class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
-                                                    <span :class="selectedAssets.some(a => a.id === {{ $asset->id }}) ? '' : 'opacity-0'">
+                                                    <span :class="selectedItems.some(a => a.id === {{ $asset->id }}) ? '' : 'opacity-0'">
                                                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                         </svg>
@@ -217,65 +219,32 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="py-3.5 pl-2 pr-6 whitespace-nowrap">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                                            <i data-feather="briefcase" class="w-5 h-5"></i>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <span class="text-sm font-semibold text-gray-700 text-theme-sm dark:text-gray-450">{{ $asset->name }}</span>
-                                            <span class="text-xs text-gray-500">{{ $asset->asset_code }} • S/N: {{ $asset->serial_number ?? '-' }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 sm:px-6 py-3.5">
-                                     @php
-                                         $statusObject = $asset->statusObject;
-                                         $statusName = optional($statusObject)->name;
-                                         $statusColor = optional($statusObject)->color;
-                                         $statusIcon = optional($statusObject)->icon;
-                                         $iconHtml = $statusIcon ? new \Illuminate\Support\HtmlString("<i data-feather='{$statusIcon}' class='w-3 h-3'></i>") : null;
-                                     @endphp
-                                     <x-ui.badge :color="$statusColor" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
-                                </td>
-                                <td class="px-4 sm:px-6 py-3.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex flex-col">
-                                        <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
-                                            {{ $asset->category->name ?? '-' }}
-                                        </span>
-                                        <span class="text-xs text-gray-500">{{ $asset->subcategory->name ?? '-' }}</span>
+                                        <a href="{{ route('ga-assets.show', $asset) }}" class="block font-medium text-brand-500 hover:text-brand-600 text-theme-sm">{{ $asset->name }}</a>
+                                        <span class="text-xs text-gray-500">{{ $asset->asset_tag ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
-                                    <div class="flex flex-col">
-                                        <span class="text-theme-sm font-bold text-gray-700 dark:text-gray-400">
-                                            Rp {{ number_format($asset->total_asset_value, 0, ',', '.') }}
-                                        </span>
-                                    </div>
+                                <td class="px-5 py-4 sm:px-6">
+                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">{{ $asset->category?->name ?? '-' }}</span>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5">
-                                    @if($asset->currentHolder)
-                                        <div class="flex flex-col">
-                                            <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
-                                                {{ $asset->currentHolder->name }}
-                                            </span>
-                                        </div>
-                                    @else
-                                        <span class="text-theme-sm text-gray-400 italic">Not Assigned</span>
-                                    @endif
+                                <td class="px-5 py-4 sm:px-6">
+                                    <x-ui.badge :color="optional($asset->status)->color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ optional($asset->status)->name ?? 'Available' }}</x-ui.badge>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3.5 text-sm font-medium">
-                                    <div class="flex items-center gap-3 text-gray-500">
-                                        <a href="{{ route('ga-assets.show', $asset) }}" class="hover:text-brand-500 transition-colors" title="View Details">
+                                <td class="px-5 py-4 sm:px-6">
+                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">{{ $asset->assignedToUser?->name ?? 'Not Assigned' }}</span>
+                                </td>
+                                <td class="px-5 py-4 sm:px-6">
+                                    <div class="flex items-center justify-end gap-3 text-gray-500">
+                                        <a href="{{ route('ga-assets.show', $asset) }}" class="transition-colors hover:text-brand-500" title="View">
                                             <i data-feather="eye" class="w-5 h-5"></i>
                                         </a>
-                                        <a href="{{ route('ga-assets.edit', $asset) }}" class="hover:text-brand-500 transition-colors" title="Edit">
+                                        <a href="{{ route('ga-assets.edit', $asset) }}" class="transition-colors hover:text-brand-500" title="Edit">
                                             <i data-feather="edit-3" class="w-5 h-5"></i>
                                         </a>
-                                        <form action="{{ route('ga-assets.destroy', $asset) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this asset?')" class="inline-flex">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="hover:text-error-500 transition-colors" title="Delete">
+                                        <form action="{{ route('ga-assets.destroy', $asset) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
                                                 <i data-feather="trash-2" class="w-5 h-5"></i>
                                             </button>
                                         </form>
@@ -284,13 +253,13 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
+                                <td colspan="6" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-feather="package" class="w-6 h-6"></i>
+                                            <i data-feather="briefcase" class="w-6 h-6"></i>
                                         </div>
-                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No assets found</p>
-                                        <p class="text-xs text-gray-450 dark:text-gray-550">Try adjusting your search filters.</p>
+                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No GA assets found</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500">Add General Affairs assets like furniture, vehicles, or appliances.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -298,67 +267,11 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-800">
+
+            {{-- Pagination Footer --}}
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
                 {{ $assets->links() }}
             </div>
         </div>
     </div>
-
-    <script>
-        function printBulkLabels(assets, copies) {
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
-            printWindow.document.write('<html><head><title>Print Asset Labels</title>');
-            printWindow.document.write('<style>');
-            printWindow.document.write('body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #fff; margin: 0; }');
-            printWindow.document.write('.label-grid { display: grid; grid-template-columns: repeat(auto-fill, 330px); gap: 12px; justify-content: start; }');
-            printWindow.document.write('.label-card { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb; width: 330px !important; max-width: 330px !important; box-sizing: border-box; page-break-inside: avoid; }');
-            printWindow.document.write('.h-24 { height: 96px; } .w-24 { width: 96px; }');
-            printWindow.document.write('.shrink-0 { flex-shrink: 0; }');
-            printWindow.document.write('.bg-white { background-color: white; padding: 6px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; }');
-            printWindow.document.write('.space-y-1 > * + * { margin-top: 4px; }');
-            printWindow.document.write('.text-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; font-weight: 700; margin: 0; }');
-            printWindow.document.write('.text-sm { font-size: 13px; font-weight: 700; color: #1f2937; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }');
-            printWindow.document.write('.text-xs { font-size: 11px; font-weight: 600; color: #4b5563; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }');
-            printWindow.document.write('.text-xs.font-medium { font-weight: 500; color: #6b7280; }');
-            printWindow.document.write('img { max-width: 100%; height: auto; display: block; }');
-            printWindow.document.write('@media print { body { padding: 0; } .label-card { page-break-inside: avoid; width: 330px !important; max-width: 330px !important; } }');
-            printWindow.document.write('</style></head><body>');
-            printWindow.document.write('<div class="label-grid">');
-            
-            assets.forEach(asset => {
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(asset.url)}`;
-                for (let i = 0; i < copies; i++) {
-                    printWindow.document.write(`
-                        <div class="label-card">
-                             <div class="bg-white h-24 w-24 shrink-0">
-                                 <img src="${qrUrl}" alt="QR Code">
-                             </div>
-                             <div class="space-y-1" style="flex: 1; min-width: 0;">
-                                 <div>
-                                     <p class="text-label">Asset Tag</p>
-                                     <p class="text-sm">${asset.tag}</p>
-                                 </div>
-                                 <div>
-                                     <p class="text-label">Serial Number</p>
-                                     <p class="text-xs">${asset.sn}</p>
-                                 </div>
-                                 <div>
-                                     <p class="text-label">Department</p>
-                                     <p class="text-xs font-medium">${asset.company}</p>
-                                 </div>
-                             </div>
-                        </div>
-                    `);
-                }
-            });
-            
-            printWindow.document.write('</div></body></html>');
-            printWindow.document.close();
-            
-            printWindow.onload = function() {
-                printWindow.print();
-                printWindow.close();
-            };
-        }
-    </script>
 @endsection

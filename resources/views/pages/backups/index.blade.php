@@ -1,8 +1,12 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Backup Management" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Create, download, and manage system database backups.
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -16,7 +20,7 @@
             <!-- Left Panel: Backup Schedules Settings -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2">
                         <i data-feather="clock" class="w-5 h-5 text-brand-500"></i>
                         Backup Schedules
                     </h3>
@@ -94,7 +98,7 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Manual Actions Card -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="play" class="w-5 h-5 text-brand-500"></i>
                         Manual Backup
                     </h3>

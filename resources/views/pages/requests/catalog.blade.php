@@ -2,6 +2,10 @@
 @section('content')
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Request Asset / Peripheral" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Browse available IT items and submit equipment requests.
+        </p>
     @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">

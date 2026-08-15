@@ -1,20 +1,27 @@
-# Assetika — Master Data CRUD Standardization Guide
+# Assetika — CRUD Standardization Guide
 
-Panduan standar pembuatan dan perbaikan halaman CRUD (Master Data, Catalog, dll.) di Assetika berdasarkan pola acuan **Asset CRUD** & **TailAdmin Design System**.
+Panduan standar pembuatan dan perbaikan **semua halaman CRUD** di Assetika: Master Data, IT Assets, Consumables, Tickets, GA Assets, Users & Roles, Stock Counts, dan modul lainnya — berdasarkan pola acuan **Asset CRUD** & **TailAdmin Design System**.
+
+> **Status**: Standar ini sudah diterapkan pada 94+ file Blade (16 modul master data + 10 modul non-master + halaman standalone). Semua halaman CRUD baru **wajib** mengikuti panduan ini.
 
 ---
 
 ## 1. Overview & Struktur File
 
-Setiap modul CRUD wajib memiliki 3-4 view utama under `resources/views/pages/master/{module}/`:
+Setiap modul CRUD wajib memiliki 3-4 view utama. Modul master data berada di `resources/views/pages/master/{module}/`, modul lain di `resources/views/pages/{module}/`:
 
 ```
-resources/views/pages/master/{module}/
+resources/views/pages/{module}/
 ├── index.blade.php      # Halaman daftar/tabel data
 ├── create.blade.php     # Form tambah data baru
 ├── edit.blade.php       # Form edit data
 └── show.blade.php       # Detail data (opsional jika ada detail khusus)
 ```
+
+Modul yang sudah terstandarisasi:
+- **Master Data (16)**: brands, categories, companies, custom-fields, departments, depreciations, eulas, fieldsets, locations, maintenance-types, master-categories, operating-systems, positions, products, statuses, vendors
+- **Non-Master (10)**: tickets, components, consumables, licenses, kits, ga-assets, ga-categories, users, roles, stock-counts
+- **Standalone**: labels, reports, backups, import, requests
 
 ---
 
@@ -62,9 +69,17 @@ resources/views/pages/master/{module}/
    </div>
    ```
 
-3. **Pill Tabs di Card Header** (TailAdmin Pro pattern, opsional untuk modul dengan segmentasi seperti Asset):
+   **Aturan penting halaman list:**
+   - **Stat Cards Header DILARANG** — kartu metrik dekoratif di atas tabel (Total X, counter, dsb.) tidak boleh ada di halaman list. Metrik/summary adalah milik halaman **dashboard**, bukan halaman CRUD. (Dihapus dari: components, consumables, licenses, kits, stock-counts, brands, categories, dll.)
+   - **Kolom checkbox HANYA jika ada bulk-delete** — jangan render kolom checkbox bila modul tidak punya route `{module}.bulk-delete` + method `bulkDestroy` (dead UI, tidak ada fungsinya). Contoh tanpa checkbox: users, roles, ga-categories, stock-counts.
+   - **Alert flash & bulk action bar di LUAR card** — posisinya di antara deskripsi dan card tabel.
+
+3. **Pill Tabs di Card Header** (TailAdmin Pro pattern, opsional untuk modul dengan segmentasi seperti Asset & Ticket):
    - Container `inline-flex` agar lebar mengikuti isi (tidak full-width), tetap scrollable di layar kecil.
    - Hitungan per tab dari summary controller, badge warna per segmen.
+   - **Modul dengan Tabs**:
+     - **Asset**: `All Assets`, `Ready to Deploy`, `Deployed`, `Service & Repair`, `Broken`, `Aged (≥4y)`
+     - **Tickets**: `All Tickets`, `New`, `In Progress`, `Pending`, `Unassigned`, `Closed`
    ```blade
    @php
        $currentTab = request('tab');
@@ -342,7 +357,8 @@ Gunakan layout 2 kolom responsif: `grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380
 ### Rules:
 1. **DILARANG** melakukan SQL `like` pada **Computed Accessor / Attribute** (contoh: `$product->model` yang hanya accessor `name`). Ini akan menyebabkan error `SQLSTATE[42S22] Unknown Column`.
 2. Gunakan `orWhereHas()` untuk mencari di relasi terkait (`brand`, `category`, `department`, `user`, dll.).
-3. Selalu tambahkan `->withQueryString()` pada pagination agar parameter search & filter tidak hilang saat ganti halaman.
+3. **Multi-context search** — search satu keyword harus bisa mencari di semua konteks yang relevan, bukan hanya 1-2 kolom. Contoh: search "zaki" di asset muncul dari asset_tag, serial_number, user name, brand, department, location, vendor, dll. (Referensi: `AssetController@index` — 18 field/relasi).
+4. Selalu tambahkan `->withQueryString()` pada pagination agar parameter search & filter tidak hilang saat ganti halaman.
 
 ```php
 public function index(Request $request)
@@ -355,6 +371,7 @@ public function index(Request $request)
         $query->where(function($q) use ($like) {
             $q->where('name', 'like', $like)
               ->orWhere('code', 'like', $like)
+              ->orWhere('description', 'like', $like)
               ->orWhereHas('relation1', function($r) use ($like) {
                   $r->where('name', 'like', $like);
               });
@@ -363,7 +380,7 @@ public function index(Request $request)
 
     $items = $query->latest()->paginate(50)->withQueryString();
 
-    return view('pages.master.{module}.index', compact('items'));
+    return view('pages.{module}.index', compact('items'));
 }
 ```
 
@@ -546,7 +563,16 @@ Gunakan dropdown filter dengan badge counter aktif (pola Asset index):
 
 Untuk modul yang butuh detail (seperti Asset), gunakan pola:
 
-### A. Header Card
+### A. Breadcrumb & Sub-header Description
+```blade
+<x-common.page-breadcrumb pageTitle="{Module} Details" :items="[['label' => '{Modules}', 'url' => route('{module}.index')], ['label' => $item->name]]" />
+
+<p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+    Detailed specification, assignment history, maintenance, and support tickets for {item->name}.
+</p>
+```
+
+### B. Header Card
 ```blade
 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
     <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -574,28 +600,36 @@ Untuk modul yang butuh detail (seperti Asset), gunakan pola:
 </div>
 ```
 
-### B. Tab Navigation (jika perlu multiple section)
+### C. Tab Navigation (TailAdmin Pro Pill Style)
 ```blade
 <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]" x-data="{ activeTab: 'details' }">
-    <div class="flex border-b border-gray-100 px-5 dark:border-gray-800">
-        <button @click="activeTab = 'details'"
-            :class="activeTab === 'details' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-            class="border-b-2 px-4 py-4 text-sm font-medium transition-all">
-            Details
-        </button>
-        <button @click="activeTab = 'history'"
-            :class="activeTab === 'history' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-            class="border-b-2 px-4 py-4 text-sm font-medium transition-all">
-            History
-        </button>
+    <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+        <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5">
+            <button @click="activeTab = 'details'"
+                :class="activeTab === 'details' ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all">
+                <i data-feather="file-text" class="w-4 h-4"></i>
+                Details
+            </button>
+            <button @click="activeTab = 'history'"
+                :class="activeTab === 'history' ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all">
+                <i data-feather="activity" class="w-4 h-4"></i>
+                History
+            </button>
+        </div>
     </div>
 
     <div class="p-6">
         <div x-show="activeTab === 'details'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1">
-            <!-- Details content -->
+            <h4 class="mb-5 flex items-center gap-2 text-base font-medium text-gray-800 border-b border-gray-100 pb-3 dark:border-gray-800 dark:text-white/90">
+                <i data-feather="info" class="h-5 w-5 text-brand-500"></i>
+                Section Title
+            </h4>
+            <!-- Key-value info cards grid -->
         </div>
         <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1">
-            <!-- History content -->
+            <!-- Table with standard thead font-medium text-theme-xs -->
         </div>
     </div>
 </div>
@@ -756,21 +790,23 @@ Contoh: `brands.index`, `brands.create`, `brands.store`, `brands.show`, `brands.
 
 ---
 
-## 13. Checklist Aplikasi Modul Master Data
+## 13. Checklist Aplikasi Modul
 
-Setiap modul Master Data yang distandarisasi harus memenuhi checklist ini:
+Setiap modul (Master Data & Non-Master) yang distandarisasi harus memenuhi checklist ini:
 
 ### Frontend — Index Page
-- [ ] Breadcrumb hierarkis (`Home > Master Data > [Modul]`)
+- [ ] Breadcrumb hierarkis (`Home > [Group] > [Modul]`)
 - [ ] Sub-header description singkat di bawah breadcrumb
-- [ ] Toolbar Search & Action di dalam card header (di bawah tabs jika ada)
+- [ ] Stat Cards Header **DILARANG** di halaman list (metrik milik dashboard)
+- [ ] Toolbar Search & Action **di dalam card header** (di bawah tabs jika ada)
 - [ ] Filter dropdown dengan badge counter (jika > 1 filter)
 - [ ] Header tabel TailAdmin (`border-b`, tanpa `bg-gray-50`, padding `px-5 py-3 sm:px-6` + `<p>` wrapper)
 - [ ] Cell body padding `px-5 py-4 sm:px-6`
 - [ ] Action icons feather (`eye`, `edit-3`, `trash-2`) dengan hover color
 - [ ] Empty state dengan icon + title + description
 - [ ] Footer pagination hanya `{{ $items->links() }}` tanpa duplikat teks "Showing..."
-- [ ] Bulk select + bulk action bar (jika perlu bulk delete)
+- [ ] Bulk select + bulk action bar (HANYA jika ada route bulk delete — jangan render jika tidak ada)
+- [ ] Kolom checkbox dihapus jika tidak ada fungsionalitas bulk delete (dead UI)
 - [ ] Status menggunakan `<x-ui.badge>`
 
 ### Frontend — Form Pages
@@ -784,14 +820,25 @@ Setiap modul Master Data yang distandarisasi harus memenuhi checklist ini:
 - [ ] Alert flash message (`<x-ui.alert>`)
 - [ ] Date picker pakai `<x-form.date-picker>`
 
+### Frontend — Show Page
+- [ ] Breadcrumb hierarkis (`Home > [Modul] > [Item Name] > Details`)
+- [ ] Sub-header description singkat di bawah breadcrumb
+- [ ] Header card dengan icon, title, status badge & action buttons (Edit, Print, dll.)
+- [ ] Sidebar cards (QR Code, Current Assignment, Quick Specs) ber-border `rounded-2xl`
+- [ ] Tabs navigation pakai TailAdmin Pro pill style (`inline-flex bg-gray-100 p-1`)
+- [ ] Section headers di dalam tab pakai `text-base font-medium` + `border-b pb-3`
+- [ ] Header tabel di dalam tab pakai `font-medium text-theme-xs` (tanpa uppercase)
+- [ ] Bebas dari efek animasi berlebihan (seperti `animate-pulse` berkelanjutan)
+
 ### Backend — Controller
 - [ ] Search hanya query kolom DB nyata, bukan accessor
 - [ ] Pakai `orWhereHas()` untuk search relasi
+- [ ] Multi-context search — 1 keyword mencari di semua konteks relevan (kolom + relasi)
 - [ ] `paginate(50)->withQueryString()`
 - [ ] Validation di store/update
 - [ ] Flash message: success/error
 - [ ] Support `create_another` redirect
-- [ ] Bulk delete route + method
+- [ ] Bulk delete route + method (jika modul butuh bulk delete)
 
 ### Backend — Route
 - [ ] Route naming convention: `{module}.index`, `.create`, `.store`, `.show`, `.edit`, `.update`, `.destroy`, `.bulk-delete`

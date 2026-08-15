@@ -1,8 +1,16 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Consumable Transactions History" />
+        <x-common.page-breadcrumb pageTitle="Consumable Transactions History" :items="[['label' => 'Consumables', 'url' => route('consumables.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process transactions.blade
+        </p>
+
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <form action="{{ route('consumable-transactions.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">

@@ -2,6 +2,10 @@
 @section('content')
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Reports" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            View asset metrics, depreciation, and activity audit logs.
+        </p>
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <a href="{{ route('reports.activity') }}" class="rounded-2xl border border-gray-200 bg-white p-6 hover:border-brand-300 dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="flex items-center gap-3"><i data-feather="activity" class="w-6 h-6 text-brand-500"></i><span class="font-semibold text-gray-800 dark:text-white/90">Activity Report</span></div>

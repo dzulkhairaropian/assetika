@@ -2,7 +2,11 @@
 
 @section('content')
 <div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Ticket Detail" />
+    <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process show.blade
+        </p>
 
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">

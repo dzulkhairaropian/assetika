@@ -1,66 +1,197 @@
 @extends('layouts.app')
+
 @section('content')
-<div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Maintenance Types" />
+    <div class="space-y-6" x-data="{
+        selectedItems: [],
+        selectAll: false,
+        toggleAll() {
+            this.selectAll = !this.selectAll;
+            if (this.selectAll) {
+                this.selectedItems = Array.from(document.querySelectorAll('.row-checkbox')).map(el => Number(el.value));
+            } else {
+                this.selectedItems = [];
+            }
+        },
+        toggleItem(id) {
+            if (this.selectedItems.includes(id)) {
+                this.selectedItems = this.selectedItems.filter(i => i !== id);
+            } else {
+                this.selectedItems.push(id);
+            }
+            this.selectAll = this.selectedItems.length === document.querySelectorAll('.row-checkbox').length;
+        }
+    }">
+        <x-common.page-breadcrumb pageTitle="Maintenance Types" />
 
-    <!-- Stat Card Header -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                    <i data-feather="tool" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Total Service Types</span>
-                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">{{ $maintenanceTypes->total() }}</h4>
-                </div>
-            </div>
-        </div>
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10">
-                    <i data-feather="settings" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Classification</span>
-                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Preventive / Repair</h4>
-                </div>
-            </div>
-        </div>
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10">
-                    <i data-feather="activity" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Maintenance System</span>
-                    <h4 class="text-lg font-bold text-gray-800 dark:text-white/90">Asset Health Tracker</h4>
-                </div>
-            </div>
-        </div>
-    </div>
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Define maintenance categories (preventive, corrective, calibration) for asset servicing.
+        </p>
 
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <form action="{{ route('maintenance-types.index') }}" method="GET" class="flex items-center gap-3">
-            <div class="relative flex items-center"><span class="absolute left-3 text-gray-400"><i data-feather="search" class="w-4 h-4"></i></span><input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900"></div>
-            @if(request()->filled('search')) <a href="{{ route('maintenance-types.index') }}" class="text-sm text-gray-500 hover:text-brand-500">Clear</a> @endif
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
+
+        <!-- Bulk Delete Form -->
+        <form id="bulkDeleteForm" action="{{ route('maintenance-types.bulk-delete') }}" method="POST" class="hidden">
+            @csrf
+            <template x-for="id in selectedItems" :key="id">
+                <input type="hidden" name="ids[]" :value="id">
+            </template>
         </form>
-        <a href="{{ route('maintenance-types.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"><i data-feather="plus" class="w-4 h-4"></i> Add Type</a>
+
+        <!-- Bulk Action Bar -->
+        <div x-show="selectedItems.length > 0"
+            x-transition
+            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
+            style="display: none;">
+            <div class="flex items-center gap-2">
+                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
+                    <span x-text="selectedItems.length"></span> items selected.
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    Delete Selected
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            {{-- Card Header: Toolbar --}}
+            <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <form action="{{ route('maintenance-types.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3 text-gray-400">
+                                <i data-feather="search" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search maintenance types..."
+                                class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        </div>
+                        @if(request()->filled('search'))
+                            <a href="{{ route('maintenance-types.index') }}" class="text-sm text-gray-500 hover:text-brand-500">Clear</a>
+                        @endif
+                    </form>
+
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('maintenance-types.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            <i data-feather="plus" class="w-4 h-4"></i>
+                            Add Maintenance Type
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Table --}}
+            <div class="max-w-full overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="border-b border-gray-100 dark:border-gray-800">
+                        <tr>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <label class="flex cursor-pointer items-center select-none">
+                                        <div class="relative">
+                                            <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
+                                            <div :class="selectAll ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
+                                                class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
+                                                <span :class="selectAll ? '' : 'opacity-0'">
+                                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Type Name</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Description</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center justify-end">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                        @forelse($maintenanceTypes as $mt)
+                            <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="px-5 py-4 sm:px-6">
+                                    <div class="flex items-center">
+                                        <label class="flex cursor-pointer items-center select-none">
+                                            <div class="relative">
+                                                <input type="checkbox" value="{{ $mt->id }}" class="row-checkbox sr-only"
+                                                    :checked="selectedItems.includes({{ $mt->id }})" @click="toggleItem({{ $mt->id }})">
+                                                <div :class="selectedItems.includes({{ $mt->id }}) ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
+                                                    class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
+                                                    <span :class="selectedItems.includes({{ $mt->id }}) ? '' : 'opacity-0'">
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 sm:px-6">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $mt->name }}</span>
+                                        @if($mt->is_default)
+                                            <span class="inline-flex items-center rounded-md bg-brand-50 px-1.5 py-0.5 text-[10px] font-medium text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">Default</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 sm:px-6">
+                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400 max-w-xs truncate block" title="{{ $mt->description }}">{{ $mt->description ?? '-' }}</span>
+                                </td>
+                                <td class="px-5 py-4 sm:px-6">
+                                    <div class="flex items-center justify-end gap-3 text-gray-500">
+                                        <a href="{{ route('maintenance-types.edit', $mt) }}" class="transition-colors hover:text-brand-500" title="Edit">
+                                            <i data-feather="edit-3" class="w-5 h-5"></i>
+                                        </a>
+                                        <form action="{{ route('maintenance-types.destroy', $mt) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
+                                                <i data-feather="trash-2" class="w-5 h-5"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center space-y-2">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
+                                            <i data-feather="wrench" class="w-6 h-6"></i>
+                                        </div>
+                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No maintenance types found</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500">Add a maintenance type to categorize asset servicing.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination Footer --}}
+            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+                {{ $maintenanceTypes->links() }}
+            </div>
+        </div>
     </div>
-    @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-        <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-900"><tr><th class="px-6 py-3 text-xs text-left text-gray-500">Name</th><th class="px-6 py-3 text-xs text-left text-gray-500">Description</th><th class="px-6 py-3 text-xs text-left text-gray-500">Actions</th></tr></thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                @forelse($maintenanceTypes as $type)
-                <tr><td class="px-6 py-3.5 text-sm font-medium">{{ $type->name }}</td><td class="px-6 py-3.5 text-sm text-gray-500">{{ $type->description }}</td><td class="px-6 py-3.5"><div class="flex items-center gap-3 text-gray-500"><a href="{{ route('maintenance-types.edit', $type) }}" class="hover:text-brand-500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
-                    <form action="{{ route('maintenance-types.destroy', $type) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">@csrf @method('DELETE')<button class="hover:text-error-500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></form></div></td></tr>
-                @empty
-                <tr><td colspan="3" class="px-6 py-12 text-center text-sm text-gray-500">No maintenance types found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-        <div class="p-6 border-t">{{ $maintenanceTypes->links() }}</div>
-    </div>
-</div>
 @endsection

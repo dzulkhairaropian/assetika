@@ -1,13 +1,17 @@
 @extends('layouts.app')
 @section('content')
 <div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Stock Count Detail" />
+    <x-common.page-breadcrumb pageTitle="Stock Count Detail" :items="[['label' => 'Stock Audits', 'url' => route('stock-counts.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process show.blade
+        </p>
     @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <h3 class="text-lg font-semibold">{{ $stockCount->name }}</h3>
+                <h3 class="text-base font-medium">{{ $stockCount->name }}</h3>
                 <p class="text-xs text-gray-500">Location: {{ $stockCount->location?->name ?? 'All' }} | Status: {{ ucfirst($stockCount->status) }}</p>
             </div>
             <div class="flex gap-2">

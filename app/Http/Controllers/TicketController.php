@@ -44,11 +44,38 @@ class TicketController extends Controller
             $query->where('priority_id', $priority);
         }
 
+        $ticketSummary = [
+            'total' => (clone $query)->count(),
+            'new' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'New'))->count(),
+            'in_progress' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'In Progress'))->count(),
+            'pending' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'Pending'))->count(),
+            'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
+            'closed' => (clone $query)->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed']))->count(),
+        ];
+
+        switch ($request->input('tab')) {
+            case 'new':
+                $query->whereHas('status', fn($q) => $q->where('name', 'New'));
+                break;
+            case 'in_progress':
+                $query->whereHas('status', fn($q) => $q->where('name', 'In Progress'));
+                break;
+            case 'pending':
+                $query->whereHas('status', fn($q) => $q->where('name', 'Pending'));
+                break;
+            case 'unassigned':
+                $query->whereNull('assigned_to_id');
+                break;
+            case 'closed':
+                $query->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed']));
+                break;
+        }
+
         $tickets = $query->latest()->paginate(15)->withQueryString();
         $statuses = TicketStatus::all();
         $priorities = Priority::all();
 
-        return view('pages.tickets.index', compact('tickets', 'statuses', 'priorities', 'search'));
+        return view('pages.tickets.index', compact('tickets', 'statuses', 'priorities', 'search', 'ticketSummary'));
     }
 
     public function create(): View

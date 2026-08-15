@@ -1,8 +1,12 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Checkout Consumable" />
+        <x-common.page-breadcrumb pageTitle="Checkout Consumable" :items="[['label' => 'Consumables', 'url' => route('consumables.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process checkout.blade
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -24,7 +28,7 @@
 
                 <!-- Section: Checkout Details -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="user" class="w-5 h-5 text-brand-500"></i>
                         Checkout Details
                     </h3>
@@ -100,7 +104,7 @@
 
                 <!-- Section: Handover Documentation -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                         <i data-feather="file-text" class="w-5 h-5 text-brand-500"></i>
                         Handover Documentation
                     </h3>

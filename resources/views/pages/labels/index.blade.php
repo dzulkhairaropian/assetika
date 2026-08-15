@@ -3,6 +3,10 @@
 <div class="space-y-6">
     <x-common.page-breadcrumb pageTitle="Barcode Label Generator" />
 
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Generate and print QR sticker labels for physical assets.
+        </p>
+
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <form action="{{ route('labels.index') }}" method="GET" class="flex items-center gap-3">
             <div class="relative flex items-center">

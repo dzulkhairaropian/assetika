@@ -2,7 +2,11 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Component Detail" />
+        <x-common.page-breadcrumb pageTitle="Component Detail" :items="[['label' => 'Components', 'url' => route('components.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Process show.blade
+        </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -14,7 +18,7 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {{-- Component Info --}}
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 lg:col-span-1">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
+                <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-4 flex items-center gap-2">
                     <i data-feather="cpu" class="w-5 h-5 text-brand-500"></i>
                     Component Info
                 </h3>
@@ -69,7 +73,7 @@
             {{-- Stock & Checkout --}}
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 lg:col-span-2">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 flex items-center gap-2">
+                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 flex items-center gap-2">
                         <i data-feather="package" class="w-5 h-5 text-brand-500"></i>
                         Stock & Assignments
                     </h3>

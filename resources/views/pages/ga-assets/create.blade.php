@@ -7,7 +7,15 @@
         nextStep() { if (this.step < this.totalSteps) this.step++; },
         prevStep() { if (this.step > 1) this.step--; }
     }">
-        <x-common.page-breadcrumb pageTitle="Create GA Asset" />
+        <x-common.page-breadcrumb pageTitle="Create GA Asset" :items="[['label' => 'GA Assets', 'url' => route('ga-assets.index')]]" />
+
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Add a new General Affairs asset to inventory.
+        </p>
+
+        @if(session('success'))
+            <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
 
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
             
