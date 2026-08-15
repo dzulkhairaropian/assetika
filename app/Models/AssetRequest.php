@@ -70,4 +70,32 @@ class AssetRequest extends Model
             default => class_basename($this->requestable_type),
         };
     }
+
+    /**
+     * Resolve the matching Status record from the statuses table (by name,
+     * scoped to the IT Request master category), so badge color & icon are
+     * driven by the Status model value.
+     */
+    public function getStatusRecordAttribute(): ?Status
+    {
+        $name = match($this->status) {
+            'approved' => 'Fulfilled',
+            'rejected' => 'Declined',
+            default => 'Pending',
+        };
+
+        return Status::where('name', $name)
+            ->whereHas('masterCategory', fn($q) => $q->where('name', 'IT Request'))
+            ->first();
+    }
+
+    public function getStatusBadgeColorAttribute(): string
+    {
+        return $this->statusRecord?->color ?? 'gray';
+    }
+
+    public function getStatusBadgeIconAttribute(): ?string
+    {
+        return $this->statusRecord?->icon;
+    }
 }

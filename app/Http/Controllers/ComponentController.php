@@ -18,7 +18,8 @@ class ComponentController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('serial', 'like', "%$search%")
-                    ->orWhere('model_number', 'like', "%$search%");
+                    ->orWhere('model_number', 'like', "%$search%")
+                    ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%$search%"));
             });
         }
 
@@ -30,7 +31,7 @@ class ComponentController extends Controller
     public function create()
     {
         $categories = \App\Models\Category::whereHas('masterCategory', function ($q) {
-            $q->where('name', 'IT Asset');
+            $q->where('name', 'IT Component');
         })->orderBy('name')->get();
         $brands = \App\Models\Brand::orderBy('name')->get();
         $locations = \App\Models\Location::orderBy('name')->get();
@@ -77,7 +78,7 @@ class ComponentController extends Controller
     public function edit(Component $component)
     {
         $categories = \App\Models\Category::whereHas('masterCategory', function ($q) {
-            $q->where('name', 'IT Asset');
+            $q->where('name', 'IT Component');
         })->orderBy('name')->get();
         $brands = \App\Models\Brand::orderBy('name')->get();
         $locations = \App\Models\Location::orderBy('name')->get();

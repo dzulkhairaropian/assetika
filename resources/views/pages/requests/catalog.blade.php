@@ -297,17 +297,14 @@
                 <div class="p-4 sm:p-5 space-y-3">
                     @forelse($myRequests as $req)
                         @php
-                            $reqColor = match($req->status) {
-                                'approved' => 'success',
-                                'rejected' => 'error',
-                                default => 'warning',
-                            };
+                            $reqColor = $req->status_badge_color;
+                            $reqIcon = $req->status_badge_icon;
                             $typeColor = $req->requestable_type_label === 'Hardware' ? 'primary' : 'info';
                         @endphp
                         <div class="rounded-xl border border-gray-100 p-3.5 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="truncate text-sm font-semibold text-gray-800 dark:text-white" title="{{ $req->requestable_name }}">{{ $req->requestable_name }}</span>
-                                <x-ui.badge :color="$reqColor" variant="light" size="sm">{{ ucfirst($req->status) }}</x-ui.badge>
+                                <x-ui.badge :color="$reqColor" variant="light" size="sm" :featherIcon="$reqIcon">{{ ucfirst($req->status) }}</x-ui.badge>
                             </div>
                             <div class="mt-2 flex items-center gap-2">
                                 <x-ui.badge :color="$typeColor" variant="light" size="sm">{{ $req->requestable_type_label }}</x-ui.badge>

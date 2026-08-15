@@ -160,14 +160,7 @@
                                 </div>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                @php
-                                    $badgeColor = match($r->status) {
-                                        'approved' => 'success',
-                                        'rejected' => 'error',
-                                        default => 'warning',
-                                    };
-                                @endphp
-                                <x-ui.badge :color="$badgeColor" variant="light" size="sm">{{ ucfirst($r->status) }}</x-ui.badge>
+                                <x-ui.badge :color="$r->status_badge_color" variant="light" size="sm" :featherIcon="$r->status_badge_icon">{{ ucfirst($r->status) }}</x-ui.badge>
                             </td>
                             <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-500 dark:text-gray-400">
                                 {{ $r->created_at->format('d M Y, H:i') }}
