@@ -5,7 +5,7 @@
     <x-common.page-breadcrumb pageTitle="Edit License" :items="[['label' => 'Licenses', 'url' => route('licenses.index')]]" />
 
         <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Update software license details for {{ $license->name }}.
+            Update software or hardware appliance license (FortiGate, Cisco, M365) details for {{ $license->name }}.
         </p>
 
         @if(session('success'))

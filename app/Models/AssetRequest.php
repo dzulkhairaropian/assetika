@@ -38,4 +38,36 @@ class AssetRequest extends Model
     {
         return $this->morphTo();
     }
+
+    /**
+     * Resolve display name regardless of requestable type
+     * (Consumable stores name on its product relation).
+     */
+    public function getRequestableNameAttribute(): string
+    {
+        $req = $this->requestable;
+
+        if (! $req) {
+            return 'Item';
+        }
+
+        if ($req instanceof \App\Models\Consumable) {
+            return $req->product?->name ?? 'Consumable';
+        }
+
+        return $req->name ?? $req->title ?? 'Item';
+    }
+
+    /**
+     * Human-friendly request type label.
+     */
+    public function getRequestableTypeLabelAttribute(): string
+    {
+        return match(class_basename($this->requestable_type)) {
+            'Category' => 'Hardware',
+            'Consumable' => 'Consumable',
+            'License' => 'License',
+            default => class_basename($this->requestable_type),
+        };
+    }
 }

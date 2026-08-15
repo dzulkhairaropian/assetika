@@ -5,10 +5,10 @@
 
         <!-- Dashboard Header -->
         <div class="col-span-12 min-w-0">
+            <x-common.page-breadcrumb pageTitle="IT Support Dashboard" />
             <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <x-common.page-breadcrumb pageTitle="IT Support Dashboard" />
-                    <h2 class="mt-3 text-2xl font-bold text-gray-800 dark:text-white">
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
                         Hi, {{ $userName }}! 👋
                         <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
                     </h2>
@@ -89,14 +89,14 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Ticket Trend (Last 6 Months)</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Monthly ticket creation volume</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div id="ticketTrendChart" class="h-80"></div>
             </div>
 
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Tickets by Status</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Current distribution across ticket lifecycle</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div id="ticketStatusChart" class="h-80"></div>
             </div>
         </div>
@@ -106,21 +106,21 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Top Categories</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Most ticket-prone categories</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div id="ticketCategoryChart" class="h-72"></div>
             </div>
 
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">By Priority</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Urgency breakdown</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div id="ticketPriorityChart" class="h-72"></div>
             </div>
 
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">By Type</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Ticket classification</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div id="ticketTypeChart" class="h-72"></div>
             </div>
         </div>
@@ -130,14 +130,14 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 min-w-0 overflow-hidden shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Top Requesters</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Users with most ticket submissions</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div id="ticketRequesterChart" class="h-72"></div>
             </div>
 
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">IT Staff Workload</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Open tickets per assigned staff</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 <div class="space-y-3">
                     @forelse($workload as $row)
                         @php $maxWl = $workload->max('count') ?: 1; $pct = ($row->count / $maxWl) * 100; @endphp
@@ -197,7 +197,7 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Top Problem Assets</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Assets with most ticket reports</p>
-                <div class="border-t border-gray-100 dark:border-gray-850 my-4"></div>
+                <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 @php $paMax = $problemAssets->max('count') ?: 1; @endphp
                 <div class="space-y-3">
                     @forelse($problemAssets as $row)

@@ -1,80 +1,60 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="grid grid-cols-12 gap-4 md:gap-6">
+    <div class="grid grid-cols-12 gap-4 md:gap-6 min-w-0">
 
         <!-- Dashboard Header -->
-        <div class="col-span-12">
+        <div class="col-span-12 min-w-0">
             <x-common.page-breadcrumb pageTitle="General Affairs Dashboard" />
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+                        Hi, {{ $userName }}! 👋
+                        <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
+                    </h2>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <i data-feather="plus" class="w-4 h-4"></i> Add GA Asset
+                    </a>
+                    <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 transition">
+                        <i data-feather="briefcase" class="w-4 h-4"></i> GA Inventory
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Metrics Widgets -->
-        <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-4 md:gap-6">
-            <!-- Total GA Assets -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                <div class="flex items-end justify-between mt-0">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Total GA Assets</span>
-                        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ number_format($totalAssets) }}</h4>
-                    </div>
-                    <span class="flex items-center gap-1 rounded-full bg-success-50 py-0.5 pl-2 pr-2.5 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
-                        <i data-feather="trending-up" class="w-3 h-3"></i>
-                        +2.5%
-                    </span>
-                </div>
-                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">Total physical GA assets in inventory</p>
-            </div>
+        <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 min-w-0">
+            <x-common.stat-card
+                title="Total GA Assets"
+                :value="number_format($totalAssets)"
+                description="Total physical GA assets in inventory"
+            />
 
-            <!-- Total Investment Value -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                <div class="flex items-end justify-between mt-0">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Total Asset Value</span>
-                        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">Rp {{ number_format($totalAssetValue, 0, ',', '.') }}</h4>
-                    </div>
-                    <span class="flex items-center gap-1 rounded-full bg-success-50 py-0.5 pl-2 pr-2.5 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
-                        <i data-feather="trending-up" class="w-3 h-3"></i>
-                        +2.5%
-                    </span>
-                </div>
-                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">Capitalized investment value for GA</p>
-            </div>
+            <x-common.stat-card
+                title="Total Asset Value"
+                value="Rp {{ number_format($totalAssetValue, 0, ',', '.') }}"
+                description="Capitalized investment value for GA"
+            />
 
-            <!-- Active Assignments -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                <div class="flex items-end justify-between mt-0">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Active Assignments</span>
-                        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ number_format($activeAssignments) }}</h4>
-                    </div>
-                    <span class="flex items-center gap-1 rounded-full bg-success-50 py-0.5 pl-2 pr-2.5 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
-                        <i data-feather="trending-up" class="w-3 h-3"></i>
-                        +8.1%
-                    </span>
-                </div>
-                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">Assets currently checked out or in use</p>
-            </div>
+            <x-common.stat-card
+                title="Active Assignments"
+                :value="number_format($activeAssignments)"
+                description="Assets currently checked out or in use"
+            />
 
-            <!-- Pending Maintenance -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                <div class="flex items-end justify-between mt-0">
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Pending Maintenance</span>
-                        <h4 class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{{ number_format($pendingMaintenance) }}</h4>
-                    </div>
-                    <span class="flex items-center gap-1 rounded-full bg-error-50 py-0.5 pl-2 pr-2.5 text-xs font-medium text-error-600 dark:bg-error-500/15 dark:text-error-500">
-                        <i data-feather="trending-down" class="w-3 h-3"></i>
-                        -5%
-                    </span>
-                </div>
-                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">Scheduled repairs and maintenance tasks</p>
-            </div>
+            <x-common.stat-card
+                title="Pending Maintenance"
+                :value="number_format($pendingMaintenance)"
+                description="Scheduled repairs and maintenance tasks"
+            />
         </div>
 
         <!-- Charts Row 1 -->
         <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Status Distribution</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Asset Status Distribution</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Proportional breakdown of current asset statuses</p>
                 <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 @if($totalAssets > 0 && count($statusChart['data']) > 0)
@@ -86,8 +66,8 @@
                 @endif
             </div>
 
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Assets by Category</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Assets by Category</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Total number of assets grouped by category</p>
                 <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 @if(count($categoryChart['data']) > 0)
@@ -102,8 +82,8 @@
 
         <!-- Charts Row 2: Spend Timeline -->
         <div class="col-span-12">
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">GA Asset Investment Timeline (by Purchase Date)</h3>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 sm:p-6 shadow-theme-xs">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">GA Asset Investment Timeline (by Purchase Date)</h3>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Monthly spend timeline tracking historical GA asset acquisitions</p>
                 <div class="border-t border-gray-100 dark:border-gray-800 my-4"></div>
                 @if(count($purchaseChart['data']) > 0)
@@ -117,95 +97,69 @@
         </div>
 
         <!-- Recent Activities Tables -->
-        <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            
+        <div class="col-span-12 grid grid-cols-1 gap-6 lg:grid-cols-2 min-w-0">
             <!-- Recent Assignments -->
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="px-5 pt-5 sm:px-6 mb-1">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Assignments</h3>
-                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Latest GA asset assignments and their current status</p>
-                </div>
-                <div class="max-w-full overflow-x-auto max-h-80 overflow-y-auto">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr class="border-t border-gray-100 dark:border-gray-800">
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Asset</p></th>
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Assigned To</p></th>
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date</p></th>
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                            @forelse($recentAssignments as $assignment)
-                                <tr>
-                                    <td class="px-5 py-3 sm:px-6">
-                                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ $assignment->asset->name ?? 'Unknown' }}</span>
-                                        <span class="block text-gray-500 text-theme-xs dark:text-gray-400 mt-0.5">{{ $assignment->asset->asset_code ?? 'N/A' }}</span>
-                                    </td>
-                                    <td class="px-5 py-3 sm:px-6">
-                                        <div class="flex items-center gap-2">
-                                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 font-semibold text-xs shrink-0">{{ strtoupper(substr($assignment->user->name ?? 'N', 0, 1)) }}</div>
-                                            <span class="font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ $assignment->user->name ?? 'N/A' }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-5 py-3 sm:px-6 text-gray-500 text-theme-sm dark:text-gray-400">{{ $assignment->assigned_at ? $assignment->assigned_at->format('M d, Y') : 'N/A' }}</td>
-                                    <td class="px-5 py-3 sm:px-6">
-                                        @if($assignment->returned_at)
-                                            <span class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">Returned</span>
-                                        @else
-                                            <span class="rounded-full bg-brand-50 px-2 py-0.5 text-theme-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">Active</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="4" class="px-5 py-10 sm:px-6 text-center text-sm text-gray-500 dark:text-gray-400">No recent assignments found</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <x-common.dashboard-table
+                title="Recent Assignments"
+                description="Latest GA asset assignments and their current status"
+                :headers="['Asset', 'Assigned To', 'Date', 'Status']"
+                :footerLink="route('ga-assets.index')"
+                footerText="View GA Inventory"
+            >
+                @forelse($recentAssignments as $assignment)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
+                        <td class="px-5 py-3 sm:px-6">
+                            <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ $assignment->asset->name ?? 'Unknown' }}</span>
+                            <span class="block text-gray-500 text-theme-xs dark:text-gray-400 mt-0.5">{{ $assignment->asset->asset_code ?? 'N/A' }}</span>
+                        </td>
+                        <td class="px-5 py-3 sm:px-6">
+                            <div class="flex items-center gap-2">
+                                <div class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 font-semibold text-xs shrink-0">{{ strtoupper(substr($assignment->user->name ?? 'N', 0, 1)) }}</div>
+                                <span class="font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ $assignment->user->name ?? 'N/A' }}</span>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3 sm:px-6 text-gray-500 text-theme-sm dark:text-gray-400">{{ $assignment->assigned_at ? $assignment->assigned_at->format('M d, Y') : 'N/A' }}</td>
+                        <td class="px-5 py-3 sm:px-6">
+                            @if($assignment->returned_at)
+                                <x-ui.badge color="success" variant="light" size="sm">Returned</x-ui.badge>
+                            @else
+                                <x-ui.badge color="primary" variant="light" size="sm">Active</x-ui.badge>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="4" class="px-5 py-10 sm:px-6 text-center text-sm text-gray-500 dark:text-gray-400">No recent assignments found</td></tr>
+                @endforelse
+            </x-common.dashboard-table>
 
             <!-- Recent Maintenance Logs -->
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="px-5 pt-5 sm:px-6 mb-1">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Maintenance</h3>
-                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Latest scheduled repairs and maintenance activities</p>
-                </div>
-                <div class="max-w-full overflow-x-auto max-h-80 overflow-y-auto">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr class="border-t border-gray-100 dark:border-gray-800">
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Asset</p></th>
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Scheduled</p></th>
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cost</p></th>
-                                <th class="px-5 py-3 sm:px-6 text-start"><p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                            @forelse($recentMaintenance as $log)
-                                <tr>
-                                    <td class="px-5 py-3 sm:px-6">
-                                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ $log->asset->name ?? 'Unknown' }}</span>
-                                        <span class="block text-gray-500 text-theme-xs dark:text-gray-400 mt-0.5">{{ $log->asset->asset_code ?? 'N/A' }}</span>
-                                    </td>
-                                    <td class="px-5 py-3 sm:px-6 text-gray-500 text-theme-sm dark:text-gray-400">{{ $log->scheduled_date ? $log->scheduled_date->format('M d, Y') : 'N/A' }}</td>
-                                    <td class="px-5 py-3 sm:px-6 text-gray-800 text-theme-sm dark:text-white/90 font-semibold">Rp {{ number_format($log->cost, 0, ',', '.') }}</td>
-                                    <td class="px-5 py-3 sm:px-6">
-                                        @if($log->completed_date)
-                                            <span class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">Completed</span>
-                                        @else
-                                            <span class="rounded-full bg-warning-50 px-2 py-0.5 text-theme-xs font-medium text-warning-700 dark:bg-warning-500/15 dark:text-orange-400">Scheduled</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="4" class="px-5 py-10 sm:px-6 text-center text-sm text-gray-500 dark:text-gray-400">No maintenance logs found</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+            <x-common.dashboard-table
+                title="Recent Maintenance"
+                description="Latest scheduled repairs and maintenance activities"
+                :headers="['Asset', 'Scheduled', 'Cost', 'Status']"
+                :footerLink="route('ga-assets.index')"
+                footerText="View GA Maintenance"
+            >
+                @forelse($recentMaintenance as $log)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
+                        <td class="px-5 py-3 sm:px-6">
+                            <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ $log->asset->name ?? 'Unknown' }}</span>
+                            <span class="block text-gray-500 text-theme-xs dark:text-gray-400 mt-0.5">{{ $log->asset->asset_code ?? 'N/A' }}</span>
+                        </td>
+                        <td class="px-5 py-3 sm:px-6 text-gray-500 text-theme-sm dark:text-gray-400">{{ $log->scheduled_date ? $log->scheduled_date->format('M d, Y') : 'N/A' }}</td>
+                        <td class="px-5 py-3 sm:px-6 text-gray-800 text-theme-sm dark:text-white/90 font-semibold">Rp {{ number_format($log->cost, 0, ',', '.') }}</td>
+                        <td class="px-5 py-3 sm:px-6">
+                            @if($log->completed_date)
+                                <x-ui.badge color="success" variant="light" size="sm">Completed</x-ui.badge>
+                            @else
+                                <x-ui.badge color="warning" variant="light" size="sm">Scheduled</x-ui.badge>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="4" class="px-5 py-10 sm:px-6 text-center text-sm text-gray-500 dark:text-gray-400">No maintenance logs found</td></tr>
+                @endforelse
+            </x-common.dashboard-table>
         </div>
 
     </div>
@@ -254,84 +208,93 @@
                     }
                 }
             },
-            dataLabels: {
-                enabled: false
-            }
+            dataLabels: { enabled: false }
         };
         const statusChart = new ApexCharts(document.querySelector("#gaStatusChart"), statusOptions);
         statusChart.render();
         @endif
 
-        // Chart 2: GA Assets by Category (Pie/Donut)
+        // Chart 2: Assets by Category (Bar)
         @if(count($categoryChart['data']) > 0)
         const categoryOptions = {
-            series: @json($categoryChart['data']),
+            series: [{
+                name: 'Total Qty',
+                data: @json($categoryChart['data'])
+            }],
             chart: {
-                fontFamily: "Outfit, sans-serif",
-                type: 'pie',
+                type: 'bar',
                 height: 320,
+                fontFamily: "Outfit, sans-serif",
+                toolbar: { show: false }
             },
-            labels: @json($categoryChart['labels']),
-            legend: {
-                position: 'bottom',
-                fontFamily: "Outfit",
+            colors: ['#465FFF'],
+            plotOptions: {
+                bar: {
+                    borderRadius: 6,
+                    horizontal: false,
+                    columnWidth: '40%',
+                }
             },
-            dataLabels: {
-                enabled: true
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: @json($categoryChart['labels']),
+                labels: { style: { fontFamily: 'Outfit' } }
+            },
+            yaxis: {
+                labels: { style: { fontFamily: 'Outfit' } }
             }
         };
         const categoryChart = new ApexCharts(document.querySelector("#gaCategoryChart"), categoryOptions);
         categoryChart.render();
         @endif
 
-        // Chart 3: General Affairs Spend Timeline (Area Chart)
+        // Chart 3: Spend Timeline (Line/Area)
         @if(count($purchaseChart['data']) > 0)
-        const spendTimelineOptions = {
+        const purchaseOptions = {
             series: [{
-                name: 'Total Spend',
+                name: 'Investment Value',
                 data: @json($purchaseChart['data'])
             }],
             chart: {
-                fontFamily: "Outfit, sans-serif",
                 type: 'area',
                 height: 320,
-                toolbar: { show: false },
+                fontFamily: "Outfit, sans-serif",
+                toolbar: { show: false }
             },
-            colors: ['#465FFF'],
+            colors: ['#12B76A'],
             fill: {
                 type: 'gradient',
                 gradient: {
                     shadeIntensity: 1,
-                    opacityFrom: 0.4,
-                    opacityTo: 0.1,
-                    stops: [0, 90, 100]
+                    opacityFrom: 0.45,
+                    opacityTo: 0.05,
+                    stops: [0, 100]
                 }
             },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            },
             dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 2 },
             xaxis: {
                 categories: @json($purchaseChart['labels']),
+                labels: { style: { fontFamily: 'Outfit' } }
             },
             yaxis: {
                 labels: {
+                    style: { fontFamily: 'Outfit' },
                     formatter: function (value) {
-                        return "Rp " + new Intl.NumberFormat('id-ID').format(value);
+                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
                     }
                 }
             },
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        return "Rp " + new Intl.NumberFormat('id-ID').format(val);
+                        return 'Rp ' + val.toLocaleString('id-ID');
                     }
                 }
             }
         };
-        const spendTimelineChart = new ApexCharts(document.querySelector("#gaSpendTimelineChart"), spendTimelineOptions);
-        spendTimelineChart.render();
+        const purchaseChart = new ApexCharts(document.querySelector("#gaSpendTimelineChart"), purchaseOptions);
+        purchaseChart.render();
         @endif
     });
 </script>

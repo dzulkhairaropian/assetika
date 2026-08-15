@@ -31,8 +31,9 @@ class LicenseController extends Controller
     public function create()
     {
         $brands = \App\Models\Brand::orderBy('name')->get();
+        $assets = \App\Models\Asset::with('product.brand')->orderBy('asset_tag')->get();
 
-        return view('pages.licenses.create', compact('brands'));
+        return view('pages.licenses.create', compact('brands', 'assets'));
     }
 
     public function store(Request $request)
@@ -47,9 +48,22 @@ class LicenseController extends Controller
             'expiration_date' => 'nullable|date',
             'purchase_cost' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
+            'asset_id' => 'nullable|exists:assets,id',
         ]);
 
-        License::create($validated);
+        $assetId = $validated['asset_id'] ?? null;
+        unset($validated['asset_id']);
+
+        $license = License::create($validated);
+
+        if ($assetId) {
+            $license->seats()->create([
+                'assigned_to_type' => Asset::class,
+                'assigned_to_id' => $assetId,
+                'checked_out_at' => now(),
+                'notes' => 'Assigned during license creation',
+            ]);
+        }
 
         if ($request->has('create_another')) {
             return redirect()->route('licenses.create')->with('success', 'License created successfully. Add another one.');

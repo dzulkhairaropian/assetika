@@ -16,13 +16,37 @@ class AssetRequestController extends Controller
     {
         $query = AssetRequest::with(['user', 'requestable', 'processedBy']);
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', fn($u) => $u->where('name', 'like', "%$search%"))
+                  ->orWhere('notes', 'like', "%$search%");
+            });
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
+        $requestSummary = [
+            'total' => (clone $query)->count(),
+            'hardware' => (clone $query)->where('requestable_type', Category::class)->count(),
+            'consumable' => (clone $query)->where('requestable_type', Consumable::class)->count(),
+            'license' => (clone $query)->where('requestable_type', \App\Models\License::class)->count(),
+        ];
+
+        if ($tab = $request->input('tab')) {
+            match($tab) {
+                'hardware' => $query->where('requestable_type', Category::class),
+                'consumable' => $query->where('requestable_type', Consumable::class),
+                'license' => $query->where('requestable_type', \App\Models\License::class),
+                default => null,
+            };
+        }
+
         $requests = $query->latest()->paginate(50)->withQueryString();
 
-        return view('pages.requests.index', compact('requests'));
+        return view('pages.requests.index', compact('requests', 'requestSummary'));
     }
 
     // User catalog to request items
@@ -30,32 +54,38 @@ class AssetRequestController extends Controller
     {
         $categories = Category::whereHas('masterCategory', fn($q) => $q->where('name', 'IT Asset'))->orderBy('name')->get();
         $consumables = Consumable::with('product')->get();
+        $licenses = \App\Models\License::orderBy('name')->get();
         $myRequests = AssetRequest::where('user_id', auth()->id())->with('requestable')->latest()->take(10)->get();
 
-        return view('pages.requests.catalog', compact('categories', 'consumables', 'myRequests'));
+        return view('pages.requests.catalog', compact('categories', 'consumables', 'licenses', 'myRequests'));
     }
 
     // User store request
     public function store(Request $request)
     {
         $request->validate([
-            'requestable_type' => 'required|in:category,consumable',
+            'requestable_type' => 'required|in:category,consumable,license',
             'requestable_id' => 'required|integer',
+            'qty' => 'nullable|integer|min:1|max:50',
             'notes' => 'nullable|string',
         ]);
 
-        $type = $request->requestable_type === 'category' ? Category::class : Consumable::class;
+        $type = match($request->requestable_type) {
+            'category' => Category::class,
+            'consumable' => Consumable::class,
+            'license' => \App\Models\License::class,
+        };
 
         AssetRequest::create([
             'user_id' => auth()->id(),
             'requestable_type' => $type,
             'requestable_id' => $request->requestable_id,
-            'qty' => 1,
+            'qty' => (int) $request->input('qty', 1),
             'status' => 'pending',
             'notes' => $request->notes,
         ]);
 
-        return back()->with('success', 'Asset request submitted successfully.');
+        return back()->with('success', 'Request submitted successfully.');
     }
 
     // Admin approve/reject request

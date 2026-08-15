@@ -10,14 +10,21 @@ class AssetLabelController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Asset::query();
+        $query = Asset::with(['product.brand', 'product.category', 'status', 'department.company', 'location']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('asset_tag', 'like', "%$search%")
                     ->orWhere('device_name', 'like', "%$search%")
-                    ->orWhere('serial_number', 'like', "%$search%");
+                    ->orWhere('serial_number', 'like', "%$search%")
+                    ->orWhereHas('product', function ($p) use ($search) {
+                        $p->where('name', 'like', "%$search%")
+                          ->orWhereHas('brand', fn($b) => $b->where('name', 'like', "%$search%"));
+                    })
+                    ->orWhereHas('department', function ($d) use ($search) {
+                        $d->where('name', 'like', "%$search%");
+                    });
             });
         }
 

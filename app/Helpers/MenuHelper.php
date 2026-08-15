@@ -16,11 +16,6 @@ class MenuHelper
                         'path' => '/',
                     ],
                     [
-                        'name' => 'GA Dashboard',
-                        'icon' => 'ga-dashboard',
-                        'path' => '/ga-dashboard',
-                    ],
-                    [
                         'name' => 'Ticket Dashboard',
                         'icon' => 'ticket',
                         'path' => '/ticket-dashboard',
@@ -28,7 +23,7 @@ class MenuHelper
                 ],
             ],
             [
-                'title' => 'Support Ticketing',
+                'title' => 'Help Desk & Requests',
                 'items' => [
                     [
                         'name' => 'All Tickets',
@@ -36,34 +31,21 @@ class MenuHelper
                         'path' => '/tickets',
                     ],
                     [
-                        'name' => 'Asset Requests',
+                        'name' => 'Item Requests',
                         'icon' => 'ticket',
                         'path' => '/asset-requests',
                     ],
                     [
-                        'name' => 'Consumable Requests',
-                        'icon' => 'ticket',
-                        'path' => '/consumable-requests',
-                    ],
-                    [
-                        'name' => 'Ticketing Data',
-                        'icon' => 'ticket-config',
-                        'subItems' => [
-                            ['name' => 'Priorities', 'path' => '/admin/priorities'],
-                            ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
-                            ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
-                            ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
-                            ['name' => 'Labels', 'path' => '/admin/labels'],
-                            ['name' => 'Sources', 'path' => '/admin/sources'],
-                            ['name' => 'Categories & Subcategories', 'path' => '/admin/ticket-categories'],
-                        ],
+                        'name' => 'Request Catalog',
+                        'icon' => 'kit',
+                        'path' => '/requestable-assets',
                     ],
                 ],
             ],
             [
-                'title' => 'IT Asset Management',
+                'title' => 'IT Assets & Inventory',
                 'items' => [
-[
+                    [
                         'name' => 'IT Assets',
                         'icon' => 'assets',
                         'subItems' => [
@@ -77,9 +59,12 @@ class MenuHelper
                         'path' => '/my-assets',
                     ],
                     [
-                        'name' => 'Request Item',
-                        'icon' => 'kit',
-                        'path' => '/requestable-assets',
+                        'name' => 'Consumables',
+                        'icon' => 'consumables',
+                        'subItems' => [
+                            ['name' => 'Inventory', 'path' => '/consumables'],
+                            ['name' => 'Transactions', 'path' => '/consumable-transactions'],
+                        ],
                     ],
                     [
                         'name' => 'Components',
@@ -97,20 +82,12 @@ class MenuHelper
                         'path' => '/kits',
                     ],
                     [
-                        'name' => 'Consumables',
-                        'icon' => 'consumables',
-                        'subItems' => [
-                            ['name' => 'Inventory', 'path' => '/consumables'],
-                            ['name' => 'Transactions', 'path' => '/consumable-transactions'],
-                        ],
-                    ],
-                    [
                         'name' => 'Depreciations',
                         'icon' => 'catalog',
                         'path' => '/depreciations',
                     ],
                     [
-                        'name' => 'Audit / Opname',
+                        'name' => 'Stock Audit',
                         'icon' => 'support',
                         'path' => '/stock-counts',
                     ],
@@ -119,6 +96,11 @@ class MenuHelper
             [
                 'title' => 'General Affairs (GA)',
                 'items' => [
+                    [
+                        'name' => 'GA Dashboard',
+                        'icon' => 'ga-dashboard',
+                        'path' => '/ga-dashboard',
+                    ],
                     [
                         'name' => 'GA Assets',
                         'icon' => 'ga-assets',
@@ -145,24 +127,36 @@ class MenuHelper
                         ],
                     ],
                     [
-                        'name' => 'Catalog',
+                        'name' => 'Product Catalog',
                         'icon' => 'catalog',
                         'subItems' => [
                             ['name' => 'Products', 'path' => '/products'],
                             ['name' => 'Master Categories', 'path' => '/master-categories'],
                             ['name' => 'Categories', 'path' => '/categories'],
-                            ['name' => 'Custom Fields', 'path' => '/custom-fields'],
-                            ['name' => 'Fieldsets', 'path' => '/fieldsets'],
-                            ['name' => 'EULA Templates', 'path' => '/eulas'],
                             ['name' => 'Brands', 'path' => '/brands'],
                             ['name' => 'Operating Systems', 'path' => '/operating-systems'],
                         ],
                     ],
                     [
-                        'name' => 'Support Data',
+                        'name' => 'Custom Fields',
+                        'icon' => 'ticket-config',
+                        'subItems' => [
+                            ['name' => 'Custom Fields', 'path' => '/custom-fields'],
+                            ['name' => 'Fieldsets', 'path' => '/fieldsets'],
+                            ['name' => 'EULA Templates', 'path' => '/eulas'],
+                        ],
+                    ],
+                    [
+                        'name' => 'Support Settings',
                         'icon' => 'support',
                         'subItems' => [
-                            ['name' => 'Statuses', 'path' => '/statuses'],
+                            ['name' => 'Priorities', 'path' => '/admin/priorities'],
+                            ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
+                            ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
+                            ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
+                            ['name' => 'Sources', 'path' => '/admin/sources'],
+                            ['name' => 'Ticket Labels', 'path' => '/admin/labels'],
+                            ['name' => 'Asset Statuses', 'path' => '/statuses'],
                             ['name' => 'Vendors', 'path' => '/vendors'],
                             ['name' => 'Maintenance Types', 'path' => '/maintenance-types'],
                         ],
@@ -170,27 +164,7 @@ class MenuHelper
                 ],
             ],
             [
-                'title' => 'Reports & Tools',
-                'items' => [
-                    [
-                        'name' => 'Reports',
-                        'icon' => 'report',
-                        'path' => '/reports',
-                    ],
-                    [
-                        'name' => 'Label Generator',
-                        'icon' => 'label',
-                        'path' => '/labels',
-                    ],
-                    [
-                        'name' => 'Import Data',
-                        'icon' => 'upload',
-                        'path' => '/import',
-                    ],
-                ],
-            ],
-            [
-                'title' => 'System',
+                'title' => 'System & Reports',
                 'items' => [
                     [
                         'name' => 'Access Control',
@@ -199,6 +173,21 @@ class MenuHelper
                             ['name' => 'Users', 'path' => '/users'],
                             ['name' => 'Roles', 'path' => '/roles'],
                         ],
+                    ],
+                    [
+                        'name' => 'Reports',
+                        'icon' => 'report',
+                        'path' => '/reports',
+                    ],
+                    [
+                        'name' => 'Barcode Labels',
+                        'icon' => 'label',
+                        'path' => '/labels',
+                    ],
+                    [
+                        'name' => 'Import Data',
+                        'icon' => 'upload',
+                        'path' => '/import',
                     ],
                     [
                         'name' => 'Backups',

@@ -87,7 +87,17 @@ class GaDashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $userName = auth()->check() ? auth()->user()->name : 'User';
+        $greetings = [
+            'Here is the latest overview of your General Affairs assets and facilities.',
+            'Track GA inventory, assignments, and scheduled maintenance.',
+            'Here is what is happening across your GA facilities today.'
+        ];
+        $randomGreeting = $greetings[array_rand($greetings)];
+
         return view('pages.dashboard.ga-assets', compact(
+            'userName',
+            'randomGreeting',
             'totalAssets',
             'totalAssetValue',
             'activeAssignments',

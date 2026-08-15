@@ -5,7 +5,7 @@
     <x-common.page-breadcrumb pageTitle="Create License" :items="[['label' => 'Licenses', 'url' => route('licenses.index')]]" />
 
         <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Add a new software license to inventory.
+            Add a new software or hardware appliance license (e.g. FortiGate, Cisco, Microsoft 365) to inventory.
         </p>
     @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
 
@@ -21,7 +21,7 @@
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Name <span class="text-error-500">*</span></label>
-                            <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g., Microsoft 365 Business" required
+                            <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g., Fortinet FortiGuard UTM / Microsoft 365" required
                                 class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                             @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
@@ -66,9 +66,32 @@
                             <input type="number" name="purchase_cost" value="{{ old('purchase_cost') }}" step="0.01" placeholder="0.00"
                                 class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800" />
                         </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                Link to Asset / Hardware <span class="text-gray-400 font-normal">(Optional)</span>
+                            </label>
+                            <div x-data="{ isOptionSelected: {{ old('asset_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
+                                <select name="asset_id"
+                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">-- Select Hardware / Asset --</option>
+                                    @foreach($assets as $asset)
+                                        <option value="{{ $asset->id }}" {{ old('asset_id') == $asset->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                            {{ $asset->asset_tag }} - {{ $asset->device_name ?? $asset->name }} ({{ optional($asset->product?->brand)->name ?? 'No Brand' }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-400 italic">Link to a hardware appliance (e.g. FortiGate firewall, Cisco router, server) if applicable.</p>
+                        </div>
                         <div class="lg:col-span-2">
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Notes</label>
-                            <textarea name="notes" rows="3" placeholder="Additional notes"
+                            <textarea name="notes" rows="3" placeholder="Additional notes or hardware target (e.g. FortiGate-100F Firewall SN: FGT71G...)"
                                 class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">{{ old('notes') }}</textarea>
                         </div>
                     </div>
