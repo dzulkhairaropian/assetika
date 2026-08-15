@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VendorController extends Controller
 {
@@ -17,7 +18,13 @@ class VendorController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                   ->orWhere('contact_person', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('phone', 'like', "%$search%")
+                  ->orWhere('npwp_number', 'like', "%$search%")
+                  ->orWhere('npwp_name', 'like', "%$search%")
+                  ->orWhere('nib', 'like', "%$search%")
+                  ->orWhere('bank_name', 'like', "%$search%")
+                  ->orWhere('bank_account_number', 'like', "%$search%");
             });
         }
 
@@ -39,7 +46,20 @@ class VendorController extends Controller
             'phone' => 'nullable|string|max:50|unique:vendors,phone',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
+            'npwp_number' => 'nullable|string|max:100',
+            'npwp_name' => 'nullable|string|max:255',
+            'npwp_photo' => 'nullable|image|mimes:jpeg,jpg,png,pdf|max:4096',
+            'nib' => 'nullable|string|max:100',
+            'bank_name' => 'nullable|string|max:100',
+            'bank_account_number' => 'nullable|string|max:100',
+            'bank_account_name' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
         ]);
+
+        if ($request->hasFile('npwp_photo')) {
+            $path = $request->file('npwp_photo')->store('vendors/npwp', 'public');
+            $validated['npwp_photo'] = $path;
+        }
 
         Vendor::create($validated);
 
@@ -64,7 +84,23 @@ class VendorController extends Controller
             'phone' => 'nullable|string|max:50|unique:vendors,phone,' . $vendor->id,
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
+            'npwp_number' => 'nullable|string|max:100',
+            'npwp_name' => 'nullable|string|max:255',
+            'npwp_photo' => 'nullable|image|mimes:jpeg,jpg,png,pdf|max:4096',
+            'nib' => 'nullable|string|max:100',
+            'bank_name' => 'nullable|string|max:100',
+            'bank_account_number' => 'nullable|string|max:100',
+            'bank_account_name' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
         ]);
+
+        if ($request->hasFile('npwp_photo')) {
+            if ($vendor->npwp_photo && Storage::disk('public')->exists($vendor->npwp_photo)) {
+                Storage::disk('public')->delete($vendor->npwp_photo);
+            }
+            $path = $request->file('npwp_photo')->store('vendors/npwp', 'public');
+            $validated['npwp_photo'] = $path;
+        }
 
         $vendor->update($validated);
 
@@ -73,6 +109,9 @@ class VendorController extends Controller
 
     public function destroy(Vendor $vendor)
     {
+        if ($vendor->npwp_photo && Storage::disk('public')->exists($vendor->npwp_photo)) {
+            Storage::disk('public')->delete($vendor->npwp_photo);
+        }
         $vendor->delete();
         return redirect()->route('vendors.index')->with('success', 'Vendor deleted successfully.');
     }

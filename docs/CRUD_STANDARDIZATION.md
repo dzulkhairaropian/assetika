@@ -78,8 +78,11 @@ Modul yang sudah terstandarisasi:
    - Container `inline-flex` agar lebar mengikuti isi (tidak full-width), tetap scrollable di layar kecil.
    - Hitungan per tab dari summary controller, badge warna per segmen.
    - **Modul dengan Tabs**:
-     - **Asset**: `All Assets`, `Ready to Deploy`, `Deployed`, `Service & Repair`, `Broken`, `Aged (≥4y)`
-     - **Tickets**: `All Tickets`, `New`, `In Progress`, `Pending`, `Unassigned`, `Closed`
+      - **Asset**: `All Assets`, `Ready to Deploy`, `Deployed`, `Service & Repair`, `Broken`, `Aged (≥4y)`
+      - **Tickets**: `All Tickets`, `New`, `In Progress`, `Pending`, `Unassigned`, `Closed`
+      - **Consumable Requests**: `All Requests`, `Pending`, `Approved`, `Completed`, `Rejected`
+      - **Asset Requests**: `All Requests`, `Hardware`, `Consumables`, `Licenses`
+      - **Request Catalog**: `Hardware Categories`, `Consumables`, `Licenses`
    ```blade
    @php
        $currentTab = request('tab');

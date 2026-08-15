@@ -24,7 +24,7 @@
         <x-common.page-breadcrumb pageTitle="Vendors" />
 
         <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Manage suppliers, manufacturers, and service providers for procurement and maintenance.
+            Manage suppliers, manufacturers, tax info (NPWP/NIB), and bank accounts for procurement.
         </p>
 
         @if(session('success'))
@@ -39,26 +39,6 @@
             </template>
         </form>
 
-        <!-- Bulk Action Bar -->
-        <div x-show="selectedItems.length > 0"
-            x-transition
-            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
-            style="display: none;">
-            <div class="flex items-center gap-2">
-                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
-                <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
-                    <span x-text="selectedItems.length"></span> items selected.
-                </span>
-            </div>
-            <div class="flex items-center gap-4">
-                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
-                    <i data-feather="trash-2" class="w-4 h-4"></i>
-                    Delete Selected
-                </button>
-            </div>
-        </div>
-
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             {{-- Card Header: Toolbar --}}
             <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
@@ -68,8 +48,8 @@
                             <span class="absolute left-3 text-gray-400">
                                 <i data-feather="search" class="w-4 h-4"></i>
                             </span>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search vendors..."
-                                class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, NPWP, NIB, bank..."
+                                class="h-10 w-72 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                         </div>
                         @if(request()->filled('search'))
                             <a href="{{ route('vendors.index') }}" class="text-sm text-gray-500 hover:text-brand-500">Clear</a>
@@ -82,6 +62,26 @@
                             Add Vendor
                         </a>
                     </div>
+                </div>
+            </div>
+
+            {{-- Bulk Action Bar (dekat tabel) --}}
+            <div x-show="selectedItems.length > 0"
+                x-transition
+                class="flex flex-wrap items-center justify-between gap-4 border-b border-brand-100 bg-brand-50/50 px-4 py-3 dark:border-brand-900/30 dark:bg-brand-500/10"
+                style="display: none;">
+                <div class="flex items-center gap-2">
+                    <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                    <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
+                        <span x-text="selectedItems.length"></span> items selected.
+                    </span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
+                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                        Delete Selected
+                    </button>
                 </div>
             </div>
 
@@ -114,17 +114,17 @@
                             </th>
                             <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Contact Person</p>
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Contact / Email</p>
                                 </div>
                             </th>
                             <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Email</p>
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">NPWP / NIB</p>
                                 </div>
                             </th>
                             <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Phone</p>
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Bank Account</p>
                                 </div>
                             </th>
                             <th class="px-5 py-3 sm:px-6">
@@ -156,29 +156,77 @@
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $vendor->name }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $vendor->name }}</span>
+                                        @if($vendor->phone)
+                                            <span class="text-xs text-gray-400">{{ $vendor->phone }}</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">{{ $vendor->contact_person ?? '-' }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $vendor->contact_person ?? '-' }}</span>
+                                        <span class="text-xs text-gray-400">{{ $vendor->email ?? '-' }}</span>
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">{{ $vendor->email ?? '-' }}</span>
+                                    <div class="flex flex-col gap-1">
+                                        @if($vendor->npwp_number)
+                                            <span class="font-mono text-xs font-semibold text-gray-700 dark:text-gray-300">NPWP: {{ $vendor->npwp_number }}</span>
+                                        @endif
+                                        @if($vendor->nib)
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">NIB: {{ $vendor->nib }}</span>
+                                        @endif
+                                        @if(!$vendor->npwp_number && !$vendor->nib && !$vendor->npwp_photo)
+                                            <span class="text-xs text-gray-400 italic">-</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">{{ $vendor->phone ?? '-' }}</span>
+                                    @if($vendor->bank_name || $vendor->bank_account_number)
+                                        <div class="flex flex-col">
+                                            <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $vendor->bank_name }} - {{ $vendor->bank_account_number }}</span>
+                                            <span class="text-xs text-gray-400">a.n. {{ $vendor->bank_account_name ?? '-' }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-400 italic">-</span>
+                                    @endif
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center justify-end gap-3 text-gray-500">
-                                        <a href="{{ route('vendors.edit', $vendor) }}" class="transition-colors hover:text-brand-500" title="Edit">
-                                            <i data-feather="edit-3" class="w-5 h-5"></i>
-                                        </a>
-                                        <form action="{{ route('vendors.destroy', $vendor) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
-                                                <i data-feather="trash-2" class="w-5 h-5"></i>
-                                            </button>
-                                        </form>
+                                <td class="px-5 py-4 sm:px-6 text-right">
+                                    <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+                                        <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+                                            <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="transform opacity-100 scale-100"
+                                            x-transition:leave-end="transform opacity-0 scale-95"
+                                            class="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900"
+                                            style="display: none;">
+                                            @if($vendor->npwp_photo)
+                                                <a href="{{ asset('storage/' . $vendor->npwp_photo) }}" target="_blank" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                    <i data-feather="file-text" class="w-4 h-4 text-gray-400"></i>
+                                                    View NPWP Doc
+                                                </a>
+                                            @endif
+                                            <a href="{{ route('vendors.edit', $vendor) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-feather="edit-3" class="w-4 h-4 text-gray-400"></i>
+                                                Edit
+                                            </a>
+                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+                                            <form action="{{ route('vendors.destroy', $vendor) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex w-full">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
+                                                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
