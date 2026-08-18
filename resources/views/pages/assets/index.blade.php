@@ -25,7 +25,7 @@
             const copies = document.getElementById('labelCopies') ? document.getElementById('labelCopies').value : 1;
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '{{ route("labels.generate") }}';
+            form.action = '{{ route("labels.generate", [], false) }}';
             form.target = '_blank';
             
             const csrf = document.createElement('input');

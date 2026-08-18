@@ -35,7 +35,7 @@
             }
         }">
 
-        <form id="generateForm" action="{{ route('labels.generate') }}" method="POST" target="_blank" class="hidden">
+        <form id="generateForm" action="{{ route('labels.generate', [], false) }}" method="POST" target="_blank" class="hidden">
             @csrf
             <template x-for="id in selectedRows" :key="id">
                 <div>
