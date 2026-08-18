@@ -151,18 +151,38 @@
                                 <td class="px-5 py-4 sm:px-6">
                                     <span class="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">{{ $fieldset->custom_fields_count ?? 0 }} fields</span>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center justify-end gap-3 text-gray-500">
-                                        <a href="{{ route('fieldsets.edit', $fieldset) }}" class="transition-colors hover:text-brand-500" title="Edit">
-                                            <i data-feather="edit-3" class="w-5 h-5"></i>
-                                        </a>
-                                        <form action="{{ route('fieldsets.destroy', $fieldset) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
-                                                <i data-feather="trash-2" class="w-5 h-5"></i>
-                                            </button>
-                                        </form>
+                                <td class="px-5 py-4 sm:px-6 text-right">
+                                    <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+                                        <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+                                            <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="transform opacity-100 scale-100"
+                                            x-transition:leave-end="transform opacity-0 scale-95"
+                                            class="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900"
+                                            style="display: none;">
+                                            
+                                            <a href="{{ route('fieldsets.edit', $fieldset) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-feather="edit-3" class="w-4 h-4 text-gray-400"></i>
+                                                Edit
+                                            </a>
+
+                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                            <form action="{{ route('fieldsets.destroy', $fieldset) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
+                                                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
