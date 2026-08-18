@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ticket_id')->constrained('tickets')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('field');
+            $table->string('field')->nullable();
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();
             $table->text('description')->nullable();

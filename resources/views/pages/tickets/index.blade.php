@@ -200,17 +200,12 @@
                         </th>
                         <th class="px-5 py-3 sm:px-6">
                             <div class="flex items-center">
-                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ticket Key</p>
+                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ticket Key / Problem</p>
                             </div>
                         </th>
                         <th class="px-5 py-3 sm:px-6">
                             <div class="flex items-center">
                                 <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Requester</p>
-                            </div>
-                        </th>
-                        <th class="px-5 py-3 sm:px-6">
-                            <div class="flex items-center">
-                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Summary</p>
                             </div>
                         </th>
                         <th class="px-5 py-3 sm:px-6">
@@ -247,8 +242,19 @@
                             $priorityIcon = $ticket->priority?->icon ?: 'flag';
                             $statusIcon = $ticket->status?->icon ?: 'clock';
                             $slaIcon = $isOverdue ? 'alert-circle' : 'check-circle';
+                            
+                            $rowBg = 'hover:bg-gray-50/50 dark:hover:bg-white/[0.02]';
+                            if ($isOverdue) {
+                                $rowBg = 'bg-error-50/70 dark:bg-error-500/10 hover:bg-error-100/60 dark:hover:bg-error-500/15';
+                            } elseif ($ticket->status?->is_closed) {
+                                $rowBg = 'bg-gray-100/70 dark:bg-white/[0.04] hover:bg-gray-200/50 dark:hover:bg-white/[0.06]';
+                            } elseif ($ticket->priority?->name === 'High') {
+                                $rowBg = 'bg-warning-50/60 dark:bg-warning-500/10 hover:bg-warning-100/60 dark:hover:bg-warning-500/15';
+                            } elseif ($ticket->priority?->name === 'Urgent') {
+                                $rowBg = 'bg-error-50/60 dark:bg-error-500/10 hover:bg-error-100/60 dark:hover:bg-error-500/15';
+                            }
                         @endphp
-                        <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                        <tr class="border-b border-gray-100 dark:border-white/[0.05] {{ $rowBg }}">
                             <td class="px-5 py-4 sm:px-6">
                                 <div class="flex items-center">
                                     <label class="flex cursor-pointer items-center select-none">
@@ -271,63 +277,98 @@
                                 </div>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <a href="{{ route('tickets.show', $ticket) }}" class="font-mono text-theme-sm font-medium text-brand-600 dark:text-brand-400">{{ $ticket->request_id }}</a>
+                                <div class="flex flex-col">
+                                    <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">{{ $ticket->request_id }}</span>
+                                    <span class="text-xs text-gray-500">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 60) }}</span>
+                                </div>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
+                                <span class="text-theme-sm text-gray-700 dark:text-gray-400">
                                     {{ $ticket->requester_name ?? $ticket->requesterUser?->name }}
                                 </span>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <span class="block max-w-xs truncate text-theme-sm text-gray-600 dark:text-gray-400">
-                                    {{ \Illuminate\Support\Str::limit($ticket->problem_description, 50) }}
-                                </span>
+                                <div class="flex flex-col gap-1">
+                                    @if($ticket->priority)
+                                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-medium {{ $ticket->priority?->color === 'danger' ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' : ($ticket->priority?->color === 'warning' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300') }}">
+                                            <i data-feather="{{ $priorityIcon }}" class="w-3 h-3"></i>
+                                            {{ $ticket->priority?->name ?? 'Normal' }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
-                                    <i data-feather="{{ $priorityIcon }}" class="w-3 h-3"></i>
-                                    {{ $ticket->priority?->name ?? 'Normal' }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-4 sm:px-6">
-                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-                                    <i data-feather="{{ $statusIcon }}" class="w-3 h-3"></i>
-                                    {{ $ticket->status?->name ?? 'Open' }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-4 sm:px-6">
-                                @if($isOverdue)
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-error-50 px-2 py-0.5 text-[11px] font-semibold text-error-600 dark:bg-error-500/10 dark:text-error-400">
-                                        <i data-feather="{{ $slaIcon }}" class="w-3 h-3"></i>
-                                        SLA Risk (>3d)
+                                <div class="flex flex-col gap-1">
+                                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                                        <i data-feather="{{ $statusIcon }}" class="w-3 h-3"></i>
+                                        {{ $ticket->status?->name ?? 'Open' }}
                                     </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 text-xs text-gray-400">
-                                        <i data-feather="{{ $slaIcon }}" class="w-3 h-3"></i>
-                                        On Track
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 sm:px-6">
+                                <div class="flex flex-col gap-1">
+                                    @if($isOverdue)
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-error-50 px-2 py-0.5 text-[10px] font-semibold text-error-700 dark:bg-error-500/10 dark:text-error-400">
+                                            <i data-feather="{{ $slaIcon }}" class="w-3 h-3"></i>
+                                            SLA Risk
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-success-50 px-2 py-0.5 text-[10px] font-semibold text-success-700 dark:bg-success-500/10 dark:text-success-400">
+                                            <i data-feather="{{ $slaIcon }}" class="w-3 h-3"></i>
+                                            On Track
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 sm:px-6">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">
+                                        {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
                                     </span>
-                                @endif
+                                    @if($ticket->assignedTo?->department)
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            {{ $ticket->assignedTo->department->name }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
-                            <td class="px-5 py-4 sm:px-6">
-                                <span class="text-theme-sm text-gray-600 dark:text-gray-400">
-                                    {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-4 sm:px-6">
-                                <div class="flex items-center justify-end gap-3 text-gray-500">
-                                    <a href="{{ route('tickets.show', $ticket) }}" class="transition-colors hover:text-brand-500" title="View Ticket">
-                                        <i data-feather="eye" class="w-5 h-5"></i>
-                                    </a>
-                                    <a href="{{ route('tickets.edit', $ticket) }}" class="transition-colors hover:text-brand-500" title="Edit Ticket">
-                                        <i data-feather="edit-3" class="w-5 h-5"></i>
-                                    </a>
-                                    <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this ticket?')" class="inline-flex">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="transition-colors hover:text-error-500" title="Delete Ticket">
-                                            <i data-feather="trash-2" class="w-5 h-5"></i>
-                                        </button>
-                                    </form>
+                            <td class="px-5 py-4 sm:px-6 text-right">
+                                <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+                                    <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+                                        <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                    </button>
+
+                                    <div x-show="open"
+                                        x-transition:enter="transition ease-out duration-100"
+                                        x-transition:enter-start="transform opacity-0 scale-95"
+                                        x-transition:enter-end="transform opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-75"
+                                        x-transition:leave-start="transform opacity-100 scale-100"
+                                        x-transition:leave-end="transform opacity-0 scale-95"
+                                        class="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900"
+                                        style="display: none;">
+                                        
+                                        <a href="{{ route('tickets.show', $ticket) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                            <i data-feather="eye" class="w-4 h-4 text-gray-400"></i>
+                                            View Details
+                                        </a>
+
+                                        <a href="{{ route('tickets.edit', $ticket) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                            <i data-feather="edit-3" class="w-4 h-4 text-gray-400"></i>
+                                            Edit
+                                        </a>
+
+                                        <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                        <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this ticket?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
+                                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                Delete Ticket
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
