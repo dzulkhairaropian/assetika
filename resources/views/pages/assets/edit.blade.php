@@ -372,7 +372,7 @@
                                 name="warranty_expiry_date"
                                 label="Warranty Expiry Date"
                                 placeholder="Select warranty expiry date"
-                                defaultDate="{{ old('warranty_expiry_date', $asset->warranty_expiry_date?->format('Y-m-d')) }}"
+                                defaultDate="{{ old('warranty_expiry_date', $asset->warranty_expiry_date ? $asset->warranty_expiry_date->format('Y-m-d') : '') }}"
                             />
                             @error('warranty_expiry_date') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
@@ -426,6 +426,20 @@
         let sn = 'DUMMY-SN-';
         for (let i = 0; i < 8; i++) sn += chars.charAt(Math.floor(Math.random() * chars.length));
         document.querySelector('input[name="serial_number"]').value = sn;
+    }
+
+    const warrantyInput = document.querySelector('input[name="warranty_expiry_date"]');
+    const releaseDateInput = document.querySelector('input[name="release_date"]');
+
+    if (releaseDateInput && warrantyInput) {
+        releaseDateInput.addEventListener('change', (e) => {
+            const releaseDate = new Date(e.target.value);
+            if (!isNaN(releaseDate.getTime())) {
+                const warrantyDate = new Date(releaseDate);
+                warrantyDate.setFullYear(warrantyDate.getFullYear() + 1);
+                warrantyInput.value = warrantyDate.toISOString().split('T')[0];
+            }
+        });
     }
 </script>
 @endpush

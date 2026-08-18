@@ -218,10 +218,10 @@ class AssetController extends Controller
         $inventorySummary = [
             'total' => (clone $query)->count(),
             'ready' => (clone $query)->whereHas('status', function($q) {
-                $q->whereIn('name', ['Ready', 'Ready to Deploy', 'Available']);
+                $q->whereIn('name', ['Ready to Deploy']);
             })->count(),
             'deployed' => (clone $query)->whereHas('status', function($q) {
-                $q->whereIn('name', ['Deployed', 'In Use', 'Borrowed']);
+                $q->whereIn('name', ['Deployed', 'Borrowed']);
             })->count(),
             'in_service' => (clone $query)->whereHas('status', function($q) {
                 $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']);
@@ -236,12 +236,12 @@ class AssetController extends Controller
         switch ($request->input('tab')) {
             case 'ready':
                 $query->whereHas('status', function($q) {
-                    $q->whereIn('name', ['Ready', 'Ready to Deploy', 'Available']);
+                    $q->whereIn('name', ['Ready to Deploy']);
                 });
                 break;
             case 'deployed':
                 $query->whereHas('status', function($q) {
-                    $q->whereIn('name', ['Deployed', 'In Use', 'Borrowed']);
+                    $q->whereIn('name', ['Deployed', 'Borrowed']);
                 });
                 break;
             case 'service':

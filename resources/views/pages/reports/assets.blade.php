@@ -197,7 +197,7 @@
                                 @elseif($warrantyPast)
                                     <span class="inline-flex items-center gap-1 rounded-full bg-error-50 px-2 py-0.5 text-theme-xs font-medium text-error-700 dark:bg-error-500/15 dark:text-error-500">Expired</span>
                                 @elseif($warranty30d)
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-theme-xs font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">Expiring {{ $a->warranty_expiry_date->diffInDays() }}d</span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-theme-xs font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">Expiring {{ (int) $a->warranty_expiry_date->diffInDays() }}d</span>
                                 @else
                                     <span class="text-xs text-gray-500">{{ $a->warranty_expiry_date->format('d M Y') }}</span>
                                 @endif

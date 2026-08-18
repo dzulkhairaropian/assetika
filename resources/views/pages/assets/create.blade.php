@@ -407,5 +407,19 @@
         for (let i = 0; i < 8; i++) sn += chars.charAt(Math.floor(Math.random() * chars.length));
         document.querySelector('input[name="serial_number"]').value = sn;
     }
+
+    const warrantyInput = document.querySelector('input[name="warranty_expiry_date"]');
+    const releaseDateInput = document.querySelector('input[name="release_date"]');
+
+    if (releaseDateInput && warrantyInput) {
+        releaseDateInput.addEventListener('change', (e) => {
+            const releaseDate = new Date(e.target.value);
+            if (!isNaN(releaseDate.getTime())) {
+                const warrantyDate = new Date(releaseDate);
+                warrantyDate.setFullYear(warrantyDate.getFullYear() + 1);
+                warrantyInput.value = warrantyDate.toISOString().split('T')[0];
+            }
+        });
+    }
 </script>
 @endpush

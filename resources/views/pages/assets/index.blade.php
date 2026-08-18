@@ -421,11 +421,11 @@
                                         @if($asset->warranty_expiry_date)
                                             @if($asset->warranty_expiry_date->isPast())
                                                 <span class="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-error-50 px-2 py-0.5 text-[10px] font-medium text-error-700 dark:bg-error-500/10 dark:text-error-400">
-                                                    Warranty Expired
+                                                    Warranty Expired ({{ (int) $asset->warranty_expiry_date->diffInDays() * -1 }}d ago)
                                                 </span>
                                             @elseif($asset->warranty_expiry_date->diffInDays() <= 30)
                                                 <span class="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                                                    Warranty Expiring ({{ $asset->warranty_expiry_date->diffInDays() }}d)
+                                                    Warranty Expiring ({{ (int) $asset->warranty_expiry_date->diffInDays() }}d)
                                                 </span>
                                             @endif
                                         @endif
