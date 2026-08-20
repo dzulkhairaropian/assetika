@@ -95,49 +95,82 @@ class DashboardController extends Controller
             $q->where('name', 'IT Asset');
         })->get();
         
-        $chartData = [
-            'labels' => $statuses->pluck('name'),
-            'data' => $statuses->map(function($status) {
-                return Asset::where('status_id', $status->id)->count();
-            }),
-            'colors' => $statuses->map(function($status) {
-                return match($status->name) {
-                    'Ready to Deploy' => '#10B981',
-                    'Deployed' => '#3B82F6',
-                    'Borrowed' => '#8B5CF6',
-                    'Service' => '#F59E0B',
-                    'Draft' => '#06B6D4',
-                    'Broken' => '#EF4444',
-                    'Retired' => '#6B7280',
-                    'In Stock', 'Fulfilled', 'Available', 'Completed' => '#10B981',
-                    'Assigned', 'In Progress', 'Reserved' => '#3B82F6',
-                    'Low Stock', 'Pending', 'Maintenance' => '#F59E0B',
-                    'Out of Stock', 'Declined', 'Lost', 'Rejected' => '#EF4444',
-                    default => '#98A2B3'
-                };
-            })
-        ];
-
-        // Chart Data 2: Department with most assets
-        $departments = Department::withCount('assets')
-            ->orderBy('assets_count', 'desc')
-            ->limit(5)
-            ->get();
-            
-        $deptChartData = [
-            'labels' => $departments->pluck('name'),
-            'data' => $departments->pluck('assets_count'),
-        ];
-
-        // Chart Data 3: Product most used with Category Selection
+        // Categories separated by Master Category
         $itAssetMaster = \App\Models\MasterCategory::where('name', 'like', 'IT Asset%')->first();
         $categories = collect();
         if ($itAssetMaster) {
-            $categories = Category::where('master_category_id', $itAssetMaster->id)->get();
+            $categories = Category::where('master_category_id', $itAssetMaster->id)->orderBy('name')->get();
         }
         if ($categories->isEmpty()) {
-            $categories = Category::all();
+            $categories = Category::orderBy('name')->get();
         }
+
+        $consumableMaster = \App\Models\MasterCategory::where('name', 'like', '%Consumable%')->first();
+        $consumableCategories = collect();
+        if ($consumableMaster) {
+            $consumableCategories = Category::where('master_category_id', $consumableMaster->id)->orderBy('name')->get();
+        }
+        if ($consumableCategories->isEmpty()) {
+            $consumableCategories = $categories;
+        }
+
+        // Chart Data 1: Status Distribution with Category filter
+        $chartDataByCategory = [];
+        $chartDataByCategory['all'] = [
+            'labels' => $statuses->pluck('name')->toArray(),
+            'data' => $statuses->map(fn($status) => Asset::where('status_id', $status->id)->count())->toArray(),
+            'colors' => $statuses->map(function($status) {
+                return match($status->name) {
+                    'Ready to Deploy' => '#12b76a',
+                    'Deployed' => '#465fff',
+                    'Borrowed' => '#8b5cf6',
+                    'Service' => '#f79009',
+                    'Draft' => '#06b6d4',
+                    'Broken' => '#f04438',
+                    'Retired' => '#64748b',
+                    default => '#98a2b3'
+                };
+            })->toArray()
+        ];
+
+        foreach ($categories as $cat) {
+            $chartDataByCategory[$cat->id] = [
+                'labels' => $statuses->pluck('name')->toArray(),
+                'data' => $statuses->map(fn($status) => Asset::where('status_id', $status->id)->whereHas('product', fn($q) => $q->where('category_id', $cat->id))->count())->toArray(),
+                'colors' => $chartDataByCategory['all']['colors']
+            ];
+        }
+
+        $chartData = $chartDataByCategory['all'];
+
+        // Chart Data 2: Department with most assets by Category
+        $deptDataByCategory = [];
+
+        $deptOverall = Department::withCount('assets')
+            ->orderBy('assets_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        $deptDataByCategory['all'] = [
+            'labels' => $deptOverall->pluck('name')->toArray(),
+            'data' => $deptOverall->pluck('assets_count')->toArray(),
+        ];
+
+        foreach ($categories as $cat) {
+            $deptCat = Department::withCount(['assets' => function($q) use ($cat) {
+                $q->whereHas('product', fn($pr) => $pr->where('category_id', $cat->id));
+            }])
+            ->orderBy('assets_count', 'desc')
+            ->limit(5)
+            ->get();
+
+            $deptDataByCategory[$cat->id] = [
+                'labels' => $deptCat->pluck('name')->toArray(),
+                'data' => $deptCat->pluck('assets_count')->toArray(),
+            ];
+        }
+
+        $deptChartData = $deptDataByCategory['all'];
 
         $productDataByCategory = [];
 
@@ -166,9 +199,11 @@ class DashboardController extends Controller
             ];
         }
 
-        // Chart Data 4: Monthly Purchases by Release Date
-        $purchaseYears = Asset::whereNotNull('release_date')
-            ->selectRaw('YEAR(release_date) as year')
+        // Chart Data 4: Monthly Purchases by Release Date / Purchase Date
+        $purchaseYears = Asset::where(function($q) {
+                $q->whereNotNull('release_date')->orWhereNotNull('purchase_date');
+            })
+            ->selectRaw('YEAR(COALESCE(release_date, purchase_date)) as year')
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
@@ -180,17 +215,29 @@ class DashboardController extends Controller
             $purchaseYear = $purchaseYears->first() ?? (string) now()->year;
         }
 
-        $purchaseTimelineQuery = Asset::whereNotNull('release_date')
-            ->whereYear('release_date', $purchaseYear);
+        $purchaseCategoryId = request('purchase_category_id');
 
-        $monthlyPurchasesRaw = $purchaseTimelineQuery
+        $baseTimelineQuery = Asset::where(function($q) {
+                $q->whereNotNull('release_date')->orWhereNotNull('purchase_date');
+            })
+            ->whereRaw('YEAR(COALESCE(release_date, purchase_date)) = ?', [$purchaseYear]);
+
+        if ($purchaseCategoryId && $purchaseCategoryId !== 'all') {
+            $baseTimelineQuery->whereHas('product', function($q) use ($purchaseCategoryId) {
+                $q->where('category_id', $purchaseCategoryId);
+            });
+        }
+
+        $monthlyPurchasesRaw = $baseTimelineQuery
             ->get()
             ->groupBy(function($asset) {
-                return $asset->release_date->format('Y-m');
+                $date = $asset->release_date ?? $asset->purchase_date;
+                return $date->format('Y-m');
             })
             ->map(function($group) {
+                $date = $group->first()->release_date ?? $group->first()->purchase_date;
                 return [
-                    'label' => $group->first()->release_date->format('M Y'),
+                    'label' => $date->format('M Y'),
                     'count' => $group->count()
                 ];
             })
@@ -202,10 +249,44 @@ class DashboardController extends Controller
             'data' => $monthlyPurchasesRaw->pluck('count'),
         ];
 
+        // Also pre-build category data per purchase year for instant client-side category switching
+        $purchaseDataByCategory = [];
+        $allYearAssets = Asset::with('product')
+            ->where(function($q) {
+                $q->whereNotNull('release_date')->orWhereNotNull('purchase_date');
+            })
+            ->whereRaw('YEAR(COALESCE(release_date, purchase_date)) = ?', [$purchaseYear])
+            ->get();
+
+        $monthlyAll = $allYearAssets
+            ->groupBy(fn($a) => ($a->release_date ?? $a->purchase_date)->format('Y-m'))
+            ->map(fn($g) => ['label' => ($g->first()->release_date ?? $g->first()->purchase_date)->format('M Y'), 'count' => $g->count()])
+            ->sortKeys()->values();
+
+        $purchaseDataByCategory['all'] = [
+            'labels' => $monthlyAll->pluck('label')->toArray(),
+            'data' => $monthlyAll->pluck('count')->toArray(),
+        ];
+
+        foreach ($categories as $cat) {
+            $catAssets = $allYearAssets->filter(fn($a) => $a->product?->category_id == $cat->id);
+            $monthlyCat = $catAssets
+                ->groupBy(fn($a) => ($a->release_date ?? $a->purchase_date)->format('Y-m'))
+                ->map(fn($g) => ['label' => ($g->first()->release_date ?? $g->first()->purchase_date)->format('M Y'), 'count' => $g->count()])
+                ->sortKeys()->values();
+
+            $purchaseDataByCategory[$cat->id] = [
+                'labels' => $monthlyCat->pluck('label')->toArray(),
+                'data' => $monthlyCat->pluck('count')->toArray(),
+            ];
+        }
+
         $purchaseChartYears = $purchaseYears->toArray();
         $purchaseChartYear = $purchaseYear;
 
-        // Chart Data 5: Consumables most requested (Top 5)
+        // Chart Data 5: Consumables most requested (Top 5) with Consumable Category filter
+        $consumableDataByCategory = [];
+
         $requestedConsumables = \App\Models\ConsumableRequestItem::with(['consumable.product'])
             ->select('consumable_id', \DB::raw('sum(quantity_requested) as total_requested'))
             ->groupBy('consumable_id')
@@ -224,14 +305,87 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        $consumableChartData = [
-            'labels' => $requestedConsumables->map(function($item) {
-                return $item->consumable->product->name ?? 'Unknown Consumable';
-            })->toArray(),
-            'data' => $requestedConsumables->pluck('total_requested')->map(function($val) {
-                return (int) $val;
-            })->toArray(),
+        $consumableDataByCategory['all'] = [
+            'labels' => $requestedConsumables->map(fn($item) => $item->consumable->product->name ?? 'Unknown Consumable')->toArray(),
+            'data' => $requestedConsumables->pluck('total_requested')->map(fn($val) => (int) $val)->toArray(),
         ];
+
+        foreach ($consumableCategories as $cat) {
+            $catConsumables = \App\Models\ConsumableRequestItem::with(['consumable.product'])
+                ->whereHas('consumable.product', fn($q) => $q->where('category_id', $cat->id))
+                ->select('consumable_id', \DB::raw('sum(quantity_requested) as total_requested'))
+                ->groupBy('consumable_id')
+                ->orderBy('total_requested', 'desc')
+                ->limit(5)
+                ->get();
+
+            if ($catConsumables->isEmpty() || $catConsumables->sum('total_requested') == 0) {
+                $catConsumables = \App\Models\ConsumableTransaction::with(['consumable.product'])
+                    ->where('type', 'checkout')
+                    ->whereHas('consumable.product', fn($q) => $q->where('category_id', $cat->id))
+                    ->select('consumable_id', \DB::raw('sum(quantity) as total_requested'))
+                    ->groupBy('consumable_id')
+                    ->orderBy('total_requested', 'desc')
+                    ->limit(5)
+                    ->get();
+            }
+
+            $consumableDataByCategory[$cat->id] = [
+                'labels' => $catConsumables->map(fn($item) => $item->consumable->product->name ?? 'Unknown Consumable')->toArray(),
+                'data' => $catConsumables->pluck('total_requested')->map(fn($val) => (int) $val)->toArray(),
+            ];
+        }
+
+        $consumableChartData = $consumableDataByCategory['all'];
+
+        // Chart Data 6: Consumable Distribution Timeline (Line Chart)
+        $consumableTxYears = \App\Models\ConsumableTransaction::whereNotNull('transaction_date')
+            ->selectRaw('YEAR(transaction_date) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year')
+            ->map(fn ($y) => (string) $y)
+            ->values();
+
+        $consumableTxYear = request('consumable_year');
+        if (! $consumableTxYear || ! $consumableTxYears->contains($consumableTxYear)) {
+            $consumableTxYear = $consumableTxYears->first() ?? (string) now()->year;
+        }
+
+        $allYearConsumableTx = \App\Models\ConsumableTransaction::with(['consumable.product'])
+            ->where('type', 'checkout')
+            ->whereNotNull('transaction_date')
+            ->whereRaw('YEAR(transaction_date) = ?', [$consumableTxYear])
+            ->get();
+
+        $consumableTimelineByCategory = [];
+
+        $monthlyConsumableAll = $allYearConsumableTx
+            ->groupBy(fn($t) => $t->transaction_date ? $t->transaction_date->format('Y-m') : now()->format('Y-m'))
+            ->map(fn($g) => ['label' => ($g->first()->transaction_date ?? now())->format('M Y'), 'count' => (int) $g->sum('quantity')])
+            ->sortKeys()->values();
+
+        $consumableTimelineByCategory['all'] = [
+            'labels' => $monthlyConsumableAll->pluck('label')->toArray(),
+            'data' => $monthlyConsumableAll->pluck('count')->toArray(),
+        ];
+
+        foreach ($consumableCategories as $cat) {
+            $catTx = $allYearConsumableTx->filter(fn($t) => $t->consumable?->product?->category_id == $cat->id);
+            $monthlyCatTx = $catTx
+                ->groupBy(fn($t) => ($t->transaction_date ?? now())->format('Y-m'))
+                ->map(fn($g) => ['label' => ($g->first()->transaction_date ?? now())->format('M Y'), 'count' => (int) $g->sum('quantity')])
+                ->sortKeys()->values();
+
+            $consumableTimelineByCategory[$cat->id] = [
+                'labels' => $monthlyCatTx->pluck('label')->toArray(),
+                'data' => $monthlyCatTx->pluck('count')->toArray(),
+            ];
+        }
+
+        $consumableTimelineChartData = $consumableTimelineByCategory['all'];
+        $consumableTimelineYears = $consumableTxYears->toArray();
+        $consumableTimelineYear = $consumableTxYear;
 
         $userName = Auth::user() ? Auth::user()->name : 'Guest';
         $greetings = [
@@ -329,13 +483,22 @@ class DashboardController extends Controller
             'recentCheckouts',
             'recentConsumableCheckouts',
             'chartData',
+            'chartDataByCategory',
             'deptChartData',
+            'deptDataByCategory',
             'categories',
+            'consumableCategories',
             'productDataByCategory',
             'purchaseChartData',
+            'purchaseDataByCategory',
             'purchaseChartYears',
             'purchaseChartYear',
             'consumableChartData',
+            'consumableDataByCategory',
+            'consumableTimelineChartData',
+            'consumableTimelineByCategory',
+            'consumableTimelineYears',
+            'consumableTimelineYear',
             'assetsOlderThan4Years',
             'userName',
             'randomGreeting',

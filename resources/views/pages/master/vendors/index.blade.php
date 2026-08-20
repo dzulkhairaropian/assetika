@@ -39,6 +39,26 @@
             </template>
         </form>
 
+        <!-- Bulk Action Bar -->
+        <div x-show="selectedItems.length > 0"
+            x-transition
+            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
+            style="display: none;">
+            <div class="flex items-center gap-2">
+                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
+                    <span x-text="selectedItems.length"></span> items selected.
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    Delete Selected
+                </button>
+            </div>
+        </div>
+
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             {{-- Card Header: Toolbar --}}
             <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
@@ -62,26 +82,6 @@
                             Add Vendor
                         </a>
                     </div>
-                </div>
-            </div>
-
-            {{-- Bulk Action Bar (dekat tabel) --}}
-            <div x-show="selectedItems.length > 0"
-                x-transition
-                class="flex flex-wrap items-center justify-between gap-4 border-b border-brand-100 bg-brand-50/50 px-4 py-3 dark:border-brand-900/30 dark:bg-brand-500/10"
-                style="display: none;">
-                <div class="flex items-center gap-2">
-                    <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
-                    <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
-                        <span x-text="selectedItems.length"></span> items selected.
-                    </span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
-                        <i data-feather="trash-2" class="w-4 h-4"></i>
-                        Delete Selected
-                    </button>
                 </div>
             </div>
 

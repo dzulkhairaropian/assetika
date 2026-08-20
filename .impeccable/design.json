@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-21T00:00:00.000Z",
+  "title": "Design System: Assetika",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Electric Indigo",
+        "canonical": "#465fff",
+        "tonalRamp": ["#161950", "#262e89", "#252dae", "#2a31d8", "#3641f5", "#465fff", "#7592ff", "#dde9ff"]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Page Canvas",
+        "canonical": "#f9fafb",
+        "tonalRamp": ["#0c111d", "#101828", "#1d2939", "#344054", "#98a2b3", "#d0d5dd", "#f2f4f7", "#f9fafb"]
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-ring",
+        "value": "0px 0px 0px 4px rgba(70, 95, 255, 0.12)",
+        "purpose": "Focus indicator for form inputs and action buttons"
+      }
+    ],
+    "motion": [],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Standard action button for primary submit and creation tasks.",
+      "html": "<button class=\"ds-btn-primary\">Save Asset</button>",
+      "css": ".ds-btn-primary { background-color: #465fff; color: #ffffff; padding: 10px 20px; border-radius: 8px; font-family: Outfit, sans-serif; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s ease; } .ds-btn-primary:hover { background-color: #3641f5; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Precision Asset Console",
+    "overview": "Assetika operates on a high-density, clean TailAdmin dashboard pattern optimized for IT and General Affairs operations. The UI prioritizes visual hierarchy, explicit status signals, and rapid data scanning over decorative embellishments.",
+    "keyCharacteristics": [
+      "High scanability with clear tabular layouts and status badges.",
+      "Cohesive brand accent #465fff guiding interactive and active states.",
+      "Clean typography utilizing Outfit for display and data density.",
+      "Native dark mode adaptation across all cards, sidebars, and data tables."
+    ],
+    "rules": [
+      {
+        "name": "The Single Accent Rule",
+        "body": "Electric Indigo (#465fff) is strictly reserved for primary user actions and selected navigation items. Status badges use semantic colors exclusively.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do use uppercase 12px Outfit Medium for table headers and badge text.",
+      "Do maintain high visual contrast in status badges with semi-transparent background tints.",
+      "Do apply --shadow-focus-ring on custom interactive element focus states."
+    ],
+    "donts": [
+      "Don't use multi-color gradients for action buttons; keep primary actions solid #465fff.",
+      "Don't mix non-Outfit fonts unless displaying raw code snippets.",
+      "Don't omit dark mode variants on custom components."
+    ]
+  }
+}

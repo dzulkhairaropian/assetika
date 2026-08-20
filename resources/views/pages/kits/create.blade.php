@@ -43,7 +43,7 @@
                             <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-400 mb-2">{{ $section['label'] }}</h3>
                             <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto">
                                 <table class="w-full">
-                                    <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0">
+                                    <thead class="border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900">
                                         <tr><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 w-12">Add</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Name</th><th class="px-4 py-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th></tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">

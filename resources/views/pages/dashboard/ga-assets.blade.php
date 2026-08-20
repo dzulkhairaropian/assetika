@@ -167,134 +167,130 @@
 
 @push('scripts')
 @if($totalAssets > 0)
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Chart 1: GA Asset Status Distribution (Donut)
+        const mountCanvas = (selector) => {
+            const container = document.querySelector(selector);
+            if (!container) return null;
+            container.innerHTML = '<canvas></canvas>';
+            return container.querySelector('canvas');
+        };
+
+        // Chart 1: GA Asset Status Distribution (Doughnut)
         @if(count($statusChart['data']) > 0)
-        const statusOptions = {
-            series: @json($statusChart['data']),
-            chart: {
-                fontFamily: "Outfit, sans-serif",
-                type: 'donut',
-                height: 320,
-            },
-            labels: @json($statusChart['labels']),
-            colors: @json($statusChart['colors']),
-            legend: {
-                position: 'bottom',
-                fontFamily: "Outfit",
-            },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '65%',
-                        labels: {
-                            show: true,
-                            name: { show: true },
-                            value: {
-                                show: true,
-                                fontSize: '20px',
-                                fontWeight: 'bold'
-                            },
-                            total: {
-                                show: true,
-                                label: 'Total Assets',
-                                formatter: function (w) {
-                                    return {{ $totalAssets }}
-                                }
-                            }
-                        }
+        const statusCanvas = mountCanvas("#gaStatusChart");
+        if (statusCanvas) {
+            new Chart(statusCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: @json($statusChart['labels']),
+                    datasets: [{
+                        data: @json($statusChart['data']),
+                        backgroundColor: @json($statusChart['colors']),
+                        borderWidth: 2,
+                        borderColor: 'transparent'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    onHover: (event, activeElements, chart) => {
+                        chart.draw();
+                    },
+                    plugins: {
+                        centerText: {
+                            label: 'Total Assets',
+                            value: {{ $totalAssets }}
+                        },
+                        legend: { position: 'bottom', labels: { padding: 14, usePointStyle: true, font: { family: 'Outfit, sans-serif' } } }
                     }
                 }
-            },
-            dataLabels: { enabled: false }
-        };
-        const statusChart = new ApexCharts(document.querySelector("#gaStatusChart"), statusOptions);
-        statusChart.render();
+            });
+        }
         @endif
 
         // Chart 2: Assets by Category (Bar)
         @if(count($categoryChart['data']) > 0)
-        const categoryOptions = {
-            series: [{
-                name: 'Total Qty',
-                data: @json($categoryChart['data'])
-            }],
-            chart: {
+        const catCanvas = mountCanvas("#gaCategoryChart");
+        if (catCanvas) {
+            new Chart(catCanvas, {
                 type: 'bar',
-                height: 320,
-                fontFamily: "Outfit, sans-serif",
-                toolbar: { show: false }
-            },
-            colors: ['#465FFF'],
-            plotOptions: {
-                bar: {
-                    borderRadius: 6,
-                    horizontal: false,
-                    columnWidth: '40%',
+                data: {
+                    labels: @json($categoryChart['labels']),
+                    datasets: [{
+                        label: 'Total Qty',
+                        data: @json($categoryChart['data']),
+                        backgroundColor: '#465fff',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { border: { dash: [4, 4] }, grid: { color: 'rgba(226, 232, 240, 0.6)' }, ticks: { precision: 0 } }
+                    }
                 }
-            },
-            dataLabels: { enabled: false },
-            xaxis: {
-                categories: @json($categoryChart['labels']),
-                labels: { style: { fontFamily: 'Outfit' } }
-            },
-            yaxis: {
-                labels: { style: { fontFamily: 'Outfit' } }
-            }
-        };
-        const categoryChart = new ApexCharts(document.querySelector("#gaCategoryChart"), categoryOptions);
-        categoryChart.render();
+            });
+        }
         @endif
 
-        // Chart 3: Spend Timeline (Line/Area)
+        // Chart 3: Spend Timeline (Crisp Sharp Line)
         @if(count($purchaseChart['data']) > 0)
-        const purchaseOptions = {
-            series: [{
-                name: 'Investment Value',
-                data: @json($purchaseChart['data'])
-            }],
-            chart: {
-                type: 'area',
-                height: 320,
-                fontFamily: "Outfit, sans-serif",
-                toolbar: { show: false }
-            },
-            colors: ['#12B76A'],
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.45,
-                    opacityTo: 0.05,
-                    stops: [0, 100]
-                }
-            },
-            dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 2 },
-            xaxis: {
-                categories: @json($purchaseChart['labels']),
-                labels: { style: { fontFamily: 'Outfit' } }
-            },
-            yaxis: {
-                labels: {
-                    style: { fontFamily: 'Outfit' },
-                    formatter: function (value) {
-                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+        const purchaseCanvas = mountCanvas("#gaSpendTimelineChart");
+        if (purchaseCanvas) {
+            new Chart(purchaseCanvas, {
+                type: 'line',
+                data: {
+                    labels: @json($purchaseChart['labels']),
+                    datasets: [{
+                        label: 'Investment Value',
+                        data: @json($purchaseChart['data']),
+                        fill: false,
+                        borderColor: '#12b76a',
+                        borderWidth: 2,
+                        tension: 0,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#12b76a',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#12b76a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { family: 'Outfit, sans-serif' },
+                            bodyFont: { family: 'Outfit, sans-serif' },
+                            padding: 10,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: (context) => ' Rp ' + Number(context.raw).toLocaleString('id-ID')
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, border: { display: true, color: '#e2e8f0' } },
+                        y: {
+                            border: { dash: [4, 4], display: false },
+                            grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                            ticks: {
+                                callback: (val) => 'Rp ' + (val / 1000000).toFixed(0) + 'M'
+                            }
+                        }
                     }
                 }
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return 'Rp ' + val.toLocaleString('id-ID');
-                    }
-                }
-            }
-        };
-        const purchaseChart = new ApexCharts(document.querySelector("#gaSpendTimelineChart"), purchaseOptions);
-        purchaseChart.render();
+            });
+        }
         @endif
     });
 </script>

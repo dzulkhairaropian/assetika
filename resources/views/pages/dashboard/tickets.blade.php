@@ -309,7 +309,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+{{-- ApexCharts bundled via Vite in app.js --}}
 <script>
     window.ticketChartData = {
         trendChart: @json($trendChart),

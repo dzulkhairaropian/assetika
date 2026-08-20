@@ -51,15 +51,21 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Purchase Date</label>
-                            <input type="date" name="purchase_date" value="{{ old('purchase_date') }}"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800" />
+<div>
+                            <x-form.date-picker
+                                name="purchase_date"
+                                label="Purchase Date"
+                                placeholder="Select purchase date"
+                                :defaultDate="old('purchase_date')"
+                            />
                         </div>
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Expiration Date</label>
-                            <input type="date" name="expiration_date" value="{{ old('expiration_date') }}"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800" />
+                            <x-form.date-picker
+                                name="expiration_date"
+                                label="Expiration Date"
+                                placeholder="Select expiration date"
+                                :defaultDate="old('expiration_date')"
+                            />
                         </div>
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Purchase Cost (Rp)</label>
@@ -106,8 +112,11 @@
                     Actions
                 </h3>
                 <div class="space-y-3">
-                    <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+<button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
                         Create License
+                    </button>
+                    <button type="submit" name="create_another" value="1" class="inline-flex w-full justify-center rounded-lg border border-brand-500 bg-white px-4 py-2.5 text-sm font-medium text-brand-500 transition hover:bg-brand-50">
+                        Create & Create Another
                     </button>
                     <a href="{{ route('licenses.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                         Cancel

@@ -42,13 +42,13 @@
         </a>
 
         <a href="{{ route('reports.depreciation') }}"
-           class="group rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-theme-xs transition-all hover:border-purple-300 hover:shadow-theme-md dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-purple-500/50">
+           class="group rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-theme-xs transition-all hover:border-brand-300 hover:shadow-theme-md dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/50">
             <div class="flex items-center gap-3.5 mb-3">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400 group-hover:scale-105 transition-transform">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10 dark:text-brand-400 group-hover:scale-105 transition-transform">
                     <i data-feather="trending-down" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 group-hover:text-purple-600 transition-colors">Depreciation</h3>
+                    <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 group-hover:text-brand-500 transition-colors">Depreciation</h3>
                     <span class="text-xs text-gray-400">Financial Book Value</span>
                 </div>
             </div>

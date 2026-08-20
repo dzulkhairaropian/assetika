@@ -1,9 +1,23 @@
-<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-    <div class="px-5 pt-5 sm:px-6 mb-1">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">{{ $title }}</h3>
-        @isset($description)
-            <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ $description }}</p>
-        @endisset
+@props(['title', 'description' => null, 'headers' => [], 'footerLink' => null, 'footerText' => 'View All', 'searchable' => true])
+
+<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+     x-data="{ search: '' }">
+    <div class="px-5 pt-5 sm:px-6 mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">{{ $title }}</h3>
+            @isset($description)
+                <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ $description }}</p>
+            @endisset
+        </div>
+        @if($searchable)
+            <div class="relative shrink-0">
+                <input type="text"
+                       x-model="search"
+                       placeholder="Filter..."
+                       class="w-full sm:w-44 rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-1.5 pl-8 text-xs text-gray-700 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-300 dark:placeholder-gray-500 dark:focus:border-brand-500 transition">
+                <i data-feather="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+        @endif
     </div>
     <div class="max-w-full overflow-x-auto max-h-80 overflow-y-auto">
         <table class="min-w-full">

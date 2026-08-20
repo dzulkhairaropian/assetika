@@ -12,14 +12,6 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Feather Icons -->
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            feather.replace();
-        });
-    </script>
-
     <!-- Theme Store -->
     <script>
         document.addEventListener('alpine:init', () => {
