@@ -201,15 +201,31 @@
 
             <!-- Assetika ITAM Integration -->
             @if($ticket->asset)
+                @php
+                    $assetHolder = $ticket->asset->currentCheckout?->checkedOutToUser?->name ?? $ticket->asset->assignedToUser?->name;
+                    $assetDept = $ticket->asset->department?->name;
+                @endphp
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-3 text-xs">
                     <div class="flex items-center justify-between">
                         <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Linked IT Asset</h3>
                         <a href="{{ route('assets.show', $ticket->asset_id) }}" class="text-brand-500 font-medium hover:underline">View Asset</a>
                     </div>
                     <div class="p-3 bg-brand-50/50 rounded-xl dark:bg-brand-900/10 space-y-1.5">
-                        <p class="font-bold text-brand-700 dark:text-brand-300 font-mono">{{ $ticket->asset->asset_tag }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-brand-700 dark:text-brand-300 font-mono">{{ $ticket->asset->asset_tag }}</span>
+                            @if($ticket->asset->status)
+                                <x-ui.badge :color="$ticket->asset->status->color" variant="light" size="sm">
+                                    {{ $ticket->asset->status->name }}
+                                </x-ui.badge>
+                            @endif
+                        </div>
                         <p class="text-gray-700 dark:text-gray-300 font-medium">{{ $ticket->asset->device_name ?? $ticket->asset->name }}</p>
                         <p class="text-gray-500">S/N: {{ $ticket->asset->serial_number ?? '-' }}</p>
+                        @if($assetHolder)
+                            <p class="text-gray-700 dark:text-gray-300 pt-1.5 border-t border-brand-100 dark:border-brand-900/30">
+                                <span class="text-gray-400">User / Holder:</span> <span class="font-semibold text-gray-800 dark:text-white">{{ $assetHolder }}</span> {{ $assetDept ? '('.$assetDept.')' : '' }}
+                            </p>
+                        @endif
                     </div>
                 </div>
             @endif

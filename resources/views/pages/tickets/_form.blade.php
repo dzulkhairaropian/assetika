@@ -16,6 +16,17 @@
             </h3>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <!-- Ticket Creation Date (Backdate) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Ticket Date & Time <span class="text-xs text-gray-400 font-normal">(Backdate supported)</span>
+                    </label>
+                    <input type="datetime-local" name="created_at"
+                        value="{{ old('created_at', isset($ticket) ? ($ticket->created_at ? $ticket->created_at->format('Y-m-d\TH:i') : '') : date('Y-m-d\TH:i')) }}"
+                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
+                    @error('created_at') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                </div>
+
                 <!-- Ticket Type -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ticket Type</label>
@@ -132,7 +143,16 @@
                     <select name="asset_id" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                         <option value="">No Asset Linked</option>
                         @foreach($assets as $asset)
-                            <option value="{{ $asset->id }}" {{ old('asset_id', $ticket?->asset_id) == $asset->id ? 'selected' : '' }}>[{{ $asset->asset_tag }}] {{ $asset->device_name ?? $asset->name }}</option>
+                            @php
+                                $holder = $asset->currentCheckout?->checkedOutToUser?->name ?? $asset->assignedToUser?->name;
+                                $dept = $asset->department?->name;
+                                $statusName = $asset->status?->name;
+                                $brandModel = optional($asset->product->brand)->name . ' ' . optional($asset->product)->model;
+                                $deviceName = $asset->device_name ?: trim($brandModel);
+                            @endphp
+                            <option value="{{ $asset->id }}" {{ old('asset_id', $ticket?->asset_id) == $asset->id ? 'selected' : '' }}>
+                                [{{ $asset->asset_tag }}] {{ $deviceName }} — {{ $holder ? 'User: ' . $holder : 'Unassigned' }} {{ $dept ? '('.$dept.')' : '' }} {{ $statusName ? '[' . $statusName . ']' : '' }}
+                            </option>
                         @endforeach
                     </select>
                 </div>

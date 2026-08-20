@@ -88,7 +88,13 @@ class TicketController extends Controller
         $sources = Source::all();
         $ticketStatuses = TicketStatus::all();
         $slaStatuses = SlaStatus::all();
-        $assets = Asset::with('assignedToUser')->get();
+        $assets = Asset::with([
+            'product.brand',
+            'assignedToUser',
+            'currentCheckout.checkedOutToUser',
+            'department',
+            'status'
+        ])->latest('id')->get();
 
         return view('pages.tickets.create', compact(
             'users',
@@ -106,6 +112,7 @@ class TicketController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'created_at' => ['nullable', 'date'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
             'requester_user_id' => ['required', 'exists:users,id'],
             'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
@@ -124,19 +131,20 @@ class TicketController extends Controller
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
 
-        $now = now();
+        $ticketDate = !empty($data['created_at']) ? \Illuminate\Support\Carbon::parse($data['created_at']) : now();
         $ticketType = !empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
         $requestCode = strtoupper($ticketType?->code ?: 'REQ');
         $dailySequence = str_pad(
-            (string) (Ticket::whereDate('created_at', $now->toDateString())->count() + 1),
+            (string) (Ticket::whereDate('created_at', $ticketDate->toDateString())->count() + 1),
             3,
             '0',
             STR_PAD_LEFT
         );
 
-        $data['request_id'] = $requestCode . '-' . $now->format('ymd') . '-' . $dailySequence;
-        $data['request_date'] = $now->toDateString();
-        $data['request_time'] = $now;
+        $data['request_id'] = $requestCode . '-' . $ticketDate->format('ymd') . '-' . $dailySequence;
+        $data['request_date'] = $ticketDate->toDateString();
+        $data['request_time'] = $ticketDate;
+        $data['created_at'] = $ticketDate;
 
         $requester = User::find($data['requester_user_id']);
         if ($requester) {
@@ -187,7 +195,8 @@ class TicketController extends Controller
         $ticket->load([
             'ticketType', 'requesterUser', 'requesterCompany', 'requesterDepartment',
             'ticketCategory', 'ticketSubcategory', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
-            'status', 'slaStatus', 'asset', 'attachments', 'comments.user', 'comments.attachments', 'histories.user'
+            'status', 'slaStatus', 'asset.product.brand', 'asset.assignedToUser', 'asset.currentCheckout.checkedOutToUser', 'asset.department', 'asset.status',
+            'attachments', 'comments.user', 'comments.attachments', 'histories.user'
         ]);
 
         return view('pages.tickets.show', compact('ticket'));
@@ -203,7 +212,13 @@ class TicketController extends Controller
         $sources = Source::all();
         $ticketStatuses = TicketStatus::all();
         $slaStatuses = SlaStatus::all();
-        $assets = Asset::with('assignedToUser')->get();
+        $assets = Asset::with([
+            'product.brand',
+            'assignedToUser',
+            'currentCheckout.checkedOutToUser',
+            'department',
+            'status'
+        ])->latest('id')->get();
 
         return view('pages.tickets.edit', compact(
             'ticket',
@@ -222,6 +237,7 @@ class TicketController extends Controller
     public function update(Request $request, Ticket $ticket): RedirectResponse
     {
         $data = $request->validate([
+            'created_at' => ['nullable', 'date'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
             'requester_user_id' => ['required', 'exists:users,id'],
             'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
@@ -241,6 +257,13 @@ class TicketController extends Controller
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
+
+        if (!empty($data['created_at'])) {
+            $ticketDate = \Illuminate\Support\Carbon::parse($data['created_at']);
+            $data['request_date'] = $ticketDate->toDateString();
+            $data['request_time'] = $ticketDate;
+            $data['created_at'] = $ticketDate;
+        }
 
         $requester = User::find($data['requester_user_id']);
         if ($requester) {
