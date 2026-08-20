@@ -17,7 +17,7 @@
                 </div>
                 <div>
                     <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 group-hover:text-brand-500 transition-colors">Activity Audit</h3>
-                    <span class="text-xs text-gray-400">Checkout / Check-in Logs</span>
+                    <span class="text-xs text-gray-400">Checkout & Check-in Logs</span>
                 </div>
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">

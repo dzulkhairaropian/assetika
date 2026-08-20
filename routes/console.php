@@ -16,7 +16,7 @@ if (file_exists($settingsPath)) {
     
     // Database Backup Schedule
     if (!empty($settings['db_backup_enabled'])) {
-        $dbEvent = Schedule::command('backup:run --only-db --disable-notifications');
+        $dbEvent = Schedule::command('backup:run', ['--only-db' => true, '--disable-notifications' => true]);
         $frequency = $settings['db_backup_frequency'] ?? 'daily';
         $time = $settings['db_backup_time'] ?? '02:00';
         
@@ -25,7 +25,7 @@ if (file_exists($settingsPath)) {
                 $dbEvent->dailyAt($time);
                 break;
             case 'weekly':
-                $dbEvent->weekly()->at($time);
+                $dbEvent->weeklyOn(1, $time);
                 break;
             case 'monthly':
                 $dbEvent->monthlyOn(1, $time);
@@ -35,7 +35,7 @@ if (file_exists($settingsPath)) {
 
     // Full Backup (Files + DB) Schedule
     if (!empty($settings['full_backup_enabled'])) {
-        $fullEvent = Schedule::command('backup:run --disable-notifications');
+        $fullEvent = Schedule::command('backup:run', ['--disable-notifications' => true]);
         $frequency = $settings['full_backup_frequency'] ?? 'weekly';
         $time = $settings['full_backup_time'] ?? '03:00';
         
@@ -44,7 +44,7 @@ if (file_exists($settingsPath)) {
                 $fullEvent->dailyAt($time);
                 break;
             case 'weekly':
-                $fullEvent->weekly()->at($time);
+                $fullEvent->weeklyOn(1, $time);
                 break;
             case 'monthly':
                 $fullEvent->monthlyOn(1, $time);
@@ -53,9 +53,9 @@ if (file_exists($settingsPath)) {
     }
     
     // Auto Clean Old Backups (Runs daily)
-    Schedule::command('backup:clean --disable-notifications')->dailyAt('01:00');
+    Schedule::command('backup:clean', ['--disable-notifications' => true])->dailyAt('01:00');
 } else {
     // Default fallback schedule if settings file does not exist yet
-    Schedule::command('backup:run --only-db --disable-notifications')->dailyAt('02:00');
-    Schedule::command('backup:clean --disable-notifications')->dailyAt('01:00');
+    Schedule::command('backup:run', ['--only-db' => true, '--disable-notifications' => true])->dailyAt('02:00');
+    Schedule::command('backup:clean', ['--disable-notifications' => true])->dailyAt('01:00');
 }
