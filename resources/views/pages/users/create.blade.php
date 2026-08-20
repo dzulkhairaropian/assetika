@@ -35,13 +35,23 @@
                             </div>
 
                             <!-- Email -->
-                            <div class="sm:col-span-2">
+                            <div>
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                     Email Address <span class="text-error-500">*</span>
                                 </label>
                                 <input type="email" name="email" value="{{ old('email') }}" required placeholder="john@example.com"
                                     class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
                                 @error('email') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <!-- Phone -->
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Phone Number
+                                </label>
+                                <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+62 812 3456 7890"
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                                @error('phone') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <!-- Password -->
@@ -64,6 +74,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <hr class="border-gray-100 dark:border-gray-800">
 
                     <div class="pt-2">
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
@@ -138,6 +150,17 @@
                                         @foreach($locations as $loc)
                                             <option value="{{ $loc->id }}" {{ old('location_id') == $loc->id ? 'selected' : '' }}>{{ $loc->name }}</option>
                                         @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Account Status -->
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Account Status</label>
+                                <div class="relative">
+                                    <select name="is_active" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                        <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Active</option>
+                                        <option value="0" {{ old('is_active') === '0' ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                 </div>
                             </div>

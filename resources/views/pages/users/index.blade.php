@@ -29,6 +29,7 @@
                             $activeCount = 0;
                             if (request('role')) $activeCount++;
                             if (request('department_id')) $activeCount++;
+                            if (request('is_active') !== null && request('is_active') !== '') $activeCount++;
                         @endphp
 
                         <div class="relative" @click.away="filterOpen = false">
@@ -79,6 +80,16 @@
                                             @endforeach
                                         </select>
                                     </div>
+
+                                    <div class="col-span-2">
+                                        <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
+                                        <select name="is_active"
+                                            class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="">All Statuses</option>
+                                            <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Active</option>
+                                            <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Inactive</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
@@ -124,6 +135,11 @@
                                 </div>
                             </th>
                             <th class="px-5 py-3 sm:px-6">
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                </div>
+                            </th>
+                            <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center justify-end">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
                                 </div>
@@ -135,19 +151,33 @@
                             <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
                                 <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
-                                            <img src="/images/avatars/avatar-boy.jpg" alt="User Avatar" class="w-full h-full object-cover" />
+                                        <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 shrink-0">
+                                            @if($user->avatar)
+                                                <img src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}" class="w-full h-full object-cover" />
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center font-bold text-sm text-brand-500 bg-brand-50 dark:bg-brand-500/10">
+                                                    {{ strtoupper(substr($user->name, 0, 2)) }}
+                                                </div>
+                                            @endif
                                         </div>
                                         <div>
                                             <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">{{ $user->name }}</span>
                                             <span class="text-xs text-gray-500">{{ $user->email }}</span>
+                                            @if($user->phone)
+                                                <span class="block text-[11px] text-gray-400">{{ $user->phone }}</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex flex-col gap-1">
+                                    <div class="flex flex-col gap-0.5">
                                         <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $user->department->name ?? '-' }}</span>
-                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ $user->company->name ?? '-' }}</span>
+                                        @if($user->position || $user->location)
+                                            <span class="text-xs text-gray-500">{{ $user->position->name ?? '-' }} @if($user->location) • {{ $user->location->name }} @endif</span>
+                                        @endif
+                                        @if($user->company)
+                                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ $user->company->name }}</span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
@@ -156,6 +186,13 @@
                                             <x-ui.badge color="primary" variant="light" size="sm">{{ $role->name }}</x-ui.badge>
                                         @endforeach
                                     </div>
+                                </td>
+                                <td class="px-5 py-4 sm:px-6">
+                                    @if($user->is_active ?? true)
+                                        <x-ui.badge color="success" variant="light" size="sm">Active</x-ui.badge>
+                                    @else
+                                        <x-ui.badge color="danger" variant="light" size="sm">Inactive</x-ui.badge>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center justify-end gap-3 text-gray-500">
@@ -176,7 +213,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-12 text-center">
+                                <td colspan="5" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                             <i data-feather="users" class="w-6 h-6"></i>
