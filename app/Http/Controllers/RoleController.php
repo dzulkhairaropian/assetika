@@ -16,7 +16,7 @@ class RoleController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $roles = $query->get();
+        $roles = $query->latest('id')->paginate(50)->withQueryString();
         return view('pages.roles.index', compact('roles'));
     }
 
