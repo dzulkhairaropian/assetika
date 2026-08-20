@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,6 +20,13 @@ class LoginController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+
+        $user = User::where('email', $request->email)->first();
+        if ($user && !($user->is_active ?? true)) {
+            return back()->withErrors([
+                'email' => 'Your account is inactive. Please contact administrator.',
+            ])->onlyInput('email');
+        }
 
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();

@@ -71,20 +71,25 @@ class BackupController extends Controller
         set_time_limit(300);
 
         try {
+            $params = [
+                '--disable-notifications' => true,
+            ];
+
             if ($request->type === 'db') {
-                $exitCode = Artisan::call('backup:run --only-db --disable-notifications');
-            } else {
-                $exitCode = Artisan::call('backup:run --disable-notifications');
+                $params['--only-db'] = true;
             }
 
+            $exitCode = Artisan::call('backup:run', $params);
+            $output = Artisan::output();
+
             if ($exitCode !== 0) {
-                $output = Artisan::output();
                 Log::error('Backup failed with exit code ' . $exitCode . '. Output: ' . $output);
                 
-                // Extract failure reason if available
                 $errorMessage = 'Backup failed.';
                 if (preg_match('/Backup failed because:?\s*(.*)/i', $output, $matches)) {
                     $errorMessage .= ' Reason: ' . trim($matches[1]);
+                } else if (!empty(trim($output))) {
+                    $errorMessage .= ' Output: ' . trim(strip_tags($output));
                 }
                 
                 return redirect()->back()->with('error', $errorMessage);

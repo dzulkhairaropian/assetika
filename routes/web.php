@@ -213,6 +213,8 @@ Route::middleware('auth')->group(function () {
     Route::post('ga-assets/{asset}/maintenance', [\App\Http\Controllers\GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');
 
     // User & Role Management
+    Route::post('users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('users.bulk-delete');
+    Route::post('users/bulk-status', [UserController::class, 'bulkStatus'])->name('users.bulk-status');
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
 

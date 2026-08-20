@@ -155,7 +155,43 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('users.index')->with('error', 'You cannot delete your own account.');
+        }
+
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+        ]);
+
+        $ids = array_diff($request->ids, [auth()->id()]);
+
+        if (!empty($ids)) {
+            User::whereIn('id', $ids)->delete();
+        }
+
+        return redirect()->route('users.index')->with('success', 'Selected users deleted successfully.');
+    }
+
+    public function bulkStatus(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $status = (bool)$request->is_active;
+
+        User::whereIn('id', $request->ids)->update(['is_active' => $status]);
+
+        $statusText = $status ? 'activated' : 'deactivated';
+        return redirect()->route('users.index')->with('success', "Selected users {$statusText} successfully.");
     }
 }
