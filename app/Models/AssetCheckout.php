@@ -24,6 +24,7 @@ class AssetCheckout extends Model
         'checked_in_at',
         'checked_in_by_user_id',
         'condition_report',
+        'checkin_status_id',
         'checkin_evidence_file_path',
         'checkin_evidence_file_name',
         'checkin_notes',
@@ -68,6 +69,11 @@ class AssetCheckout extends Model
     public function checkedInByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'checked_in_by_user_id');
+    }
+
+    public function checkinStatus(): BelongsTo
+    {
+        return $this->belongsTo(Status::class, 'checkin_status_id');
     }
 
     // Scopes

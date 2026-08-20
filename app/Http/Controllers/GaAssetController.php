@@ -244,10 +244,14 @@ class GaAssetController extends Controller
     {
         $validated = $request->validate([
             'returned_at' => 'required|date',
+            'status' => 'required|string|in:Available,Broken,Maintenance',
             'condition_on_return' => 'required|string|max:50',
             'notes' => 'nullable|string',
             'checkin_evidence' => 'nullable|image|max:2048',
         ]);
+
+        $status = $validated['status'];
+        unset($validated['status']);
 
         $assignment = $asset->assignments()->whereNull('returned_at')->latest()->first();
 
@@ -260,7 +264,7 @@ class GaAssetController extends Controller
         }
 
         $asset->update([
-            'status' => 'Available',
+            'status' => $status,
             'current_holder_id' => null
         ]);
 

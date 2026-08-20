@@ -356,6 +356,7 @@
                                             <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">User / Dept</th>
                                             <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date Out</th>
                                             <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date In</th>
+                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</th>
                                             <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Condition</th>
                                             <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">BAST</th>
                                         </tr>
@@ -380,6 +381,17 @@
                                                     @endif
                                                 </td>
                                                 <td class="py-4">
+                                                    @if($history->checkinStatus)
+                                                        <x-ui.badge :color="$history->checkinStatus->color ?? 'gray'" variant="light" size="sm">
+                                                            {{ $history->checkinStatus->name }}
+                                                        </x-ui.badge>
+                                                    @elseif(!$history->checked_in_at)
+                                                        <x-ui.badge color="primary" variant="light" size="sm">Deployed</x-ui.badge>
+                                                    @else
+                                                        <span class="text-xs text-gray-400">-</span>
+                                                    @endif
+                                                </td>
+                                                <td class="py-4">
                                                     <span class="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[150px]" title="{{ $history->condition_report ?? '-' }}">
                                                         {{ $history->condition_report ?? '-' }}
                                                     </span>
@@ -393,7 +405,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="px-6 py-12 text-center">
+                                                <td colspan="6" class="px-6 py-12 text-center">
                                                     <div class="flex flex-col items-center justify-center space-y-2">
                                                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                                             <i data-feather="clock" class="w-6 h-6"></i>

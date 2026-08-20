@@ -30,7 +30,7 @@
                                @endphp
                                <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $asset->name }} • {{ $asset->brand }} {{ $asset->model }} • Qty: {{ $asset->qty }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $asset->name }} ï¿½ {{ $asset->brand }} {{ $asset->model }} ï¿½ Qty: {{ $asset->qty }}</p>
                     </div>
                 </div>
 
@@ -367,6 +367,14 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Date Returned <span class="text-error-500">*</span></label>
                         <input type="datetime-local" name="returned_at" value="{{ date('Y-m-d\TH:i') }}" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Status After Checkin <span class="text-error-500">*</span></label>
+                        <select name="status" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white">
+                            <option value="Available">Available</option>
+                            <option value="Broken">Broken</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Condition on Return <span class="text-error-500">*</span></label>

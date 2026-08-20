@@ -102,7 +102,11 @@ class AssetManagementController extends Controller
             return redirect()->back()->with('error', 'Asset is not checked out.');
         }
 
-        return view('pages.assets.management.checkin', compact('asset'));
+        $statuses = Status::whereHas('masterCategory', function($q) {
+            $q->where('name', 'IT Asset');
+        })->get();
+
+        return view('pages.assets.management.checkin', compact('asset', 'statuses'));
     }
 
     public function processCheckin(Request $request, $asset)
@@ -113,6 +117,7 @@ class AssetManagementController extends Controller
 
         $request->validate([
             'checked_in_at' => 'required|date',
+            'status_id' => 'required|exists:statuses,id',
             'condition_report' => 'required|string',
             'checkin_notes' => 'nullable|string',
             'checkin_evidence' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
@@ -125,23 +130,24 @@ class AssetManagementController extends Controller
             $evidencePath = $request->file('checkin_evidence')->store('checkins', 'public');
         }
 
+        $selectedStatus = Status::findOrFail($request->status_id);
+
         $checkout->update([
             'checked_in_at' => $request->checked_in_at,
             'checked_in_by_user_id' => auth()->id(),
             'condition_report' => $request->condition_report,
+            'checkin_status_id' => $selectedStatus->id,
             'checkin_notes' => $request->checkin_notes,
             'checkin_evidence_file_path' => $evidencePath,
             'checkin_evidence_file_name' => $request->file('checkin_evidence')?->getClientOriginalName(),
         ]);
-
-        $readyStatus = Status::where('name', 'Ready to Deploy')->first();
 
         $toUserId = $checkout->checked_out_to_user_id;
 
         $asset->update([
             'current_checkout_id' => null,
             'assigned_to_user_id' => null,
-            'status_id' => $readyStatus ? $readyStatus->id : $asset->status_id,
+            'status_id' => $selectedStatus->id,
         ]);
 
         $toUser = User::find($toUserId);
