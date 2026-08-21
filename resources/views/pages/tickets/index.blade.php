@@ -70,7 +70,7 @@
                     ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $ticketSummary['in_progress'], 'icon' => 'clock',        'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
                     ['key' => 'pending',     'label' => 'Pending',     'count' => $ticketSummary['pending'],     'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
                     ['key' => 'unassigned',  'label' => 'Unassigned',  'count' => $ticketSummary['unassigned'],  'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
-                    ['key' => 'closed',      'label' => 'Closed',      'count' => $ticketSummary['closed'],      'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                    ['key' => 'closed',      'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],      'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
                 ];
             @endphp
             <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5">
@@ -288,44 +288,45 @@
                                 </span>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <div class="flex flex-col gap-1">
-                                    @if($ticket->priority)
-                                        @php
-                                            $priorityBadgeClasses = match ($ticket->priority?->color) {
-                                                'danger' => 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400',
-                                                'warning' => 'bg-amber-50 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400',
-                                                default => 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-                                            };
-                                        @endphp
-                                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-medium {{ $priorityBadgeClasses }}">
-                                            <i data-feather="{{ $priorityIcon }}" class="w-3 h-3"></i>
-                                            {{ $ticket->priority?->name ?? 'Normal' }}
-                                        </span>
-                                    @endif
-                                </div>
+                                @if($ticket->priority)
+                                    <x-ui.badge 
+                                        size="sm" 
+                                        :color="$ticket->priority->color ?? 'secondary'"
+                                        :featherIcon="$ticket->priority->icon ?? 'flag'"
+                                    >
+                                        {{ $ticket->priority->name }}
+                                    </x-ui.badge>
+                                @endif
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <div class="flex flex-col gap-1">
-                                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-                                        <i data-feather="{{ $statusIcon }}" class="w-3 h-3"></i>
-                                        {{ $ticket->status?->name ?? 'Open' }}
-                                    </span>
-                                </div>
+                                @if($ticket->status)
+                                    <x-ui.badge 
+                                        size="sm" 
+                                        :color="$ticket->status->color ?? 'primary'"
+                                        :featherIcon="$ticket->status->icon ?? 'disc'"
+                                    >
+                                        {{ $ticket->status->name }}
+                                    </x-ui.badge>
+                                @endif
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <div class="flex flex-col gap-1">
-                                    @if($isOverdue)
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-error-50 px-2 py-0.5 text-[10px] font-semibold text-error-700 dark:bg-error-500/10 dark:text-error-400">
-                                            <i data-feather="{{ $slaIcon }}" class="w-3 h-3"></i>
-                                            SLA Risk
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-success-50 px-2 py-0.5 text-[10px] font-semibold text-success-700 dark:bg-success-500/10 dark:text-success-400">
-                                            <i data-feather="{{ $slaIcon }}" class="w-3 h-3"></i>
-                                            On Track
-                                        </span>
-                                    @endif
-                                </div>
+                                @if($ticket->slaStatus)
+                                    <x-ui.badge 
+                                        size="sm" 
+                                        :color="$ticket->slaStatus->color ?? ($isOverdue ? 'danger' : 'success')"
+                                        :featherIcon="$ticket->slaStatus->icon ?? ($isOverdue ? 'alert-circle' : 'check-circle')"
+                                    >
+                                        {{ $ticket->slaStatus->name }}
+                                    </x-ui.badge>
+                                @else
+                                    <x-ui.badge 
+                                        size="sm" 
+                                        :color="$isOverdue ? 'danger' : 'success'"
+                                        :featherIcon="$isOverdue ? 'alert-circle' : 'check-circle'"
+                                    >
+                                        {{ $isOverdue ? 'SLA Risk' : 'On Track' }}
+                                    </x-ui.badge>
+                                @endif
                             </td>
                             <td class="px-5 py-4 sm:px-6">
                                 <div class="flex flex-col gap-1">

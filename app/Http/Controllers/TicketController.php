@@ -50,7 +50,7 @@ class TicketController extends Controller
             'in_progress' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'In Progress'))->count(),
             'pending' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'Pending'))->count(),
             'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
-            'closed' => (clone $query)->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed']))->count(),
+            'closed' => (clone $query)->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true))->count(),
         ];
 
         switch ($request->input('tab')) {
@@ -67,7 +67,7 @@ class TicketController extends Controller
                 $query->whereNull('assigned_to_id');
                 break;
             case 'closed':
-                $query->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed']));
+                $query->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true));
                 break;
         }
 
@@ -155,6 +155,13 @@ class TicketController extends Controller
         }
 
         $data['created_by_id'] = auth()->id();
+
+        if (empty($data['sla_status_id'])) {
+            $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+            if ($fulfilledSla) {
+                $data['sla_status_id'] = $fulfilledSla->id;
+            }
+        }
 
         $ticket = Ticket::create($data);
 
@@ -277,12 +284,20 @@ class TicketController extends Controller
         // Auto SLA resolution calculation on closing
         if (isset($data['status_id'])) {
             $statusObj = TicketStatus::find($data['status_id']);
-            if ($statusObj && $statusObj->is_closed && ! $ticket->completed_date) {
-                $data['completed_date'] = now()->toDateString();
-                $data['completed_time'] = now();
-                if (! isset($data['resolution_time_hours']) || ! $data['resolution_time_hours']) {
-                    $hours = $ticket->created_at ? round($ticket->created_at->diffInMinutes(now()) / 60, 2) : 0;
-                    $data['resolution_time_hours'] = $hours;
+            if ($statusObj && $statusObj->is_closed) {
+                if (!$ticket->completed_date) {
+                    $data['completed_date'] = now()->toDateString();
+                    $data['completed_time'] = now();
+                    if (! isset($data['resolution_time_hours']) || ! $data['resolution_time_hours']) {
+                        $hours = $ticket->created_at ? round($ticket->created_at->diffInMinutes(now()) / 60, 2) : 0;
+                        $data['resolution_time_hours'] = $hours;
+                    }
+                }
+                if (empty($data['sla_status_id'])) {
+                    $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+                    if ($fulfilledSla) {
+                        $data['sla_status_id'] = $fulfilledSla->id;
+                    }
                 }
             }
         }

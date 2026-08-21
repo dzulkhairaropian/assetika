@@ -9,7 +9,7 @@
 ])
 
 @php
-    $baseStyles = 'inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium capitalize';
+    $baseStyles = 'inline-flex items-center w-fit px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium capitalize';
 
     $sizeStyles = [
         'sm' => 'text-[10px] px-2 py-0',
