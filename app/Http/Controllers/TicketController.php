@@ -16,7 +16,9 @@ use App\Models\TicketHistory;
 use App\Models\TicketStatus;
 use App\Models\TicketType;
 use App\Models\User;
-use App\Notifications\SystemNotification;
+use App\Exports\TicketsExport;
+use App\Models\Company;
+use App\Models\Department;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +26,11 @@ use Illuminate\View\View;
 
 class TicketController extends Controller
 {
+    public function export(Request $request)
+    {
+        return (new TicketsExport($request->all()))->download('tickets-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
     public function index(Request $request): View
     {
         $query = Ticket::with(['ticketCategory', 'ticketSubcategory', 'priority', 'status', 'slaStatus', 'assignedTo', 'requesterUser', 'requesterDepartment']);
@@ -75,7 +82,13 @@ class TicketController extends Controller
         $statuses = TicketStatus::all();
         $priorities = Priority::all();
 
-        return view('pages.tickets.index', compact('tickets', 'statuses', 'priorities', 'search', 'ticketSummary'));
+        $companies = Company::all();
+        $departments = Department::all();
+        $categories = TicketCategory::all();
+        $users = User::all();
+
+        return view('pages.tickets.index', compact('tickets', 'statuses', 'priorities', 'search', 'ticketSummary', 'companies', 'departments', 'categories', 'users'));
+    }
     }
 
     public function create(): View
