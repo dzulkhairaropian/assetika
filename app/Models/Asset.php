@@ -57,6 +57,95 @@ class Asset extends Model
         'purchase_cost' => 'decimal:2',
     ];
 
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $like = '%' . $search . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('asset_tag', 'like', $like)
+                    ->orWhere('serial_number', 'like', $like)
+                    ->orWhere('product_number', 'like', $like)
+                    ->orWhere('device_name', 'like', $like)
+                    ->orWhere('user_name', 'like', $like)
+                    ->orWhere('invoice_number', 'like', $like)
+                    ->orWhere('notes', 'like', $like)
+                    ->orWhere('specification', 'like', $like)
+                    ->orWhereHas('product', function ($p) use ($like) {
+                        $p->where('name', 'like', $like)
+                            ->orWhereHas('brand', function ($b) use ($like) {
+                                $b->where('name', 'like', $like);
+                            })
+                            ->orWhereHas('category', function ($c) use ($like) {
+                                $c->where('name', 'like', $like);
+                            });
+                    })
+                    ->orWhereHas('status', function ($s) use ($like) {
+                        $s->where('name', 'like', $like);
+                    })
+                    ->orWhereHas('department', function ($d) use ($like) {
+                        $d->where('name', 'like', $like)
+                            ->orWhereHas('company', function ($cmp) use ($like) {
+                                $cmp->where('name', 'like', $like);
+                            });
+                    })
+                    ->orWhereHas('location', function ($l) use ($like) {
+                        $l->where('name', 'like', $like);
+                    })
+                    ->orWhereHas('vendor', function ($v) use ($like) {
+                        $v->where('name', 'like', $like);
+                    })
+                    ->orWhereHas('depreciation', function ($d) use ($like) {
+                        $d->where('name', 'like', $like);
+                    })
+                    ->orWhereHas('assignedToUser', function ($u) use ($like) {
+                        $u->where('name', 'like', $like)
+                            ->orWhere('email', 'like', $like);
+                    })
+                    ->orWhereHas('currentCheckout.checkedOutToUser', function ($u) use ($like) {
+                        $u->where('name', 'like', $like)
+                            ->orWhere('email', 'like', $like);
+                    });
+            });
+        }
+
+        if (!empty($filters['status_id'])) {
+            $query->where('status_id', $filters['status_id']);
+        }
+
+        if (!empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        if (!empty($filters['location_id'])) {
+            $query->where('location_id', $filters['location_id']);
+        }
+
+        if (!empty($filters['product_id'])) {
+            $query->where('product_id', $filters['product_id']);
+        }
+
+        if (!empty($filters['category_id'])) {
+            $query->whereHas('product', function ($q) use ($filters) {
+                $q->where('category_id', $filters['category_id']);
+            });
+        }
+
+        if (!empty($filters['brand_id'])) {
+            $query->whereHas('product', function ($q) use ($filters) {
+                $q->where('brand_id', $filters['brand_id']);
+            });
+        }
+
+        if (!empty($filters['company_id'])) {
+            $query->whereHas('department', function ($q) use ($filters) {
+                $q->where('company_id', $filters['company_id']);
+            });
+        }
+
+        return $query;
+    }
+
     // Relationships
 
     /**

@@ -58,6 +58,38 @@ class Ticket extends Model
         ];
     }
 
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $like = '%' . $search . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('request_id', 'like', $like)
+                    ->orWhere('problem_description', 'like', $like)
+                    ->orWhere('requester_name', 'like', $like)
+                    ->orWhere('requester_email', 'like', $like);
+            });
+        }
+
+        if (!empty($filters['status_id'])) {
+            $query->where('status_id', $filters['status_id']);
+        }
+
+        if (!empty($filters['priority_id'])) {
+            $query->where('priority_id', $filters['priority_id']);
+        }
+
+        if (!empty($filters['assigned_to_id'])) {
+            $query->where('assigned_to_id', $filters['assigned_to_id']);
+        }
+
+        if (!empty($filters['ticket_category_id'])) {
+            $query->where('ticket_category_id', $filters['ticket_category_id']);
+        }
+
+        return $query;
+    }
+
     // Relationships
     public function ticketType(): BelongsTo
     {

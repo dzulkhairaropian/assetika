@@ -16,36 +16,11 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with(['roles', 'department', 'company', 'position', 'location']);
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $like = '%' . $search . '%';
-            $query->where(function($q) use ($like) {
-                $q->where('name', 'like', $like)
-                  ->orWhere('email', 'like', $like)
-                  ->orWhere('phone', 'like', $like)
-                  ->orWhereHas('department', fn($d) => $d->where('name', 'like', $like))
-                  ->orWhereHas('company', fn($c) => $c->where('name', 'like', $like))
-                  ->orWhereHas('position', fn($p) => $p->where('name', 'like', $like))
-                  ->orWhereHas('location', fn($l) => $l->where('name', 'like', $like))
-                  ->orWhereHas('roles', fn($r) => $r->where('name', 'like', $like));
-            });
-        }
-
-        if ($request->filled('role')) {
-            $query->role($request->role);
-        }
-
-        if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
-        }
-
-        if ($request->has('is_active') && $request->is_active !== null && $request->is_active !== '') {
-            $query->where('is_active', (bool)$request->is_active);
-        }
-
-        $users = $query->latest()->paginate(50)->withQueryString();
+        $users = User::with(['roles', 'department', 'company', 'position', 'location'])
+            ->filter($request->all())
+            ->latest()
+            ->paginate(50)
+            ->withQueryString();
         
         $roles = Role::all();
         $departments = Department::all();

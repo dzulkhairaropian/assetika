@@ -15,8 +15,16 @@ use Illuminate\Http\Request;
 
 use App\Exports\AssetsExport;
 
+use App\Services\AssetService;
+
 class AssetController extends Controller
 {
+    protected AssetService $assetService;
+
+    public function __construct(AssetService $assetService)
+    {
+        $this->assetService = $assetService;
+    }
     public function export(Request $request)
     {
         return (new AssetsExport($request->all()))->download('assets-' . now()->format('Y-m-d') . '.xlsx');
@@ -29,75 +37,7 @@ class AssetController extends Controller
             'status', 'assignedToUser', 'department.company',
             'location', 'vendor', 'depreciation',
             'currentCheckout.checkedOutToUser',
-        ]);
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $like = '%' . $search . '%';
-            $query->where(function($q) use ($like, $search) {
-                $q->where('asset_tag', 'like', $like)
-                  ->orWhere('serial_number', 'like', $like)
-                  ->orWhere('product_number', 'like', $like)
-                  ->orWhere('device_name', 'like', $like)
-                  ->orWhere('user_name', 'like', $like)
-                  ->orWhere('invoice_number', 'like', $like)
-                  ->orWhere('notes', 'like', $like)
-                  ->orWhere('specification', 'like', $like)
-                  ->orWhereHas('product', function($p) use ($like) {
-                      $p->where('name', 'like', $like)
-                        ->orWhereHas('brand', function($b) use ($like) {
-                            $b->where('name', 'like', $like);
-                        })
-                        ->orWhereHas('category', function($c) use ($like) {
-                            $c->where('name', 'like', $like);
-                        });
-                  })
-                  ->orWhereHas('status', function($s) use ($like) {
-                      $s->where('name', 'like', $like);
-                  })
-                  ->orWhereHas('department', function($d) use ($like) {
-                      $d->where('name', 'like', $like)
-                        ->orWhereHas('company', function($cmp) use ($like) {
-                            $cmp->where('name', 'like', $like);
-                        });
-                  })
-                  ->orWhereHas('location', function($l) use ($like) {
-                      $l->where('name', 'like', $like);
-                  })
-                  ->orWhereHas('vendor', function($v) use ($like) {
-                      $v->where('name', 'like', $like);
-                  })
-                  ->orWhereHas('depreciation', function($d) use ($like) {
-                      $d->where('name', 'like', $like);
-                  })
-                  ->orWhereHas('assignedToUser', function($u) use ($like) {
-                      $u->where('name', 'like', $like)
-                        ->orWhere('email', 'like', $like);
-                  })
-                  ->orWhereHas('currentCheckout.checkedOutToUser', function($u) use ($like) {
-                      $u->where('name', 'like', $like)
-                        ->orWhere('email', 'like', $like);
-                  });
-            });
-        }
-
-        if ($request->filled('status_id')) {
-            $query->where('status_id', $request->status_id);
-        }
-
-        if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
-        }
-
-        if ($request->filled('location_id')) {
-            $query->where('location_id', $request->location_id);
-        }
-
-        if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
-        }
-
-        if ($request->filled('category_id')) {
+        ])->filter($request->all());
             $query->whereHas('product', function($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             });

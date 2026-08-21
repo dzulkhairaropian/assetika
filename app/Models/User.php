@@ -58,6 +58,38 @@ class User extends Authenticatable
         ];
     }
 
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $like = '%' . $search . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('phone', 'like', $like)
+                    ->orWhereHas('department', fn($d) => $d->where('name', 'like', $like))
+                    ->orWhereHas('company', fn($c) => $c->where('name', 'like', $like))
+                    ->orWhereHas('position', fn($p) => $p->where('name', 'like', $like))
+                    ->orWhereHas('location', fn($l) => $l->where('name', 'like', $like))
+                    ->orWhereHas('roles', fn($r) => $r->where('name', 'like', $like));
+            });
+        }
+
+        if (!empty($filters['role'])) {
+            $query->role($filters['role']);
+        }
+
+        if (!empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        if (array_key_exists('is_active', $filters) && $filters['is_active'] !== null && $filters['is_active'] !== '') {
+            $query->where('is_active', (bool)$filters['is_active']);
+        }
+
+        return $query;
+    }
+
     /**
      * Get the company that owns the user.
      */

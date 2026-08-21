@@ -19,6 +19,31 @@ class GaAsset extends Model
         "retired_at" => "date",
     ];
 
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $like = '%' . $search . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('asset_code', 'like', $like)
+                    ->orWhere('name', 'like', $like)
+                    ->orWhere('brand', 'like', $like)
+                    ->orWhere('model', 'like', $like)
+                    ->orWhere('serial_number', 'like', $like);
+            });
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+
+        return $query;
+    }
+
     public function category()
     {
         return $this->belongsTo(GaAssetCategory::class);
