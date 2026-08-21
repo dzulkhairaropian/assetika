@@ -26,7 +26,7 @@ class TicketController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Ticket::with(['ticketCategory', 'ticketSubcategory', 'priority', 'status', 'slaStatus', 'assignedTo', 'requesterUser']);
+        $query = Ticket::with(['ticketCategory', 'ticketSubcategory', 'priority', 'status', 'slaStatus', 'assignedTo', 'requesterUser', 'requesterDepartment']);
 
         if ($search = $request->string('search')->trim()->toString()) {
             $query->where(function ($q) use ($search): void {

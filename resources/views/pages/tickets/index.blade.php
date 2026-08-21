@@ -283,9 +283,16 @@
                                 </div>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
-                                <span class="text-theme-sm text-gray-700 dark:text-gray-400">
-                                    {{ $ticket->requester_name ?? $ticket->requesterUser?->name }}
-                                </span>
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">
+                                        {{ $ticket->requester_name ?? $ticket->requesterUser?->name }}
+                                    </span>
+                                    @if($ticket->requesterDepartment || $ticket->requesterUser?->department)
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            {{ $ticket->requesterDepartment?->name ?? $ticket->requesterUser?->department?->name }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-5 py-4 sm:px-6">
                                 @if($ticket->priority)
