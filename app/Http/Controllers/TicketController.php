@@ -236,6 +236,7 @@ class TicketController extends Controller
 
     public function update(Request $request, Ticket $ticket): RedirectResponse
     {
+        $oldStatusId = $ticket->status_id;
         $data = $request->validate([
             'created_at' => ['nullable', 'date'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],

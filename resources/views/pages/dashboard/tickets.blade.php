@@ -260,29 +260,27 @@
                         </td>
                         <td class="py-3.5 pr-4">
                             @php
-                                $pColor = $ticket->priority?->color ?? 'gray';
-                                $pClasses = [
-                                    'danger' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
-                                    'warning' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500',
-                                    'success' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
-                                    'info' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
-                                    'gray' => 'bg-gray-50 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
-                                ];
+                                $pColor = $ticket->priority?->color ?? 'secondary';
                             @endphp
-                            <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium {{ $pClasses[$pColor] ?? $pClasses['gray'] }}">{{ $ticket->priority?->name ?? '-' }}</span>
+                            <x-ui.badge 
+                                size="sm" 
+                                :color="$pColor"
+                                :featherIcon="$ticket->priority?->icon ?? 'alert-circle'"
+                            >
+                                {{ $ticket->priority?->name ?? '-' }}
+                            </x-ui.badge>
                         </td>
                         <td class="py-3.5 pr-4">
                             @php
-                                $sColor = $ticket->status?->color ?? 'gray';
-                                $sClasses = [
-                                    'info' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
-                                    'warning' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500',
-                                    'success' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
-                                    'danger' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
-                                    'gray' => 'bg-gray-50 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
-                                ];
+                                $sColor = $ticket->status?->color ?? 'secondary';
                             @endphp
-                            <span class="rounded-full px-2 py-0.5 text-theme-xs font-medium {{ $sClasses[$sColor] ?? $sClasses['gray'] }}">{{ $ticket->status?->name ?? '-' }}</span>
+                            <x-ui.badge 
+                                size="sm" 
+                                :color="$sColor"
+                                :featherIcon="$ticket->status?->icon ?? 'disc'"
+                            >
+                                {{ $ticket->status?->name ?? '-' }}
+                            </x-ui.badge>
                         </td>
                         <td class="py-3.5 pr-4">
                             <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</p>

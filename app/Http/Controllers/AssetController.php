@@ -38,10 +38,6 @@ class AssetController extends Controller
             'location', 'vendor', 'depreciation',
             'currentCheckout.checkedOutToUser',
         ])->filter($request->all());
-            $query->whereHas('product', function($q) use ($request) {
-                $q->where('category_id', $request->category_id);
-            });
-        }
 
         if ($request->filled('depreciation_id')) {
             $query->where('depreciation_id', $request->depreciation_id);
