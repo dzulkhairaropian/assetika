@@ -40,6 +40,16 @@ class MenuHelper
                         'icon' => 'kit',
                         'path' => '/requestable-assets',
                     ],
+                    [
+                        'name' => 'Knowledge Base',
+                        'icon' => 'catalog',
+                        'path' => '/kb',
+                    ],
+                    [
+                        'name' => 'Asset Reservations',
+                        'icon' => 'ga-dashboard',
+                        'path' => '/reservations',
+                    ],
                 ],
             ],
             [
@@ -154,6 +164,7 @@ class MenuHelper
                             ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
                             ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
                             ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
+                            ['name' => 'SLA Policies', 'path' => '/sla-policies'],
                             ['name' => 'Sources', 'path' => '/admin/sources'],
                             ['name' => 'Ticket Labels', 'path' => '/admin/labels'],
                             ['name' => 'Asset Statuses', 'path' => '/statuses'],
@@ -193,6 +204,11 @@ class MenuHelper
                         'name' => 'Backups',
                         'icon' => 'backup',
                         'path' => '/backups',
+                    ],
+                    [
+                        'name' => 'Expiry & Renewals',
+                        'icon' => 'support',
+                        'path' => '/renewals',
                     ],
                 ],
             ],

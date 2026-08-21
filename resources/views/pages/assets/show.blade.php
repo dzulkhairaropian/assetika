@@ -353,34 +353,46 @@
                                 <table class="w-full text-left">
                                     <thead class="border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">User / Dept</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date Out</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date In</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Condition</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">BAST</th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">User / Dept</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date Out</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Date In</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Condition</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6 text-right">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">BAST</p>
+                                            </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                                         @forelse($asset->checkoutHistory as $history)
-                                            <tr>
-                                                <td class="py-4">
+                                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     <div class="flex flex-col">
-                                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $history->checkedOutToUser->name ?? '-' }}</span>
+                                                        <span class="text-sm font-medium text-gray-800 dark:text-white/90">{{ $history->checkedOutToUser->name ?? '-' }}</span>
                                                         <span class="text-[10px] text-gray-400">{{ $history->department->name ?? '-' }}</span>
                                                     </div>
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     <span class="text-sm text-gray-600 dark:text-gray-400">{{ $history->checked_out_at?->format('d M Y') ?? '-' }}</span>
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     @if($history->checked_in_at)
                                                         <span class="text-sm text-gray-600 dark:text-gray-400">{{ $history->checked_in_at?->format('d M Y') ?? '-' }}</span>
                                                     @else
                                                         <x-ui.badge color="primary" variant="light" size="sm">Current</x-ui.badge>
                                                     @endif
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     @if($history->checkinStatus)
                                                         <x-ui.badge :color="$history->checkinStatus->color ?? 'gray'" variant="light" size="sm">
                                                             {{ $history->checkinStatus->name }}
@@ -391,12 +403,12 @@
                                                         <span class="text-xs text-gray-400">-</span>
                                                     @endif
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     <span class="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[150px]" title="{{ $history->condition_report ?? '-' }}">
                                                         {{ $history->condition_report ?? '-' }}
                                                     </span>
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6 text-right">
                                                     <a href="{{ route('assets.bast', [$asset, $history]) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-500 hover:text-brand-600 transition-colors">
                                                         <i data-feather="download-cloud" class="h-4 w-4"></i>
                                                         BAST
@@ -427,35 +439,45 @@
                                 <table class="w-full text-left">
                                     <thead class="border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Provider</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Start Date</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Completion Date</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cost</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Notes</th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Provider</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Start Date</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Completion Date</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cost</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Notes</p>
+                                            </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                                         @forelse($asset->maintenances as $maint)
-                                            <tr>
-                                                <td class="py-4">
-                                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $maint->service_provider ?? '-' }}</span>
+                                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                                <td class="px-5 py-4 sm:px-6">
+                                                    <span class="text-sm font-medium text-gray-800 dark:text-white/90">{{ $maint->service_provider ?? '-' }}</span>
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     <span class="text-sm text-gray-600 dark:text-gray-400">{{ $maint->start_date?->format('d M Y') ?? '-' }}</span>
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     @if($maint->completion_date)
                                                         <span class="text-sm text-gray-600 dark:text-gray-400">{{ $maint->completion_date?->format('d M Y') ?? '-' }}</span>
                                                     @else
                                                         <x-ui.badge color="warning" variant="light" size="sm">In Repair</x-ui.badge>
                                                     @endif
                                                 </td>
-                                                <td class="py-4">
-                                                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                                <td class="px-5 py-4 sm:px-6">
+                                                    <span class="text-sm font-semibold text-gray-800 dark:text-white/90">
                                                         {{ $maint->cost ? 'Rp ' . number_format($maint->cost, 2) : '-' }}
                                                     </span>
                                                 </td>
-                                                <td class="py-4">
+                                                <td class="px-5 py-4 sm:px-6">
                                                     <span class="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[150px]" title="{{ $maint->notes ?? '-' }}">
                                                         {{ $maint->notes ?? '-' }}
                                                     </span>
@@ -484,40 +506,54 @@
                                 <table class="w-full text-left">
                                     <thead class="border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ticket ID</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Requester</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Problem Summary</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Priority</th>
-                                            <th class="pb-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</th>
-                                            <th class="pb-3 text-right font-medium text-gray-500 text-theme-xs dark:text-gray-400">Action</th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Ticket ID</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Requester</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Problem Summary</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Priority</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                                            </th>
+                                            <th class="px-5 py-3 sm:px-6 text-right">
+                                                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Action</p>
+                                            </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                                         @forelse($asset->tickets as $t)
-                                            <tr>
-                                                <td class="py-4 font-mono font-medium text-brand-600 dark:text-brand-400">
+                                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                                <td class="px-5 py-4 sm:px-6 font-mono font-medium text-brand-600 dark:text-brand-400">
                                                     <a href="{{ route('tickets.show', $t) }}" class="hover:underline">#{{ $t->request_id }}</a>
                                                 </td>
-                                                <td class="py-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                <td class="px-5 py-4 sm:px-6 text-sm font-medium text-gray-800 dark:text-white/90">
                                                     {{ $t->requester_name ?? '-' }}
                                                 </td>
-                                                <td class="py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title="{{ $t->problem_description }}">
+                                                <td class="px-5 py-4 sm:px-6 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title="{{ $t->problem_description }}">
                                                     {{ Str::limit($t->problem_description, 50) }}
                                                 </td>
-                                                <td class="py-4">
-                                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+                                                <td class="px-5 py-4 sm:px-6">
+                                                    <x-ui.badge color="gray" variant="light" size="sm">
                                                         {{ $t->priority?->name ?? 'Normal' }}
-                                                    </span>
+                                                    </x-ui.badge>
                                                 </td>
-                                                <td class="py-4">
-                                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                                                <td class="px-5 py-4 sm:px-6">
+                                                    <x-ui.badge :color="$t->status?->color ?? 'primary'" variant="light" size="sm">
                                                         {{ $t->status?->name ?? 'Open' }}
-                                                    </span>
+                                                    </x-ui.badge>
                                                 </td>
-                                                <td class="py-4 text-right">
-                                                    <a href="{{ route('tickets.show', $t) }}" class="text-xs font-medium text-brand-500 hover:underline">
-                                                        View Ticket
-                                                    </a>
+                                                <td class="px-5 py-4 sm:px-6 text-right">
+                                                    <div class="flex items-center justify-end gap-3 text-gray-500">
+                                                        <a href="{{ route('tickets.show', $t) }}" class="transition-colors hover:text-brand-500" title="View Ticket">
+                                                            <i data-feather="eye" class="w-5 h-5"></i>
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty

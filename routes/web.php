@@ -242,6 +242,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('admin/ticket-subcategories/{subcategory}', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'destroySubcategory'])->name('admin.ticket-subcategories.destroy');
     Route::get('api/ticket-categories/{category}/subcategories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'getSubcategories'])->name('api.ticket-categories.subcategories');
 
+    // New Next-Phase Modules
+    Route::get('kb/suggestions', [\App\Http\Controllers\KbController::class, 'suggestions'])->name('kb.suggestions');
+    Route::resource('kb', \App\Http\Controllers\KbController::class);
+    Route::resource('sla-policies', \App\Http\Controllers\SlaPolicyController::class)->only(['index', 'store']);
+    Route::post('reservations/{reservation}/approve', [\App\Http\Controllers\AssetReservationController::class, 'approve'])->name('reservations.approve');
+    Route::post('reservations/{reservation}/reject', [\App\Http\Controllers\AssetReservationController::class, 'reject'])->name('reservations.reject');
+    Route::resource('reservations', \App\Http\Controllers\AssetReservationController::class);
+    Route::resource('renewals', \App\Http\Controllers\RenewalController::class);
+
     Route::resource('admin/priorities', PriorityController::class, ['names' => 'admin.priorities']);
     Route::resource('admin/labels', LabelController::class, ['names' => 'admin.labels']);
     Route::resource('admin/sources', SourceController::class, ['names' => 'admin.sources']);

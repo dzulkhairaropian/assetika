@@ -59,3 +59,6 @@ if (file_exists($settingsPath)) {
     Schedule::command('backup:run', ['--only-db' => true, '--disable-notifications' => true])->dailyAt('02:00');
     Schedule::command('backup:clean', ['--disable-notifications' => true])->dailyAt('01:00');
 }
+
+// Auto sync asset reservations (checkout & checkin based on time)
+Schedule::command('reservations:sync')->everyMinute();
