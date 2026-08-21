@@ -89,6 +89,51 @@ class AssetManagementController extends Controller
             ));
         }
 
+        // Automatic Ticket Creation for Checkout
+        $ticketDate = \Illuminate\Support\Carbon::parse($request->checked_out_at);
+        $reqType = \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $requestCode = strtoupper($reqType?->code ?: 'REQ');
+        $prefix = $requestCode . '-' . $ticketDate->format('ymd') . '-';
+        
+        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->first();
+            
+        $nextSeq = 1;
+        if ($latestTicket) {
+            $parts = explode('-', $latestTicket->request_id);
+            $nextSeq = ((int) end($parts)) + 1;
+        }
+
+        $completedStatus = \App\Models\TicketStatus::where('name', 'Completed')->first() ?? \App\Models\TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
+        $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
+        $portalSource = \App\Models\Source::first();
+
+        \App\Models\Ticket::create([
+            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+            'ticket_type_id' => $reqType?->id,
+            'requester_user_id' => $toUser?->id,
+            'requester_name' => $toUser?->name,
+            'requester_email' => $toUser?->email,
+            'requester_company_id' => $toUser?->company_id,
+            'requester_department_id' => $toUser?->department_id,
+            'assigned_to_id' => auth()->id(),
+            'created_by_id' => auth()->id(),
+            'asset_id' => $asset->id,
+            'priority_id' => $mediumPriority?->id,
+            'source_id' => $portalSource?->id,
+            'status_id' => $completedStatus?->id,
+            'sla_status_id' => $fulfilledSla?->id,
+            'problem_description' => "[Auto-Generated] Checkout Asset: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . " ke " . ($toUser?->name ?? 'User'),
+            'resolution_notes' => 'Asset successfully checked out and handed over.',
+            'request_date' => $ticketDate->toDateString(),
+            'request_time' => $ticketDate,
+            'completed_date' => $ticketDate->toDateString(),
+            'completed_time' => $ticketDate,
+            'created_at' => $ticketDate,
+        ]);
+
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked out successfully.');
     }
 
@@ -160,6 +205,51 @@ class AssetManagementController extends Controller
                 'Asset'
             ));
         }
+
+        // Automatic Ticket Creation for Checkin
+        $ticketDate = \Illuminate\Support\Carbon::parse($request->checked_in_at);
+        $reqType = \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $requestCode = strtoupper($reqType?->code ?: 'REQ');
+        $prefix = $requestCode . '-' . $ticketDate->format('ymd') . '-';
+        
+        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->first();
+            
+        $nextSeq = 1;
+        if ($latestTicket) {
+            $parts = explode('-', $latestTicket->request_id);
+            $nextSeq = ((int) end($parts)) + 1;
+        }
+
+        $completedStatus = \App\Models\TicketStatus::where('name', 'Completed')->first() ?? \App\Models\TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
+        $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
+        $portalSource = \App\Models\Source::first();
+
+        \App\Models\Ticket::create([
+            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+            'ticket_type_id' => $reqType?->id,
+            'requester_user_id' => $toUser?->id,
+            'requester_name' => $toUser?->name,
+            'requester_email' => $toUser?->email,
+            'requester_company_id' => $toUser?->company_id,
+            'requester_department_id' => $toUser?->department_id,
+            'assigned_to_id' => auth()->id(),
+            'created_by_id' => auth()->id(),
+            'asset_id' => $asset->id,
+            'priority_id' => $mediumPriority?->id,
+            'source_id' => $portalSource?->id,
+            'status_id' => $completedStatus?->id,
+            'sla_status_id' => $fulfilledSla?->id,
+            'problem_description' => "[Auto-Generated] Checkin Asset: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . " dari " . ($toUser?->name ?? 'User') . ". Kondisi: " . $request->condition_report,
+            'resolution_notes' => 'Asset checked in and status updated to ' . $selectedStatus->name . '.',
+            'request_date' => $ticketDate->toDateString(),
+            'request_time' => $ticketDate,
+            'completed_date' => $ticketDate->toDateString(),
+            'completed_time' => $ticketDate,
+            'created_at' => $ticketDate,
+        ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked in successfully.');
     }
