@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Calender" />
-    <x-calender-area />
+    <div class="space-y-6">
+        <x-common.page-breadcrumb pageTitle="Calendar & Events" />
+        <x-calender-area />
+    </div>
 @endsection

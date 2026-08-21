@@ -1,82 +1,135 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
-    <x-common.page-breadcrumb pageTitle="Add Renewal Item" :items="[['label' => 'Expiry & Renewals', 'url' => route('renewals.index')], ['label' => 'Add Item']]" />
+    <div class="space-y-6">
+        <x-common.page-breadcrumb pageTitle="Add Renewal Item" :items="[['label' => 'Expiry & Renewals', 'url' => route('renewals.index')], ['label' => 'Add Item']]" />
 
-    <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-        Create a new item to track expiration and renewal schedules.
-    </p>
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Create a new item to track expiration and renewal schedules.
+        </p>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-        <form method="POST" action="{{ route('renewals.store') }}">
+        @if(session('error'))
+            <x-ui.alert variant="error" message="{{ session('error') }}" />
+        @endif
+
+        <form action="{{ route('renewals.store') }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
             @csrf
 
+            <!-- Left Column: Primary Form Fields -->
             <div class="space-y-6">
-                <div>
-                    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Item / Domain / License Name <span class="text-error-500">*</span></label>
-                    <input type="text" name="name" required placeholder="Example: SSL Wildcard *.diastika.co.id" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                </div>
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
+                    <div>
+                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                            <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                            General Information
+                        </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Renewal Type <span class="text-error-500">*</span></label>
-                        <select name="type" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                            <option value="ssl_certificate">SSL Certificate</option>
-                            <option value="domain">Web Domain</option>
-                            <option value="license">Software License</option>
-                            <option value="vehicle_tax">GA Vehicle Tax</option>
-                            <option value="vehicle_insurance">GA Vehicle Insurance</option>
-                            <option value="custom">Custom / Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Expiration Date <span class="text-error-500">*</span></label>
-                        <input type="date" name="expiration_date" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    </div>
-                </div>
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                            <div class="lg:col-span-2">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Item / Domain / License Name <span class="text-error-500">*</span>
+                                </label>
+                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="Example: SSL Wildcard *.diastika.co.id"
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Reminder Days (Before Expiry) <span class="text-error-500">*</span></label>
-                        <input type="number" name="reminder_days_before" value="30" min="1" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Renewal Cost (Rp)</label>
-                        <input type="number" name="cost" step="0.01" placeholder="0" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    </div>
-                </div>
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Renewal Type <span class="text-error-500">*</span>
+                                </label>
+                                <div class="relative z-20 bg-transparent">
+                                    <select name="type" required
+                                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                                        <option value="ssl_certificate">SSL Certificate</option>
+                                        <option value="domain">Web Domain</option>
+                                        <option value="license">Software License</option>
+                                        <option value="vehicle_tax">GA Vehicle Tax</option>
+                                        <option value="vehicle_insurance">GA Vehicle Insurance</option>
+                                        <option value="custom">Custom / Other</option>
+                                    </select>
+                                    <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                                        <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                </div>
+                                @error('type') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Vendor / Provider</label>
-                        <select name="vendor_id" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                            <option value="">-- Optional --</option>
-                            @foreach($vendors as $vendor)
-                                <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
-                            @endforeach
-                        </select>
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Expiration Date <span class="text-error-500">*</span>
+                                </label>
+                                <input type="date" name="expiration_date" value="{{ old('expiration_date') }}" required
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                @error('expiration_date') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
                     </div>
+
+                    <hr class="border-gray-100 dark:border-gray-800">
+
                     <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Responsible User</label>
-                        <select name="responsible_user_id" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                            <option value="">-- Optional --</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
+                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                            <i data-feather="clock" class="w-5 h-5 text-brand-500"></i>
+                            Settings & Assignment
+                        </h3>
+
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Reminder Days (Before Expiry) <span class="text-error-500">*</span>
+                                </label>
+                                <input type="number" name="reminder_days_before" value="{{ old('reminder_days_before', 30) }}" min="1" required
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                @error('reminder_days_before') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Estimated Renewal Cost (Rp)
+                                </label>
+                                <input type="number" name="cost" value="{{ old('cost') }}" step="0.01" placeholder="0"
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                @error('cost') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                @php
+                                    $vendorOpts = array_merge([['id' => '', 'text' => 'Select Vendor (Optional)']], $vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray());
+                                @endphp
+                                <x-form.searchable-select name="vendor_id" label="Vendor / Provider" :options="$vendorOpts" :selected="old('vendor_id')" placeholder="Select Vendor" />
+                            </div>
+
+                            <div>
+                                @php
+                                    $userOpts = array_merge([['id' => '', 'text' => 'Select Responsible User']], $users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])->toArray());
+                                @endphp
+                                <x-form.searchable-select name="responsible_user_id" label="Responsible User" :options="$userOpts" :selected="old('responsible_user_id')" placeholder="Select User" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-5 dark:border-gray-800">
-                <a href="{{ route('renewals.index') }}" class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">Cancel</a>
-                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                    <i data-feather="check-circle" class="w-4 h-4"></i>
-                    Save Item
-                </button>
+            <!-- Right Column: Sidebar Actions -->
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
+                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        Actions
+                    </h3>
+                    <div class="space-y-3">
+                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            Save Item
+                        </button>
+                        <a href="{{ route('renewals.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
-</div>
 @endsection

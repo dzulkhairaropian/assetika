@@ -31,7 +31,7 @@ class AssetReservationController extends Controller
         $request->validate([
             'reservable_type' => 'required|string',
             'reservable_id' => 'required|integer',
-            'start_time' => 'required|date|after:now',
+            'start_time' => 'required|date|after_or_equal:now',
             'end_time' => 'required|date|after:start_time',
             'purpose' => 'required|string|max:500',
         ]);

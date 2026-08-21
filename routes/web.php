@@ -242,7 +242,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('admin/ticket-subcategories/{subcategory}', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'destroySubcategory'])->name('admin.ticket-subcategories.destroy');
     Route::get('api/ticket-categories/{category}/subcategories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'getSubcategories'])->name('api.ticket-categories.subcategories');
 
-    // New Next-Phase Modules
+    // Calendar Page
+    Route::get('calendar', function () {
+        return view('pages.calender');
+    })->name('calendar.index');
+    Route::get('api/calendar/events', [\App\Http\Controllers\CalendarController::class, 'events'])->name('api.calendar.events');
+    Route::post('api/calendar/events', [\App\Http\Controllers\CalendarController::class, 'store'])->name('api.calendar.store');
+    Route::put('api/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'update'])->name('api.calendar.update');
+    Route::delete('api/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'destroy'])->name('api.calendar.destroy');
     Route::get('kb/suggestions', [\App\Http\Controllers\KbController::class, 'suggestions'])->name('kb.suggestions');
     Route::resource('kb', \App\Http\Controllers\KbController::class);
     Route::resource('sla-policies', \App\Http\Controllers\SlaPolicyController::class)->only(['index', 'store']);
