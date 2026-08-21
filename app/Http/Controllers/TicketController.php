@@ -89,7 +89,6 @@ class TicketController extends Controller
 
         return view('pages.tickets.index', compact('tickets', 'statuses', 'priorities', 'search', 'ticketSummary', 'companies', 'departments', 'categories', 'users'));
     }
-    }
 
     public function create(): View
     {
