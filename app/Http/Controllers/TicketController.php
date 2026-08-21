@@ -134,12 +134,20 @@ class TicketController extends Controller
         $ticketDate = !empty($data['created_at']) ? \Illuminate\Support\Carbon::parse($data['created_at']) : now();
         $ticketType = !empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
         $requestCode = strtoupper($ticketType?->code ?: 'REQ');
-        $dailySequence = str_pad(
-            (string) (Ticket::whereDate('created_at', $ticketDate->toDateString())->count() + 1),
-            3,
-            '0',
-            STR_PAD_LEFT
-        );
+        $prefix = $requestCode . '-' . $ticketDate->format('ymd') . '-';
+        
+        $latestTicket = Ticket::where('request_id', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->first();
+            
+        $nextSeq = 1;
+        if ($latestTicket) {
+            $parts = explode('-', $latestTicket->request_id);
+            $lastNum = (int) end($parts);
+            $nextSeq = $lastNum + 1;
+        }
+
+        $dailySequence = str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
 
         $data['request_id'] = $requestCode . '-' . $ticketDate->format('ymd') . '-' . $dailySequence;
         $data['request_date'] = $ticketDate->toDateString();

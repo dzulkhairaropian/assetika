@@ -39,25 +39,76 @@
                 </div>
 
                 <!-- Requester -->
-                <div>
+                <div x-data="{
+                    search: '',
+                    open: false,
+                    selectedId: '{{ old('requester_user_id', $ticket?->requester_user_id ?? auth()->id()) }}',
+                    selectedLabel: '',
+                    init() {
+                        const selectedOpt = this.$refs.select.querySelector('option[value=\'' + this.selectedId + '\']');
+                        if (selectedOpt) this.selectedLabel = selectedOpt.textContent.trim();
+                    },
+                    selectOption(id, label) {
+                        this.selectedId = id;
+                        this.selectedLabel = label;
+                        this.open = false;
+                        this.search = '';
+                    }
+                }" class="relative">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Requester User <span class="text-error-500">*</span></label>
-                    <select name="requester_user_id" required class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                    <select name="requester_user_id" x-ref="select" x-model="selectedId" required class="hidden">
                         <option value="">Select User</option>
                         @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('requester_user_id', $ticket?->requester_user_id ?? auth()->id()) == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->email }})</option>
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                         @endforeach
                     </select>
+                    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                        <span x-text="selectedLabel || 'Select User'" class="truncate"></span>
+                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+                    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                        <input type="text" x-model="search" placeholder="Search user..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                        <template x-for="option in Array.from($refs.select.options).filter(o => o.value && o.textContent.toLowerCase().includes(search.toLowerCase()))">
+                            <div @click="selectOption(option.value, option.textContent.trim())" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="option.textContent"></div>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- Assigned To -->
-                <div>
+                <div x-data="{
+                    search: '',
+                    open: false,
+                    selectedId: '{{ old('assigned_to_id', $ticket?->assigned_to_id) }}',
+                    selectedLabel: '',
+                    init() {
+                        const selectedOpt = this.$refs.select.querySelector('option[value=\'' + this.selectedId + '\']');
+                        if (selectedOpt) this.selectedLabel = selectedOpt.textContent.trim();
+                    },
+                    selectOption(id, label) {
+                        this.selectedId = id;
+                        this.selectedLabel = label;
+                        this.open = false;
+                        this.search = '';
+                    }
+                }" class="relative">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned Staff</label>
-                    <select name="assigned_to_id" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                    <select name="assigned_to_id" x-ref="select" x-model="selectedId" class="hidden">
                         <option value="">Unassigned</option>
                         @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('assigned_to_id', $ticket?->assigned_to_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
                         @endforeach
                     </select>
+                    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                        <span x-text="selectedLabel || 'Unassigned'" class="truncate"></span>
+                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+                    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                        <input type="text" x-model="search" placeholder="Search staff..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                        <div @click="selectOption('', 'Unassigned')" class="cursor-pointer rounded-md p-2 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">Unassigned</div>
+                        <template x-for="option in Array.from($refs.select.options).filter(o => o.value && o.textContent.toLowerCase().includes(search.toLowerCase()))">
+                            <div @click="selectOption(option.value, option.textContent.trim())" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="option.textContent"></div>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- ITSM Ticket Category -->
@@ -138,9 +189,24 @@
                 </div>
 
                 <!-- Linked IT Asset -->
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-2" x-data="{
+                    search: '',
+                    open: false,
+                    selectedId: '{{ old('asset_id', $ticket?->asset_id) }}',
+                    selectedLabel: '',
+                    init() {
+                        const selectedOpt = this.$refs.select.querySelector('option[value=\'' + this.selectedId + '\']');
+                        if (selectedOpt) this.selectedLabel = selectedOpt.textContent.trim();
+                    },
+                    selectOption(id, label) {
+                        this.selectedId = id;
+                        this.selectedLabel = label;
+                        this.open = false;
+                        this.search = '';
+                    }
+                }">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Linked Asset (ITAM)</label>
-                    <select name="asset_id" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                    <select name="asset_id" x-ref="select" x-model="selectedId" class="hidden">
                         <option value="">No Asset Linked</option>
                         @foreach($assets as $asset)
                             @php
@@ -150,11 +216,22 @@
                                 $brandModel = optional($asset->product->brand)->name . ' ' . optional($asset->product)->model;
                                 $deviceName = $asset->device_name ?: trim($brandModel);
                             @endphp
-                            <option value="{{ $asset->id }}" {{ old('asset_id', $ticket?->asset_id) == $asset->id ? 'selected' : '' }}>
+                            <option value="{{ $asset->id }}">
                                 [{{ $asset->asset_tag }}] {{ $deviceName }} — {{ $holder ? 'User: ' . $holder : 'Unassigned' }} {{ $dept ? '('.$dept.')' : '' }} {{ $statusName ? '[' . $statusName . ']' : '' }}
                             </option>
                         @endforeach
                     </select>
+                    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                        <span x-text="selectedLabel || 'No Asset Linked'" class="truncate"></span>
+                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+                    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                        <input type="text" x-model="search" placeholder="Search asset tag, device, user..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                        <div @click="selectOption('', 'No Asset Linked')" class="cursor-pointer rounded-md p-2 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">No Asset Linked</div>
+                        <template x-for="option in Array.from($refs.select.options).filter(o => o.value && o.textContent.toLowerCase().includes(search.toLowerCase()))">
+                            <div @click="selectOption(option.value, option.textContent.trim())" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="option.textContent"></div>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
