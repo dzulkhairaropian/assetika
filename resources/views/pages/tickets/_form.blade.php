@@ -39,77 +39,29 @@
                 </div>
 
                 <!-- Requester -->
-                <div x-data="{
-                    search: '',
-                    open: false,
-                    selectedId: '{{ old('requester_user_id', $ticket?->requester_user_id ?? auth()->id()) }}',
-                    selectedLabel: '',
-                    init() {
-                        const selectedOpt = this.$refs.select.querySelector('option[value=\'' + this.selectedId + '\']');
-                        if (selectedOpt) this.selectedLabel = selectedOpt.textContent.trim();
-                    },
-                    selectOption(id, label) {
-                        this.selectedId = id;
-                        this.selectedLabel = label;
-                        this.open = false;
-                        this.search = '';
-                    }
-                }" class="relative">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Requester User <span class="text-error-500">*</span></label>
-                    <select name="requester_user_id" x-ref="select" x-model="selectedId" required class="hidden">
-                        <option value="">Select User</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                        @endforeach
-                    </select>
-                    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                        <span x-text="selectedLabel || 'Select User'" class="truncate"></span>
-                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
-                    </div>
-                    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-                        <input type="text" x-model="search" placeholder="Search user..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-                        <template x-for="option in Array.from($refs.select.options).filter(o => o.value && o.textContent.toLowerCase().includes(search.toLowerCase()))">
-                            <div @click="selectOption(option.value, option.textContent.trim())" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="option.textContent"></div>
-                        </template>
-                    </div>
-                </div>
+                @php
+                    $userOptions = $users->map(fn($u) => ['id' => $u->id, 'text' => $u->name . ' (' . $u->email . ')'])->toArray();
+                @endphp
+                <x-form.searchable-select
+                    name="requester_user_id"
+                    label="Requester User"
+                    :options="$userOptions"
+                    :selected="old('requester_user_id', $ticket?->requester_user_id ?? auth()->id())"
+                    placeholder="Select User"
+                    required="true"
+                />
 
                 <!-- Assigned To -->
-                <div x-data="{
-                    search: '',
-                    open: false,
-                    selectedId: '{{ old('assigned_to_id', $ticket?->assigned_to_id) }}',
-                    selectedLabel: '',
-                    init() {
-                        const selectedOpt = this.$refs.select.querySelector('option[value=\'' + this.selectedId + '\']');
-                        if (selectedOpt) this.selectedLabel = selectedOpt.textContent.trim();
-                    },
-                    selectOption(id, label) {
-                        this.selectedId = id;
-                        this.selectedLabel = label;
-                        this.open = false;
-                        this.search = '';
-                    }
-                }" class="relative">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned Staff</label>
-                    <select name="assigned_to_id" x-ref="select" x-model="selectedId" class="hidden">
-                        <option value="">Unassigned</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endforeach
-                    </select>
-                    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                        <span x-text="selectedLabel || 'Unassigned'" class="truncate"></span>
-                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
-                    </div>
-                    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-                        <input type="text" x-model="search" placeholder="Search staff..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-                        <div @click="selectOption('', 'Unassigned')" class="cursor-pointer rounded-md p-2 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">Unassigned</div>
-                        <template x-for="option in Array.from($refs.select.options).filter(o => o.value && o.textContent.toLowerCase().includes(search.toLowerCase()))">
-                            <div @click="selectOption(option.value, option.textContent.trim())" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="option.textContent"></div>
-                        </template>
-                    </div>
-                </div>
+                @php
+                    $staffOptions = array_merge([['id' => '', 'text' => 'Unassigned']], $users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])->toArray());
+                @endphp
+                <x-form.searchable-select
+                    name="assigned_to_id"
+                    label="Assigned Staff"
+                    :options="$staffOptions"
+                    :selected="old('assigned_to_id', $ticket?->assigned_to_id)"
+                    placeholder="Unassigned"
+                />
 
                 <!-- ITSM Ticket Category -->
                 <div>
@@ -145,9 +97,30 @@
                 </div>
 
                 <!-- Status -->
-                <div>
+                @php
+                    $closedStatusIds = $ticketStatuses->filter(fn($s) => $s->is_closed || in_array($s->name, ['Completed', 'Closed', 'Resolved']))->pluck('id')->toArray();
+                @endphp
+                <div x-data="{
+                    closedIds: {{ json_encode($closedStatusIds) }},
+                    onStatusChange(e) {
+                        const val = parseInt(e.target.value);
+                        if (this.closedIds.includes(val)) {
+                            const now = new Date();
+                            const yyyy = now.getFullYear();
+                            const mm = String(now.getMonth() + 1).padStart(2, '0');
+                            const dd = String(now.getDate()).padStart(2, '0');
+                            const hh = String(now.getHours()).padStart(2, '0');
+                            const min = String(now.getMinutes()).padStart(2, '0');
+                            
+                            const dateInput = document.querySelector('input[name=\'completed_date\']');
+                            const timeInput = document.querySelector('input[name=\'completed_time\']');
+                            if (dateInput && !dateInput.value) dateInput.value = `${yyyy}-${mm}-${dd}`;
+                            if (timeInput && !timeInput.value) timeInput.value = `${hh}:${min}`;
+                        }
+                    }
+                }">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                    <select name="status_id" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                    <select name="status_id" @change="onStatusChange($event)" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
                         <option value="">Select Status</option>
                         @foreach($ticketStatuses as $status)
                             <option value="{{ $status->id }}" {{ old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? '')) == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
@@ -189,50 +162,30 @@
                 </div>
 
                 <!-- Linked IT Asset -->
-                <div class="sm:col-span-2" x-data="{
-                    search: '',
-                    open: false,
-                    selectedId: '{{ old('asset_id', $ticket?->asset_id) }}',
-                    selectedLabel: '',
-                    init() {
-                        const selectedOpt = this.$refs.select.querySelector('option[value=\'' + this.selectedId + '\']');
-                        if (selectedOpt) this.selectedLabel = selectedOpt.textContent.trim();
-                    },
-                    selectOption(id, label) {
-                        this.selectedId = id;
-                        this.selectedLabel = label;
-                        this.open = false;
-                        this.search = '';
-                    }
-                }">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Linked Asset (ITAM)</label>
-                    <select name="asset_id" x-ref="select" x-model="selectedId" class="hidden">
-                        <option value="">No Asset Linked</option>
-                        @foreach($assets as $asset)
-                            @php
-                                $holder = $asset->currentCheckout?->checkedOutToUser?->name ?? $asset->assignedToUser?->name;
-                                $dept = $asset->department?->name;
-                                $statusName = $asset->status?->name;
-                                $brandModel = optional($asset->product->brand)->name . ' ' . optional($asset->product)->model;
-                                $deviceName = $asset->device_name ?: trim($brandModel);
-                            @endphp
-                            <option value="{{ $asset->id }}">
-                                [{{ $asset->asset_tag }}] {{ $deviceName }} — {{ $holder ? 'User: ' . $holder : 'Unassigned' }} {{ $dept ? '('.$dept.')' : '' }} {{ $statusName ? '[' . $statusName . ']' : '' }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                        <span x-text="selectedLabel || 'No Asset Linked'" class="truncate"></span>
-                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
-                    </div>
-                    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-                        <input type="text" x-model="search" placeholder="Search asset tag, device, user..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-                        <div @click="selectOption('', 'No Asset Linked')" class="cursor-pointer rounded-md p-2 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">No Asset Linked</div>
-                        <template x-for="option in Array.from($refs.select.options).filter(o => o.value && o.textContent.toLowerCase().includes(search.toLowerCase()))">
-                            <div @click="selectOption(option.value, option.textContent.trim())" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="option.textContent"></div>
-                        </template>
-                    </div>
-                </div>
+                @php
+                    $assetOptions = array_merge(
+                        [['id' => '', 'text' => 'No Asset Linked']],
+                        $assets->map(function($asset) {
+                            $holder = $asset->currentCheckout?->checkedOutToUser?->name ?? $asset->assignedToUser?->name;
+                            $dept = $asset->department?->name;
+                            $statusName = $asset->status?->name;
+                            $brandModel = optional($asset->product?->brand)->name . ' ' . optional($asset->product)->model;
+                            $deviceName = $asset->device_name ?: trim($brandModel);
+                            return [
+                                'id' => $asset->id,
+                                'text' => '[' . $asset->asset_tag . '] ' . $deviceName . ' — ' . ($holder ? 'User: ' . $holder : 'Unassigned') . ($dept ? ' ('.$dept.')' : '') . ($statusName ? ' [' . $statusName . ']' : '')
+                            ];
+                        })->toArray()
+                    );
+                @endphp
+                <x-form.searchable-select
+                    name="asset_id"
+                    label="Linked Asset (ITAM)"
+                    :options="$assetOptions"
+                    :selected="old('asset_id', $ticket?->asset_id)"
+                    placeholder="No Asset Linked"
+                    class="sm:col-span-2"
+                />
             </div>
         </div>
 
@@ -264,6 +217,16 @@
                     Notes & Resolution
                 </h3>
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completed Date</label>
+                        <input type="date" name="completed_date" value="{{ old('completed_date', $ticket->completed_date?->format('Y-m-d')) }}" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completed Time</label>
+                        <input type="time" name="completed_time" value="{{ old('completed_time', $ticket->completed_time?->format('H:i')) }}" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Internal Notes</label>
                         <textarea name="internal_notes" rows="3" class="w-full rounded-lg border border-gray-300 bg-transparent p-3 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">{{ old('internal_notes', $ticket->internal_notes) }}</textarea>
