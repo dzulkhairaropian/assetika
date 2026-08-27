@@ -469,12 +469,12 @@
                             <p class="font-medium text-brand-600 dark:text-brand-400">#{{ $ticket->request_id }}</p>
                             <p class="text-[11px] text-gray-400 dark:text-gray-500">{{ Str::limit($ticket->requester_name, 20) }}</p>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ $ticket->category?->name ?? '-' }}</td>
+                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? '-' }}</td>
                         <td class="px-4 py-2.5">
                             <x-ui.badge 
                                 size="sm" 
                                 :color="$ticket->priority?->color ?? 'warning'"
-                                :featherIcon="$ticket->priority?->icon ?? 'alert-circle'"
+                                :featherIcon="$ticket->priority?->icon ?: 'alert-circle'"
                             >
                                 {{ $ticket->priority?->name ?? '-' }}
                             </x-ui.badge>
@@ -536,13 +536,13 @@
                             {{ $ticket->requester_name }}
                         </td>
                         <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
-                            {{ $ticket->category?->name ?? '-' }}
+                            {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? '-' }}
                         </td>
                         <td class="px-4 py-2.5">
                             <x-ui.badge 
                                 size="sm" 
                                 :color="$ticket->priority?->color ?? 'secondary'"
-                                :featherIcon="$ticket->priority?->icon ?? 'alert-circle'"
+                                :featherIcon="$ticket->priority?->icon ?: 'alert-circle'"
                             >
                                 {{ $ticket->priority?->name ?? '-' }}
                             </x-ui.badge>
@@ -551,7 +551,7 @@
                             <x-ui.badge 
                                 size="sm" 
                                 :color="$ticket->status?->color ?? 'primary'"
-                                :featherIcon="$ticket->status?->icon ?? 'disc'"
+                                :featherIcon="$ticket->status?->icon ?: 'disc'"
                             >
                                 {{ $ticket->status?->name ?? '-' }}
                             </x-ui.badge>

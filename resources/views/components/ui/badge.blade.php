@@ -1,4 +1,3 @@
-
 @props([
     'variant' => 'light',
     'size' => 'md',
@@ -12,30 +11,30 @@
     $baseStyles = 'inline-flex items-center w-fit px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium capitalize';
 
     $sizeStyles = [
-        'sm' => 'text-[10px] px-2 py-0',
+        'sm' => 'text-[10px] px-2 py-0.5',
         'md' => 'text-xs px-2.5 py-0.5',
     ];
 
     $variants = [
         'light' => [
-            'primary'   => 'bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400',
-            'secondary' => 'bg-gray-100 text-gray-600 dark:bg-gray-500/15 dark:text-gray-400',
-            'success'   => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500',
-            'danger'    => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
-            'error'     => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
-            'warning'   => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400',
-            'info'      => 'bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500',
+            'primary'   => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400',
+            'secondary' => 'bg-gray-100 text-gray-700 dark:bg-gray-500/15 dark:text-gray-400',
+            'success'   => 'bg-green-50 text-green-700 dark:bg-green-500/15 dark:text-green-400',
+            'danger'    => 'bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-400',
+            'error'     => 'bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-400',
+            'warning'   => 'bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400',
+            'info'      => 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/15 dark:text-cyan-400',
             'light'     => 'bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80',
             'dark'      => 'bg-gray-500 text-white dark:bg-white/5 dark:text-white',
         ],
         'solid' => [
             'primary'   => 'bg-brand-500 text-white',
             'secondary' => 'bg-gray-500 text-white dark:bg-white/15 dark:text-white',
-            'success'   => 'bg-success-500 text-white',
-            'danger'    => 'bg-error-500 text-white',
-            'error'     => 'bg-error-500 text-white',
-            'warning'   => 'bg-warning-500 text-white',
-            'info'      => 'bg-blue-light-500 text-white',
+            'success'   => 'bg-green-500 text-white',
+            'danger'    => 'bg-red-500 text-white',
+            'error'     => 'bg-red-500 text-white',
+            'warning'   => 'bg-orange-500 text-white',
+            'info'      => 'bg-cyan-500 text-white',
             'light'     => 'bg-gray-400 dark:bg-white/5 text-white dark:text-white/80',
             'dark'      => 'bg-gray-800 text-white dark:bg-white/15 dark:text-white',
         ],
@@ -47,8 +46,14 @@
     $isHexColor = preg_match($hexRegex, $color);
 
     if ($isHexColor) {
+        if (strlen($color) === 7) {
+            $bgColor = $color . '20'; // 12% opacity hex string
+        } else {
+            $bgColor = $color;
+        }
+
         if ($variant === 'light') {
-            $colorStyles = "background-color: color-mix(in srgb, {$color} 12%, transparent); color: {$color};";
+            $colorStyles = "background-color: {$bgColor}; color: {$color};";
         } else {
             $r = hexdec(substr($color, 1, 2));
             $g = hexdec(substr($color, 3, 2));
@@ -67,7 +72,34 @@
 <span class="{{ $baseStyles }} {{ $sizeClass }} {{ $isCustomStyle ? '' : $colorStyles }} {{ $attributes->get('class') }}" style="{{ $isCustomStyle ? $colorStyles : '' }}" {{ $attributes->except('class') }}>
     @if($featherIcon)
         <span class="flex shrink-0">
-            <i data-feather="{{ $featherIcon }}" class="w-3 h-3"></i>
+            @switch($featherIcon)
+                @case('alert-circle')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    @break
+                @case('check-circle')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    @break
+                @case('clock')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    @break
+                @case('flag')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                    @break
+                @case('disc')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                    @break
+                @case('thumbs-up')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    @break
+                @case('info')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    @break
+                @case('alert-triangle')
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    @break
+                @default
+                    <i data-feather="{{ $featherIcon }}" class="w-3 h-3"></i>
+            @endswitch
         </span>
     @endif
 

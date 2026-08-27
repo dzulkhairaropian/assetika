@@ -1,54 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-4">
     <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
 
-        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Process show.blade
-        </p>
-
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-3">
-            <h2 class="text-xl font-bold font-mono text-gray-800 dark:text-white/90">
-                [{{ $ticket->request_id }}]
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2.5">
+            <h2 class="text-lg font-bold font-mono text-gray-900 dark:text-white">
+                #{{ $ticket->request_id }}
             </h2>
-            <span class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <x-ui.badge :color="$ticket->status?->color ?? 'primary'" variant="light" size="sm" :featherIcon="$ticket->status?->icon ?: 'disc'">
                 {{ $ticket->status?->name ?? 'Open' }}
-            </span>
+            </x-ui.badge>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+            <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                 Back
             </a>
-            <a href="{{ route('tickets.edit', $ticket) }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-theme-sm font-medium text-white hover:bg-brand-600">
+            <a href="{{ route('tickets.edit', $ticket) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
                 Edit Issue
             </a>
         </div>
     </div>
 
     @if (session('success'))
-        <div class="p-4 rounded-xl border border-success-200 bg-success-50 text-success-700 dark:border-success-900/30 dark:bg-success-500/10 dark:text-success-400">
-            {{ session('success') }}
-        </div>
+        <x-ui.alert variant="success" message="{{ session('success') }}" />
     @endif
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <!-- Main Content Area: Problem, Comments, Activity Timeline -->
-        <div class="space-y-6 lg:col-span-8">
+        <div class="space-y-4 lg:col-span-8">
             <!-- Issue Description -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-4">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">Problem Description</h3>
-                <div class="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 p-4 rounded-xl dark:bg-gray-900/50">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Problem Description</h3>
+                <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 p-3.5 rounded-lg dark:bg-gray-950">
                     {{ $ticket->problem_description }}
                 </div>
 
                 @if($ticket->attachments->count() > 0)
-                    <div class="pt-2">
-                        <h4 class="text-xs font-semibold uppercase text-gray-500 mb-2">Ticket Attachments</h4>
+                    <div class="pt-1">
+                        <h4 class="text-[11px] font-semibold uppercase text-gray-400 mb-1.5">Ticket Attachments</h4>
                         <div class="flex flex-wrap gap-2">
                             @foreach($ticket->attachments as $attachment)
-                                <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                                     <i data-feather="file" class="w-3.5 h-3.5 text-brand-500"></i>
                                     <span>{{ $attachment->filename }}</span>
                                 </a>
@@ -60,19 +54,19 @@
 
             <!-- Resolution & Internal Notes -->
             @if($ticket->resolution_notes || $ticket->internal_notes)
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-4">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3">
                     @if($ticket->resolution_notes)
                         <div>
-                            <h4 class="text-xs font-semibold uppercase text-success-600 dark:text-success-400 mb-1">Resolution Summary</h4>
-                            <div class="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 bg-success-50/50 p-4 rounded-xl dark:bg-success-900/10">
+                            <h4 class="text-[11px] font-semibold uppercase text-green-600 dark:text-green-400 mb-1">Resolution Summary</h4>
+                            <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 bg-green-50/50 p-3 rounded-lg dark:bg-green-950/20">
                                 {{ $ticket->resolution_notes }}
                             </div>
                         </div>
                     @endif
                     @if($ticket->internal_notes)
                         <div>
-                            <h4 class="text-xs font-semibold uppercase text-warning-600 dark:text-warning-400 mb-1">Internal Notes</h4>
-                            <div class="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 bg-warning-50/50 p-4 rounded-xl dark:bg-warning-900/10">
+                            <h4 class="text-[11px] font-semibold uppercase text-orange-600 dark:text-orange-400 mb-1">Internal Notes</h4>
+                            <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 bg-orange-50/50 p-3 rounded-lg dark:bg-orange-950/20">
                                 {{ $ticket->internal_notes }}
                             </div>
                         </div>
@@ -81,24 +75,24 @@
             @endif
 
             <!-- Comments & Discussion -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-6">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">Activity & Discussion</h3>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Activity & Discussion</h3>
 
                 <!-- Add Comment Form -->
-                <form action="{{ route('tickets.comment', $ticket) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                <form action="{{ route('tickets.comment', $ticket) }}" method="POST" enctype="multipart/form-data" class="space-y-2.5">
                     @csrf
                     <div>
-                        <textarea name="comment" rows="3" required placeholder="Add a response or internal update..." class="w-full rounded-xl border border-gray-300 bg-transparent p-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+                        <textarea name="comment" rows="3" required placeholder="Add a response or internal update..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
                     </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                            <label class="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <label class="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                 <input type="checkbox" name="is_internal" value="1" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
                                 Internal note (visible to staff only)
                             </label>
-                            <input type="file" name="attachment" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-800 dark:file:text-gray-300"/>
+                            <input type="file" name="attachment" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-800 dark:file:text-gray-300"/>
                         </div>
-                        <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600">
+                        <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
                             Add Comment
                         </button>
                     </div>
@@ -107,24 +101,24 @@
                 <hr class="border-gray-100 dark:border-gray-800" />
 
                 <!-- Comment Feed -->
-                <div class="space-y-4">
+                <div class="space-y-3">
                     @forelse($ticket->comments as $comment)
-                        <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800 {{ $comment->is_internal ? 'bg-warning-50/30 dark:bg-warning-900/10' : 'bg-gray-50/50 dark:bg-gray-900/30' }}">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-medium text-xs text-gray-800 dark:text-white">
+                        <div class="rounded-lg border border-gray-100 p-3 dark:border-gray-800 {{ $comment->is_internal ? 'bg-orange-50/30 dark:bg-orange-950/20' : 'bg-gray-50/50 dark:bg-gray-950' }}">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="font-semibold text-xs text-gray-900 dark:text-white">
                                     {{ $comment->user?->name ?? 'System' }}
                                     @if($comment->is_internal)
-                                        <span class="ml-2 rounded bg-warning-100 px-1.5 py-0.5 text-[10px] font-semibold text-warning-700">Internal</span>
+                                        <span class="ml-1.5 rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">Internal</span>
                                     @endif
                                 </span>
                                 <span class="text-[11px] text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
                             </div>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $comment->body ?? $comment->comment }}</p>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $comment->body ?? $comment->comment }}</p>
 
                             @if($comment->attachments->count() > 0)
-                                <div class="mt-3 pt-2 border-t border-gray-100 dark:border-gray-800/60 flex flex-wrap gap-2">
+                                <div class="mt-2 pt-1.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
                                     @foreach($comment->attachments as $attachment)
-                                        <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:underline">
+                                        <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-medium text-brand-600 hover:underline">
                                             <i data-feather="paperclip" class="w-3 h-3"></i>
                                             {{ $attachment->filename }}
                                         </a>
@@ -133,18 +127,18 @@
                             @endif
                         </div>
                     @empty
-                        <p class="text-center text-xs text-gray-400 py-4">No comments yet.</p>
+                        <p class="text-center text-xs text-gray-400 py-3">No comments yet.</p>
                     @endforelse
                 </div>
             </div>
         </div>
 
         <!-- Sidebar Details / ITSM Metadata -->
-        <div class="space-y-6 lg:col-span-4">
+        <div class="space-y-4 lg:col-span-4">
             <!-- Ticket Info -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-4 text-xs">
-                <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Ticket Meta</h3>
-                <div class="space-y-2.5">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3 text-xs">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Ticket Meta</h3>
+                <div class="space-y-2">
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Priority</span>
                         <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->priority?->name ?? 'Normal' }}</span>
@@ -182,7 +176,7 @@
                         <span class="text-gray-500">Actual Hours</span>
                         <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->actual_hours ?? '0' }} hrs</span>
                     </div>
-                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+                    <div class="flex justify-between py-1">
                         <span class="text-gray-500">Created At</span>
                         <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->created_at?->format('d M Y H:i') }}</span>
                     </div>
@@ -190,10 +184,10 @@
             </div>
 
             <!-- Requester Information -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-3 text-xs">
-                <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Requester Details</h3>
-                <div class="space-y-2">
-                    <p class="font-medium text-sm text-gray-800 dark:text-white">{{ $ticket->requester_name ?? '-' }}</p>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-2 text-xs">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Requester Details</h3>
+                <div class="space-y-1">
+                    <p class="font-semibold text-xs text-gray-900 dark:text-white">{{ $ticket->requester_name ?? '-' }}</p>
                     <p class="text-gray-500">{{ $ticket->requester_email ?? '-' }}</p>
                     <p class="text-gray-500">{{ $ticket->requesterDepartment?->name ?? '-' }} / {{ $ticket->requesterCompany?->name ?? '-' }}</p>
                 </div>
@@ -205,12 +199,12 @@
                     $assetHolder = $ticket->asset->currentCheckout?->checkedOutToUser?->name ?? $ticket->asset->assignedToUser?->name;
                     $assetDept = $ticket->asset->department?->name;
                 @endphp
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 space-y-3 text-xs">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-2.5 text-xs">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Linked IT Asset</h3>
-                        <a href="{{ route('assets.show', $ticket->asset_id) }}" class="text-brand-500 font-medium hover:underline">View Asset</a>
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Linked IT Asset</h3>
+                        <a href="{{ route('assets.show', $ticket->asset_id) }}" class="text-brand-600 font-semibold hover:underline">View Asset</a>
                     </div>
-                    <div class="p-3 bg-brand-50/50 rounded-xl dark:bg-brand-900/10 space-y-1.5">
+                    <div class="p-2.5 bg-brand-50/50 rounded-lg dark:bg-brand-950/30 space-y-1">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-brand-700 dark:text-brand-300 font-mono">{{ $ticket->asset->asset_tag }}</span>
                             @if($ticket->asset->status)
@@ -219,10 +213,10 @@
                                 </x-ui.badge>
                             @endif
                         </div>
-                        <p class="text-gray-700 dark:text-gray-300 font-medium">{{ $ticket->asset->device_name ?? $ticket->asset->name }}</p>
-                        <p class="text-gray-500">S/N: {{ $ticket->asset->serial_number ?? '-' }}</p>
+                        <p class="text-gray-900 dark:text-white font-semibold text-xs">{{ $ticket->asset->device_name ?? $ticket->asset->name }}</p>
+                        <p class="text-gray-500 text-[11px]">S/N: {{ $ticket->asset->serial_number ?? '-' }}</p>
                         @if($assetHolder)
-                            <p class="text-gray-700 dark:text-gray-300 pt-1.5 border-t border-brand-100 dark:border-brand-900/30">
+                            <p class="text-gray-700 dark:text-gray-300 pt-1 border-t border-brand-100 dark:border-brand-900/30 text-[11px]">
                                 <span class="text-gray-400">User / Holder:</span> <span class="font-semibold text-gray-800 dark:text-white">{{ $assetHolder }}</span> {{ $assetDept ? '('.$assetDept.')' : '' }}
                             </p>
                         @endif

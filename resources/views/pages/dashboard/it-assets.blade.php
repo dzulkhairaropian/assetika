@@ -6,22 +6,22 @@
         <!-- Dashboard Header -->
         <div class="col-span-12 min-w-0">
             <x-common.page-breadcrumb pageTitle="IT Assets Dashboard" />
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
                         Hi, {{ $userName }}! 👋
-                        <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
                     </h2>
                 </div>
-                <div class="flex items-center gap-3 shrink-0">
-                    <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                        <i data-feather="plus" class="w-4 h-4"></i> Add Asset
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <i data-feather="plus" class="w-3.5 h-3.5"></i> Add Asset
                     </a>
-                    <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 transition">
-                        <i data-feather="download" class="w-4 h-4"></i> Export
+                    <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                        <i data-feather="download" class="w-3.5 h-3.5"></i> Export
                     </a>
-                    <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 transition">
-                        <i data-feather="log-out" class="w-4 h-4"></i> Checkout
+                    <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                        <i data-feather="log-out" class="w-3.5 h-3.5"></i> Checkout
                     </a>
                 </div>
             </div>

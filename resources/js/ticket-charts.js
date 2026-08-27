@@ -183,8 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Requester Horizontal Bar
     const reqCanvas = mountCanvas('#ticketRequesterChart');
-    if (requesterChart && reqCanvas) {
+    if (reqCanvas && requesterChart) {
         new Chart(reqCanvas, createHBarConfig(requesterChart.labels, requesterChart.data, chartColors.green));
+    }
+
+    if (window.feather) {
+        window.feather.replace();
     }
 });
 
