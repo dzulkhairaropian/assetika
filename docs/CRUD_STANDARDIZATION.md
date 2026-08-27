@@ -317,38 +317,21 @@ Gunakan layout 2 kolom responsif: `grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380
 @endsection
 ```
 
-### B. Standard Input Styling
+### B. Standard Input Styling (Compact TailAdmin Pattern)
 ```blade
 <!-- Input Text/Email/Number -->
 <div>
-    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
         Label <span class="text-error-500">*</span>
     </label>
     <input type="text" name="field_name" value="{{ old('field_name') }}" placeholder="Enter placeholder..." required
-        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
     @error('field_name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
 </div>
 
-<!-- Select Input -->
+<!-- Searchable Select Component -->
 <div>
-    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Select Label <span class="text-error-500">*</span>
-    </label>
-    <div x-data="{ isOptionSelected: {{ old('select_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-        <select name="select_id" required
-            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-            :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-            <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Option</option>
-            @foreach($options as $opt)
-                <option value="{{ $opt->id }}" {{ old('select_id') == $opt->id ? 'selected' : '' }}>{{ $opt->name }}</option>
-            @endforeach
-        </select>
-        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-        </span>
-    </div>
+    <x-form.searchable-select name="select_id" label="Select Label" :options="$options" :selected="old('select_id')" placeholder="Select Option" required="true" />
     @error('select_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
 </div>
 ```
