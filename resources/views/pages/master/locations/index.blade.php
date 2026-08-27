@@ -1,7 +1,7 @@
 ﻿@extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6" x-data="{
+    <div class="space-y-4" x-data="{
         selectedItems: [],
         selectAll: false,
         toggleAll() {
@@ -23,7 +23,7 @@
     }">
         <x-common.page-breadcrumb pageTitle="Locations" />
 
-        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+        <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
             Manage offices and sites where assets are deployed.
         </p>
 
@@ -42,73 +42,63 @@
         <!-- Bulk Action Bar -->
         <div x-show="selectedItems.length > 0"
             x-transition
-            class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-900/30 dark:bg-brand-500/10"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
-                <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
-                <span class="text-sm font-medium text-brand-700 dark:text-brand-400">
+                <i data-feather="info" class="w-4 h-4 text-brand-500"></i>
+                <span class="text-xs font-semibold text-brand-700 dark:text-brand-400">
                     <span x-text="selectedItems.length"></span> items selected.
                 </span>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-error-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-error-600">
-                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
+                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             {{-- Card Header: Toolbar --}}
-            <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <form action="{{ route('locations.index') }}" method="GET" class="flex flex-wrap items-center gap-3" x-data="{ filterOpen: false }">
+            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <form action="{{ route('locations.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
                         <div class="relative flex items-center">
-                            <span class="absolute left-3 text-gray-400">
-                                <i data-feather="search" class="w-4 h-4"></i>
+                            <span class="absolute left-2.5 text-gray-400">
+                                <i data-feather="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search locations..."
-                                class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
                         </div>
 
                         @php $activeCount = request('company_id') ? 1 : 0; @endphp
 
                         <div class="relative" @click.away="filterOpen = false">
                             <button type="button" @click="filterOpen = !filterOpen"
-                                class="relative inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition">
-                                <svg class="stroke-current fill-white dark:fill-gray-900" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2.29004 5.90393H17.7067" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M17.7075 14.0961H2.29085" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M12.0826 3.33331C13.5024 3.33331 14.6534 4.48431 14.6534 5.90414C14.6534 7.32398 13.5024 8.47498 12.0826 8.47498C10.6627 8.47498 9.51172 7.32398 9.51172 5.90415C9.51172 4.48432 10.6627 3.33331 12.0826 3.33331Z" fill="" stroke="" stroke-width="1.5" />
-                                    <path d="M7.91745 11.525C6.49762 11.525 5.34662 12.676 5.34662 14.0959C5.34661 15.5157 6.49762 16.6667 7.91745 16.6667C9.33728 16.6667 10.4883 15.5157 10.4883 14.0959C10.4883 12.676 9.33728 11.525 7.91745 11.525Z" fill="" stroke="" stroke-width="1.5" />
-                                </svg>
+                                class="relative inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                                <i data-feather="sliders" class="w-3.5 h-3.5"></i>
                                 Filters
                                 @if($activeCount > 0)
-                                    <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
+                                    <span class="inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
                                 @endif
                             </button>
 
                             <div x-show="filterOpen"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute left-0 top-full z-50 mt-2 w-80 rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+                                x-transition
+                                class="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                 style="display: none;">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white/90">Filter Options</h4>
+                                <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
+                                    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-white">Filter Options</h4>
                                     <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                        <i data-feather="x" class="w-5 h-5"></i>
+                                        <i data-feather="x" class="w-4 h-4"></i>
                                     </button>
                                 </div>
 
                                 <div>
-                                    <label class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Company</label>
+                                    <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Company</label>
                                     <select name="company_id"
-                                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 pr-8 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                        class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                         <option value="">All Companies</option>
                                         @foreach($companies as $company)
                                             <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
@@ -116,12 +106,12 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-center justify-between mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
-                                    <a href="{{ route('locations.index') }}" class="text-sm text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400 transition">
+                                <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                                    <a href="{{ route('locations.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
                                         Clear All Filters
                                     </a>
                                     <button type="submit" @click="filterOpen = false"
-                                        class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 transition">
+                                        class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
                                         Apply Filters
                                     </button>
                                 </div>
@@ -129,9 +119,9 @@
                         </div>
                     </form>
 
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('locations.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                            <i data-feather="plus" class="w-4 h-4"></i>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('locations.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                            <i data-feather="plus" class="w-3.5 h-3.5"></i>
                             Add Location
                         </a>
                     </div>
@@ -140,88 +130,75 @@
 
             {{-- Table --}}
             <div class="max-w-full overflow-x-auto">
-                <table class="min-w-full">
-                    <thead class="border-b border-gray-100 dark:border-gray-800">
-                        <tr>
-                            <th class="px-5 py-3 sm:px-6">
-                                <div class="flex items-center">
+                <table class="min-w-full text-xs">
+                    <thead>
+                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
+                                <label class="flex cursor-pointer items-center select-none">
+                                    <div class="relative">
+                                        <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
+                                        <div :class="selectAll ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
+                                            class="hover:border-brand-500 dark:hover:border-brand-500 flex h-4 w-4 items-center justify-center rounded border transition">
+                                            <span :class="selectAll ? '' : 'opacity-0'">
+                                                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Code</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Location Name</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Company</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assets Count</th>
+                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        @forelse($locations as $loc)
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
+                                <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
-                                            <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
-                                            <div :class="selectAll ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
-                                                class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
-                                                <span :class="selectAll ? '' : 'opacity-0'">
-                                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <input type="checkbox" value="{{ $loc->id }}" class="row-checkbox sr-only"
+                                                :checked="selectedItems.includes({{ $loc->id }})" @click="toggleItem({{ $loc->id }})">
+                                            <div :class="selectedItems.includes({{ $loc->id }}) ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
+                                                class="hover:border-brand-500 dark:hover:border-brand-500 flex h-4 w-4 items-center justify-center rounded border transition">
+                                                <span :class="selectedItems.includes({{ $loc->id }}) ? '' : 'opacity-0'">
+                                                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                     </svg>
                                                 </span>
                                             </div>
                                         </div>
                                     </label>
-                                </div>
-                            </th>
-                            <th class="px-5 py-3 sm:px-6">
-                                <div class="flex items-center">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Location Name</p>
-                                </div>
-                            </th>
-                            <th class="px-5 py-3 sm:px-6">
-                                <div class="flex items-center">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Company</p>
-                                </div>
-                            </th>
-                            <th class="px-5 py-3 sm:px-6">
-                                <div class="flex items-center justify-end">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                        @forelse($locations as $loc)
-                            <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <label class="flex cursor-pointer items-center select-none">
-                                            <div class="relative">
-                                                <input type="checkbox" value="{{ $loc->id }}" class="row-checkbox sr-only"
-                                                    :checked="selectedItems.includes({{ $loc->id }})" @click="toggleItem({{ $loc->id }})">
-                                                <div :class="selectedItems.includes({{ $loc->id }}) ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
-                                                    class="hover:border-brand-500 dark:hover:border-brand-500 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px] transition">
-                                                    <span :class="selectedItems.includes({{ $loc->id }}) ? '' : 'opacity-0'">
-                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <span class="text-theme-sm font-medium text-gray-700 dark:text-gray-400">{{ $loc->name }}</span>
+                                <td class="px-4 py-2.5">
+                                    <span class="font-mono font-semibold text-gray-900 dark:text-white">{{ $loc->code }}</span>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <span class="text-theme-sm text-gray-600 dark:text-gray-400">{{ $loc->company->name ?? '-' }}</span>
+                                <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white">
+                                    {{ $loc->name }}
                                 </td>
-                                <td class="px-5 py-4 sm:px-6 text-right">
+                                <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
+                                    {{ $loc->company?->name ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2.5 font-semibold text-gray-800 dark:text-gray-200">
+                                    {{ $loc->assets_count ?? 0 }} assets
+                                </td>
+                                <td class="px-4 py-2.5 text-end">
                                     <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
-                                        <button type="button" @click="open = !open" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
-                                            <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                        <button type="button" @click="open = !open" class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+                                            <i data-feather="more-vertical" class="w-4 h-4"></i>
                                         </button>
 
                                         <div x-show="open"
-                                            x-transition:enter="transition ease-out duration-100"
-                                            x-transition:enter-start="transform opacity-0 scale-95"
-                                            x-transition:enter-end="transform opacity-100 scale-100"
-                                            x-transition:leave="transition ease-in duration-75"
-                                            x-transition:leave-start="transform opacity-100 scale-100"
-                                            x-transition:leave-end="transform opacity-0 scale-95"
-                                            class="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900"
+                                            x-transition
+                                            class="absolute right-0 top-full z-50 mt-1 w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                             style="display: none;">
                                             
-                                            <a href="{{ route('locations.edit', $loc) }}" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-feather="edit-3" class="w-4 h-4 text-gray-400"></i>
+                                            <a href="{{ route('locations.edit', $loc) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-feather="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
                                                 Edit
                                             </a>
 
@@ -230,8 +207,8 @@
                                             <form action="{{ route('locations.destroy', $loc) }}" method="POST" onsubmit="return confirm('Are you sure?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
-                                                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
+                                                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
                                                     Delete
                                                 </button>
                                             </form>
@@ -241,13 +218,13 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center space-y-2">
-                                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-feather="map-pin" class="w-6 h-6"></i>
+                                <td colspan="6" class="px-4 py-8 text-center">
+                                    <div class="flex flex-col items-center justify-center space-y-1.5">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
+                                            <i data-feather="map-pin" class="w-5 h-5"></i>
                                         </div>
-                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No locations found</p>
-                                        <p class="text-xs text-gray-400 dark:text-gray-500">Add a location to assign assets to a site.</p>
+                                        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No locations found</p>
+                                        <p class="text-[11px] text-gray-400 dark:text-gray-500">Add a location to track asset placement across sites.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -257,7 +234,7 @@
             </div>
 
             {{-- Pagination Footer --}}
-            <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6">
+            <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
                 {{ $locations->links() }}
             </div>
         </div>

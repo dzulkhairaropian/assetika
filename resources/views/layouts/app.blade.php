@@ -130,14 +130,14 @@
     <x-common.preloader/>
     {{-- preloader end --}}
 
-    <div class="min-h-screen xl:flex">
+    <div class="min-h-screen relative overflow-x-hidden">
         @include('layouts.backdrop')
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out"
+        <div class="flex flex-col min-h-screen transition-all duration-300 ease-in-out"
             :class="{
-                'xl:ml-[290px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
-                'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
+                'xl:ml-[290px]': $store.sidebar.isExpanded,
+                'xl:ml-[90px]': !$store.sidebar.isExpanded,
                 'ml-0': $store.sidebar.isMobileOpen
             }">
             <!-- app header start -->
