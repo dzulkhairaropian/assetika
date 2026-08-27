@@ -179,35 +179,35 @@
 
                     <!-- Export Modal -->
                     <div x-show="exportModalOpen" x-cloak @keydown.escape.window="exportModalOpen = false"
-                        class="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto p-5"
+                        class="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto p-4"
                         style="display: none;">
                         <div @click="exportModalOpen = false" class="fixed inset-0 h-full w-full bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
                         
-                        <div @click.stop class="relative w-full max-w-[650px] rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 z-10 border border-gray-200 dark:border-gray-800">
-                            <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div @click.stop class="relative w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 z-10 border border-gray-200 dark:border-gray-800">
+                            <div class="mb-3 flex items-center justify-between border-b border-gray-100 pb-2.5 dark:border-gray-800">
                                 <div>
-                                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Export Tickets</h3>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Filter and export support request tickets to an Excel spreadsheet.</p>
+                                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Export Tickets</h3>
+                                    <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Select filters to export support tickets to Excel.</p>
                                 </div>
                                 <button type="button" @click="exportModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                    <i data-feather="x" class="w-5 h-5"></i>
+                                    <i data-feather="x" class="w-4 h-4"></i>
                                 </button>
                             </div>
 
-                            <form action="{{ route('tickets.export') }}" method="GET" class="space-y-4">
-                                <div class="grid grid-cols-2 gap-3 text-left">
+                            <form action="{{ route('tickets.export') }}" method="GET" class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
-                                        <input type="date" name="from_date" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">From Date</label>
+                                        <input type="date" name="from_date" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
-                                        <input type="date" name="to_date" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white" />
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">To Date</label>
+                                        <input type="date" name="to_date" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
-                                        <select name="company_id" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Company</label>
+                                        <select name="company_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Companies</option>
                                             @foreach($companies as $c)
                                                 <option value="{{ $c->id }}">{{ $c->name }}</option>
@@ -216,8 +216,8 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
-                                        <select name="department_id" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Department</label>
+                                        <select name="department_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Departments</option>
                                             @foreach($departments as $d)
                                                 <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -226,8 +226,8 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-                                        <select name="ticket_category_id" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Category</label>
+                                        <select name="ticket_category_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Categories</option>
                                             @foreach($categories as $cat)
                                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -236,8 +236,8 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
-                                        <select name="priority_id" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Priority</label>
+                                        <select name="priority_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Priorities</option>
                                             @foreach($priorities as $p)
                                                 <option value="{{ $p->id }}">{{ $p->name }}</option>
@@ -246,8 +246,8 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                                        <select name="status_id" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
+                                        <select name="status_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Statuses</option>
                                             @foreach($statuses as $st)
                                                 <option value="{{ $st->id }}">{{ $st->name }}</option>
@@ -256,8 +256,8 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Created By</label>
-                                        <select name="created_by_id" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Created By</label>
+                                        <select name="created_by_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Users</option>
                                             @foreach($users as $u)
                                                 <option value="{{ $u->id }}">{{ $u->name }}</option>
@@ -266,11 +266,11 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-5 flex items-center justify-end gap-2.5 border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <button type="button" @click="exportModalOpen = false" class="rounded-lg border border-gray-300 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                                <div class="mt-4 flex items-center justify-end gap-2 border-t border-gray-100 pt-3 dark:border-gray-800">
+                                    <button type="button" @click="exportModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
                                         Cancel
                                     </button>
-                                    <button type="submit" @click="exportModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
+                                    <button type="submit" @click="exportModalOpen = false" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
                                         <i data-feather="download" class="w-3.5 h-3.5"></i>
                                         Export Excel
                                     </button>
