@@ -226,7 +226,9 @@ class TicketController extends Controller
             'attachments', 'comments.user', 'comments.attachments', 'histories.user'
         ]);
 
-        return view('pages.tickets.show', compact('ticket'));
+        $projects = \App\Models\Project::latest()->get();
+
+        return view('pages.tickets.show', compact('ticket', 'projects'));
     }
 
     public function edit(Ticket $ticket): View

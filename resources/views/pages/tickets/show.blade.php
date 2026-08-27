@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-4">
+<div class="space-y-4" x-data="{ openProjectModal: false }">
     <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -14,6 +14,12 @@
             </x-ui.badge>
         </div>
         <div class="flex gap-2">
+            @if(isset($projects) && $projects->count() > 0)
+                <button type="button" @click="openProjectModal = true" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 transition">
+                    <i data-feather="layout" class="w-3.5 h-3.5"></i>
+                    Add to Project Task
+                </button>
+            @endif
             <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                 Back
             </a>
@@ -225,5 +231,70 @@
             @endif
         </div>
     </div>
+
+    <!-- Modal Link to Project -->
+    @if(isset($projects) && $projects->count() > 0)
+        <div x-show="openProjectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak x-data="{ selectedProject: '{{ $projects->first()?->id }}' }">
+            <div class="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Convert Ticket to Project Task</h3>
+                    <button type="button" @click="openProjectModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form :action="'/projects/' + selectedProject + '/tasks'" method="POST" class="space-y-3.5 text-left">
+                    @csrf
+                    <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
+                    @if($ticket->asset_id)
+                        <input type="hidden" name="asset_id" value="{{ $ticket->asset_id }}">
+                    @endif
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Target Project <span class="text-error-500">*</span></label>
+                        <select x-model="selectedProject" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                            @foreach($projects as $prj)
+                                <option value="{{ $prj->id }}">{{ $prj->code }} - {{ $prj->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Task Title <span class="text-error-500">*</span></label>
+                        <input type="text" name="title" value="[Ticket #{{ $ticket->request_id }}] {{ $ticket->title }}" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Assign Tech/Staff</label>
+                            <select name="assigned_to_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                <option value="">Unassigned</option>
+                                <option value="{{ $ticket->assigned_to_id }}" selected>{{ $ticket->assignedTo?->name ?: 'Same as Ticket Assignee' }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
+                            <select name="priority" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                <option value="low">Low</option>
+                                <option value="medium" {{ strtolower($ticket->priority?->name) === 'medium' ? 'selected' : '' }}>Medium</option>
+                                <option value="high" {{ strtolower($ticket->priority?->name) === 'high' ? 'selected' : '' }}>High</option>
+                                <option value="urgent" {{ in_array(strtolower($ticket->priority?->name), ['urgent', 'critical']) ? 'selected' : '' }}>Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Task Notes / Details</label>
+                        <textarea name="description" rows="3" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">{{ $ticket->problem_description }}</textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                        <button type="button" @click="openProjectModal = false" class="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">Cancel</button>
+                        <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">Add to Project Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

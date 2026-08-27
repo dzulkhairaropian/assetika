@@ -17,6 +17,7 @@ class Project extends Model
         'name',
         'description',
         'owner_id',
+        'status_id',
         'status',
         'priority',
         'start_date',
@@ -35,6 +36,11 @@ class Project extends Model
         return $this->belongsTo(User::class, 'owner_id');
     }
 
+    public function statusRel(): BelongsTo
+    {
+        return $this->belongsTo(Status::class, 'status_id');
+    }
+
     public function tasks(): HasMany
     {
         return $this->hasMany(ProjectTask::class);
@@ -44,7 +50,14 @@ class Project extends Model
     {
         $total = $this->tasks()->count();
         if ($total === 0) return 0;
-        $done = $this->tasks()->where('status', 'done')->count();
-        return (int) round(($done / $total) * 100);
+        
+        $doneCount = $this->tasks()->where(function ($q) {
+            $q->where('status', 'done')
+              ->orWhereHas('statusRel', function ($sq) {
+                  $sq->where('name', 'Done');
+              });
+        })->count();
+
+        return (int) round(($doneCount / $total) * 100);
     }
 }

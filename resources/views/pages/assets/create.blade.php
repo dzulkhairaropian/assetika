@@ -25,118 +25,31 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Product <span class="text-error-500">*</span>
-                            </label>
-                            <div x-data="{ isOptionSelected: {{ old('product_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-                                <select name="product_id" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Product</option>
-                                    @foreach($products as $product)
-                                        <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                            {{ $product->brand->name ?? '' }} - {{ $product->model }} ({{ $product->category->name ?? '' }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
+                            <x-form.searchable-select name="product_id" label="Product" :options="$productOpts" :selected="old('product_id')" placeholder="Select Product" required="true" />
                             @error('product_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Status <span class="text-error-500">*</span>
-                            </label>
                             @php
                                 $readyToDeployStatus = $statuses->where('name', 'Ready to Deploy')->first();
                                 $defaultStatusId = $readyToDeployStatus ? $readyToDeployStatus->id : '';
                             @endphp
-                            <div x-data="{ isOptionSelected: {{ old('status_id', $defaultStatusId) ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-                                <select name="status_id" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Status</option>
-                                    @foreach($statuses as $status)
-                                        <option value="{{ $status->id }}" {{ old('status_id', $defaultStatusId) == $status->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">{{ $status->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
+                            <x-form.searchable-select name="status_id" label="Status" :options="$statusOpts" :selected="old('status_id', $defaultStatusId)" placeholder="Select Status" required="true" />
                             @error('status_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Vendor
-                            </label>
-                            <div x-data="{ isOptionSelected: {{ old('vendor_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-                                <select name="vendor_id"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Vendor</option>
-                                    @foreach($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}" {{ old('vendor_id') == $vendor->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">{{ $vendor->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
+                            <x-form.searchable-select name="vendor_id" label="Vendor" :options="$vendorOpts" :selected="old('vendor_id')" placeholder="Select Vendor" />
                             @error('vendor_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Department <span class="text-error-500">*</span>
-                            </label>
-                            <div x-data="{ isOptionSelected: {{ old('department_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-                                <select name="department_id" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Department</option>
-                                    @foreach($departments as $dept)
-                                        <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">{{ $dept->name }}{{ $dept->company ? ' - ' . $dept->company->name : '' }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
+                            <x-form.searchable-select name="department_id" label="Department" :options="$deptOpts" :selected="old('department_id')" placeholder="Select Department" required="true" />
                             @error('department_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Location
-                            </label>
-                            <div x-data="{ isOptionSelected: {{ old('location_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-                                <select name="location_id"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Location</option>
-                                    @foreach($locations as $loc)
-                                        <option value="{{ $loc->id }}" {{ old('location_id') == $loc->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">{{ $loc->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
+                            <x-form.searchable-select name="location_id" label="Location" :options="$locationOpts" :selected="old('location_id')" placeholder="Select Location" />
                             @error('location_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
@@ -252,24 +165,7 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Operating System
-                            </label>
-                            <div x-data="{ isOptionSelected: {{ old('operating_system_id') ? 'true' : 'false' }} }" class="relative z-20 bg-transparent">
-                                <select name="operating_system_id"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                    <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select OS</option>
-                                    @foreach($operatingSystems as $os)
-                                        <option value="{{ $os->id }}" {{ old('operating_system_id') == $os->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">{{ $os->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
+                            <x-form.searchable-select name="operating_system_id" label="Operating System" :options="$osOpts" :selected="old('operating_system_id')" placeholder="Select OS" />
                             @error('operating_system_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 

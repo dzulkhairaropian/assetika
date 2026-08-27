@@ -214,7 +214,7 @@ class AssetController extends Controller
 
     public function create()
     {
-        $products = Product::with('category')
+        $products = Product::with(['category', 'brand'])
             ->whereHas('masterCategory', function($q) {
                 $q->where('name', 'IT Asset');
             })->get();
@@ -223,12 +223,20 @@ class AssetController extends Controller
         })->get();
         $vendors = Vendor::all();
         $operatingSystems = OperatingSystem::all();
-        $departments = Department::all();
+        $departments = Department::with('company')->get();
         $locations = Location::all();
         $depreciations = \App\Models\Depreciation::all();
 
+        $productOpts = $products->map(fn($p) => ['id' => $p->id, 'text' => ($p->brand->name ?? '') . ' - ' . $p->model . ' (' . ($p->category->name ?? '') . ')'])->toArray();
+        $statusOpts = $statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray();
+        $vendorOpts = $vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray();
+        $deptOpts = $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray();
+        $locationOpts = $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray();
+        $osOpts = $operatingSystems->map(fn($o) => ['id' => $o->id, 'text' => $o->name])->toArray();
+
         return view('pages.assets.create', compact(
-            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations'
+            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
+            'productOpts', 'statusOpts', 'vendorOpts', 'deptOpts', 'locationOpts', 'osOpts'
         ));
     }
     public function store(Request $request)
@@ -318,7 +326,7 @@ class AssetController extends Controller
 
     public function edit(Asset $asset)
     {
-        $products = Product::with('category')
+        $products = Product::with(['category', 'brand'])
             ->whereHas('masterCategory', function($q) {
                 $q->where('name', 'IT Asset');
             })->get();
@@ -327,12 +335,20 @@ class AssetController extends Controller
         })->get();
         $vendors = Vendor::all();
         $operatingSystems = OperatingSystem::all();
-        $departments = Department::all();
+        $departments = Department::with('company')->get();
         $locations = Location::all();
         $depreciations = \App\Models\Depreciation::all();
 
+        $productOpts = $products->map(fn($p) => ['id' => $p->id, 'text' => ($p->brand->name ?? '') . ' - ' . $p->model . ' (' . ($p->category->name ?? '') . ')'])->toArray();
+        $statusOpts = $statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray();
+        $vendorOpts = $vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray();
+        $deptOpts = $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray();
+        $locationOpts = $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray();
+        $osOpts = $operatingSystems->map(fn($o) => ['id' => $o->id, 'text' => $o->name])->toArray();
+
         return view('pages.assets.edit', compact(
-            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations'
+            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
+            'productOpts', 'statusOpts', 'vendorOpts', 'deptOpts', 'locationOpts', 'osOpts'
         ));
     }
 

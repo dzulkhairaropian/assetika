@@ -14,6 +14,12 @@
     options: {{ json_encode($options) }},
     selectedId: '{{ $selected }}',
     placeholder: '{{ addslashes($placeholder) }}',
+    toggleOpen() {
+        this.open = !this.open;
+        if (this.open) {
+            $nextTick(() => this.$refs.searchInput?.focus());
+        }
+    },
     get selectedLabel() {
         const item = this.options.find(o => o.id == this.selectedId);
         return item ? item.text : this.placeholder;
@@ -29,7 +35,7 @@
     }
 }">
     @if($label)
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
             {{ $label }}
             @if($required) <span class="text-error-500">*</span> @endif
         </label>
@@ -37,15 +43,38 @@
 
     <input type="hidden" name="{{ $name }}" :value="selectedId" @if($required) required @endif>
 
-    <div @click="open = !open" @click.away="open = false" class="cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-        <span x-text="selectedLabel" class="truncate"></span>
-        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 shrink-0"></i>
+    <!-- Trigger Button -->
+    <div @click="toggleOpen()" @click.away="open = false" 
+        class="dark:bg-dark-900 shadow-theme-xs cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 focus:border-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+        <span x-text="selectedLabel" :class="!selectedId && 'text-gray-400 dark:text-white/30'" class="truncate"></span>
+        <svg class="stroke-current text-gray-500 dark:text-gray-400 shrink-0" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
     </div>
 
-    <div x-show="open" x-cloak class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-        <input type="text" x-model="search" @click.stop placeholder="Search..." class="w-full mb-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-        <template x-for="item in filteredOptions" :key="item.id">
-            <div @click="selectOption(item.id)" class="cursor-pointer rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" x-text="item.text"></div>
-        </template>
+    <!-- Dropdown Menu with Search -->
+    <div x-show="open" x-cloak x-transition
+        class="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-xl border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-800 dark:bg-gray-900 space-y-1">
+        <div class="p-1 sticky top-0 bg-white dark:bg-gray-900 z-10">
+            <input type="text" x-ref="searchInput" x-model="search" @click.stop 
+                placeholder="Search..." 
+                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+        </div>
+        <div class="divide-y divide-gray-50 dark:divide-gray-800/50">
+            <div @click="selectOption('')" 
+                 class="cursor-pointer rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800">
+                -- {{ $placeholder }} --
+            </div>
+            <template x-for="item in filteredOptions" :key="item.id">
+                <div @click="selectOption(item.id)" 
+                     :class="selectedId == item.id ? 'bg-brand-50 text-brand-600 font-semibold dark:bg-brand-500/10 dark:text-brand-400' : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'"
+                     class="cursor-pointer rounded-lg px-3 py-2 text-xs transition-colors" 
+                     x-text="item.text">
+                </div>
+            </template>
+            <div x-show="filteredOptions.length === 0" class="p-3 text-center text-xs text-gray-400">
+                No matching options found.
+            </div>
+        </div>
     </div>
 </div>

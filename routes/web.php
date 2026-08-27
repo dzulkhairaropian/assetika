@@ -230,6 +230,12 @@ Route::middleware('auth')->group(function () {
     Route::put('api/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'update'])->name('api.calendar.update');
     Route::delete('api/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'destroy'])->name('api.calendar.destroy');
     Route::get('kb/suggestions', [\App\Http\Controllers\KbController::class, 'suggestions'])->name('kb.suggestions');
+    // Projects & Operations
+    Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+    Route::post('projects/{project}/tasks', [\App\Http\Controllers\ProjectController::class, 'storeTask'])->name('projects.store-task');
+    Route::patch('project-tasks/{task}/status', [\App\Http\Controllers\ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
+    Route::delete('project-tasks/{task}', [\App\Http\Controllers\ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
+
     Route::resource('kb', \App\Http\Controllers\KbController::class);
     Route::resource('sla-policies', \App\Http\Controllers\SlaPolicyController::class)->only(['index', 'store']);
     Route::resource('renewals', \App\Http\Controllers\RenewalController::class);

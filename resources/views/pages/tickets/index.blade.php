@@ -418,7 +418,7 @@
 
                                     <div x-show="open"
                                         x-transition
-                                        class="absolute right-0 top-full z-50 mt-1 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+                                        class="absolute right-0 {{ $loop->remaining < 3 ? 'bottom-full mb-1' : 'top-full mt-1' }} z-50 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                         style="display: none;">
                                         
                                         <a href="{{ route('tickets.show', $ticket) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">

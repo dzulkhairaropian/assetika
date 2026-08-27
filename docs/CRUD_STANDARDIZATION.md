@@ -2,7 +2,7 @@
 
 Panduan standar pembuatan dan perbaikan **semua halaman CRUD** di Assetika: Master Data, IT Assets, Consumables, Tickets, GA Assets, Users & Roles, Stock Counts, dan modul lainnya — berdasarkan pola acuan **Asset CRUD** & **TailAdmin Design System**.
 
-> **Status**: Standar ini sudah diterapkan pada 94+ file Blade (16 modul master data + 10 modul non-master + halaman standalone). Semua halaman CRUD baru **wajib** mengikuti panduan ini.
+> **Status**: Standar ini sudah diterapkan pada semua file Blade di Assetika (13 modul master data + 11 modul non-master + projects & standalone). Semua halaman CRUD baru **wajib** mengikuti panduan ini.
 
 ---
 
@@ -19,9 +19,9 @@ resources/views/pages/{module}/
 ```
 
 Modul yang sudah terstandarisasi:
-- **Master Data (16)**: brands, categories, companies, custom-fields, departments, depreciations, eulas, fieldsets, locations, maintenance-types, master-categories, operating-systems, positions, products, statuses, vendors
-- **Non-Master (10)**: tickets, components, consumables, licenses, kits, ga-assets, ga-categories, users, roles, stock-counts
-- **Standalone**: labels, reports, backups, import, requests
+- **Master Data (13)**: brands, categories, companies, departments, depreciations, locations, maintenance-types, master-categories, operating-systems, positions, products, statuses, vendors
+- **Non-Master (11)**: tickets, components, consumables, licenses, kits, ga-assets, ga-categories, users, roles, stock-counts, projects
+- **Standalone**: backups, import, requests
 
 ---
 

@@ -85,6 +85,11 @@ class MenuHelper
                 'title' => 'Service Desk',
                 'items' => [
                     [
+                        'name' => 'IT Projects',
+                        'icon' => 'dashboard',
+                        'path' => '/projects',
+                    ],
+                    [
                         'name' => 'Ticketing System',
                         'icon' => 'ticket',
                         'path' => '/tickets',

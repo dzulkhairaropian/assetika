@@ -16,6 +16,7 @@ class ProjectTask extends Model
         'title',
         'description',
         'assigned_to_id',
+        'status_id',
         'status',
         'priority',
         'start_date',
@@ -34,6 +35,11 @@ class ProjectTask extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function statusRel(): BelongsTo
+    {
+        return $this->belongsTo(Status::class, 'status_id');
     }
 
     public function assignedTo(): BelongsTo
