@@ -106,7 +106,7 @@
                                         <select name="category_id"
                                             class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                             <option value="">All Categories</option>
-                                            @foreach($gaCategories as $cat)
+                                            @foreach($categories as $cat)
                                                 <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                             @endforeach
                                         </select>
@@ -116,8 +116,8 @@
                                         <select name="status"
                                             class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                             <option value="">All Statuses</option>
-                                            @foreach($statuses as $status)
-                                                <option value="{{ $status->id }}" {{ request('status') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                            @foreach(['Available', 'Deployed', 'In Repair', 'Disposed'] as $status)
+                                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -200,7 +200,25 @@
                                     {{ $asset->category?->name ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    <x-ui.badge :color="optional($asset->status)->color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ optional($asset->status)->name ?? 'Available' }}</x-ui.badge>
+                                    @php
+                                        $statusName = $asset->status ?? 'Available';
+                                        $statusObj = $asset->statusObject;
+                                        $color = $statusObj->color ?? match($statusName) {
+                                            'Available' => 'success',
+                                            'Deployed', 'In Use' => 'brand',
+                                            'In Repair', 'Maintenance' => 'warning',
+                                            'Disposed', 'Broken' => 'danger',
+                                            default => 'gray'
+                                        };
+                                        $icon = $statusObj->icon ?? match($statusName) {
+                                            'Available' => 'check-circle',
+                                            'Deployed', 'In Use' => 'monitor',
+                                            'In Repair', 'Maintenance' => 'tool',
+                                            'Disposed', 'Broken' => 'alert-triangle',
+                                            default => 'info'
+                                        };
+                                    @endphp
+                                    <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $statusName }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
                                     {{ $asset->assignedToUser?->name ?? 'Not Assigned' }}

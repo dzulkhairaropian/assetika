@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-4" x-data="{
@@ -347,7 +347,7 @@
                                 </td>
                                 <td class="px-4 py-2.5">
                                     <div class="flex flex-col">
-                                        <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_tag }}</span>
+                                        <a href="{{ route('assets.show', $asset) }}" class="block font-medium text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
                                         <span class="text-[11px] text-gray-400 dark:text-gray-500">{{ $asset->device_name }}</span>
                                     </div>
                                 </td>
