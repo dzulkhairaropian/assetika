@@ -227,14 +227,8 @@ class AssetController extends Controller
         $locations = Location::all();
         $depreciations = \App\Models\Depreciation::all();
 
-        // Pre-load fieldsets for JS-driven dynamic rendering
-        $fieldsets = \App\Models\Fieldset::with('customFields')->get()->keyBy('id');
-        $categoryFieldsets = \App\Models\Category::with('fieldsets.customFields')->get()
-            ->mapWithKeys(fn($c) => [$c->id => $c->fieldsets]);
-
         return view('pages.assets.create', compact(
-            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
-            'fieldsets', 'categoryFieldsets'
+            'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations'
         ));
     }
     public function store(Request $request)
@@ -305,11 +299,6 @@ class AssetController extends Controller
 
         $asset = Asset::create($validated);
 
-        // Sync custom field values
-        if ($request->has('custom_fields')) {
-            $asset->syncCustomFields($request->custom_fields);
-        }
-
         if ($request->has('create_another')) {
             return redirect()->route('assets.create')->with('success', 'Asset created successfully. Add another one.');
         }
@@ -342,15 +331,8 @@ class AssetController extends Controller
         $locations = Location::all();
         $depreciations = \App\Models\Depreciation::all();
 
-        $asset->load('customFieldValues');
-
-        $fieldsets = \App\Models\Fieldset::with('customFields')->get()->keyBy('id');
-        $categoryFieldsets = \App\Models\Category::with('fieldsets.customFields')->get()
-            ->mapWithKeys(fn($c) => [$c->id => $c->fieldsets]);
-
         return view('pages.assets.edit', compact(
-            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
-            'fieldsets', 'categoryFieldsets'
+            'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations'
         ));
     }
 
@@ -420,12 +402,13 @@ class AssetController extends Controller
 
         $asset->update($validated);
 
-        // Sync custom field values
-        if ($request->has('custom_fields')) {
-            $asset->syncCustomFields($request->custom_fields);
-        }
-
         return redirect()->route('assets.index')->with('success', $isDraft ? 'Asset saved as draft successfully.' : 'Asset updated successfully.');
+    }
+
+    public function printLabel(Asset $asset)
+    {
+        $asset->load(['product.category', 'department.company']);
+        return view('pages.assets.print-label', compact('asset'));
     }
 
     public function destroy(Asset $asset)

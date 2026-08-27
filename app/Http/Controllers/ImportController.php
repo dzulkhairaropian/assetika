@@ -360,15 +360,10 @@ class ImportController extends Controller
                     ? \App\Models\MasterCategory::where('name', trim($data['master_category_name']))->first()
                     : \App\Models\MasterCategory::first();
 
-                $eulaId = !empty($data['eula_name'])
-                    ? \App\Models\Eula::where('name', trim($data['eula_name']))->first()?->id
-                    : null;
-
                 \App\Models\Category::create([
                     'name' => trim($data['name']),
                     'code' => !empty($data['code']) ? trim($data['code']) : null,
                     'master_category_id' => $masterCategory?->id,
-                    'eula_id' => $eulaId,
                     'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;

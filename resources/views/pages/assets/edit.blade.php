@@ -316,8 +316,6 @@
                     </div>
                 </div>
 
-                <hr class="border-gray-100 dark:border-gray-800">
-                @include('pages.assets.partials.custom-fields')
                 </div>
             </div>
 

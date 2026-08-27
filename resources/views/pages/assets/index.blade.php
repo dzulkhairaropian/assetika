@@ -20,37 +20,6 @@
                 this.selectedAssets.push(asset);
             }
             this.selectAll = this.selectedAssets.length === document.querySelectorAll('.asset-checkbox').length;
-        },
-        submitBulkLabels() {
-            const copies = document.getElementById('labelCopies') ? document.getElementById('labelCopies').value : 1;
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ route("labels.generate", [], false) }}';
-            form.target = '_blank';
-            
-            const csrf = document.createElement('input');
-            csrf.type = 'hidden';
-            csrf.name = '_token';
-            csrf.value = '{{ csrf_token() }}';
-            form.appendChild(csrf);
-
-            this.selectedAssets.forEach(a => {
-                const inputId = document.createElement('input');
-                inputId.type = 'hidden';
-                inputId.name = 'ids[]';
-                inputId.value = a.id;
-                form.appendChild(inputId);
-
-                const inputQty = document.createElement('input');
-                inputQty.type = 'hidden';
-                inputQty.name = 'quantities[' + a.id + ']';
-                inputQty.value = copies;
-                form.appendChild(inputQty);
-            });
-
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
         }
     }">
         <x-common.page-breadcrumb pageTitle="Asset Management" />
@@ -492,5 +461,5 @@
 @endsection
 
 @push('scripts')
-@vite('resources/js/asset-labels.js')
+
 @endpush

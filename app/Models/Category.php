@@ -20,9 +20,4 @@ class Category extends Model
     {
         return $this->belongsTo(MasterCategory::class, 'master_category_id');
     }
-
-    public function fieldsets(): BelongsToMany
-    {
-        return $this->belongsToMany(Fieldset::class, 'category_fieldset')->withTimestamps();
-    }
 }

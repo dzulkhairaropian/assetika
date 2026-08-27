@@ -55,11 +55,6 @@ class MenuHelper
                         'icon' => 'catalog',
                         'path' => '/kb',
                     ],
-                    [
-                        'name' => 'Asset Reservations',
-                        'icon' => 'ga-dashboard',
-                        'path' => '/reservations',
-                    ],
                 ],
             ],
             [
@@ -153,15 +148,6 @@ class MenuHelper
                         ],
                     ],
                     [
-                        'name' => 'Custom Fields',
-                        'icon' => 'ticket-config',
-                        'subItems' => [
-                            ['name' => 'Custom Fields', 'path' => '/custom-fields'],
-                            ['name' => 'Fieldsets', 'path' => '/fieldsets'],
-                            ['name' => 'EULA Templates', 'path' => '/eulas'],
-                        ],
-                    ],
-                    [
                         'name' => 'Support Settings',
                         'icon' => 'support',
                         'subItems' => [
@@ -189,16 +175,6 @@ class MenuHelper
                             ['name' => 'Users', 'path' => '/users'],
                             ['name' => 'Roles', 'path' => '/roles'],
                         ],
-                    ],
-                    [
-                        'name' => 'Reports',
-                        'icon' => 'report',
-                        'path' => '/reports',
-                    ],
-                    [
-                        'name' => 'Barcode Labels',
-                        'icon' => 'label',
-                        'path' => '/labels',
                     ],
                     [
                         'name' => 'Import Data',

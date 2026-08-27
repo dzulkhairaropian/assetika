@@ -19,10 +19,6 @@ class AssetService
 
         $asset = Asset::create($data);
 
-        if (isset($data['custom_fields'])) {
-            $asset->syncCustomFields($data['custom_fields']);
-        }
-
         return $asset;
     }
 
@@ -37,10 +33,6 @@ class AssetService
         }
 
         $asset->update($data);
-
-        if (isset($data['custom_fields'])) {
-            $asset->syncCustomFields($data['custom_fields']);
-        }
 
         return $asset;
     }

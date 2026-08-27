@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AssetReservation;
 use App\Models\Renewal;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -13,25 +12,7 @@ class CalendarController extends Controller
     {
         $events = [];
 
-        // 1. Asset Reservations
-        $reservations = AssetReservation::with(['user', 'reservable'])->get();
-        foreach ($reservations as $res) {
-            $events[] = [
-                'id' => 'res_' . $res->id,
-                'title' => '[Booking] ' . ($res->reservable->name ?? 'Asset') . ' - ' . ($res->user->name ?? 'User'),
-                'start' => $res->start_time->toIso8601String(),
-                'end' => $res->end_time->toIso8601String(),
-                'allDay' => false,
-                'extendedProps' => [
-                    'calendar' => 'Primary',
-                    'type' => 'reservation',
-                    'real_id' => $res->id,
-                    'purpose' => $res->purpose,
-                ],
-            ];
-        }
-
-        // 2. Renewal / Expiry Items
+        // 1. Renewal / Expiry Items
         $renewals = Renewal::all();
         foreach ($renewals as $renew) {
             $events[] = [
@@ -86,27 +67,11 @@ class CalendarController extends Controller
             'end' => 'nullable|date',
         ]);
 
-        if (str_starts_with($id, 'res_')) {
-            $resId = str_replace('res_', '', $id);
-            $res = AssetReservation::find($resId);
-            if ($res) {
-                $res->update([
-                    'start_time' => $validated['start'],
-                    'end_time' => $validated['end'] ?? $validated['start'],
-                ]);
-            }
-        }
-
         return response()->json(['success' => true]);
     }
 
     public function destroy($id)
     {
-        if (str_starts_with($id, 'res_')) {
-            $resId = str_replace('res_', '', $id);
-            AssetReservation::destroy($resId);
-        }
-
         return response()->json(['success' => true]);
     }
 }
