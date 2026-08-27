@@ -1,7 +1,61 @@
 document.addEventListener('DOMContentLoaded', () => {
     const { totalAssets, chartData, deptChartData, productDataByCategory, consumableChartData, purchaseChartData } = window.chartData || {};
 
-    const createDoughnutConfig = (labels, data, colors, centerLabel = 'Total', centerValue = undefined) => ({
+    // shadcn-inspired color palette
+    const chartColors = {
+        blue: '#3b82f6',
+        green: '#22c55e',
+        orange: '#f97316',
+        red: '#ef4444',
+        purple: '#8b5cf6',
+        cyan: '#06b6d4',
+        pink: '#ec4899',
+    };
+
+    const defaultDonutColors = [
+        chartColors.blue,
+        chartColors.green,
+        chartColors.orange,
+        chartColors.red,
+        chartColors.purple,
+    ];
+
+    // Custom plugin to render center text in Doughnut charts (shadcn style)
+    const centerTextPlugin = {
+        id: 'centerText',
+        beforeDraw(chart) {
+            const { ctx, chartArea } = chart;
+            const centerConfig = chart.config.options.plugins?.centerText;
+            if (!centerConfig || centerConfig.value === undefined) return;
+
+            const { left, top, width, height } = chartArea;
+            const centerX = left + width / 2;
+            const centerY = top + height / 2;
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Value text (bold number)
+            ctx.font = 'bold 24px Outfit, sans-serif';
+            ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a';
+            ctx.fillText(Number(centerConfig.value).toLocaleString(), centerX, centerY - 8);
+
+            // Label text (muted subtext)
+            ctx.font = '500 12px Outfit, sans-serif';
+            ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
+            ctx.fillText(centerConfig.label || 'Total', centerX, centerY + 14);
+
+            ctx.restore();
+        }
+    };
+
+    // Chart.js register center plugin
+    if (typeof Chart !== 'undefined') {
+        Chart.register(centerTextPlugin);
+    }
+
+    const createDoughnutConfig = (labels, data, colors = defaultDonutColors, centerLabel = 'Total', centerValue = undefined) => ({
         type: 'doughnut',
         data: {
             labels,
@@ -9,21 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 data,
                 backgroundColor: colors,
                 borderWidth: 2,
-                borderColor: 'transparent',
-                hoverOffset: 6
+                borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                hoverOffset: 6,
+                borderRadius: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            cutout: '60%',
             onHover: (event, activeElements, chart) => {
                 chart.draw();
             },
             plugins: {
                 centerText: {
                     label: centerLabel,
-                    value: centerValue
+                    value: centerValue !== undefined ? centerValue : data.reduce((a, b) => Number(a) + Number(b), 0)
                 },
                 legend: {
                     position: 'bottom',
@@ -31,15 +86,84 @@ document.addEventListener('DOMContentLoaded', () => {
                         padding: 16,
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        font: { family: 'Outfit, sans-serif', size: 12 }
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        font: { family: 'Outfit, sans-serif', size: 12, weight: '500' },
+                        color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569'
                     }
                 },
                 tooltip: {
                     backgroundColor: '#0f172a',
-                    titleFont: { family: 'Outfit, sans-serif', size: 13, weight: 'bold' },
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
                     bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                    padding: 10,
-                    cornerRadius: 8
+                    padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                    cornerRadius: 8,
+                    displayColors: true,
+                    boxPadding: 4
+                }
+            }
+        }
+    });
+
+    const createLineConfig = (labels, data, label, lineColor = chartColors.green) => ({
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label,
+                data,
+                fill: false,
+                borderColor: lineColor,
+                borderWidth: 2,
+                tension: 0, // Crisp linear line matching shadcn ChartLineLinear
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: lineColor,
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: lineColor,
+                pointHoverBorderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                    bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                    padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: {
+                        font: { family: 'Outfit, sans-serif', size: 11 },
+                        color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8'
+                    }
+                },
+                y: {
+                    border: { display: false },
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)',
+                        dash: [4, 4]
+                    },
+                    ticks: {
+                        font: { family: 'Outfit, sans-serif', size: 11 },
+                        color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8',
+                        precision: 0
+                    }
                 }
             }
         }
@@ -52,10 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return container.querySelector('canvas');
     };
 
-    // 1. Asset Status Chart
-    const statusCanvas = mountCanvas("#assetStatusChart");
+    // 1. Asset Status Distribution Chart (Donut)
+    const statusCanvas = mountCanvas('#assetStatusChart');
     if (statusCanvas && chartData) {
-        window.statusChartInstance = new Chart(statusCanvas, createDoughnutConfig(chartData.labels, chartData.data, chartData.colors || ['#465fff', '#12b76a', '#f79009', '#f04438'], 'Total Assets', totalAssets));
+        const statusColors = chartData.colors || [chartColors.blue, chartColors.green, chartColors.orange, chartColors.red];
+        window.statusChartInstance = new Chart(statusCanvas, createDoughnutConfig(chartData.labels, chartData.data, statusColors, 'Total Assets', totalAssets));
 
         window.updateStatusChartJS = (catId) => {
             const map = window.chartData?.chartDataByCategory;
@@ -70,10 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 2. Department Chart
-    const deptCanvas = mountCanvas("#deptAssetChart");
+    // 2. Department Chart (Donut)
+    const deptCanvas = mountCanvas('#deptAssetChart');
     if (deptCanvas && deptChartData && deptChartData.data?.length) {
-        window.deptChartInstance = new Chart(deptCanvas, createDoughnutConfig(deptChartData.labels, deptChartData.data, ['#465fff', '#12b76a', '#f79009', '#3b82f6', '#8b5cf6']));
+        const deptColors = [chartColors.blue, chartColors.green, chartColors.orange, chartColors.purple, chartColors.cyan];
+        window.deptChartInstance = new Chart(deptCanvas, createDoughnutConfig(deptChartData.labels, deptChartData.data, deptColors, 'Total Assets'));
 
         window.updateDeptChartJS = (catId) => {
             const map = window.chartData?.deptDataByCategory;
@@ -88,28 +214,31 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 3. Product Chart
-    const productCanvas = mountCanvas("#productAssetChart");
+    // 3. Product Chart (Donut)
+    const productCanvas = mountCanvas('#productAssetChart');
     if (productCanvas && productDataByCategory && productDataByCategory.all) {
         window.productChartDataMap = productDataByCategory;
         const initialData = productDataByCategory.all;
-        window.productChartInstance = new Chart(productCanvas, createDoughnutConfig(initialData.labels, initialData.data, ['#465fff', '#12b76a', '#f79009', '#06b6d4', '#8b5cf6']));
+        const productColors = [chartColors.blue, chartColors.cyan, chartColors.purple, chartColors.orange, chartColors.green];
+        window.productChartInstance = new Chart(productCanvas, createDoughnutConfig(initialData.labels, initialData.data, productColors, 'Total Units'));
 
-        // Adapter method for Alpine dropdown filter
         window.updateProductChartJS = (catId) => {
             const newData = (window.productChartDataMap && window.productChartDataMap[catId]) || { labels: ['No Data'], data: [0] };
             if (window.productChartInstance) {
                 window.productChartInstance.data.labels = newData.labels;
                 window.productChartInstance.data.datasets[0].data = newData.data;
+                const total = newData.data.reduce((a, b) => Number(a) + Number(b), 0);
+                window.productChartInstance.options.plugins.centerText.value = total;
                 window.productChartInstance.update();
             }
         };
     }
 
-    // 4. Consumables Chart
-    const consumableCanvas = mountCanvas("#requestedConsumablesChart");
+    // 4. Consumables Chart (Donut)
+    const consumableCanvas = mountCanvas('#requestedConsumablesChart');
     if (consumableCanvas && consumableChartData && consumableChartData.data?.length) {
-        window.consumableChartInstance = new Chart(consumableCanvas, createDoughnutConfig(consumableChartData.labels, consumableChartData.data, ['#465fff', '#f79009', '#12b76a', '#ec4899', '#8b5cf6']));
+        const consumableColors = [chartColors.blue, chartColors.orange, chartColors.green, chartColors.pink, chartColors.purple];
+        window.consumableChartInstance = new Chart(consumableCanvas, createDoughnutConfig(consumableChartData.labels, consumableChartData.data, consumableColors, 'Requests'));
 
         window.updateConsumableChartJS = (catId) => {
             const map = window.chartData?.consumableDataByCategory;
@@ -124,59 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 5. Consumable Usage Timeline Chart (Crisp Sharp Line)
-    const consumableTLCanvas = mountCanvas("#consumableTimelineChart");
+    // 5. Consumable Usage Timeline Chart (Linear Line)
+    const consumableTLCanvas = mountCanvas('#consumableTimelineChart');
     const { consumableTimelineChartData } = window.chartData || {};
     if (consumableTLCanvas && consumableTimelineChartData && consumableTimelineChartData.data?.length) {
-        window.consumableTLChartInstance = new Chart(consumableTLCanvas, {
-            type: 'line',
-            data: {
-                labels: consumableTimelineChartData.labels,
-                datasets: [{
-                    label: 'Consumables Distributed',
-                    data: consumableTimelineChartData.data,
-                    fill: false,
-                    borderColor: '#12b76a',
-                    borderWidth: 2,
-                    tension: 0,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#12b76a',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#12b76a',
-                    pointHoverBorderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { intersect: false, mode: 'index' },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
-                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        displayColors: false
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        border: { display: true, color: '#e2e8f0' },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 } }
-                    },
-                    y: {
-                        border: { dash: [4, 4], display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)' },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
-                    }
-                }
-            }
-        });
+        window.consumableTLChartInstance = new Chart(
+            consumableTLCanvas,
+            createLineConfig(consumableTimelineChartData.labels, consumableTimelineChartData.data, 'Consumables Distributed', chartColors.green)
+        );
 
         window.updateConsumableTimelineChartJS = (catId) => {
             const map = window.chartData?.consumableTimelineByCategory;
@@ -189,63 +273,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 6. Purchase Timeline Chart (Crisp Sharp Line)
-    const purchaseCanvas = mountCanvas("#purchaseTimelineChart");
+    // 6. Purchase Timeline Chart (Linear Line)
+    const purchaseCanvas = mountCanvas('#purchaseTimelineChart');
     if (purchaseCanvas && purchaseChartData && purchaseChartData.data?.length) {
-        window.purchaseTimelineChartInstance = new Chart(purchaseCanvas, {
-            type: 'line',
-            data: {
-                labels: purchaseChartData.labels,
-                datasets: [{
-                    label: 'Assets Purchased',
-                    data: purchaseChartData.data,
-                    fill: false,
-                    borderColor: '#465fff',
-                    borderWidth: 2,
-                    tension: 0, // Sharp straight lines
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#465fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#465fff',
-                    pointHoverBorderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
-                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        displayColors: false
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        border: { display: true, color: '#e2e8f0' },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 } }
-                    },
-                    y: {
-                        border: { dash: [4, 4], display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)' },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
-                    }
-                }
-            }
-        });
+        window.purchaseTimelineChartInstance = new Chart(
+            purchaseCanvas,
+            createLineConfig(purchaseChartData.labels, purchaseChartData.data, 'Assets Purchased', chartColors.blue)
+        );
 
-        // Adapter method for Alpine category filter
         window.updatePurchaseTimelineChartJS = (catId) => {
             const map = window.chartData?.purchaseDataByCategory;
             const newData = (map && map[catId]) || { labels: ['No Data'], data: [0] };
@@ -257,3 +292,4 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
+
