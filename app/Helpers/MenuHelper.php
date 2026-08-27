@@ -8,57 +8,22 @@ class MenuHelper
     {
         return [
             [
-                'title' => 'Dashboard',
+                'title' => 'Overview',
                 'items' => [
                     [
-                        'name' => 'IT Dashboard',
+                        'name' => 'Dashboards',
                         'icon' => 'dashboard',
-                        'path' => '/',
-                    ],
-                    [
-                        'name' => 'Financial Dashboard',
-                        'icon' => 'catalog',
-                        'path' => '/finance-dashboard',
-                    ],
-                    [
-                        'name' => 'Ticket Dashboard',
-                        'icon' => 'ticket',
-                        'path' => '/ticket-dashboard',
-                    ],
-                    [
-                        'name' => 'General Affair Dashboard',
-                        'icon' => 'ga-dashboard',
-                        'path' => '/ga-dashboard',
+                        'subItems' => [
+                            ['name' => 'IT Dashboard', 'path' => '/'],
+                            ['name' => 'Financial Dashboard', 'path' => '/finance-dashboard'],
+                            ['name' => 'Ticket Dashboard', 'path' => '/ticket-dashboard'],
+                            ['name' => 'General Affair Dashboard', 'path' => '/ga-dashboard'],
+                        ],
                     ],
                 ],
             ],
             [
-                'title' => 'Help Desk & Requests',
-                'items' => [
-                    [
-                        'name' => 'All Tickets',
-                        'icon' => 'ticket',
-                        'path' => '/tickets',
-                    ],
-                    [
-                        'name' => 'Item Requests',
-                        'icon' => 'ticket',
-                        'path' => '/asset-requests',
-                    ],
-                    [
-                        'name' => 'Request Catalog',
-                        'icon' => 'kit',
-                        'path' => '/requestable-assets',
-                    ],
-                    [
-                        'name' => 'Knowledge Base',
-                        'icon' => 'catalog',
-                        'path' => '/kb',
-                    ],
-                ],
-            ],
-            [
-                'title' => 'IT Assets & Inventory',
+                'title' => 'Assets & Inventory',
                 'items' => [
                     [
                         'name' => 'IT Assets',
@@ -74,6 +39,14 @@ class MenuHelper
                         'path' => '/my-assets',
                     ],
                     [
+                        'name' => 'GA Assets',
+                        'icon' => 'ga-assets',
+                        'subItems' => [
+                            ['name' => 'GA Inventory', 'path' => '/ga-assets'],
+                            ['name' => 'GA Categories', 'path' => '/ga-categories'],
+                        ],
+                    ],
+                    [
                         'name' => 'Consumables',
                         'icon' => 'consumables',
                         'subItems' => [
@@ -82,17 +55,17 @@ class MenuHelper
                         ],
                     ],
                     [
+                        'name' => 'Software Licenses',
+                        'icon' => 'license',
+                        'path' => '/licenses',
+                    ],
+                    [
                         'name' => 'Components',
                         'icon' => 'components',
                         'path' => '/components',
                     ],
                     [
-                        'name' => 'Licenses',
-                        'icon' => 'license',
-                        'path' => '/licenses',
-                    ],
-                    [
-                        'name' => 'Kits',
+                        'name' => 'Asset Kits',
                         'icon' => 'kit',
                         'path' => '/kits',
                     ],
@@ -109,17 +82,25 @@ class MenuHelper
                 ],
             ],
             [
-                'title' => 'General Affairs (GA)',
+                'title' => 'Service Desk',
                 'items' => [
                     [
-                        'name' => 'GA Assets',
-                        'icon' => 'ga-assets',
-                        'path' => '/ga-assets',
+                        'name' => 'Ticketing System',
+                        'icon' => 'ticket',
+                        'path' => '/tickets',
                     ],
                     [
-                        'name' => 'GA Categories',
+                        'name' => 'Asset Requests',
+                        'icon' => 'ticket',
+                        'subItems' => [
+                            ['name' => 'All Requests', 'path' => '/asset-requests'],
+                            ['name' => 'Request Catalog', 'path' => '/requestable-assets'],
+                        ],
+                    ],
+                    [
+                        'name' => 'Knowledge Base',
                         'icon' => 'catalog',
-                        'path' => '/ga-categories',
+                        'path' => '/kb',
                     ],
                 ],
             ],
@@ -148,28 +129,28 @@ class MenuHelper
                         ],
                     ],
                     [
-                        'name' => 'Support Settings',
+                        'name' => 'Configurations',
                         'icon' => 'support',
                         'subItems' => [
-                            ['name' => 'Priorities', 'path' => '/admin/priorities'],
+                            ['name' => 'Asset Statuses', 'path' => '/statuses'],
+                            ['name' => 'Vendors', 'path' => '/vendors'],
+                            ['name' => 'Maintenance Types', 'path' => '/maintenance-types'],
                             ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
                             ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
+                            ['name' => 'Priorities', 'path' => '/admin/priorities'],
                             ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
                             ['name' => 'SLA Policies', 'path' => '/sla-policies'],
                             ['name' => 'Sources', 'path' => '/admin/sources'],
                             ['name' => 'Ticket Labels', 'path' => '/admin/labels'],
-                            ['name' => 'Asset Statuses', 'path' => '/statuses'],
-                            ['name' => 'Vendors', 'path' => '/vendors'],
-                            ['name' => 'Maintenance Types', 'path' => '/maintenance-types'],
                         ],
                     ],
                 ],
             ],
             [
-                'title' => 'System & Reports',
+                'title' => 'System Administration',
                 'items' => [
                     [
-                        'name' => 'Access Control',
+                        'name' => 'Users & Roles',
                         'icon' => 'access',
                         'subItems' => [
                             ['name' => 'Users', 'path' => '/users'],
@@ -187,7 +168,7 @@ class MenuHelper
                         'path' => '/backups',
                     ],
                     [
-                        'name' => 'Expiry & Renewals',
+                        'name' => 'Renewals Expiry',
                         'icon' => 'support',
                         'path' => '/renewals',
                     ],
@@ -207,14 +188,14 @@ class MenuHelper
             'consumables' => '<i data-feather="package" class="w-6 h-6"></i>',
             'org' => '<i data-feather="columns" class="w-6 h-6"></i>',
             'catalog' => '<i data-feather="book-open" class="w-6 h-6"></i>',
-            'support' => '<i data-feather="help-circle" class="w-6 h-6"></i>',
+            'support' => '<i data-feather="settings" class="w-6 h-6"></i>',
             'access' => '<i data-feather="shield" class="w-6 h-6"></i>',
             'backup' => '<i data-feather="database" class="w-6 h-6"></i>',
             'ticket' => '<i data-feather="file-text" class="w-6 h-6"></i>',
             'components' => '<i data-feather="cpu" class="w-6 h-6"></i>',
             'license' => '<i data-feather="key" class="w-6 h-6"></i>',
             'kit' => '<i data-feather="box" class="w-6 h-6"></i>',
-            'ticket-config' => '<i data-feather="settings" class="w-6 h-6"></i>',
+            'ticket-config' => '<i data-feather="sliders" class="w-6 h-6"></i>',
             'report' => '<i data-feather="bar-chart-2" class="w-6 h-6"></i>',
             'label' => '<i data-feather="tag" class="w-6 h-6"></i>',
             'upload' => '<i data-feather="upload" class="w-6 h-6"></i>',
