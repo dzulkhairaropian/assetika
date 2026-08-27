@@ -35,7 +35,7 @@
     }
 }">
     @if($label)
-        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">
             {{ $label }}
             @if($required) <span class="text-error-500">*</span> @endif
         </label>
@@ -45,9 +45,9 @@
 
     <!-- Trigger Button -->
     <div @click="toggleOpen()" @click.away="open = false" 
-        class="dark:bg-dark-900 shadow-theme-xs cursor-pointer flex items-center justify-between h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 focus:border-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-        <span x-text="selectedLabel" :class="!selectedId && 'text-gray-400 dark:text-white/30'" class="truncate"></span>
-        <svg class="stroke-current text-gray-500 dark:text-gray-400 shrink-0" width="20" height="20" viewBox="0 0 20 20" fill="none">
+        class="h-9 w-full cursor-pointer flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+        <span x-text="selectedLabel" :class="!selectedId && 'text-gray-400 dark:text-gray-500'" class="truncate"></span>
+        <svg class="stroke-current text-gray-400 shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none">
             <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
     </div>
@@ -62,7 +62,7 @@
         </div>
         <div class="divide-y divide-gray-50 dark:divide-gray-800/50">
             <div @click="selectOption('')" 
-                 class="cursor-pointer rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800">
+                 class="cursor-pointer rounded-lg px-3 py-2 text-xs font-medium text-gray-400 hover:bg-gray-50 dark:text-gray-500 dark:hover:bg-gray-800">
                 -- {{ $placeholder }} --
             </div>
             <template x-for="item in filteredOptions" :key="item.id">

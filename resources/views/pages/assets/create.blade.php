@@ -54,34 +54,34 @@
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Serial Number <span class="text-error-500">*</span>
                             </label>
                             <div class="flex items-center gap-2">
                                 <input type="text" name="serial_number" value="{{ old('serial_number') }}" placeholder="Enter serial number" required
-                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                <button type="button" onclick="generateSN()" title="Generate Random Serial Number" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 shadow-theme-xs transition hover:bg-gray-50 hover:text-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-brand-400">
-                                    <i data-feather="shuffle" class="w-4 h-4"></i>
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
+                                <button type="button" onclick="generateSN()" title="Generate Random Serial Number" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:bg-gray-50 hover:text-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                                    <i data-feather="shuffle" class="w-3.5 h-3.5"></i>
                                 </button>
                             </div>
                             @error('serial_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Product Number
                             </label>
                             <input type="text" name="product_number" value="{{ old('product_number') }}" placeholder="Enter product number"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             @error('product_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 User Name
                             </label>
                             <input type="text" name="user_name" value="{{ old('user_name') }}" placeholder="e.g. John Doe"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             @error('user_name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
