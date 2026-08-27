@@ -51,6 +51,8 @@ class TicketsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoS
         }
         if (!empty($this->filters['ticket_category_id'])) {
             $query->where('ticket_category_id', $this->filters['ticket_category_id']);
+        } elseif (!empty($this->filters['category_id'])) {
+            $query->where('ticket_category_id', $this->filters['category_id']);
         }
         if (!empty($this->filters['priority_id'])) {
             $query->where('priority_id', $this->filters['priority_id']);
@@ -63,6 +65,12 @@ class TicketsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoS
         }
         if (!empty($this->filters['assigned_to_id'])) {
             $query->where('assigned_to_id', $this->filters['assigned_to_id']);
+        }
+        if (!empty($this->filters['year']) && $this->filters['year'] !== 'all') {
+            $query->whereRaw('YEAR(created_at) = ?', [$this->filters['year']]);
+        }
+        if (!empty($this->filters['month']) && $this->filters['month'] !== 'all') {
+            $query->whereRaw('MONTH(created_at) = ?', [$this->filters['month']]);
         }
 
         return $query->latest('request_date');
