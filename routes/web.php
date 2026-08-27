@@ -28,6 +28,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinanceDashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ConsumableController;
@@ -68,6 +69,7 @@ Route::get('asset/{asset}', [AssetController::class, 'publicScan'])->name('asset
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('finance-dashboard', [FinanceDashboardController::class, 'index'])->name('finance-dashboard');
     Route::get('ga-dashboard', [GaDashboardController::class, 'index'])->name('ga-dashboard');
     Route::get('ticket-dashboard', [TicketDashboardController::class, 'index'])->name('ticket-dashboard');
     Route::get('tickets/export', [\App\Http\Controllers\TicketController::class, 'export'])->name('tickets.export');

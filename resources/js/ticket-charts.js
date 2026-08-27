@@ -1,6 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const { trendChart, chartStatusData, categoryChart, priorityChart, typeChart, requesterChart } = window.ticketChartData || {};
 
+    const chartColors = {
+        blue: '#3b82f6',
+        green: '#22c55e',
+        orange: '#f97316',
+        red: '#ef4444',
+        purple: '#8b5cf6',
+        cyan: '#06b6d4',
+    };
+
     const mountCanvas = (selector) => {
         const container = document.querySelector(selector);
         if (!container) return null;
@@ -16,37 +25,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 data,
                 backgroundColor: colors,
                 borderWidth: 2,
-                borderColor: 'transparent',
-                hoverOffset: 6
+                borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                hoverOffset: 6,
+                borderRadius: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            cutout: '60%',
             onHover: (event, activeElements, chart) => {
                 chart.draw();
             },
             plugins: {
                 centerText: {
                     label: centerLabel,
-                    value: centerValue
+                    value: centerValue !== undefined ? centerValue : data.reduce((a, b) => Number(a) + Number(b), 0)
                 },
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 16,
+                        padding: 14,
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        font: { family: 'Outfit, sans-serif', size: 12 }
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        font: { family: 'Outfit, sans-serif', size: 11, weight: '500' },
+                        color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569'
                     }
                 },
                 tooltip: {
                     backgroundColor: '#0f172a',
-                    titleFont: { family: 'Outfit, sans-serif', size: 13, weight: 'bold' },
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
                     bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                    padding: 10,
-                    cornerRadius: 8
+                    padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                    cornerRadius: 8,
                 }
             }
         }
@@ -59,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [{
                 data,
                 backgroundColor: color,
-                borderRadius: 6,
+                borderRadius: 4,
                 borderSkipped: false
             }]
         },
@@ -71,16 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 legend: { display: false },
                 tooltip: {
                     backgroundColor: '#0f172a',
-                    titleFont: { family: 'Outfit, sans-serif' },
-                    bodyFont: { family: 'Outfit, sans-serif' },
-                    padding: 10,
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    padding: { top: 8, bottom: 8, left: 12, right: 12 },
                     cornerRadius: 8
                 }
             },
             scales: {
                 x: {
-                    border: { dash: [4, 4] },
-                    grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                    border: { display: false },
+                    grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
                     ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
                 },
                 y: {
@@ -91,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 1. Trend Line Chart (Crisp Sharp Line)
+    // 1. Trend Line Chart (Crisp Linear Line)
     const trendCanvas = mountCanvas('#ticketTrendChart');
     if (trendChart && trendCanvas) {
         new Chart(trendCanvas, {
@@ -102,15 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     label: 'Tickets',
                     data: trendChart.data,
                     fill: false,
-                    borderColor: '#465fff',
+                    borderColor: chartColors.blue,
                     borderWidth: 2,
                     tension: 0,
                     pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#465fff',
+                    pointBorderColor: chartColors.blue,
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#465fff'
                 }]
             },
             options: {
@@ -123,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         backgroundColor: '#0f172a',
                         titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
                         bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                        padding: 10,
+                        padding: { top: 8, bottom: 8, left: 12, right: 12 },
                         cornerRadius: 8,
                         displayColors: false
                     }
@@ -131,12 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 scales: {
                     x: {
                         grid: { display: false },
-                        border: { display: true, color: '#e2e8f0' },
                         ticks: { font: { family: 'Outfit, sans-serif', size: 11 } }
                     },
                     y: {
-                        border: { dash: [4, 4], display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                        border: { display: false },
+                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
                         ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
                     }
                 }
@@ -147,30 +160,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Status Donut
     const statusCanvas = mountCanvas('#ticketStatusChart');
     if (chartStatusData && statusCanvas) {
-        new Chart(statusCanvas, createDoughnutConfig(chartStatusData.labels, chartStatusData.data, chartStatusData.colors || ['#465fff', '#12b76a', '#f79009', '#f04438']));
+        new Chart(statusCanvas, createDoughnutConfig(chartStatusData.labels, chartStatusData.data, chartStatusData.colors || [chartColors.blue, chartColors.green, chartColors.orange, chartColors.red], 'Status'));
     }
 
     // 3. Category Donut
     const catCanvas = mountCanvas('#ticketCategoryChart');
     if (categoryChart && catCanvas) {
-        new Chart(catCanvas, createDoughnutConfig(categoryChart.labels, categoryChart.data, ['#465fff', '#12b76a', '#f79009', '#06b6d4', '#8b5cf6']));
+        new Chart(catCanvas, createDoughnutConfig(categoryChart.labels, categoryChart.data, [chartColors.blue, chartColors.green, chartColors.orange, chartColors.cyan, chartColors.purple], 'Categories'));
     }
 
     // 4. Type Donut
     const typeCanvas = mountCanvas('#ticketTypeChart');
     if (typeChart && typeCanvas) {
-        new Chart(typeCanvas, createDoughnutConfig(typeChart.labels, typeChart.data, ['#06b6d4', '#8b5cf6', '#465fff', '#f79009', '#12b76a']));
+        new Chart(typeCanvas, createDoughnutConfig(typeChart.labels, typeChart.data, [chartColors.cyan, chartColors.purple, chartColors.blue, chartColors.orange, chartColors.green], 'Types'));
     }
 
     // 5. Priority Horizontal Bar
     const priorityCanvas = mountCanvas('#ticketPriorityChart');
     if (priorityChart && priorityCanvas) {
-        new Chart(priorityCanvas, createHBarConfig(priorityChart.labels, priorityChart.data, '#f79009'));
+        new Chart(priorityCanvas, createHBarConfig(priorityChart.labels, priorityChart.data, chartColors.orange));
     }
 
     // 6. Requester Horizontal Bar
     const reqCanvas = mountCanvas('#ticketRequesterChart');
     if (requesterChart && reqCanvas) {
-        new Chart(reqCanvas, createHBarConfig(requesterChart.labels, requesterChart.data, '#12b76a'));
+        new Chart(reqCanvas, createHBarConfig(requesterChart.labels, requesterChart.data, chartColors.green));
     }
 });
+

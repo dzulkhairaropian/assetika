@@ -11,14 +11,24 @@ class MenuHelper
                 'title' => 'Dashboard',
                 'items' => [
                     [
-                        'name' => 'Main Dashboard',
+                        'name' => 'IT Dashboard',
                         'icon' => 'dashboard',
                         'path' => '/',
+                    ],
+                    [
+                        'name' => 'Financial Dashboard',
+                        'icon' => 'catalog',
+                        'path' => '/finance-dashboard',
                     ],
                     [
                         'name' => 'Ticket Dashboard',
                         'icon' => 'ticket',
                         'path' => '/ticket-dashboard',
+                    ],
+                    [
+                        'name' => 'General Affair Dashboard',
+                        'icon' => 'ga-dashboard',
+                        'path' => '/ga-dashboard',
                     ],
                 ],
             ],
@@ -106,11 +116,6 @@ class MenuHelper
             [
                 'title' => 'General Affairs (GA)',
                 'items' => [
-                    [
-                        'name' => 'GA Dashboard',
-                        'icon' => 'ga-dashboard',
-                        'path' => '/ga-dashboard',
-                    ],
                     [
                         'name' => 'GA Assets',
                         'icon' => 'ga-assets',

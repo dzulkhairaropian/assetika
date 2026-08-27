@@ -75,10 +75,24 @@ class TicketDashboardController extends Controller
             ->groupBy('status_id')
             ->pluck('count', 'status_id');
         $statuses = TicketStatus::all()->keyBy('id');
+
+        $palette = ['#3b82f6', '#22c55e', '#f97316', '#06b6d4', '#8b5cf6', '#ef4444'];
+        $colors = [];
+        $i = 0;
+        foreach ($ticketsByStatus->keys() as $id) {
+            $statusObj = $statuses[$id] ?? null;
+            $color = $this->statusColor($statusObj?->color ?? '', $statusObj?->name ?? '');
+            if ($color === '#64748b') {
+                $color = $palette[$i % count($palette)];
+            }
+            $colors[] = $color;
+            $i++;
+        }
+
         $chartStatusData = [
             'labels' => $ticketsByStatus->keys()->map(fn($id) => $statuses[$id]?->name ?? 'Unknown')->values()->toArray(),
             'data' => $ticketsByStatus->values()->toArray(),
-            'colors' => $ticketsByStatus->keys()->map(fn($id) => $this->statusColor($statuses[$id]?->color ?? 'gray'))->values()->toArray(),
+            'colors' => $colors,
         ];
 
         // Monthly ticket trend (area chart)
@@ -203,21 +217,37 @@ class TicketDashboardController extends Controller
         return round((($current - $previous) / $previous) * 100, 1);
     }
 
-    private function statusColor(string $color): string
+    private function statusColor(string $color, string $name = ''): string
     {
+        $color = trim(strtolower($color));
+        $name = trim(strtolower($name));
+
+        if (str_starts_with($color, '#')) {
+            return $color;
+        }
+
+        // Map by status name first if available
+        if (str_contains($name, 'new') || str_contains($name, 'open')) {
+            return '#06b6d4'; // Cyan
+        }
+        if (str_contains($name, 'progress')) {
+            return '#f97316'; // Orange
+        }
+        if (str_contains($name, 'pending') || str_contains($name, 'hold')) {
+            return '#8b5cf6'; // Purple
+        }
+        if (str_contains($name, 'resolved') || str_contains($name, 'closed') || str_contains($name, 'done')) {
+            return '#22c55e'; // Green
+        }
+
         return match ($color) {
-            'primary'   => '#465FFF',
-            'secondary' => '#667085',
-            'success'   => '#12B76A',
-            'danger'    => '#F04438',
-            'error'     => '#F04438',
-            'warning'   => '#F79009',
-            'info'      => '#0BA5EC',
-            'light'     => '#E4E7EC',
-            'dark'      => '#1D2939',
-            'gray'      => '#667085',
-            'orange'    => '#FB6514',
-            default => '#667085',
+            'primary'   => '#3b82f6',
+            'success'   => '#22c55e',
+            'danger', 'error' => '#ef4444',
+            'warning', 'orange' => '#f97316',
+            'info', 'cyan'      => '#06b6d4',
+            'purple'    => '#8b5cf6',
+            default     => '#64748b',
         };
     }
 }
