@@ -76,21 +76,21 @@
 
     <!-- Modal Add Category -->
     <div x-show="openAddCat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
-        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Add Ticket Category</h3>
-            <form action="{{ route('admin.ticket-categories.store') }}" method="POST" class="space-y-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white mb-4">Add Ticket Category</h3>
+            <form action="{{ route('admin.ticket-categories.store') }}" method="POST" class="space-y-3.5">
                 @csrf
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Category Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Hardware, Software" class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
+                    <input type="text" name="name" required placeholder="e.g. Hardware, Software" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Code (Optional)</label>
-                    <input type="text" name="code" placeholder="e.g. HW, SW" class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
+                    <input type="text" name="code" placeholder="e.g. HW, SW" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" @click="openAddCat = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
-                    <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600">Save</button>
+                    <button type="button" @click="openAddCat = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600">Save</button>
                 </div>
             </form>
         </div>
@@ -98,23 +98,23 @@
 
     <!-- Modal Add Subcategory -->
     <div x-show="openAddSub" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
-        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-1">Add Subcategory</h3>
-            <p class="text-xs text-gray-500 mb-4">Under category: <span class="font-semibold text-brand-600" x-text="selectedCatName"></span></p>
-            <form action="{{ route('admin.ticket-subcategories.store') }}" method="POST" class="space-y-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1">Add Subcategory</h3>
+            <p class="text-[11px] text-gray-500 mb-4">Under category: <span class="font-semibold text-brand-600" x-text="selectedCatName"></span></p>
+            <form action="{{ route('admin.ticket-subcategories.store') }}" method="POST" class="space-y-3.5">
                 @csrf
                 <input type="hidden" name="ticket_category_id" :value="selectedCatId"/>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Subcategory Name *</label>
-                    <input type="text" name="name" required placeholder="e.g. Laptop / Notebook, Printer" class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
+                    <input type="text" name="name" required placeholder="e.g. Laptop / Notebook, Printer" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Code (Optional)</label>
-                    <input type="text" name="code" placeholder="e.g. LAPTOP, PRINTER" class="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
+                    <input type="text" name="code" placeholder="e.g. PRINTER" class="h-9 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"/>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" @click="openAddSub = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
-                    <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600">Save</button>
+                    <button type="button" @click="openAddSub = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600">Save</button>
                 </div>
             </form>
         </div>

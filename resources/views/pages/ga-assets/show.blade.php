@@ -323,33 +323,33 @@
 
         <!-- Checkout Modal -->
         <div x-show="checkoutOpen" class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4" style="display:none;">
-            <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl" @click.away="checkoutOpen = false">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white">Checkout GA Asset</h3>
-                <form action="{{ route('ga-assets.checkout', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div class="bg-white dark:bg-gray-900 rounded-xl max-w-md w-full p-5 space-y-4 shadow-xl border border-gray-200 dark:border-gray-800" @click.away="checkoutOpen = false">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Checkout GA Asset</h3>
+                <form action="{{ route('ga-assets.checkout', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-3.5">
                     @csrf
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Employee <span class="text-error-500">*</span></label>
-                        <select name="user_id" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white">
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Employee <span class="text-error-500">*</span></label>
+                        <select name="user_id" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white">
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Date Assigned <span class="text-error-500">*</span></label>
-                        <input type="datetime-local" name="assigned_at" value="{{ date('Y-m-d\TH:i') }}" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Date Assigned <span class="text-error-500">*</span></label>
+                        <input type="datetime-local" name="assigned_at" value="{{ date('Y-m-d\TH:i') }}" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Checkout Evidence (Photo)</label>
-                        <input type="file" name="checkout_evidence" accept="image/*" class="w-full text-sm text-gray-500" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Checkout Evidence (Photo)</label>
+                        <input type="file" name="checkout_evidence" accept="image/*" class="w-full text-xs text-gray-500" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Notes</label>
-                        <textarea name="notes" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-3 text-sm dark:bg-gray-900 dark:text-white"></textarea>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                        <textarea name="notes" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-3 text-xs dark:bg-gray-900 dark:text-white"></textarea>
                     </div>
-                    <div class="flex justify-end gap-3 pt-3">
-                        <button type="button" @click="checkoutOpen = false" class="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-brand-500 text-white rounded-lg text-sm font-medium hover:bg-brand-600">Assign Asset</button>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="checkoutOpen = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
+                        <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600">Assign Asset</button>
                     </div>
                 </form>
             </div>
@@ -357,41 +357,41 @@
 
         <!-- Checkin Modal -->
         <div x-show="checkinOpen" class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4" style="display:none;">
-            <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl" @click.away="checkinOpen = false">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white">Checkin GA Asset</h3>
-                <form action="{{ route('ga-assets.checkin', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div class="bg-white dark:bg-gray-900 rounded-xl max-w-md w-full p-5 space-y-4 shadow-xl border border-gray-200 dark:border-gray-800" @click.away="checkinOpen = false">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Checkin GA Asset</h3>
+                <form action="{{ route('ga-assets.checkin', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-3.5">
                     @csrf
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Date Returned <span class="text-error-500">*</span></label>
-                        <input type="datetime-local" name="returned_at" value="{{ date('Y-m-d\TH:i') }}" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Date Returned <span class="text-error-500">*</span></label>
+                        <input type="datetime-local" name="returned_at" value="{{ date('Y-m-d\TH:i') }}" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Status After Checkin <span class="text-error-500">*</span></label>
-                        <select name="status" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white">
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Status After Checkin <span class="text-error-500">*</span></label>
+                        <select name="status" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white">
                             <option value="Available">Available</option>
                             <option value="Broken">Broken</option>
                             <option value="Maintenance">Maintenance</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Condition on Return <span class="text-error-500">*</span></label>
-                        <select name="condition_on_return" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white">
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Condition on Return <span class="text-error-500">*</span></label>
+                        <select name="condition_on_return" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white">
                             <option value="Good">Good</option>
                             <option value="Fair">Fair</option>
                             <option value="Damaged">Damaged</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Checkin Evidence (Photo)</label>
-                        <input type="file" name="checkin_evidence" accept="image/*" class="w-full text-sm text-gray-500" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Checkin Evidence (Photo)</label>
+                        <input type="file" name="checkin_evidence" accept="image/*" class="w-full text-xs text-gray-500" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Notes</label>
-                        <textarea name="notes" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-3 text-sm dark:bg-gray-900 dark:text-white"></textarea>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                        <textarea name="notes" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-3 text-xs dark:bg-gray-900 dark:text-white"></textarea>
                     </div>
-                    <div class="flex justify-end gap-3 pt-3">
-                        <button type="button" @click="checkinOpen = false" class="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-warning-500 text-white rounded-lg text-sm font-medium hover:bg-warning-600">Confirm Return</button>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="checkinOpen = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
+                        <button type="submit" class="rounded-lg bg-warning-500 text-white px-4 py-2 text-xs font-semibold hover:bg-warning-600">Confirm Return</button>
                     </div>
                 </form>
             </div>
@@ -399,40 +399,40 @@
 
         <!-- Maintenance Modal -->
         <div x-show="maintOpen" class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4" style="display:none;">
-            <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl" @click.away="maintOpen = false">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white">Log Maintenance</h3>
-                <form action="{{ route('ga-assets.maintenance', $asset) }}" method="POST" class="space-y-4">
+            <div class="bg-white dark:bg-gray-900 rounded-xl max-w-md w-full p-5 space-y-4 shadow-xl border border-gray-200 dark:border-gray-800" @click.away="maintOpen = false">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Log Maintenance</h3>
+                <form action="{{ route('ga-assets.maintenance', $asset) }}" method="POST" class="space-y-3.5">
                     @csrf
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Maintenance Type <span class="text-error-500">*</span></label>
-                        <select name="type" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white">
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maintenance Type <span class="text-error-500">*</span></label>
+                        <select name="type" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white">
                             <option value="Repair">Repair</option>
                             <option value="Routine">Routine Service</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Cost (Rp) <span class="text-error-500">*</span></label>
-                        <input type="number" name="cost" required placeholder="e.g. 500000" class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Cost (Rp) <span class="text-error-500">*</span></label>
+                        <input type="number" name="cost" required placeholder="e.g. 500000" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Vendor / Workshop</label>
-                        <input type="text" name="vendor" placeholder="e.g. Auto2000" class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Vendor / Workshop</label>
+                        <input type="text" name="vendor" placeholder="e.g. Auto2000" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Scheduled Date <span class="text-error-500">*</span></label>
-                        <input type="date" name="scheduled_date" value="{{ date('Y-m-d') }}" required class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Scheduled Date <span class="text-error-500">*</span></label>
+                        <input type="date" name="scheduled_date" value="{{ date('Y-m-d') }}" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Completed Date (Optional)</label>
-                        <input type="date" name="completed_date" class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-sm dark:bg-gray-900 dark:text-white" />
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Completed Date (Optional)</label>
+                        <input type="date" name="completed_date" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Notes / Details</label>
-                        <textarea name="notes" rows="2" placeholder="Describe the repair details..." class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-3 text-sm dark:bg-gray-900 dark:text-white"></textarea>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Notes / Details</label>
+                        <textarea name="notes" rows="2" placeholder="Describe the repair details..." class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-3 text-xs dark:bg-gray-900 dark:text-white"></textarea>
                     </div>
-                    <div class="flex justify-end gap-3 pt-3">
-                        <button type="button" @click="maintOpen = false" class="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-info-500 text-white rounded-lg text-sm font-medium hover:bg-info-600">Save Log</button>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="maintOpen = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">Cancel</button>
+                        <button type="submit" class="rounded-lg bg-info-500 text-white px-4 py-2 text-xs font-semibold hover:bg-info-600">Save Log</button>
                     </div>
                 </form>
             </div>
