@@ -146,7 +146,7 @@
             </div>
 
             {{-- Table --}}
-            <div class="max-w-full overflow-x-auto">
+            <div class="max-w-full overflow-x-auto min-h-[180px]">
                 <table class="min-w-full text-xs">
                     <thead>
                         <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
