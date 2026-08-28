@@ -55,7 +55,7 @@
                                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                                     <!-- First Name -->
                                     <div class="sm:col-span-1">
-                                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                             First Name<span class="text-error-500">*</span>
                                         </label>
                                         <input type="text" id="fname" name="fname"
@@ -64,7 +64,7 @@
                                     </div>
                                     <!-- Last Name -->
                                     <div class="sm:col-span-1">
-                                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                             Last Name<span class="text-error-500">*</span>
                                         </label>
                                         <input type="text" id="lname" name="lname"
@@ -74,7 +74,7 @@
                                 </div>
                                 <!-- Email -->
                                 <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                         Email<span class="text-error-500">*</span>
                                     </label>
                                     <input type="email" id="email" name="email" placeholder="Enter your email"
@@ -82,7 +82,7 @@
                                 </div>
                                 <!-- Password -->
                                 <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                         Password<span class="text-error-500">*</span>
                                     </label>
                                     <div x-data="{ showPassword: false }" class="relative">

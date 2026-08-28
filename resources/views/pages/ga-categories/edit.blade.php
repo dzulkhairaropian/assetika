@@ -24,29 +24,29 @@
                         </h3>
                         <div class="grid grid-cols-1 gap-5">
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Category Name <span class="text-error-500">*</span>
                                 </label>
                                 <input type="text" name="name" value="{{ old('name', $category->name) }}" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-850 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                                 @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Code Prefix <span class="text-error-500">*</span>
                                 </label>
                                 <input type="text" name="code_prefix" value="{{ old('code_prefix', $category->code_prefix) }}" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-855 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                                 @error('code_prefix') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Depreciation Method <span class="text-error-500">*</span>
                                 </label>
                                 <select name="depreciation_method" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-850 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
                                     <option value="straight_line" {{ old('depreciation_method', $category->depreciation_method) == 'straight_line' ? 'selected' : '' }}>Straight Line</option>
                                     <option value="double_declining" {{ old('depreciation_method', $category->depreciation_method) == 'double_declining' ? 'selected' : '' }}>Double Declining Balance</option>
                                     <option value="sum_of_years_digits" {{ old('depreciation_method', $category->depreciation_method) == 'sum_of_years_digits' ? 'selected' : '' }}>Sum of Years Digits</option>
@@ -55,11 +55,11 @@
                             </div>
 
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Useful Life (Years) <span class="text-error-500">*</span>
                                 </label>
                                 <input type="number" name="useful_life_years" value="{{ old('useful_life_years', $category->useful_life_years) }}" min="1" required
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-850 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                                 @error('useful_life_years') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
                         </div>

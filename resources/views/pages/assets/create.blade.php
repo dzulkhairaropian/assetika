@@ -86,7 +86,7 @@
                         </div>
 
                         <div>
-                            <label for="release_date" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label for="release_date" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Release Date <span class="text-error-500">*</span>
                             </label>
                             <x-form.date-picker
@@ -109,20 +109,20 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 MAC Address Wireless
                             </label>
                             <input type="text" name="mac_address_wireless" value="{{ old('mac_address_wireless') }}" placeholder="00:00:00:00:00:00"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             @error('mac_address_wireless') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 MAC Address Ethernet
                             </label>
                             <input type="text" name="mac_address_ethernet" value="{{ old('mac_address_ethernet') }}" placeholder="00:00:00:00:00:00"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             @error('mac_address_ethernet') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -137,20 +137,20 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Windows License
                             </label>
                             <input type="text" name="license_windows" value="{{ old('license_windows') }}" placeholder="Enter Windows license key"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             @error('license_windows') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Office License
                             </label>
                             <input type="text" name="license_office" value="{{ old('license_office') }}" placeholder="Enter Office license key"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             @error('license_office') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -170,20 +170,20 @@
                         </div>
 
                         <div class="lg:col-span-2">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Specification
                             </label>
                             <textarea name="specification" rows="4" placeholder="e.g. Core i7, 16GB RAM, 512GB SSD"
-                                class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">{{ old('specification') }}</textarea>
+                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('specification') }}</textarea>
                             @error('specification') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="lg:col-span-2">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Accessories
                             </label>
                             <textarea name="accessories" rows="3" placeholder="e.g. Mouse, Keyboard, Charger"
-                                class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">{{ old('accessories') }}</textarea>
+                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('accessories') }}</textarea>
                             @error('accessories') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -212,23 +212,23 @@
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Purchase Cost
                             </label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
                                 <input type="number" step="0.01" name="purchase_cost" value="{{ old('purchase_cost') }}" placeholder="0.00"
-                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent pl-10 pr-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             </div>
                             @error('purchase_cost') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Depreciation Profile
                             </label>
                             <select name="depreciation_id"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800">
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
                                 <option value="">-- Select Depreciation --</option>
                                 @foreach($depreciations as $depr)
                                     <option value="{{ $depr->id }}" {{ old('depreciation_id') == $depr->id ? 'selected' : '' }}>{{ $depr->name }} ({{ $depr->months }} Months)</option>
@@ -249,20 +249,20 @@
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Invoice Number
                             </label>
                             <input type="text" name="invoice_number" value="{{ old('invoice_number') }}" placeholder="e.g. INV/2026/06/001"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             @error('invoice_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Notes
                             </label>
                             <textarea name="notes" rows="3" placeholder="Additional notes..."
-                                class="dark:bg-dark-900 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">{{ old('notes') }}</textarea>
+                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('notes') }}</textarea>
                             @error('notes') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
                     </div>

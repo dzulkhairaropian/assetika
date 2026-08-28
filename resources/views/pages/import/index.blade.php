@@ -30,11 +30,11 @@
                     <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
                         <!-- Import Type -->
                         <div class="lg:col-span-2">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Data Type to Import <span class="text-error-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="type" required class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                <select name="type" required class="dark:bg-gray-950 h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 pr-11 text-xs text-gray-800 shadow-sm outline-none focus:border-brand-500 focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
                                     <optgroup label="Core Modules">
                                         <option value="assets">IT Assets Hardware</option>
                                         <option value="consumables">Consumables Inventory</option>
@@ -58,7 +58,7 @@
 
                         <!-- CSV File Upload Dropzone -->
                         <div class="lg:col-span-2">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Select CSV File <span class="text-error-500">*</span>
                             </label>
                             <div class="relative flex items-center justify-center w-full">

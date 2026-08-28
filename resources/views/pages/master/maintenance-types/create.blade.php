@@ -19,12 +19,12 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Name <span class="text-error-500">*</span></label>
-                            <input type="text" name="name" value="{{ old('name') }}" required class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Name <span class="text-error-500">*</span></label>
+                            <input type="text" name="name" value="{{ old('name') }}" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 shadow-sm focus:border-brand-500 focus:outline-none focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:focus:border-brand-800">
                         </div>
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
-                            <input type="text" name="description" value="{{ old('description') }}" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Description</label>
+                            <input type="text" name="description" value="{{ old('description') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 shadow-sm focus:border-brand-500 focus:outline-none focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:focus:border-brand-800">
                         </div>
                         <div class="lg:col-span-2">
                             <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-400">

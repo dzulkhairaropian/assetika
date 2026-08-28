@@ -67,7 +67,7 @@
                                 <div class="space-y-5">
                                     <!-- Email -->
                                     <div>
-                                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                             Email<span class="text-error-500">*</span>
                                         </label>
                                         <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="info@gmail.com"
@@ -78,7 +78,7 @@
                                     </div>
                                     <!-- Password -->
                                     <div>
-                                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                             Password<span class="text-error-500">*</span>
                                         </label>
                                         <div x-data="{ showPassword: false }" class="relative">
