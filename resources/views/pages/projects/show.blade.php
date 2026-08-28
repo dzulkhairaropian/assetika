@@ -209,55 +209,34 @@
                 </div>
 
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Assigned To</label>
-                    <select name="assigned_to_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                        <option value="">Unassigned</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select name="assigned_to_id" label="Assigned To" 
+                        :options="$users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])" 
+                        :selected="old('assigned_to_id')" placeholder="Unassigned" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Initial Status</label>
-                        <select name="status_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            @foreach($columns as $stOption)
-                                @if(isset($stOption->id))
-                                    <option value="{{ $stOption->id }}">{{ $stOption->name }}</option>
-                                @endif
-                            @endforeach
-                        </select>
+                        <x-form.searchable-select name="status_id" label="Initial Status" 
+                            :options="$columns->filter(fn($st) => isset($st->id))->map(fn($st) => ['id' => $st->id, 'text' => $st->name])->values()" 
+                            :selected="old('status_id')" placeholder="Select Status" />
                     </div>
                     <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
-                        <select name="priority" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                        </select>
+                        <x-form.searchable-select name="priority" label="Priority" 
+                            :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" 
+                            :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Link Asset (Optional)</label>
-                        <select name="asset_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            <option value="">None</option>
-                            @foreach($assets as $ast)
-                                <option value="{{ $ast->id }}">{{ $ast->asset_tag }} - {{ $ast->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-form.searchable-select name="asset_id" label="Link Asset (Optional)" 
+                            :options="$assets->map(fn($a) => ['id' => $a->id, 'text' => $a->asset_tag . ' - ' . $a->name])" 
+                            :selected="old('asset_id')" placeholder="None" />
                     </div>
                     <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Link Ticket (Optional)</label>
-                        <select name="ticket_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            <option value="">None</option>
-                            @foreach($tickets as $tkt)
-                                <option value="{{ $tkt->id }}">#{{ $tkt->request_id }} - {{ $tkt->title }}</option>
-                            @endforeach
-                        </select>
+                        <x-form.searchable-select name="ticket_id" label="Link Ticket (Optional)" 
+                            :options="$tickets->map(fn($t) => ['id' => $t->id, 'text' => '#' . $t->request_id . ' - ' . $t->title])" 
+                            :selected="old('ticket_id')" placeholder="None" />
                     </div>
                 </div>
 

@@ -199,32 +199,21 @@
                 </div>
 
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Project Manager / Owner</label>
-                    <select name="owner_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                        <option value="">Select Owner</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select name="owner_id" label="Project Manager / Owner" 
+                        :options="$users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])" 
+                        :selected="old('owner_id')" placeholder="Select Owner" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
-                        <select name="status_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            @foreach($projectStatuses as $st)
-                                <option value="{{ $st->id }}">{{ $st->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-form.searchable-select name="status_id" label="Status" 
+                            :options="$projectStatuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])" 
+                            :selected="old('status_id')" placeholder="Select Status" />
                     </div>
                     <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
-                        <select name="priority" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                        </select>
+                        <x-form.searchable-select name="priority" label="Priority" 
+                            :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" 
+                            :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
                     </div>
                 </div>
 
