@@ -12,7 +12,7 @@
     @endif
 
     <!-- Unified Table Card -->
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="overflow-hidden xl:overflow-visible rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <!-- Card Header Toolbar -->
         <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Standard Table View (Matching Asset Index Specs) -->
-        <div class="max-w-full overflow-x-auto min-h-[180px]">
+        <div class="max-w-full overflow-x-auto xl:overflow-visible">
             <table class="min-w-full text-xs">
                 <thead>
                     <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
@@ -106,7 +106,7 @@
 
                                     <div x-show="open"
                                         x-transition
-                                        class="absolute right-0 {{ $loop->remaining < 3 ? 'bottom-full mb-1' : 'top-full mt-1' }} z-50 w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+                                        class="absolute right-0 top-full mt-1 z-50 w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                         style="display: none;">
                                         
                                         <a href="{{ route('projects.show', $project) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">

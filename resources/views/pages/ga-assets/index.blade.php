@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div class="overflow-hidden xl:overflow-visible rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             {{-- Card Header: Toolbar --}}
             <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -146,7 +146,7 @@
             </div>
 
             {{-- Table --}}
-            <div class="max-w-full overflow-x-auto min-h-[180px]">
+            <div class="max-w-full overflow-x-auto xl:overflow-visible">
                 <table class="min-w-full text-xs">
                     <thead>
                         <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
