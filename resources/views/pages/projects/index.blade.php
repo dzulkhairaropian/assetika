@@ -55,6 +55,7 @@
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Project Name</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Owner</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Progress</th>
                         <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                     </tr>
@@ -73,8 +74,17 @@
                                     <p class="text-[11px] text-gray-400 dark:text-gray-500 line-clamp-1 max-w-md">{{ $project->description }}</p>
                                 @endif
                             </td>
-                            <td class="px-4 py-2.5 font-medium text-gray-800 dark:text-gray-200">
-                                {{ $project->owner?->name ?: '-' }}
+                            <td class="px-4 py-2.5">
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-gray-800 dark:text-gray-200">
+                                        {{ $project->owner?->name ?: '-' }}
+                                    </span>
+                                    @if($project->owner && $project->owner->department)
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            {{ $project->owner->department->name }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-4 py-2.5">
                                 @php
@@ -85,6 +95,24 @@
                                 @endphp
                                 <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">
                                     {{ $stName }}
+                                </x-ui.badge>
+                            </td>
+                            <td class="px-4 py-2.5">
+                                @php
+                                    $prColor = match($project->priority) {
+                                        'low' => 'info',
+                                        'medium' => 'warning',
+                                        'high' => 'error',
+                                        'urgent' => 'error',
+                                        default => 'secondary'
+                                    };
+                                    $prIcon = match($project->priority) {
+                                        'urgent' => 'alert-triangle',
+                                        default => 'flag'
+                                    };
+                                @endphp
+                                <x-ui.badge :color="$prColor" variant="light" size="sm" :featherIcon="$prIcon">
+                                    {{ ucfirst($project->priority ?: 'medium') }}
                                 </x-ui.badge>
                             </td>
                             <td class="px-4 py-2.5 w-48">
