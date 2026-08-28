@@ -37,6 +37,7 @@ class AssetController extends Controller
             'status', 'assignedToUser', 'department.company',
             'location', 'vendor', 'depreciation',
             'currentCheckout.checkedOutToUser',
+            'lastCheckout.checkedOutToUser',
         ])->filter($request->all());
 
         if ($request->filled('depreciation_id')) {

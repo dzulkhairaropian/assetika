@@ -377,7 +377,14 @@
                                             </span>
                                         </div>
                                     @else
-                                        <span class="text-gray-400 italic">Not Assigned</span>
+                                        <div class="flex flex-col">
+                                            <span class="text-gray-400 italic">Not Assigned</span>
+                                            @if($asset->lastCheckout && $asset->lastCheckout->checkedOutToUser)
+                                                <span class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                                    Prev: {{ $asset->lastCheckout->checkedOutToUser->name }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2.5">

@@ -218,6 +218,11 @@ class Asset extends Model
         return $this->belongsTo(AssetCheckout::class, 'current_checkout_id');
     }
 
+    public function lastCheckout()
+    {
+        return $this->hasOne(AssetCheckout::class)->latestOfMany('checked_out_at');
+    }
+
     public function checkouts()
     {
         return $this->hasMany(AssetCheckout::class);
