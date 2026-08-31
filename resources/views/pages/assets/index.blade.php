@@ -20,6 +20,45 @@
                 this.selectedAssets.push(asset);
             }
             this.selectAll = this.selectedAssets.length === document.querySelectorAll('.asset-checkbox').length;
+        },
+        submitBulkLabels() {
+            if (!this.selectedAssets || !this.selectedAssets.length) return;
+            const copies = document.getElementById('labelCopies') ? document.getElementById('labelCopies').value : 1;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("labels.generate", [], false) }}';
+            form.target = '_blank';
+            
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            this.selectedAssets.forEach(a => {
+                const inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = 'ids[]';
+                inputId.value = a.id;
+                form.appendChild(inputId);
+            });
+
+            const inputCopies = document.createElement('input');
+            inputCopies.type = 'hidden';
+            inputCopies.name = 'copies';
+            inputCopies.value = copies;
+            form.appendChild(inputCopies);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        },
+        exportSelectedAssets(assets = this.selectedAssets) {
+            const selected = assets && assets.length ? assets : this.selectedAssets;
+            if (!selected || !selected.length) return;
+            const url = new URL('{{ route("assets.export") }}', window.location.origin);
+            selected.forEach(asset => url.searchParams.append('ids[]', asset.id));
+            window.location.href = url.toString();
         }
     }">
         <x-common.page-breadcrumb pageTitle="Asset Management" />

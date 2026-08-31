@@ -424,8 +424,9 @@ class AssetController extends Controller
 
     public function printLabel(Asset $asset)
     {
-        $asset->load(['product.category', 'department.company']);
-        return view('pages.assets.print-label', compact('asset'));
+        $asset->load(['product.category', 'product.brand', 'department.company', 'location']);
+        $assets = collect([$asset]);
+        return view('pages.labels.print', compact('assets'));
     }
 
     public function destroy(Asset $asset)

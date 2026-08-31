@@ -126,6 +126,8 @@ Route::middleware('auth')->group(function () {
     Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
     Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');
     Route::post('assets/bulk-checkout', [AssetController::class, 'bulkCheckout'])->name('assets.bulk-checkout.process');
+    Route::post('labels/generate', [\App\Http\Controllers\AssetLabelController::class, 'generate'])->name('labels.generate');
+    Route::get('labels/{asset}/print', [\App\Http\Controllers\AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
     Route::get('assets/{asset}/print-label', [AssetController::class, 'printLabel'])->name('assets.print-label');
     Route::resource('assets', AssetController::class);
     Route::get('asset-transactions/export', [\App\Http\Controllers\AssetTransactionController::class, 'export'])->name('asset-transactions.export');
