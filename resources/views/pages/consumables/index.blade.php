@@ -55,9 +55,34 @@
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            {{-- Card Header: Toolbar --}}
-            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
+        <div class="overflow-hidden xl:overflow-visible rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            {{-- Card Header: Tabs + Toolbar --}}
+            <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
+                @php
+                    $currentTab = request('tab') ?: request('status');
+                    $tabFilters = array_filter(request()->except(['page', 'tab', 'status']));
+                    $tabs = [
+                        ['key' => null,           'label' => 'All Consumables', 'count' => $consumableSummary['total'],        'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'in_stock',     'label' => 'In Stock',        'count' => $consumableSummary['in_stock'],     'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'low_stock',    'label' => 'Low Stock',       'count' => $consumableSummary['low_stock'],    'icon' => 'alert-circle', 'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
+                        ['key' => 'out_of_stock', 'label' => 'Out of Stock',   'count' => $consumableSummary['out_of_stock'], 'icon' => 'x-circle',     'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                    ];
+                @endphp
+                <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+                    @foreach($tabs as $tab)
+                        @php
+                            $isActive = ($tab['key'] === null && empty($currentTab)) || ($tab['key'] === $currentTab);
+                            $tabUrl = route('consumables.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+                        @endphp
+                        <a href="{{ $tabUrl }}"
+                           class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                            <i data-feather="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                            {{ $tab['label'] }}
+                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('consumables.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
                         <div class="relative flex items-center">
@@ -136,9 +161,9 @@
                                         <select name="status"
                                             class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                             <option value="">All Statuses</option>
-                                            <option value="in_stock" {{ request('status') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
-                                            <option value="low_stock" {{ request('status') === 'low_stock' ? 'selected' : '' }}>Low Stock</option>
-                                            <option value="out_of_stock" {{ request('status') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
+                                            <option value="in_stock" {{ (request('status') === 'in_stock' || request('tab') === 'in_stock') ? 'selected' : '' }}>In Stock</option>
+                                            <option value="low_stock" {{ (request('status') === 'low_stock' || request('tab') === 'low_stock') ? 'selected' : '' }}>Low Stock</option>
+                                            <option value="out_of_stock" {{ (request('status') === 'out_of_stock' || request('tab') === 'out_of_stock') ? 'selected' : '' }}>Out of Stock</option>
                                         </select>
                                     </div>
                                 </div>

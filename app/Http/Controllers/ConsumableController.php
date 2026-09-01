@@ -42,15 +42,20 @@ class ConsumableController extends Controller
             });
         }
 
-        if ($request->filled('status')) {
-            $status = $request->status;
-            if ($status === 'in_stock') {
-                $query->where('quantity', '>', DB::raw('low_threshold'));
-            } elseif ($status === 'low_stock') {
-                $query->where('quantity', '<=', DB::raw('low_threshold'))->where('quantity', '>', 0);
-            } elseif ($status === 'out_of_stock') {
-                $query->where('quantity', '<=', 0);
-            }
+        $consumableSummary = [
+            'total' => (clone $query)->count(),
+            'in_stock' => (clone $query)->where('quantity', '>', DB::raw('low_threshold'))->count(),
+            'low_stock' => (clone $query)->where('quantity', '<=', DB::raw('low_threshold'))->where('quantity', '>', 0)->count(),
+            'out_of_stock' => (clone $query)->where('quantity', '<=', 0)->count(),
+        ];
+
+        $activeTab = $request->input('tab') ?: $request->input('status');
+        if ($activeTab === 'in_stock') {
+            $query->where('quantity', '>', DB::raw('low_threshold'));
+        } elseif ($activeTab === 'low_stock') {
+            $query->where('quantity', '<=', DB::raw('low_threshold'))->where('quantity', '>', 0);
+        } elseif ($activeTab === 'out_of_stock') {
+            $query->where('quantity', '<=', 0);
         }
 
         $consumables = $query->latest()->paginate(50)->withQueryString();
@@ -65,7 +70,7 @@ class ConsumableController extends Controller
 
         $brands = Brand::orderBy('name')->get();
 
-        return view('pages.consumables.index', compact('consumables', 'products', 'categories', 'brands'));
+        return view('pages.consumables.index', compact('consumables', 'products', 'categories', 'brands', 'consumableSummary'));
     }
 
     public function create()
