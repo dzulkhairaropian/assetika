@@ -167,7 +167,7 @@
                             Rp {{ number_format($asset->purchase_cost, 0, ',', '.') }}
                         </td>
                         <td class="px-4 py-2.5">
-                            <span class="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">Fully Depreciated</span>
+                            <x-ui.badge color="danger" variant="light" size="sm" featherIcon="alert-circle">Fully Depreciated</x-ui.badge>
                         </td>
                     </tr>
                 @empty

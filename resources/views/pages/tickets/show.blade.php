@@ -214,7 +214,7 @@
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-brand-700 dark:text-brand-300 font-mono">{{ $ticket->asset->asset_tag }}</span>
                             @if($ticket->asset->status)
-                                <x-ui.badge :color="$ticket->asset->status->color" variant="light" size="sm">
+                                <x-ui.badge :color="$ticket->asset->status->color" variant="light" size="sm" :featherIcon="$ticket->asset->status->icon">
                                     {{ $ticket->asset->status->name }}
                                 </x-ui.badge>
                             @endif

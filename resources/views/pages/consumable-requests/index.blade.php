@@ -122,16 +122,22 @@
                             </td>
                             <td class="px-5 py-4 sm:px-6">
                                 @php
-                                    $statusValue = is_object($req->status) ? $req->status->value : $req->status;
-                                    $statusLabel = is_object($req->status) ? $req->status->getLabel() : ucfirst($req->status);
-                                    $color = match($statusValue) {
+                                    $isEnum = $req->status instanceof \App\Enums\ConsumableRequestStatus;
+                                    $statusLabel = $isEnum ? $req->status->getLabel() : ucfirst($req->status);
+                                    $color = $isEnum ? $req->status->getColor() : match((string)$req->status) {
                                         'approved' => 'primary',
                                         'completed' => 'success',
-                                        'rejected' => 'error',
+                                        'rejected' => 'danger',
                                         default => 'warning',
                                     };
+                                    $icon = $isEnum ? $req->status->getIcon() : match((string)$req->status) {
+                                        'approved' => 'thumbs-up',
+                                        'completed' => 'check',
+                                        'rejected' => 'x',
+                                        default => 'clock',
+                                    };
                                 @endphp
-                                <x-ui.badge :color="$color" variant="light" size="sm">{{ $statusLabel }}</x-ui.badge>
+                                <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $statusLabel }}</x-ui.badge>
                             </td>
                             <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-500 dark:text-gray-400">
                                 {{ $req->requested_at?->format('d M Y, H:i') ?? '-' }}

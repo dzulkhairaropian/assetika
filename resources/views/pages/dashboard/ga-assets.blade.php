@@ -151,9 +151,9 @@
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $assignment->assigned_at ? $assignment->assigned_at->format('M d, Y') : 'N/A' }}</td>
                         <td class="px-4 py-2.5">
                             @if($assignment->returned_at)
-                                <span class="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Returned</span>
+                                <x-ui.badge color="success" variant="light" size="sm" featherIcon="rotate-ccw">Returned</x-ui.badge>
                             @else
-                                <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">Active</span>
+                                <x-ui.badge color="primary" variant="light" size="sm" featherIcon="user-check">Active</x-ui.badge>
                             @endif
                         </td>
                     </tr>
@@ -181,9 +181,9 @@
                         <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($log->cost, 0, ',', '.') }}</td>
                         <td class="px-4 py-2.5">
                             @if($log->completed_date)
-                                <span class="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Completed</span>
+                                <x-ui.badge color="success" variant="light" size="sm" featherIcon="check-circle">Completed</x-ui.badge>
                             @else
-                                <span class="rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">Scheduled</span>
+                                <x-ui.badge color="warning" variant="light" size="sm" featherIcon="clock">Scheduled</x-ui.badge>
                             @endif
                         </td>
                     </tr>

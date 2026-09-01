@@ -1,4 +1,4 @@
-﻿@extends('layouts.fullscreen-layout')
+@extends('layouts.fullscreen-layout')
 
 @section('content')
     @php
@@ -24,7 +24,7 @@
                         <div class="min-w-0 space-y-4">
                             <div class="flex flex-wrap items-center gap-3">
                                 <span class="inline-flex rounded bg-white/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-white">{{ $asset->asset_tag }}</span>
-                                <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$asset->status->icon">{{ $statusName }}</x-ui.badge>
+                                <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
                             </div>
 
                             <div class="space-y-1">

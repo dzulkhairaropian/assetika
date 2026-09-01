@@ -122,11 +122,11 @@
                                     </td>
                                     <td class="px-4 py-2.5">
                                         @if($conOut)
-                                            <x-ui.badge color="danger" variant="light" size="sm">Out of Stock</x-ui.badge>
+                                            <x-ui.badge color="danger" variant="light" size="sm" featherIcon="x-circle">Out of Stock</x-ui.badge>
                                         @elseif($conLow)
-                                            <x-ui.badge color="warning" variant="light" size="sm">Low: {{ $con->quantity }} left</x-ui.badge>
+                                            <x-ui.badge color="warning" variant="light" size="sm" featherIcon="alert-circle">Low: {{ $con->quantity }} left</x-ui.badge>
                                         @else
-                                            <x-ui.badge color="success" variant="light" size="sm">{{ $con->quantity }} available</x-ui.badge>
+                                            <x-ui.badge color="success" variant="light" size="sm" featherIcon="check-circle">{{ $con->quantity }} available</x-ui.badge>
                                         @endif
                                     </td>
                                     <td class="px-4 py-2.5 text-end">

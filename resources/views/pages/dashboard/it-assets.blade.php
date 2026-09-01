@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="space-y-6">
@@ -216,17 +216,24 @@
             <x-common.dashboard-table
                 title="Recent Asset Checkouts"
                 description="Latest IT asset assignments to users"
-                :headers="['Item', 'Qty', 'To User', 'Date']"
+                :headers="['Item', 'Status', 'To User', 'Date']"
                 :footerLink="$recentCheckouts->isNotEmpty() ? route('assets.index') : null"
                 footerText="View All Assets"
             >
                 @forelse($recentCheckouts as $checkout)
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
-                            <span class="block font-medium text-gray-900 dark:text-white">{{ optional($checkout->asset)->asset_code ?? optional($checkout->asset)->name ?? 'Unknown' }}</span>
+                            <span class="block font-medium text-gray-900 dark:text-white">{{ optional($checkout->asset)->asset_tag ?? optional($checkout->asset)->name ?? 'Unknown' }}</span>
                             <span class="block text-[11px] text-gray-400">{{ optional(optional(optional($checkout->asset))->product)->name ?? '-' }}</span>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ optional($checkout->asset)->quantity ?? 1 }} pcs</td>
+                        <td class="px-4 py-2.5">
+                            @php
+                                $stName = optional(optional($checkout->asset)->status)->name ?? 'Deployed';
+                                $stColor = optional(optional($checkout->asset)->status)->color ?? 'primary';
+                                $stIcon = optional(optional($checkout->asset)->status)->icon ?? 'user-check';
+                            @endphp
+                            <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
+                        </td>
                         <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</td>
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $checkout->checked_out_at->format('M d, H:i') }}</td>
                     </tr>
@@ -241,18 +248,25 @@
             <x-common.dashboard-table
                 title="Aging Assets (4+ Years)"
                 description="Hardware reaching end-of-life cycle"
-                :headers="['Item', 'Qty', 'User', 'Acquisition']"
+                :headers="['Item', 'Status', 'User', 'Acquisition']"
                 :footerLink="$assetsOlderThan4Years->isNotEmpty() ? route('assets.index') : null"
                 footerText="View All Assets"
             >
                 @forelse($assetsOlderThan4Years as $asset)
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
-                            <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_code ?? $asset->name }}</span>
+                            <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_tag ?? $asset->name }}</span>
                             <span class="block text-[11px] text-gray-400">{{ optional(optional($asset->product)->brand)->name ?? '-' }}</span>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ $asset->quantity }} pcs</td>
-                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $asset->checkedOutToUser->name ?? 'N/A' }}</td>
+                        <td class="px-4 py-2.5">
+                            @php
+                                $stName = optional($asset->status)->name ?? 'Aged';
+                                $stColor = optional($asset->status)->color ?? 'warning';
+                                $stIcon = optional($asset->status)->icon ?? 'clock';
+                            @endphp
+                            <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
+                        </td>
+                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $asset->checkedOutToUser->name ?? optional($asset->currentCheckout?->checkedOutToUser)->name ?? 'Unassigned' }}</td>
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             @if($asset->purchase_date)
                                 {{ $asset->purchase_date->format('M d, Y') }}

@@ -30,4 +30,14 @@ enum ConsumableRequestStatus: string
             self::COMPLETED => 'success',
         };
     }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::PENDING => 'clock',
+            self::APPROVED => 'thumbs-up',
+            self::REJECTED => 'x',
+            self::COMPLETED => 'check',
+        };
+    }
 }

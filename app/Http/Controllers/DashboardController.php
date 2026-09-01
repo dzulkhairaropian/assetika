@@ -78,7 +78,7 @@ class DashboardController extends Controller
         })->where('created_at', '<', $startOfMonth)->count();
         $serviceTrend = $this->calculateTrend($service, $servicePrev);
 
-        $recentCheckouts = AssetCheckout::with(['asset.product.brand', 'asset.department', 'checkedOutToUser'])
+        $recentCheckouts = AssetCheckout::with(['asset.product.brand', 'asset.department', 'asset.status', 'checkedOutToUser'])
             ->latest('checked_out_at')
             ->limit(5)
             ->get();
@@ -414,7 +414,7 @@ class DashboardController extends Controller
             ->get();
 
         $fourYearsAgo = \Carbon\Carbon::now()->subYears(4);
-        $assetsOlderThan4Years = Asset::with(['checkedOutToUser', 'product.brand', 'department'])
+        $assetsOlderThan4Years = Asset::with(['checkedOutToUser', 'product.brand', 'department', 'status'])
             ->where(function($query) use ($fourYearsAgo) {
                 $query->where('purchase_date', '<=', $fourYearsAgo)
                       ->orWhere(function($q) use ($fourYearsAgo) {
