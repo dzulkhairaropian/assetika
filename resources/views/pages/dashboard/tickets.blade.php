@@ -226,8 +226,17 @@
                             {{ $ticket->status?->name ?? '-' }}
                         </x-ui.badge>
                     </td>
-                    <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
-                        {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
+                    <td class="px-4 py-2.5">
+                        <div class="flex flex-col">
+                            <span class="font-medium text-gray-900 dark:text-white">
+                                {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
+                            </span>
+                            @if($ticket->assignedTo?->department)
+                                <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                    {{ $ticket->assignedTo->department->name }}
+                                </span>
+                            @endif
+                        </div>
                     </td>
                     <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {{ $ticket->created_at->format('M d, H:i') }}

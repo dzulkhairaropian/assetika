@@ -443,8 +443,17 @@
                                     </x-ui.badge>
                                 @endif
                             </td>
-                            <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
-                                {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
+                            <td class="px-4 py-2.5">
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-gray-900 dark:text-white">
+                                        {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
+                                    </span>
+                                    @if($ticket->assignedTo?->department)
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            {{ $ticket->assignedTo->department->name }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-4 py-2.5 text-end">
                                 <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
