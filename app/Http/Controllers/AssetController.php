@@ -154,6 +154,9 @@ class AssetController extends Controller
 
         $inventorySummary = [
             'total' => (clone $query)->count(),
+            'draft' => (clone $query)->whereHas('status', function($q) {
+                $q->whereIn('name', ['Draft']);
+            })->count(),
             'ready' => (clone $query)->whereHas('status', function($q) {
                 $q->whereIn('name', ['Ready to Deploy']);
             })->count(),
@@ -171,6 +174,11 @@ class AssetController extends Controller
 
         // Tab quick filter
         switch ($request->input('tab')) {
+            case 'draft':
+                $query->whereHas('status', function($q) {
+                    $q->whereIn('name', ['Draft']);
+                });
+                break;
             case 'ready':
                 $query->whereHas('status', function($q) {
                     $q->whereIn('name', ['Ready to Deploy']);
