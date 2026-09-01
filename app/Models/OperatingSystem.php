@@ -18,4 +18,9 @@ class OperatingSystem extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
 }

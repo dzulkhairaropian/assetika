@@ -11,7 +11,7 @@ class OperatingSystemController extends Controller
 {
     public function index(Request $request)
     {
-        $query = OperatingSystem::query();
+        $query = OperatingSystem::withCount('assets');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');

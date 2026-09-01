@@ -10,7 +10,7 @@ class MasterCategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = MasterCategory::query();
+        $query = MasterCategory::withCount('categories');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');

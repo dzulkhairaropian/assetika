@@ -11,7 +11,7 @@ class LocationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Location::with('company');
+        $query = Location::with('company')->withCount('assets');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');

@@ -10,7 +10,7 @@ class DepreciationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Depreciation::query();
+        $query = Depreciation::withCount('assets');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");

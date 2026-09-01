@@ -20,4 +20,9 @@ class MasterCategory extends Model
     {
         return $this->hasMany(Status::class);
     }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }

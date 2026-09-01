@@ -20,4 +20,9 @@ class Category extends Model
     {
         return $this->belongsTo(MasterCategory::class, 'master_category_id');
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

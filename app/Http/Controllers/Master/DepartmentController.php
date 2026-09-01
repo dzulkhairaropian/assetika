@@ -11,7 +11,7 @@ class DepartmentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Department::with('company');
+        $query = Department::with('company')->withCount(['users', 'assets']);
 
         if ($request->filled('search')) {
             $search = $request->search;

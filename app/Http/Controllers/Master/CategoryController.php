@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::with('masterCategory');
+        $query = Category::with('masterCategory')->withCount('products');
 
         if ($request->filled('search')) {
             $search = $request->search;

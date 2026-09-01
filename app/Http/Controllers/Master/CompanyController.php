@@ -10,7 +10,7 @@ class CompanyController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Company::query();
+        $query = Company::withCount('departments');
 
         if ($request->filled('search')) {
             $search = $request->search;

@@ -10,7 +10,7 @@ class PositionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Position::query();
+        $query = Position::withCount('users');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
