@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-4" x-data="{
@@ -139,7 +139,11 @@
                                     {{ $status->color ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2.5 font-semibold text-gray-800 dark:text-gray-200">
-                                    {{ $status->assets_count ?? 0 }} assets
+                                    @php
+                                        $count = ($status->assets_count ?? 0) + ($status->consumables_count ?? 0);
+                                        $isConsumable = str_contains(strtolower(optional($status->masterCategory)->name ?? ''), 'consumable');
+                                    @endphp
+                                    {{ $count }} {{ $isConsumable ? 'items' : 'assets' }}
                                 </td>
                                 <td class="px-4 py-2.5 text-end">
                                     <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">

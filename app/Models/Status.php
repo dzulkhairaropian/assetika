@@ -26,6 +26,11 @@ class Status extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
+
     public function consumables()
     {
         return $this->hasMany(Consumable::class);

@@ -267,20 +267,11 @@
                                 </td>
                                 <td class="px-4 py-2.5">
                                     @php
-                                        $statusText = 'In Stock';
-                                        $color = 'success';
-                                        $icon = 'check-circle';
-                                        if ($consumable->quantity <= 0) {
-                                            $statusText = 'Out of Stock';
-                                            $color = 'danger';
-                                            $icon = 'alert-triangle';
-                                        } elseif ($consumable->quantity <= $consumable->low_threshold) {
-                                            $statusText = 'Low Stock';
-                                            $color = 'warning';
-                                            $icon = 'alert-circle';
-                                        }
+                                        $statusName = optional($consumable->status)->name ?? ($consumable->quantity <= 0 ? 'Out of Stock' : ($consumable->quantity <= $consumable->low_threshold ? 'Low Stock' : 'In Stock'));
+                                        $statusColor = optional($consumable->status)->color ?? ($consumable->quantity <= 0 ? 'danger' : ($consumable->quantity <= $consumable->low_threshold ? 'warning' : 'success'));
+                                        $statusIcon = optional($consumable->status)->icon ?? ($consumable->quantity <= 0 ? 'x-circle' : ($consumable->quantity <= $consumable->low_threshold ? 'alert-circle' : 'check-circle'));
                                     @endphp
-                                    <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $statusText }}</x-ui.badge>
+                                    <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="$statusIcon">{{ $statusName }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-900 dark:text-white font-medium">
                                     Rp {{ number_format($consumable->purchase_cost, 0, ',', '.') }}

@@ -11,7 +11,7 @@ class StatusController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Status::with('masterCategory');
+        $query = Status::with('masterCategory')->withCount(['assets', 'consumables']);
 
         if ($request->filled('search')) {
             $search = $request->search;
