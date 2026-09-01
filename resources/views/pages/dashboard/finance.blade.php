@@ -1,131 +1,122 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="grid grid-cols-12 gap-4 md:gap-6 min-w-0">
+<div class="space-y-6">
 
-        <!-- Dashboard Header -->
-        <div class="col-span-12 min-w-0">
-            <x-common.page-breadcrumb pageTitle="Financial Dashboard" />
-            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <!-- Top Action & Title Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Financial & Valuation Control Panel</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Real-time asset valuation, capital spend trends, and straight-line depreciation metrics.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                <i data-feather="download" class="w-4 h-4"></i> Export Valuation
+            </a>
+            <a href="{{ route('depreciations.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-brand-600 transition">
+                <i data-feather="settings" class="w-4 h-4"></i> Depreciation Config
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. Key Financial KPI Grid -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <x-common.stat-card
+            title="Total Purchase Cost"
+            icon="dollar-sign"
+            value="Rp {{ number_format($totalPurchaseCost, 0, ',', '.') }}"
+            description="Initial acquisition cost of all assets"
+        />
+
+        <x-common.stat-card
+            title="Current Book Value"
+            icon="trending-up"
+            value="Rp {{ number_format($totalBookValue, 0, ',', '.') }}"
+            description="Remaining net value after depreciation"
+        />
+
+        <x-common.stat-card
+            title="Total Depreciated"
+            icon="trending-down"
+            value="Rp {{ number_format($totalDepreciated, 0, ',', '.') }}"
+            description="Accumulated value loss to date"
+        />
+
+        <x-common.stat-card
+            title="Avg Asset Cost"
+            icon="pie-chart"
+            value="Rp {{ number_format($avgAssetCost, 0, ',', '.') }}"
+            description="Average cost per registered unit"
+        />
+    </div>
+
+    <!-- 2. Financial Analytics Charts Grid -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        
+        <!-- Spend Timeline Chart (Spans 2 columns) -->
+        <div class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-                        Financial & Asset Valuation Overview
-                    </h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Asset acquisition costs, straight-line depreciation, and valuation metrics.</p>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Asset Acquisition Spend Timeline</h3>
+                    <p class="text-xs text-gray-400">Monthly capital expenditure on IT assets</p>
                 </div>
-                <div class="flex items-center gap-2.5 shrink-0">
-                    <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-feather="download" class="w-3.5 h-3.5"></i> Export Report
-                    </a>
-                    <a href="{{ route('depreciations.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                        <i data-feather="settings" class="w-3.5 h-3.5"></i> Depreciation Settings
-                    </a>
+
+                <!-- Year Selector -->
+                <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
+                    <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                        <i data-feather="calendar" class="w-3 h-3 text-brand-500"></i>
+                        <span>Year: {{ $selectedYear }}</span>
+                        <i data-feather="chevron-down" class="w-3 h-3"></i>
+                    </button>
+                    <div x-show="dropdownOpen" class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50 flex flex-col gap-0.5 w-max max-h-56 overflow-y-auto" style="display: none;">
+                        @foreach($purchaseYears as $year)
+                            <a href="{{ request()->fullUrlWithQuery(['purchase_year' => $year]) }}"
+                               class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ (string) $selectedYear === (string) $year ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400' }}">
+                                {{ $year }}
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
+
+            @if(array_sum($spendTimelineChartData['data']) > 0)
+                <div id="financeSpendTimelineChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No purchase spend data for {{ $selectedYear }}</div>
+            @endif
         </div>
 
-        <!-- 1. Key Financial Metrics (Top 4 Cards) -->
-        <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 min-w-0">
-            <x-common.stat-card
-                title="Total Purchase Cost"
-                icon="dollar-sign"
-                value="Rp {{ number_format($totalPurchaseCost, 0, ',', '.') }}"
-                description="Initial acquisition cost of all IT assets"
-            />
-
-            <x-common.stat-card
-                title="Current Book Value"
-                icon="trending-up"
-                value="Rp {{ number_format($totalBookValue, 0, ',', '.') }}"
-                description="Remaining net value after straight-line depreciation"
-            />
-
-            <x-common.stat-card
-                title="Total Depreciated"
-                icon="trending-down"
-                value="Rp {{ number_format($totalDepreciated, 0, ',', '.') }}"
-                description="Accumulated value loss to date"
-            />
-
-            <x-common.stat-card
-                title="Avg Asset Cost"
-                icon="pie-chart"
-                value="Rp {{ number_format($avgAssetCost, 0, ',', '.') }}"
-                description="Average cost per registered asset unit"
-            />
+        <!-- Cost by Category (Donut) -->
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="mb-4">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Cost by Category</h3>
+                <p class="text-xs text-gray-400">Top 5 categories by initial spend</p>
+            </div>
+            @if(array_sum($categoryChartData['data']) > 0)
+                <div id="financeCategoryChart" class="h-64 flex items-center justify-center"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No category spend data available</div>
+            @endif
         </div>
 
-        <!-- 2. Financial Charts Row -->
-        <div class="col-span-12 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 min-w-0">
-            
-            <!-- Acquisition Spend Timeline (Line Chart - Spans 2 or 3) -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden md:col-span-2 xl:col-span-3">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Asset Acquisition Spend Timeline</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">Monthly capital expenditure on IT assets</p>
-                    </div>
-
-                    <!-- Year Selector -->
-                    <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                        <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <i data-feather="calendar" class="w-3 h-3 text-brand-500"></i>
-                            <span>Year: {{ $selectedYear }}</span>
-                            <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                        </button>
-                        <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 w-max max-h-56 overflow-y-auto" style="display: none;">
-                            @foreach($purchaseYears as $year)
-                                <a href="{{ request()->fullUrlWithQuery(['purchase_year' => $year]) }}"
-                                   class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition {{ (string) $selectedYear === (string) $year ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800' }}">
-                                    {{ $year }}
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                @if(array_sum($spendTimelineChartData['data']) > 0)
-                    <div id="financeSpendTimelineChart" class="h-64"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No purchase spend data for {{ $selectedYear }}</p>
-                    </div>
-                @endif
+        <!-- Cost by Department (Donut - Full width below or span) -->
+        <div class="lg:col-span-3 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="mb-4">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Asset Valuation by Department</h3>
+                <p class="text-xs text-gray-400">Top departments by total allocated asset capital</p>
             </div>
-
-            <!-- Cost by Category (Donut) -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden">
-                <div class="mb-2">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">Purchase Cost by Category</h3>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 truncate">Top 5 categories by initial expenditure</p>
-                </div>
-                @if(array_sum($categoryChartData['data']) > 0)
-                    <div id="financeCategoryChart" class="h-64 flex items-center justify-center"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No category spend data available</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Cost by Department (Donut) -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden md:col-span-2 xl:col-span-2">
-                <div class="mb-2">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">Asset Value by Department</h3>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 truncate">Top 5 departments by allocated asset cost</p>
-                </div>
-                @if(array_sum($departmentChartData['data']) > 0)
-                    <div id="financeDeptChart" class="h-64 flex items-center justify-center"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No department spend data available</p>
-                    </div>
-                @endif
-            </div>
+            @if(array_sum($departmentChartData['data']) > 0)
+                <div id="financeDeptChart" class="h-64 flex items-center justify-center"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No department spend data available</div>
+            @endif
         </div>
 
-        <!-- 3. Tables Row (Highest Value Assets & Fully Depreciated Assets) -->
-        <div class="col-span-12 xl:col-span-6 min-w-0">
+    </div>
+
+    <!-- 3. Asset Valuation Data Tables -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Highest Value Assets"
                 description="Top IT assets by initial purchase cost"
@@ -137,7 +128,7 @@
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_code ?? $asset->asset_tag ?? $asset->name }}</span>
-                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($asset->product)->brand)->name ?? '-' }} • {{ optional($asset->product)->name ?? '-' }}</span>
+                            <span class="block text-[11px] text-gray-400">{{ optional(optional($asset->product)->brand)->name ?? '-' }} • {{ optional($asset->product)->name ?? '-' }}</span>
                         </td>
                         <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
                             {{ optional(optional($asset->product)->category)->name ?? 'Uncategorized' }}
@@ -155,7 +146,7 @@
             </x-common.dashboard-table>
         </div>
 
-        <div class="col-span-12 xl:col-span-6 min-w-0">
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Fully Depreciated Assets"
                 description="Assets with zero remaining book value"
@@ -167,7 +158,7 @@
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_code ?? $asset->asset_tag ?? $asset->name }}</span>
-                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($asset->product)->brand)->name ?? '-' }}</span>
+                            <span class="block text-[11px] text-gray-400">{{ optional(optional($asset->product)->brand)->name ?? '-' }}</span>
                         </td>
                         <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">
                             {{ $asset->purchase_date ? $asset->purchase_date->format('M d, Y') : '-' }}
@@ -184,8 +175,9 @@
                 @endforelse
             </x-common.dashboard-table>
         </div>
-
     </div>
+
+</div>
 @endsection
 
 @push('scripts')

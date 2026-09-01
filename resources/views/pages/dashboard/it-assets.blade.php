@@ -1,442 +1,218 @@
 ﻿@extends('layouts.app')
 
 @section('content')
-    <div class="grid grid-cols-12 gap-4 md:gap-6 min-w-0">
+<div class="space-y-6">
 
-        <!-- Dashboard Header -->
-        <div class="col-span-12 min-w-0">
-            <x-common.page-breadcrumb pageTitle="IT Assets Dashboard" />
-            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-                        Hi, {{ $userName }}! 👋
-                        <span class="block text-xs font-normal text-gray-500 dark:text-gray-400 mt-0.5">{{ $randomGreeting }}</span>
-                    </h2>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                        <i data-feather="plus" class="w-3.5 h-3.5"></i> Add Asset
-                    </a>
-                    <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-feather="download" class="w-3.5 h-3.5"></i> Export
-                    </a>
-                    <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-feather="log-out" class="w-3.5 h-3.5"></i> Checkout
-                    </a>
-                </div>
-            </div>
+    <!-- Top Title & Search Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">IT Assets Analytics & Control Panel</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live monitoring of IT hardware, equipment allocation, and system alerts for {{ $userName }}.</p>
         </div>
-
-        <!-- Metrics Widgets (Top Row) -->
-        <div class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 min-w-0">
-            @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'success' : 'error'; @endphp
-            <x-common.stat-card
-                title="Total Assets"
-                icon="hard-drive"
-                :value="$totalAssets"
-                :trend="$totalAssetsTrend"
-                :trendColor="$totalAssetsTrendColor"
-                description="Total registered IT hardware assets"
-            />
-
-            @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'success' : 'error'; @endphp
-            <x-common.stat-card
-                title="Ready to Deploy"
-                icon="check-circle"
-                :value="$readyToDeploy"
-                :trend="$readyToDeployTrend"
-                :trendColor="$readyToDeployTrendColor"
-                description="Available assets for deployment"
-            />
-
-            @php $deployedTrendColor = $deployedTrend >= 0 ? 'success' : 'error'; @endphp
-            <x-common.stat-card
-                title="Deployed"
-                icon="user-check"
-                :value="$deployed"
-                :trend="$deployedTrend"
-                :trendColor="$deployedTrendColor"
-                description="IT assets currently assigned to users"
-            />
-
-            @php $serviceTrendColor = $serviceTrend >= 0 ? 'success' : 'error'; @endphp
-            <x-common.stat-card
-                title="In Service"
-                icon="wrench"
-                :value="$service"
-                :trend="$serviceTrend"
-                :trendColor="$serviceTrendColor"
-                description="Assets currently under maintenance"
-            />
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-brand-600 transition">
+                <i data-feather="plus" class="w-4 h-4"></i> Add IT Asset
+            </a>
+            <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                <i data-feather="download" class="w-4 h-4"></i> Export Data
+            </a>
+            <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                <i data-feather="log-out" class="w-4 h-4"></i> Bulk Checkout
+            </a>
         </div>
+    </div>
 
-        <!-- Alerts Summary (Second Row) -->
-        @if($lowStockConsumables->isNotEmpty() || $assetsInService->isNotEmpty() || $assetsOlderThan4Years->isNotEmpty() || $brokenDisposal > 0)
-            <div class="col-span-12 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                @php
-                    $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
-                    $lowStockTrendColor = $lowStockTrend <= 0 ? 'success' : 'error';
-                @endphp
-                <x-common.stat-card
-                    title="Low Stock Consumables"
-                    icon="package"
-                    :value="$lowStockConsumables->count()"
-                    :trend="$lowStockTrend"
-                    :trendColor="$lowStockTrendColor"
-                    description="Items at or below minimum threshold."
-                />
+    <!-- Main Grid of KPI Cards -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'success' : 'error'; @endphp
+        <x-common.stat-card
+            title="Total Registered Assets"
+            icon="hard-drive"
+            :value="$totalAssets"
+            :trend="$totalAssetsTrend"
+            :trendColor="$totalAssetsTrendColor"
+            description="Total IT hardware inventory"
+        />
 
-                @php
-                    $brokenTrend = $brokenDisposal > 0 ? 1 : -1;
-                    $brokenTrendColor = $brokenTrend <= 0 ? 'success' : 'error';
-                @endphp
-                <x-common.stat-card
-                    title="Broken / Disposal Alerts"
-                    icon="alert-triangle"
-                    :value="$brokenDisposal"
-                    :trend="$brokenTrend"
-                    :trendColor="$brokenTrendColor"
-                    description="Assets marked as broken or retired."
-                />
+        @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'success' : 'error'; @endphp
+        <x-common.stat-card
+            title="Ready to Deploy"
+            icon="check-circle"
+            :value="$readyToDeploy"
+            :trend="$readyToDeployTrend"
+            :trendColor="$readyToDeployTrendColor"
+            description="Available for immediate setup"
+        />
 
-                @php
-                    $agingTrend = $assetsOlderThan4Years->count() > 0 ? 1 : -1;
-                    $agingTrendColor = $agingTrend <= 0 ? 'success' : 'error';
-                @endphp
-                <x-common.stat-card
-                    title="Aging Assets"
-                    icon="clock"
-                    :value="$assetsOlderThan4Years->count()"
-                    :trend="$agingTrend"
-                    :trendColor="$agingTrendColor"
-                    description="Assets approaching lifecycle replacement."
-                />
-            </div>
-        @endif
+        @php $deployedTrendColor = $deployedTrend >= 0 ? 'success' : 'error'; @endphp
+        <x-common.stat-card
+            title="Active Deployed"
+            icon="user-check"
+            :value="$deployed"
+            :trend="$deployedTrend"
+            :trendColor="$deployedTrendColor"
+            description="Assigned to employees & offices"
+        />
 
-        <div class="col-span-12 grid grid-cols-1 gap-4 lg:grid-cols-2 min-w-0">
+        @php $serviceTrendColor = $serviceTrend >= 0 ? 'success' : 'error'; @endphp
+        <x-common.stat-card
+            title="In Repair / Service"
+            icon="wrench"
+            :value="$service"
+            :trend="$serviceTrend"
+            :trendColor="$serviceTrendColor"
+            description="Undergoing maintenance"
+        />
+    </div>
+
+    <!-- Alert KPI Row (If any critical issues) -->
+    @if($lowStockConsumables->isNotEmpty() || $assetsInService->isNotEmpty() || $assetsOlderThan4Years->isNotEmpty() || $brokenDisposal > 0)
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
             @php
-                $locationMax = $assetsByLocation->max('total') ?: 1;
-                $categoryMax = $assetsByCategory->max('total') ?: 1;
+                $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
+                $lowStockTrendColor = $lowStockTrend <= 0 ? 'success' : 'error';
             @endphp
+            <x-common.stat-card
+                title="Low Stock Consumables"
+                icon="package"
+                :value="$lowStockConsumables->count()"
+                :trend="$lowStockTrend"
+                :trendColor="$lowStockTrendColor"
+                description="Items below minimum stock threshold."
+            />
 
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div class="mb-3">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Top Locations</h3>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">Asset distribution across physical locations</p>
+            @php
+                $brokenTrend = $brokenDisposal > 0 ? 1 : -1;
+                $brokenTrendColor = $brokenTrend <= 0 ? 'success' : 'error';
+            @endphp
+            <x-common.stat-card
+                title="Broken / Disposal Alerts"
+                icon="alert-triangle"
+                :value="$brokenDisposal"
+                :trend="$brokenTrend"
+                :trendColor="$brokenTrendColor"
+                description="Assets marked for decommissioning."
+            />
+
+            @php
+                $agingTrend = $assetsOlderThan4Years->count() > 0 ? 1 : -1;
+                $agingTrendColor = $agingTrend <= 0 ? 'success' : 'error';
+            @endphp
+            <x-common.stat-card
+                title="Aging Assets (4+ Yrs)"
+                icon="clock"
+                :value="$assetsOlderThan4Years->count()"
+                :trend="$agingTrend"
+                :trendColor="$agingTrendColor"
+                description="Hardware nearing end of lifecycle."
+            />
+        </div>
+    @endif
+
+    <!-- Main Grid: Charts & Analytics Breakdown -->
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+        <!-- Chart 1: Status Distribution -->
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+             x-data="{ activeStatusCat: 'all', categoryLabel: 'All Categories', updateStatusChart(catId, label) { this.activeStatusCat = catId; this.categoryLabel = label; if (window.updateStatusChartJS) { window.updateStatusChartJS(catId); } } }">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Status Breakdown</h3>
+                    <p class="text-xs text-gray-400">Availability ratio</p>
                 </div>
-                <div class="space-y-2.5">
-                    @forelse($assetsByLocation as $item)
-                        @php
-                            $locationName = optional($item->location)->name ?? 'Unassigned';
-                            $locationPercent = min(100, round(($item->total / $locationMax) * 100));
-                        @endphp
-                        <div>
-                            <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="truncate font-medium text-gray-700 dark:text-gray-300">{{ $locationName }}</span>
-                                <span class="font-bold text-gray-900 dark:text-white">{{ $item->total }}</span>
-                            </div>
-                            <div class="h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                                <div class="h-full rounded-full bg-blue-500 transition-all duration-500" style="width: {{ $locationPercent }}%"></div>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-xs text-gray-400 py-4 text-center">No location data available</p>
-                    @endforelse
+                <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
+                    <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                        <span x-text="categoryLabel">All Categories</span>
+                        <i data-feather="chevron-down" class="w-3 h-3"></i>
+                    </button>
+                    <div x-show="dropdownOpen" class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50 flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max" style="display: none;">
+                        <button @click="updateStatusChart('all', 'All Categories'); dropdownOpen = false;" class="px-3 py-1.5 text-xs text-left font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300">All Categories</button>
+                        @foreach($categories as $category)
+                            <button @click="updateStatusChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" class="px-3 py-1.5 text-xs text-left font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300">{{ $category->name }}</button>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div class="mb-3">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Top Categories</h3>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">Most common IT asset categories in inventory</p>
-                </div>
-                <div class="space-y-2.5">
-                    @forelse($assetsByCategory as $item)
-                        @php
-                            $categoryName = $item->name ?? optional(optional($item->product)->category)->name ?? 'Uncategorized';
-                            $categoryPercent = min(100, round(($item->total / $categoryMax) * 100));
-                        @endphp
-                        <div>
-                            <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="truncate font-medium text-gray-700 dark:text-gray-300">{{ $categoryName }}</span>
-                                <span class="font-bold text-gray-900 dark:text-white">{{ $item->total }}</span>
-                            </div>
-                            <div class="h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                                <div class="h-full rounded-full bg-green-500 transition-all duration-500" style="width: {{ $categoryPercent }}%"></div>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-xs text-gray-400 py-4 text-center">No category data available</p>
-                    @endforelse
-                </div>
-            </div>
+            @if($totalAssets > 0)
+                <div id="assetStatusChart" class="h-64 flex items-center justify-center"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No asset status data available</div>
+            @endif
         </div>
 
-        <!-- Charts Row: Donut/Pie Charts (3 per row) -->
-        <div class="col-span-12 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 min-w-0">
-            <!-- 1. Asset Status Distribution -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden"
-                 x-data="{ activeStatusCat: 'all', categoryLabel: 'All Categories', updateStatusChart(catId, label) { this.activeStatusCat = catId; this.categoryLabel = label; if (window.updateStatusChartJS) { window.updateStatusChartJS(catId); } } }">
-                <div class="flex items-center justify-between mb-2 min-w-0">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">Asset Status Distribution</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 truncate">By operational availability</p>
-                    </div>
-                    <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                        <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <span x-text="categoryLabel">All Categories</span>
-                            <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                        </button>
-                        <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max max-w-[90vw]" style="display: none;">
-                            <button @click="updateStatusChart('all', 'All Categories'); dropdownOpen = false;" :class="activeStatusCat === 'all' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">All Categories</button>
-                            @foreach($categories as $category)
-                                <button @click="updateStatusChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" :class="activeStatusCat === '{{ $category->id }}' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">{{ $category->name }}</button>
-                            @endforeach
-                        </div>
-                    </div>
+        <!-- Chart 2: Department Distribution -->
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+             x-data="{ activeDeptCat: 'all', categoryLabel: 'All Categories', updateDeptChart(catId, label) { this.activeDeptCat = catId; this.categoryLabel = label; if (window.updateDeptChartJS) { window.updateDeptChartJS(catId); } } }">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Assets by Department</h3>
+                    <p class="text-xs text-gray-400">Top allocated departments</p>
                 </div>
-
-                @if($totalAssets > 0)
-                    <div id="assetStatusChart" class="h-64 flex items-center justify-center"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No asset status data available</p>
-                    </div>
-                @endif
             </div>
-
-            <!-- 2. Assets by Department -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden"
-                 x-data="{ activeDeptCat: 'all', categoryLabel: 'All Categories', updateDeptChart(catId, label) { this.activeDeptCat = catId; this.categoryLabel = label; if (window.updateDeptChartJS) { window.updateDeptChartJS(catId); } } }">
-                <div class="flex items-center justify-between mb-2 min-w-0">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">Assets by Department</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 truncate">Top 5 departments</p>
-                    </div>
-                    <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                        <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <span x-text="categoryLabel">All Categories</span>
-                            <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                        </button>
-                        <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max max-w-[90vw]" style="display: none;">
-                            <button @click="updateDeptChart('all', 'All Categories'); dropdownOpen = false;" :class="activeDeptCat === 'all' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">All Categories</button>
-                            @foreach($categories as $category)
-                                <button @click="updateDeptChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" :class="activeDeptCat === '{{ $category->id }}' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">{{ $category->name }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                @if(count($deptChartData['data']) > 0)
-                    <div id="deptAssetChart" class="h-64 flex items-center justify-center"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No department asset data available</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- 3. Most Used Products -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden"
-                 x-data="{ activeCategory: 'all', categoryLabel: 'All Categories', updateProductChart(catId, label) { this.activeCategory = catId; this.categoryLabel = label; if (window.updateProductChartJS) { window.updateProductChartJS(catId); } } }">
-                <div class="flex items-center justify-between mb-2 min-w-0">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">Most Used Products</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 truncate">Top 5 hardware models</p>
-                    </div>
-                    <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                        <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <span x-text="categoryLabel">All Categories</span>
-                            <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                        </button>
-                        <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max max-w-[90vw]" style="display: none;">
-                            <button @click="updateProductChart('all', 'All Categories'); dropdownOpen = false;" :class="activeCategory === 'all' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">All Categories</button>
-                            @foreach($categories as $category)
-                                <button @click="updateProductChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" :class="activeCategory === '{{ $category->id }}' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">{{ $category->name }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                @if(count($productDataByCategory['all']['data']) > 0)
-                    <div id="productAssetChart" class="h-64 flex items-center justify-center"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No product usage data available</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- 4. Most Requested Consumables -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden"
-                 x-data="{ activeConsumableCat: 'all', categoryLabel: 'All Categories', updateConsumableChart(catId, label) { this.activeConsumableCat = catId; this.categoryLabel = label; if (window.updateConsumableChartJS) { window.updateConsumableChartJS(catId); } } }">
-                <div class="flex items-center justify-between mb-2 min-w-0">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">Most Requested Consumables</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500 truncate">Top 5 requested items</p>
-                    </div>
-                    <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                        <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <span x-text="categoryLabel">All Categories</span>
-                            <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                        </button>
-                        <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max max-w-[90vw]" style="display: none;">
-                            <button @click="updateConsumableChart('all', 'All Categories'); dropdownOpen = false;" :class="activeConsumableCat === 'all' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">All Categories</button>
-                            @foreach($consumableCategories as $category)
-                                <button @click="updateConsumableChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" :class="activeConsumableCat === '{{ $category->id }}' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">{{ $category->name }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                @if(count($consumableChartData['data']) > 0)
-                    <div id="requestedConsumablesChart" class="h-64 flex items-center justify-center"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No consumable request data available</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- 5. Consumable Usage Timeline -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden md:col-span-2 xl:col-span-3"
-                 x-data="{ activeConsumableTLCat: 'all', categoryLabel: 'All Categories', updateConsumableTimelineChart(catId, label) { this.activeConsumableTLCat = catId; this.categoryLabel = label; if (window.updateConsumableTimelineChartJS) { window.updateConsumableTimelineChartJS(catId); } } }">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Consumable Usage Timeline</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">Filtered by distribution date</p>
-                    </div>
-
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                            <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                                <span x-text="categoryLabel">All Categories</span>
-                                <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                            </button>
-                            <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max max-w-[90vw]" style="display: none;">
-                                <button @click="updateConsumableTimelineChart('all', 'All Categories'); dropdownOpen = false;" :class="activeConsumableTLCat === 'all' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">All Categories</button>
-                                @foreach($consumableCategories as $category)
-                                    <button @click="updateConsumableTimelineChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" :class="activeConsumableTLCat === '{{ $category->id }}' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">{{ $category->name }}</button>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                            <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                                <i data-feather="calendar" class="w-3 h-3 text-brand-500"></i>
-                                <span>Year: {{ $consumableTimelineYear }}</span>
-                                <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                            </button>
-                            <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 w-max max-h-56 overflow-y-auto" style="display: none;">
-                                @foreach($consumableTimelineYears as $year)
-                                    <a href="{{ request()->fullUrlWithQuery(['consumable_year' => $year]) }}"
-                                       class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition {{ (string) $consumableTimelineYear === (string) $year ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800' }}">
-                                        {{ $year }}
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @if(count($consumableTimelineChartData['data']) > 0)
-                    <div id="consumableTimelineChart" class="h-64"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No consumable usage timeline data available</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- 6. Asset Purchases Timeline -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 min-w-0 overflow-hidden md:col-span-2 xl:col-span-3"
-                 x-data="{ activeTimelineCat: 'all', categoryLabel: 'All Categories', updateTimelineChart(catId, label) { this.activeTimelineCat = catId; this.categoryLabel = label; if (window.updatePurchaseTimelineChartJS) { window.updatePurchaseTimelineChartJS(catId); } } }">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Asset Purchases Timeline</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">Filtered by acquisition date</p>
-                    </div>
-
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                            <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                                <span x-text="categoryLabel">All Categories</span>
-                                <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                            </button>
-                            <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max max-w-[90vw]" style="display: none;">
-                                <button @click="updateTimelineChart('all', 'All Categories'); dropdownOpen = false;" :class="activeTimelineCat === 'all' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">All Categories</button>
-                                @foreach($categories as $category)
-                                    <button @click="updateTimelineChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" :class="activeTimelineCat === '{{ $category->id }}' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'" class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap">{{ $category->name }}</button>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                            <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center justify-between gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                                <i data-feather="calendar" class="w-3 h-3 text-brand-500"></i>
-                                <span>Year: {{ $purchaseChartYear }}</span>
-                                <i data-feather="chevron-down" class="w-3 h-3" :class="{ 'rotate-180': dropdownOpen }"></i>
-                            </button>
-                            <div x-show="dropdownOpen" x-transition class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-[9999] flex flex-col gap-0.5 w-max max-h-56 overflow-y-auto" style="display: none;">
-                                @foreach($purchaseChartYears as $year)
-                                    <a href="{{ request()->fullUrlWithQuery(['purchase_year' => $year]) }}"
-                                       class="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition {{ (string) $purchaseChartYear === (string) $year ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800' }}">
-                                        {{ $year }}
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @if(count($purchaseChartData['data']) > 0)
-                    <div id="purchaseTimelineChart" class="h-64"></div>
-                @else
-                    <div class="flex flex-col items-center justify-center h-64 text-center">
-                        <p class="text-xs text-gray-400 font-medium">No purchase timeline data available</p>
-                    </div>
-                @endif
-            </div>
+            @if(count($deptChartData['data']) > 0)
+                <div id="deptAssetChart" class="h-64 flex items-center justify-center"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No department asset data available</div>
+            @endif
         </div>
 
-        <!-- Consumables Stock -->
-        <div class="col-span-12 xl:col-span-6 min-w-0">
-            <x-common.dashboard-table
-                title="Consumables Stock"
-                description="Current stock levels for consumable items"
-                :headers="['Item', 'Qty', 'Status']"
-                :footerLink="$consumablesBreakdown->isNotEmpty() ? route('consumables.index') : null"
-                footerText="Manage All Consumables"
-            >
-                @forelse($consumablesBreakdown as $item)
-                    @php
-                        $statusText = 'In Stock';
-                        $badgeClasses = 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400';
-                        if ($item->quantity <= 0) {
-                            $badgeClasses = 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400';
-                            $statusText = 'Out of Stock';
-                        } elseif ($item->quantity <= $item->low_threshold) {
-                            $badgeClasses = 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400';
-                            $statusText = 'Low Stock';
-                        }
-                    @endphp
-                    <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
-                        <td class="px-4 py-2.5">
-                            <span class="block font-medium text-gray-900 dark:text-white">{{ optional($item->product)->name }}</span>
-                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($item->product)->brand)->name ?? '-' }}</span>
-                        </td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 font-medium">{{ $item->quantity }}</td>
-                        <td class="px-4 py-2.5">
-                            <span class="rounded-full px-2 py-0.5 text-[11px] font-medium {{ $badgeClasses }}">{{ $statusText }}</span>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="3" class="px-4 py-6 text-center text-xs text-gray-400">No consumables in inventory</td></tr>
-                @endforelse
-            </x-common.dashboard-table>
+        <!-- Chart 3: Most Used Products -->
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+             x-data="{ activeCategory: 'all', categoryLabel: 'All Categories', updateProductChart(catId, label) { this.activeCategory = catId; this.categoryLabel = label; if (window.updateProductChartJS) { window.updateProductChartJS(catId); } } }">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Most Used Hardware</h3>
+                    <p class="text-xs text-gray-400">Top 5 hardware models</p>
+                </div>
+            </div>
+            @if(count($productDataByCategory['all']['data']) > 0)
+                <div id="productAssetChart" class="h-64 flex items-center justify-center"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No product usage data available</div>
+            @endif
         </div>
 
-        <!-- Recent Asset Checkouts -->
-        <div class="col-span-12 xl:col-span-6 min-w-0">
+    </div>
+
+    <!-- Timeline & Purchases Section -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        
+        <!-- Timeline Chart: Consumable Usage -->
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Consumable Usage Timeline</h3>
+                    <p class="text-xs text-gray-400">Distribution trend by month</p>
+                </div>
+            </div>
+            @if(count($consumableTimelineChartData['data']) > 0)
+                <div id="consumableTimelineChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No consumable timeline data available</div>
+            @endif
+        </div>
+
+        <!-- Timeline Chart: Asset Purchases -->
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Asset Acquisition Timeline</h3>
+                    <p class="text-xs text-gray-400">Historical acquisition volume</p>
+                </div>
+            </div>
+            @if(count($purchaseChartData['data']) > 0)
+                <div id="purchaseTimelineChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No purchase timeline data available</div>
+            @endif
+        </div>
+
+    </div>
+
+    <!-- Data Tables Grid -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <!-- Recent Asset Checkouts Table -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Recent Asset Checkouts"
                 description="Latest IT asset assignments to users"
@@ -448,12 +224,10 @@
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ optional($checkout->asset)->asset_code ?? optional($checkout->asset)->name ?? 'Unknown' }}</span>
-                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional(optional($checkout->asset))->product)->name ?? '-' }}</span>
+                            <span class="block text-[11px] text-gray-400">{{ optional(optional(optional($checkout->asset))->product)->name ?? '-' }}</span>
                         </td>
                         <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ optional($checkout->asset)->quantity ?? 1 }} pcs</td>
-                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">
-                            {{ $checkout->checkedOutToUser->name ?? 'N/A' }}
-                        </td>
+                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</td>
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $checkout->checked_out_at->format('M d, H:i') }}</td>
                     </tr>
                 @empty
@@ -462,36 +236,12 @@
             </x-common.dashboard-table>
         </div>
 
-        <!-- Recent Consumable Checkouts -->
-        <div class="col-span-12 xl:col-span-6 min-w-0">
+        <!-- Aging Assets Table -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
-                title="Recent Consumable Checkouts"
-                description="Latest consumable distribution transactions"
-                :headers="['Item', 'Qty', 'To User', 'Date']"
-                :footerLink="$recentConsumableCheckouts->isNotEmpty() ? route('consumable-transactions.index') : null"
-                footerText="View All Transactions"
-            >
-                @forelse($recentConsumableCheckouts as $transaction)
-                    <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
-                        <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white">{{ optional(optional($transaction->consumable)->product)->name ?? 'Unknown' }}</td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ $transaction->quantity }} pcs</td>
-                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">
-                            {{ $transaction->checkedOutToUser->name ?? 'N/A' }}
-                        </td>
-                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $transaction->transaction_date->format('M d, H:i') }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No recent consumable checkouts</td></tr>
-                @endforelse
-            </x-common.dashboard-table>
-        </div>
-
-        <!-- Assets Older Than 4 Years -->
-        <div class="col-span-12 xl:col-span-6 min-w-0">
-            <x-common.dashboard-table
-                title="Assets Older Than 4 Years"
-                description="Aging assets approaching replacement"
-                :headers="['Item', 'Qty', 'To User', 'Date']"
+                title="Aging Assets (4+ Years)"
+                description="Hardware reaching end-of-life cycle"
+                :headers="['Item', 'Qty', 'User', 'Acquisition']"
                 :footerLink="$assetsOlderThan4Years->isNotEmpty() ? route('assets.index') : null"
                 footerText="View All Assets"
             >
@@ -499,18 +249,15 @@
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_code ?? $asset->name }}</span>
-                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($asset->product)->brand)->name ?? '-' }} • {{ optional($asset->product)->name ?? '-' }}</span>
+                            <span class="block text-[11px] text-gray-400">{{ optional(optional($asset->product)->brand)->name ?? '-' }}</span>
                         </td>
                         <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">{{ $asset->quantity }} pcs</td>
-                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">
-                            {{ $asset->checkedOutToUser->name ?? 'N/A' }}
-                        </td>
+                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $asset->checkedOutToUser->name ?? 'N/A' }}</td>
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             @if($asset->purchase_date)
                                 {{ $asset->purchase_date->format('M d, Y') }}
-                                <span class="block text-[10px] text-gray-400">@php $age = $asset->purchase_date->diff(now()); echo $age->y . ' yrs ' . $age->m . ' mos'; @endphp</span>
                             @else
-                                {{ $asset->created_at->format('M d, H:i') }}
+                                {{ $asset->created_at->format('M d, Y') }}
                             @endif
                         </td>
                     </tr>
