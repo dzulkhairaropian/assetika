@@ -4,18 +4,11 @@
 @endphp
 <div class="space-y-4" x-data="{
     selectedCategory: '{{ old('ticket_category_id', $ticket?->ticket_category_id) }}',
-    selectedSubcategory: '{{ old('ticket_subcategory_id', $ticket?->ticket_subcategory_id) }}',
-    categories: {{ json_encode($ticketCategories) }},
     statusId: '{{ old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? '')) }}',
     closedIds: {{ json_encode($closedStatusIds) }},
     completedStatusId: '{{ $completedStatusId }}',
     completedDate: '{{ old('completed_date', $ticket?->completed_date?->format('Y-m-d')) }}',
     completedTime: '{{ old('completed_time', $ticket?->completed_time?->format('H:i')) }}',
-    get subcategories() {
-        if (!this.selectedCategory) return [];
-        const cat = this.categories.find(c => c.id == this.selectedCategory);
-        return cat ? cat.subcategories : [];
-    },
     onStatusChange() {
         const val = parseInt(this.statusId);
         if (this.closedIds.includes(val)) {
@@ -83,14 +76,19 @@
                     name="requester_user_id"
                     label="Requester User"
                     :options="$userOptions"
-                    :selected="old('requester_user_id', $ticket?->requester_user_id ?? auth()->id())"
+                    :selected="old('requester_user_id', $ticket?->requester_user_id)"
                     placeholder="Select User"
                     required="true"
                 />
 
                 <!-- Assigned To -->
                 @php
-                    $staffOptions = array_merge([['id' => '', 'text' => 'Unassigned']], $users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])->toArray());
+                    $staffList = $staffUsers ?? $users->filter(fn($u) => $u->hasAnyRole(['it_admin', 'super_admin']));
+                    if ($staffList->isEmpty()) $staffList = $users;
+                    $staffOptions = array_merge([['id' => '', 'text' => 'Unassigned']], $staffList->map(fn($u) => [
+                        'id' => $u->id, 
+                        'text' => $u->name . ($u->department ? ' (' . $u->department->name . ')' : '')
+                    ])->toArray());
                 @endphp
                 <x-form.searchable-select
                     name="assigned_to_id"
@@ -103,22 +101,11 @@
                 <!-- ITSM Ticket Category -->
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">ITSM Category</label>
-                    <select name="ticket_category_id" x-model="selectedCategory" @change="selectedSubcategory = ''" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                    <select name="ticket_category_id" x-model="selectedCategory" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                         <option value="">Select Category</option>
-                        <template x-for="cat in categories" :key="cat.id">
-                            <option :value="cat.id" x-text="cat.name" :selected="cat.id == selectedCategory"></option>
-                        </template>
-                    </select>
-                </div>
-
-                <!-- ITSM Ticket Subcategory -->
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">ITSM Subcategory</label>
-                    <select name="ticket_subcategory_id" x-model="selectedSubcategory" :disabled="!selectedCategory" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 disabled:opacity-50 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Subcategory</option>
-                        <template x-for="sub in subcategories" :key="sub.id">
-                            <option :value="sub.id" x-text="sub.name" :selected="sub.id == selectedSubcategory"></option>
-                        </template>
+                        @foreach($ticketCategories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
                     </select>
                 </div>
 

@@ -42,6 +42,7 @@ class Ticket extends Model
         'internal_notes',
         'estimated_hours',
         'actual_hours',
+        'created_at',
     ];
 
     protected function casts(): array

@@ -34,7 +34,7 @@ class TicketController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Ticket::with(['ticketCategory', 'ticketSubcategory', 'priority', 'status', 'slaStatus', 'assignedTo.department', 'requesterUser.department', 'requesterDepartment']);
+        $query = Ticket::with(['ticketCategory', 'priority', 'status', 'slaStatus', 'assignedTo.department', 'requesterUser.department', 'requesterDepartment']);
 
         if ($search = $request->string('search')->trim()->toString()) {
             $query->where(function ($q) use ($search): void {
@@ -125,9 +125,13 @@ class TicketController extends Controller
 
     public function create(): View
     {
-        $users = User::all();
+        $users = User::with('department')->orderBy('name')->get();
+        $staffUsers = User::role(['it_admin', 'super_admin'])->with('department')->orderBy('name')->get();
+        if ($staffUsers->isEmpty()) {
+            $staffUsers = $users;
+        }
         $ticketTypes = TicketType::all();
-        $ticketCategories = TicketCategory::where('is_active', true)->with('subcategories')->get();
+        $ticketCategories = TicketCategory::where('is_active', true)->orderBy('name')->get();
         $priorities = Priority::all();
         $labels = Label::all();
         $sources = Source::all();
@@ -143,6 +147,7 @@ class TicketController extends Controller
 
         return view('pages.tickets.create', compact(
             'users',
+            'staffUsers',
             'ticketTypes',
             'ticketCategories',
             'priorities',
@@ -235,7 +240,10 @@ class TicketController extends Controller
             }
         }
 
-        $ticket = Ticket::create($data);
+        $ticket = new Ticket();
+        $ticket->fill($data);
+        $ticket->created_at = $ticketDate;
+        $ticket->save();
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
@@ -273,7 +281,7 @@ class TicketController extends Controller
     {
         $ticket->load([
             'ticketType', 'requesterUser', 'requesterCompany', 'requesterDepartment',
-            'ticketCategory', 'ticketSubcategory', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
+            'ticketCategory', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
             'status', 'slaStatus', 'asset.product.brand', 'asset.assignedToUser', 'asset.currentCheckout.checkedOutToUser', 'asset.department', 'asset.status',
             'attachments', 'comments.user', 'comments.attachments', 'histories.user'
         ]);
@@ -285,9 +293,13 @@ class TicketController extends Controller
 
     public function edit(Ticket $ticket): View
     {
-        $users = User::all();
+        $users = User::with('department')->orderBy('name')->get();
+        $staffUsers = User::role(['it_admin', 'super_admin'])->with('department')->orderBy('name')->get();
+        if ($staffUsers->isEmpty()) {
+            $staffUsers = $users;
+        }
         $ticketTypes = TicketType::all();
-        $ticketCategories = TicketCategory::where('is_active', true)->with('subcategories')->get();
+        $ticketCategories = TicketCategory::where('is_active', true)->orderBy('name')->get();
         $priorities = Priority::all();
         $labels = Label::all();
         $sources = Source::all();
@@ -304,6 +316,7 @@ class TicketController extends Controller
         return view('pages.tickets.edit', compact(
             'ticket',
             'users',
+            'staffUsers',
             'ticketTypes',
             'ticketCategories',
             'priorities',
@@ -396,7 +409,11 @@ class TicketController extends Controller
             }
         }
 
-        $ticket->update($data);
+        $ticket->fill($data);
+        if (!empty($data['created_at'])) {
+            $ticket->created_at = \Illuminate\Support\Carbon::parse($data['created_at']);
+        }
+        $ticket->save();
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
