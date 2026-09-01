@@ -1,11 +1,48 @@
+@php
+    $closedStatusIds = $ticketStatuses->filter(fn($s) => $s->is_closed || in_array($s->name, ['Completed', 'Closed', 'Resolved']))->pluck('id')->toArray();
+    $completedStatusId = $ticketStatuses->firstWhere('name', 'Completed')?->id ?? ($ticketStatuses->firstWhere('is_closed', true)?->id ?? 4);
+@endphp
 <div class="space-y-4" x-data="{
     selectedCategory: '{{ old('ticket_category_id', $ticket?->ticket_category_id) }}',
     selectedSubcategory: '{{ old('ticket_subcategory_id', $ticket?->ticket_subcategory_id) }}',
     categories: {{ json_encode($ticketCategories) }},
+    statusId: '{{ old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? '')) }}',
+    closedIds: {{ json_encode($closedStatusIds) }},
+    completedStatusId: '{{ $completedStatusId }}',
+    completedDate: '{{ old('completed_date', $ticket?->completed_date?->format('Y-m-d')) }}',
+    completedTime: '{{ old('completed_time', $ticket?->completed_time?->format('H:i')) }}',
     get subcategories() {
         if (!this.selectedCategory) return [];
         const cat = this.categories.find(c => c.id == this.selectedCategory);
         return cat ? cat.subcategories : [];
+    },
+    onStatusChange() {
+        const val = parseInt(this.statusId);
+        if (this.closedIds.includes(val)) {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            
+            if (!this.completedDate) this.completedDate = `${yyyy}-${mm}-${dd}`;
+            if (!this.completedTime) this.completedTime = `${hh}:${min}`;
+        }
+    },
+    onDateChange() {
+        if (this.completedDate && this.completedStatusId) {
+            const currentVal = parseInt(this.statusId);
+            if (!this.closedIds.includes(currentVal)) {
+                this.statusId = this.completedStatusId;
+            }
+            if (!this.completedTime) {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                this.completedTime = `${hh}:${min}`;
+            }
+        }
     }
 }">
     <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
@@ -97,33 +134,12 @@
                 </div>
 
                 <!-- Status -->
-                @php
-                    $closedStatusIds = $ticketStatuses->filter(fn($s) => $s->is_closed || in_array($s->name, ['Completed', 'Closed', 'Resolved']))->pluck('id')->toArray();
-                @endphp
-                <div x-data="{
-                    closedIds: {{ json_encode($closedStatusIds) }},
-                    onStatusChange(e) {
-                        const val = parseInt(e.target.value);
-                        if (this.closedIds.includes(val)) {
-                            const now = new Date();
-                            const yyyy = now.getFullYear();
-                            const mm = String(now.getMonth() + 1).padStart(2, '0');
-                            const dd = String(now.getDate()).padStart(2, '0');
-                            const hh = String(now.getHours()).padStart(2, '0');
-                            const min = String(now.getMinutes()).padStart(2, '0');
-                            
-                            const dateInput = document.querySelector('input[name=\'completed_date\']');
-                            const timeInput = document.querySelector('input[name=\'completed_time\']');
-                            if (dateInput && !dateInput.value) dateInput.value = `${yyyy}-${mm}-${dd}`;
-                            if (timeInput && !timeInput.value) timeInput.value = `${hh}:${min}`;
-                        }
-                    }
-                }">
+                <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                    <select name="status_id" @change="onStatusChange($event)" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                    <select name="status_id" x-model="statusId" @change="onStatusChange()" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                         <option value="">Select Status</option>
                         @foreach($ticketStatuses as $status)
-                            <option value="{{ $status->id }}" {{ old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? '')) == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                            <option value="{{ $status->id }}">{{ $status->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -219,12 +235,12 @@
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Completed Date</label>
-                        <input type="date" name="completed_date" value="{{ old('completed_date', $ticket->completed_date?->format('Y-m-d')) }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        <input type="date" name="completed_date" x-model="completedDate" @input="onDateChange()" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Completed Time</label>
-                        <input type="time" name="completed_time" value="{{ old('completed_time', $ticket->completed_time?->format('H:i')) }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        <input type="time" name="completed_time" x-model="completedTime" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                     </div>
 
                     <div>

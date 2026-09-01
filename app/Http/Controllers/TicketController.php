@@ -170,7 +170,11 @@ class TicketController extends Controller
             'assigned_to_id' => ['nullable', 'exists:users,id'],
             'asset_id' => ['nullable', 'exists:assets,id'],
             'problem_description' => ['required', 'string'],
+            'completed_date' => ['nullable', 'date'],
+            'completed_time' => ['nullable'],
             'internal_notes' => ['nullable', 'string'],
+            'resolution_notes' => ['nullable', 'string'],
+            'resolution_time_hours' => ['nullable', 'numeric'],
             'estimated_hours' => ['nullable', 'numeric', 'min:0'],
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
@@ -208,6 +212,21 @@ class TicketController extends Controller
         }
 
         $data['created_by_id'] = auth()->id();
+
+        // If completed_date is provided, auto-set status to Completed
+        if (!empty($data['completed_date'])) {
+            $currentStatus = !empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
+            if (!$currentStatus || !$currentStatus->is_closed) {
+                $completedStatus = TicketStatus::where('name', 'Completed')->first() 
+                    ?? TicketStatus::where('is_closed', true)->first();
+                if ($completedStatus) {
+                    $data['status_id'] = $completedStatus->id;
+                }
+            }
+            if (empty($data['completed_time'])) {
+                $data['completed_time'] = now();
+            }
+        }
 
         if (empty($data['sla_status_id'])) {
             $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
@@ -313,6 +332,8 @@ class TicketController extends Controller
             'assigned_to_id' => ['nullable', 'exists:users,id'],
             'asset_id' => ['nullable', 'exists:assets,id'],
             'problem_description' => ['required', 'string'],
+            'completed_date' => ['nullable', 'date'],
+            'completed_time' => ['nullable'],
             'internal_notes' => ['nullable', 'string'],
             'resolution_notes' => ['nullable', 'string'],
             'resolution_time_hours' => ['nullable', 'numeric'],
@@ -336,17 +357,35 @@ class TicketController extends Controller
             $data['requester_department_id'] = $requester->department_id;
         }
 
+        // If completed_date is provided and status is not explicitly set to a closed status, auto-set status to Completed
+        if (!empty($data['completed_date'])) {
+            $currentStatus = !empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
+            if (!$currentStatus || !$currentStatus->is_closed) {
+                $completedStatus = TicketStatus::where('name', 'Completed')->first() 
+                    ?? TicketStatus::where('is_closed', true)->first();
+                if ($completedStatus) {
+                    $data['status_id'] = $completedStatus->id;
+                }
+            }
+            if (empty($data['completed_time'])) {
+                $data['completed_time'] = now();
+            }
+        }
+
         // Auto SLA resolution calculation on closing
         if (isset($data['status_id'])) {
             $statusObj = TicketStatus::find($data['status_id']);
             if ($statusObj && $statusObj->is_closed) {
-                if (!$ticket->completed_date) {
+                if (empty($data['completed_date'])) {
                     $data['completed_date'] = now()->toDateString();
+                }
+                if (empty($data['completed_time'])) {
                     $data['completed_time'] = now();
-                    if (! isset($data['resolution_time_hours']) || ! $data['resolution_time_hours']) {
-                        $hours = $ticket->created_at ? round($ticket->created_at->diffInMinutes(now()) / 60, 2) : 0;
-                        $data['resolution_time_hours'] = $hours;
-                    }
+                }
+                if (! isset($data['resolution_time_hours']) || ! $data['resolution_time_hours']) {
+                    $createdAt = isset($data['created_at']) ? \Illuminate\Support\Carbon::parse($data['created_at']) : ($ticket->created_at ?? now());
+                    $hours = $createdAt ? round($createdAt->diffInMinutes(now()) / 60, 2) : 0;
+                    $data['resolution_time_hours'] = $hours;
                 }
                 if (empty($data['sla_status_id'])) {
                     $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
