@@ -105,6 +105,8 @@
                         if (request('ticket_category_id')) $activeCount++;
                         if (request('company_id')) $activeCount++;
                         if (request('department_id')) $activeCount++;
+                        if (request('start_date') || request('from_date')) $activeCount++;
+                        if (request('end_date') || request('to_date')) $activeCount++;
                     @endphp
 
                     <div class="relative" @click.away="filterOpen = false">
@@ -129,6 +131,18 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2.5 text-left">
+                                <div class="col-span-2 sm:col-span-1">
+                                    <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Start Date</label>
+                                    <input type="date" name="start_date" value="{{ request('start_date', request('from_date')) }}"
+                                        class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                </div>
+
+                                <div class="col-span-2 sm:col-span-1">
+                                    <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">End Date</label>
+                                    <input type="date" name="end_date" value="{{ request('end_date', request('to_date')) }}"
+                                        class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                </div>
+
                                 <div>
                                     <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Status</label>
                                     <select name="status_id"
@@ -147,6 +161,28 @@
                                         <option value="">All Priorities</option>
                                         @foreach($priorities as $priority)
                                             <option value="{{ $priority->id }}" {{ request('priority_id') == $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Category</label>
+                                    <select name="ticket_category_id"
+                                        class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                        <option value="">All Categories</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ (request('ticket_category_id') == $category->id || request('category_id') == $category->id) ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Company</label>
+                                    <select name="company_id"
+                                        class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                        <option value="">All Companies</option>
+                                        @foreach($companies as $company)
+                                            <option value="{{ $company->id }}" {{ request('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

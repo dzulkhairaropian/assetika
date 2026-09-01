@@ -43,12 +43,44 @@ class TicketController extends Controller
             });
         }
 
+        if ($startDate = ($request->input('start_date') ?: $request->input('from_date'))) {
+            $query->where(function($q) use ($startDate) {
+                $q->whereDate('request_date', '>=', $startDate)
+                  ->orWhere(function($sub) use ($startDate) {
+                      $sub->whereNull('request_date')
+                          ->whereDate('created_at', '>=', $startDate);
+                  });
+            });
+        }
+
+        if ($endDate = ($request->input('end_date') ?: $request->input('to_date'))) {
+            $query->where(function($q) use ($endDate) {
+                $q->whereDate('request_date', '<=', $endDate)
+                  ->orWhere(function($sub) use ($endDate) {
+                      $sub->whereNull('request_date')
+                          ->whereDate('created_at', '<=', $endDate);
+                  });
+            });
+        }
+
         if ($status = $request->input('status_id')) {
             $query->where('status_id', $status);
         }
 
         if ($priority = $request->input('priority_id')) {
             $query->where('priority_id', $priority);
+        }
+
+        if ($catId = ($request->input('ticket_category_id') ?: $request->input('category_id'))) {
+            $query->where('ticket_category_id', $catId);
+        }
+
+        if ($companyId = $request->input('company_id')) {
+            $query->where('requester_company_id', $companyId);
+        }
+
+        if ($deptId = $request->input('department_id')) {
+            $query->where('requester_department_id', $deptId);
         }
 
         $ticketSummary = [
