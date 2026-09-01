@@ -188,8 +188,12 @@ Route::middleware('auth')->group(function () {
 
     // GA Asset Management Routes
     Route::resource('ga-categories', \App\Http\Controllers\GaAssetCategoryController::class);
+    Route::resource('ga-subcategories', \App\Http\Controllers\GaAssetSubcategoryController::class);
+    Route::get('ga-assets/subcategories-ajax', [\App\Http\Controllers\GaAssetController::class, 'getSubcategoriesAjax'])->name('ga-assets.subcategories-ajax');
     Route::post('ga-assets/bulk-delete', [\App\Http\Controllers\GaAssetController::class, 'bulkDestroy'])->name('ga-assets.bulk-delete');
     Route::resource('ga-assets', \App\Http\Controllers\GaAssetController::class);
+    Route::get('ga-assets/{asset}/bast/{assignment}', [\App\Http\Controllers\GaAssetController::class, 'showBAST'])->name('ga-assets.bast');
+    Route::post('ga-assets/{asset}/renew-tax', [\App\Http\Controllers\GaAssetController::class, 'renewVehicleTax'])->name('ga-assets.renew-tax');
     Route::post('ga-assets/{asset}/checkout', [\App\Http\Controllers\GaAssetController::class, 'checkout'])->name('ga-assets.checkout');
     Route::post('ga-assets/{asset}/checkin', [\App\Http\Controllers\GaAssetController::class, 'checkin'])->name('ga-assets.checkin');
     Route::post('ga-assets/{asset}/maintenance', [\App\Http\Controllers\GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');

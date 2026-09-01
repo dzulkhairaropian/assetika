@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6" x-data="{ activeTab: 'details', checkoutOpen: false, checkinOpen: false, maintOpen: false }">
+    <div class="space-y-6" x-data="{ activeTab: 'details', checkoutOpen: false, checkinOpen: false, maintOpen: false, renewTaxOpen: false }">
         <x-common.page-breadcrumb pageTitle="General Affairs Asset Details" :items="[['label' => 'GA Assets', 'url' => route('ga-assets.index')]]" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
@@ -52,6 +52,13 @@
                         </button>
                     @endif
                     
+                    @if($asset->vehicle)
+                        <button type="button" @click="renewTaxOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-blue-700">
+                            <i data-feather="file-text" class="h-3.5 w-3.5"></i>
+                            Perpanjang STNK / Kaleng
+                        </button>
+                    @endif
+
                     <button type="button" @click="maintOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-amber-600">
                         <i data-feather="tool" class="h-3.5 w-3.5"></i>
                         Maintenance
@@ -225,8 +232,12 @@
                                         <p class="mt-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ $asset->vehicle->fuel_consumption ? $asset->vehicle->fuel_consumption . ' km/l' : '-' }}</p>
                                     </div>
                                     <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-800/20">
-                                        <p class="text-[10px] font-medium uppercase text-gray-400">Tax Due Date</p>
+                                        <p class="text-[10px] font-medium uppercase text-gray-400">Jatuh Tempo Pajak STNK (1 Thn)</p>
                                         <p class="mt-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ $asset->vehicle->tax_due_date ? $asset->vehicle->tax_due_date->format('d M Y') : '-' }}</p>
+                                    </div>
+                                    <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-800/20">
+                                        <p class="text-[10px] font-medium uppercase text-gray-400">Jatuh Tempo Plat Kaleng (5 Thn)</p>
+                                        <p class="mt-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ $asset->vehicle->plate_expiry_date ? $asset->vehicle->plate_expiry_date->format('d M Y') : '-' }}</p>
                                     </div>
                                     <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-800/20">
                                         <p class="text-[10px] font-medium uppercase text-gray-400">Last Odometer</p>
@@ -246,6 +257,7 @@
                                             <th class="px-4 py-2.5 text-left font-semibold uppercase tracking-wider text-gray-400">Assigned</th>
                                             <th class="px-4 py-2.5 text-left font-semibold uppercase tracking-wider text-gray-400">Returned</th>
                                             <th class="px-4 py-2.5 text-left font-semibold uppercase tracking-wider text-gray-400">Return Cond.</th>
+                                            <th class="px-4 py-2.5 text-right font-semibold uppercase tracking-wider text-gray-400">BAST</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -262,6 +274,12 @@
                                                 </td>
                                                 <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400">
                                                     {{ $assign->condition_on_return ?? '-' }}
+                                                </td>
+                                                <td class="px-4 py-2.5 text-right">
+                                                    <a href="{{ route('ga-assets.bast', [$asset, $assign]) }}" target="_blank"
+                                                        class="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                                                        <i data-feather="file-text" class="w-3 h-3 text-brand-500"></i> BAST PDF
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @empty
@@ -437,6 +455,50 @@
                 </form>
             </div>
         </div>
+
+        <!-- Modal Renewal STNK / Kaleng / Pajak -->
+        @if($asset->vehicle)
+        <div x-show="renewTaxOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" style="display: none;">
+            <div class="bg-white dark:bg-gray-900 rounded-xl max-w-md w-full p-5 space-y-4 shadow-xl border border-gray-200 dark:border-gray-800" @click.away="renewTaxOpen = false">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Perpanjangan STNK / Plat Kaleng / Pajak</h3>
+                <form action="{{ route('ga-assets.renew-tax', $asset) }}" method="POST" class="space-y-3.5">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Jenis Perpanjangan <span class="text-error-500">*</span></label>
+                        <select name="renewal_type" required class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white">
+                            <option value="tax">Pajak Tahunan STNK (1 Tahun)</option>
+                            <option value="plate">Plat Kaleng (5 Tahun)</option>
+                            <option value="both">Pajak Tahunan & Plat Kaleng (5 Tahun)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tgl Jatuh Tempo Pajak Baru (1 Thn)</label>
+                        <input type="date" name="tax_due_date" value="{{ $asset->vehicle->tax_due_date ? $asset->vehicle->tax_due_date->copy()->addYear()->format('Y-m-d') : date('Y-m-d', strtotime('+1 year')) }}" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tgl Jatuh Tempo Kaleng Baru (5 Thn)</label>
+                        <input type="date" name="plate_expiry_date" value="{{ ($asset->vehicle->plate_expiry_date ?? $asset->vehicle->tax_due_date) ? ($asset->vehicle->plate_expiry_date ?? $asset->vehicle->tax_due_date)->copy()->addYears(5)->format('Y-m-d') : date('Y-m-d', strtotime('+5 years')) }}" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Nomor STNK Baru (Opsional)</label>
+                        <input type="text" name="stnk_number" value="{{ $asset->vehicle->stnk_number }}" placeholder="Nomor STNK" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Biaya Perpanjangan (Rp)</label>
+                        <input type="number" name="cost" placeholder="e.g. 1500000" class="h-9 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 text-xs dark:bg-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Catatan</label>
+                        <textarea name="notes" rows="2" placeholder="Nomor resi Samsat, lokasi pengurusan..." class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent p-2.5 text-xs dark:bg-gray-900 dark:text-white"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="renewTaxOpen = false" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300">Batal</button>
+                        <button type="submit" class="rounded-lg bg-blue-600 text-white px-4 py-2 text-xs font-semibold hover:bg-blue-700">Simpan Perpanjangan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
 
     </div>
 @endsection

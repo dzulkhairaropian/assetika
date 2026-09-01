@@ -32,6 +32,61 @@
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
 
+        @if(($taxDueVehiclesCount ?? 0) > 0 || ($warrantyExpiringCount ?? 0) > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                @if(($taxDueVehiclesCount ?? 0) > 0)
+                    <div class="rounded-xl border border-warning-200 bg-warning-50/80 p-3.5 dark:border-warning-900/30 dark:bg-warning-500/10 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-warning-500 text-white">
+                                    <i data-feather="truck" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <h4 class="text-xs font-bold text-warning-800 dark:text-warning-300">Pajak Kendaraan Jatuh Tempo ({{ $taxDueVehiclesCount }})</h4>
+                            </div>
+                            <a href="{{ route('ga-assets.index', ['filter' => 'tax_due']) }}" class="text-[11px] font-semibold text-warning-800 underline hover:text-warning-900">Filter List</a>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            @foreach($taxDueVehicles->take(5) as $v)
+                                @if($v->asset)
+                                    <a href="{{ route('ga-assets.show', $v->asset) }}" class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-[11px] font-semibold text-warning-900 shadow-xs border border-warning-200 hover:bg-warning-100 dark:bg-gray-900 dark:text-warning-300 dark:border-warning-800">
+                                        <span>{{ $v->license_plate ?: $v->asset->asset_code }}</span>
+                                        <span class="text-[10px] text-gray-500">({{ $v->tax_due_date ? $v->tax_due_date->format('d M Y') : '-' }})</span>
+                                    </a>
+                                @endif
+                            @endforeach
+                            @if($taxDueVehiclesCount > 5)
+                                <span class="text-[10px] text-warning-700 self-center">+{{ $taxDueVehiclesCount - 5 }} lainnya</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+                @if(($warrantyExpiringCount ?? 0) > 0)
+                    <div class="rounded-xl border border-blue-200 bg-blue-50/80 p-3.5 dark:border-blue-900/30 dark:bg-blue-500/10 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500 text-white">
+                                    <i data-feather="shield-off" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <h4 class="text-xs font-bold text-blue-800 dark:text-blue-300">Garansi Aset GA Expiring ({{ $warrantyExpiringCount }})</h4>
+                            </div>
+                            <a href="{{ route('ga-assets.index', ['filter' => 'warranty_expiring']) }}" class="text-[11px] font-semibold text-blue-800 underline hover:text-blue-900">Filter List</a>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            @foreach($warrantyExpiringAssets->take(5) as $item)
+                                <a href="{{ route('ga-assets.show', $item) }}" class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-[11px] font-semibold text-blue-900 shadow-xs border border-blue-200 hover:bg-blue-100 dark:bg-gray-900 dark:text-blue-300 dark:border-blue-800">
+                                    <span>{{ $item->asset_code }} - {{ Str::limit($item->name, 15) }}</span>
+                                    <span class="text-[10px] text-gray-500">({{ $item->warranty_expiry_date ? $item->warranty_expiry_date->format('d M Y') : '-' }})</span>
+                                </a>
+                            @endforeach
+                            @if($warrantyExpiringCount > 5)
+                                <span class="text-[10px] text-blue-700 self-center">+{{ $warrantyExpiringCount - 5 }} lainnya</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <!-- Bulk Delete Form -->
         <form id="bulkDeleteForm" action="{{ route('ga-assets.bulk-delete') }}" method="POST" class="hidden">
             @csrf

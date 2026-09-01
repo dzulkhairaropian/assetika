@@ -10,6 +10,7 @@ class GaAssetVehicle extends Model
 
     protected $casts = [
         'tax_due_date' => 'date',
+        'plate_expiry_date' => 'date',
         'last_service_date' => 'date',
         'insurance_expiry_date' => 'date',
         'fuel_consumption' => 'decimal:2',

@@ -44,6 +44,7 @@ class MenuHelper
                         'subItems' => [
                             ['name' => 'GA Inventory', 'path' => '/ga-assets'],
                             ['name' => 'GA Categories', 'path' => '/ga-categories'],
+                            ['name' => 'GA Subcategories', 'path' => '/ga-subcategories'],
                         ],
                     ],
                     [

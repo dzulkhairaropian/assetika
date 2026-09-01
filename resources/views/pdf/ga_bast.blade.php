@@ -1,273 +1,113 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>GA Minutes of Handover</title>
+    <title>Berita Acara Serah Terima Aset GA</title>
     <style>
-        @page {
-            margin: 12mm 14mm;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 11.5px;
-            line-height: 1.35;
-            margin: 0;
-            padding: 0;
-        }
-
-        .logo {
-            text-align: left;
-            margin-bottom: 2px;
-        }
-
-        .company-slogan {
-            text-align: right;
-            font-size: 9px;
-            margin-top: -24px;
-        }
-
-        .doc-title {
-            text-align: center;
-            font-weight: bold;
-            margin-top: 8px;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        .doc-number {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 11px;
-        }
-
-        table.info-table td {
-            padding: 0 !important;
-            line-height: 1.2;
-        }
-
-        .section-title {
-            font-weight: bold;
-        }
-
-        .spec-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .spec-table td {
-            padding: 0 !important;
-            line-height: 1.15;
-            vertical-align: top;
-        }
-
-        .signature-area {
-            margin-top: 8px;
-            width: 100%;
-        }
-
-        .signature-box {
-            width: 33.33%;
-            text-align: center;
-            float: left;
-        }
-
-        .signature-name {
-            margin-top: 28px;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        p {
-            margin: 6px 0;
-        }
-
-        .no-break {
-            page-break-inside: avoid;
-        }
-
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-
-        footer {
-            margin-top: 20px;
-            font-size: 9px;
-            line-height: 1.3;
-        }
+        body { font-family: Arial, sans-serif; font-size: 13px; padding: 10px 20px; line-height: 1.5; }
+        .logo { text-align: left; margin-bottom: 5px; }
+        .company-slogan { text-align: right; font-size: 10px; margin-top: -30px; }
+        .doc-title { text-align: center; font-weight: bold; margin-top: 15px; font-size: 16px; text-transform: uppercase; }
+        .doc-number { text-align: center; margin-bottom: 20px; font-size: 12px; color: #4b5563; }
+        table.info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        table.info-table td { padding: 4px 0; vertical-align: top; }
+        .section-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
+        .spec-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
+        .spec-table th, .spec-table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; }
+        .spec-table th { background-color: #f3f4f6; font-size: 12px; }
+        .signature-area { margin-top: 30px; width: 100%; }
+        .signature-box { width: 32%; text-align: center; float: left; }
+        .signature-name { margin-top: 55px; font-weight: bold; text-decoration: underline; }
+        .clearfix::after { content: ""; clear: both; display: table; }
     </style>
 </head>
-
 <body>
 
     <div class="logo">
-        <img src="{{ public_path('images/diastikalogo.png') }}" height="82px" />
-        <div class="company-slogan">
-            Your Partner for Best Solution
-        </div>
+        <img src="{{ public_path('images/diastikalogo.png') }}" height="40" alt="Logo">
+    </div>
+    <div class="company-slogan">
+        <b>BERITA ACARA SERAH TERIMA ASET GENERAL AFFAIRS</b>
     </div>
 
-    <div class="doc-title">MINUTES OF HANDOVER (GA ASSET)</div>
-    <div class="doc-number">
-        No.{{ $sequence_number }}/GA/{{ $company_code }}/HD/{{ $assignment->assigned_at->format('m') }}/{{ $assignment->assigned_at->format('Y') }}
-    </div>
+    <div class="doc-title">BERITA ACARA SERAH TERIMA</div>
+    <div class="doc-number">Nomor: BAST-GA/{{ $assignment->assigned_at->format('Ym') }}/{{ str_pad($assignment->id, 4, '0', STR_PAD_LEFT) }}</div>
 
-    <p class="no-break">
-        On the day <strong>{{ $day }}</strong> date <strong>{{ $date }}</strong> month <strong>{{ $month }}</strong>
-        in <strong>{{ $year }}</strong>, the handover of <strong>{{ $asset->name ?? 'GA Asset' }}</strong> has been
-        carried out between:
-    </p>
+    <p>Pada hari ini <b>{{ $assignment->assigned_at->translatedFormat('l, d F Y') }}</b>, kami yang bertanda tangan di bawah ini:</p>
 
-    <table class="info-table" style="margin-top: -10px">
-        <tr>
-            <td>Name</td>
-            <td>: {{ $giver->name }}</td>
-        </tr>
-        <tr>
-            <td>Position</td>
-            <td>: {{ $giver->position->name ?? '-' }}</td>
-        </tr>
-    </table>
-    <div class="section-title">As a FIRST PARTY,</div>
-
-    <div class="section-title">With</div>
     <table class="info-table">
         <tr>
-            <td>Name</td>
-            <td>: {{ $receiver->name }}</td>
+            <td width="30%"><b>PIHAK PERTAMA (Yang Menyerahkan)</b></td>
+            <td width="3%">:</td>
+            <td>{{ $assignment->checkedOutByUser->name ?? 'Admin GA' }}</td>
         </tr>
         <tr>
-            <td>Position</td>
-            <td>: {{ $receiver->position->name ?? '-' }}</td>
+            <td>Jabatan / Unit</td>
+            <td>:</td>
+            <td>General Affairs & Property Management</td>
         </tr>
     </table>
-    <div class="section-title">As a SECOND PARTY,</div>
 
-    @php
-        $specNo = 1;
-        $vehicle = $asset->vehicle;
-    @endphp
-    <div class="section-title" style="margin-top: 8px">Asset Specifications:</div>
-    <table class="spec-table no-break">
+    <table class="info-table">
         <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Asset Name</td>
-            <td>: {{ $asset->name ?? '-' }}</td>
+            <td width="30%"><b>PIHAK KEDUA (Yang Menerima)</b></td>
+            <td width="3%">:</td>
+            <td>{{ $assignment->user->name ?? '-' }}</td>
         </tr>
         <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Quantity</td>
-            <td>: {{ $asset->qty ?? 1 }}</td>
+            <td>Email / Dept</td>
+            <td>:</td>
+            <td>{{ $assignment->user->email ?? '-' }} ({{ $assignment->user->department->name ?? '-' }})</td>
         </tr>
-        <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Category</td>
-            <td>: {{ $asset->category->name ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Brand / Model</td>
-            <td>: {{ $asset->brand ?? '-' }} / {{ $asset->model ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Asset Code</td>
-            <td>: {{ $asset->asset_code ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Inventory Number</td>
-            <td>: {{ $asset->inventory_number ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Serial Number</td>
-            <td>: {{ $asset->serial_number ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>{{ $specNo++ }}.</td>
-            <td>Location</td>
-            <td>: {{ $asset->location ?? '-' }}</td>
-        </tr>
-        @if($vehicle)
-            @if($vehicle->license_plate)
-                <tr>
-                    <td>{{ $specNo++ }}.</td>
-                    <td>License Plate</td>
-                    <td>: {{ $vehicle->license_plate }}</td>
-                </tr>
-            @endif
-            @if($vehicle->chassis_number)
-                <tr>
-                    <td>{{ $specNo++ }}.</td>
-                    <td>Chassis Number</td>
-                    <td>: {{ $vehicle->chassis_number }}</td>
-                </tr>
-            @endif
-            @if($vehicle->engine_number)
-                <tr>
-                    <td>{{ $specNo++ }}.</td>
-                    <td>Engine Number</td>
-                    <td>: {{ $vehicle->engine_number }}</td>
-                </tr>
-            @endif
-            @if($vehicle->bpkb_number)
-                <tr>
-                    <td>{{ $specNo++ }}.</td>
-                    <td>BPKB Number</td>
-                    <td>: {{ $vehicle->bpkb_number }}</td>
-                </tr>
-            @endif
-            @if($vehicle->stnk_number)
-                <tr>
-                    <td>{{ $specNo++ }}.</td>
-                    <td>STNK Number</td>
-                    <td>: {{ $vehicle->stnk_number }}</td>
-                </tr>
-            @endif
-            @if($vehicle->tax_due_date)
-                <tr>
-                    <td>{{ $specNo++ }}.</td>
-                    <td>Vehicle Tax Due</td>
-                    <td>: {{ $vehicle->tax_due_date->format('d M Y') }}</td>
-                </tr>
-            @endif
-        @endif
     </table>
 
-    <p>Thus, this handover minutes document is made and used as intended.</p>
+    <p>PIHAK PERTAMA menyerahkan barang/aset GA kepada PIHAK KEDUA, dan PIHAK KEDUA menyatakan telah menerima barang/aset tersebut dalam kondisi baik dan berfungsi normal dengan rincian sebagai berikut:</p>
 
-    <div class="signature-area clearfix no-break">
+    <table class="spec-table">
+        <thead>
+            <tr>
+                <th>Kode Aset</th>
+                <th>Nama Barang / Deskripsi</th>
+                <th>Kategori / Subkategori</th>
+                <th>Serial / Plat No</th>
+                <th>Tgl Penyerahan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>{{ $asset->asset_code }}</b></td>
+                <td>{{ $asset->name }} {{ $asset->brand ? '('.$asset->brand.' '.$asset->model.')' : '' }}</td>
+                <td>{{ $asset->category->name ?? '-' }} / {{ $asset->subcategory->name ?? '-' }}</td>
+                <td>{{ $asset->vehicle->license_plate ?? $asset->serial_number ?? '-' }}</td>
+                <td>{{ $assignment->assigned_at->format('d M Y') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    @if($assignment->notes)
+        <p><b>Catatan Khusus:</b> {{ $assignment->notes }}</p>
+    @endif
+
+    <p style="font-size: 11px; color: #6b7280; margin-top: 15px;">
+        * PIHAK KEDUA bertanggung jawab penuh atas pemeliharaan dan penggunaan barang/aset GA tersebut sesuai dengan prosedur dan ketentuan yang berlaku di perusahaan.
+    </p>
+
+    <div class="signature-area clearfix">
         <div class="signature-box">
-            The Submitted,<br><br>
-            <div class="signature-name">({{ $giver->name }})</div>
+            <p>PIHAK PERTAMA,</p>
+            <div class="signature-name">{{ $assignment->checkedOutByUser->name ?? 'Admin GA' }}</div>
+            <p style="font-size: 10px; color: #6b7280;">General Affairs Team</p>
         </div>
-        <div class="signature-box">
-            <br><br><br><br><br>
-            Knowing
+        <div class="signature-box" style="margin-left: 4%;">
+            <p>PIHAK KEDUA,</p>
+            <div class="signature-name">{{ $assignment->user->name ?? 'Penerima' }}</div>
+            <p style="font-size: 10px; color: #6b7280;">Menerima & Menggunakan</p>
         </div>
-        <div class="signature-box">
-            The Receiver,<br><br>
-            <div class="signature-name">({{ $receiver->name }})</div>
-            <div style="margin-top:90px; font-weight:bold;">
-                ({{ $receiver_supervisor->name ?? $receiver->name }}
-                @if(($receiver_supervisor->position->name ?? null))
-                    - {{ $receiver_supervisor->position->name }}
-                @endif)
-            </div>
+        <div class="signature-box" style="margin-left: 4%;">
+            <p>MENGETAHUI,</p>
+            <div class="signature-name">Head of GA / Operations</div>
+            <p style="font-size: 10px; color: #6b7280;">Management</p>
         </div>
     </div>
 
-    <footer class="no-break">
-        Jalan Rawa Gelam V Blok L, Kav 11-13, Gedung Etana Lantai 3,<br>
-        Kelurahan Jatinegara, Kecamatan Cakung, Jakarta Timur,<br>
-        DKI Jakarta, 13930<br>
-        T: (+62) 21 38865038 - 38865045 - 38865047<br>
-        E: customer.service@diastika.co.id &nbsp;&nbsp; www.diastika.co.id
-    </footer>
-
 </body>
-
 </html>

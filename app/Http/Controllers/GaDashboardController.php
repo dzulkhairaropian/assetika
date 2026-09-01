@@ -208,6 +208,8 @@ class GaDashboardController extends Controller
             'isPendingMaintenanceDummy',
             'totalVehicles',
             'upcomingVehicleTaxes',
+            'activeReservations',
+            'facilityReservations',
             'monthlyMaintenanceSpend',
             'statusChart',
             'isStatusChartDummy',

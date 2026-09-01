@@ -20,9 +20,6 @@
                     <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
                         <i data-feather="briefcase" class="w-3.5 h-3.5"></i> GA Inventory
                     </a>
-                    <a href="{{ route('reservations.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-feather="calendar" class="w-3.5 h-3.5"></i> Reservations
-                    </a>
                 </div>
             </div>
         </div>
@@ -313,7 +310,7 @@
                 title="Active Facility Reservations"
                 description="Room & vehicle booking schedules (Dummy Value)"
                 :headers="['Facility / Vehicle', 'Reserved By', 'Time Schedule', 'Status']"
-                :footerLink="route('reservations.index')"
+                :footerLink="route('ga-assets.index')"
                 footerText="View All Reservations"
             >
                 @foreach($facilityReservations as $res)

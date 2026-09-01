@@ -79,7 +79,7 @@
 
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Category <span class="text-error-500">*</span></label>
-                            <select name="category_id" required
+                            <select name="category_id" id="ga_category_id" required
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
@@ -91,7 +91,7 @@
 
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Subcategory</label>
-                            <select name="subcategory_id"
+                            <select name="subcategory_id" id="ga_subcategory_id"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
                                 <option value="">Select Subcategory</option>
                                 @foreach($subcategories as $sub)
@@ -231,8 +231,14 @@
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Tax Due Date</label>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Jatuh Tempo Pajak (1 Thn)</label>
                             <input type="date" name="vehicle[tax_due_date]" value="{{ old('vehicle.tax_due_date') }}"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Jatuh Tempo Plat Kaleng (5 Thn)</label>
+                            <input type="date" name="vehicle[plate_expiry_date]" value="{{ old('vehicle.plate_expiry_date') }}"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                         </div>
 
@@ -300,4 +306,26 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById('ga_category_id')?.addEventListener('change', function() {
+            const catId = this.value;
+            const subSelect = document.getElementById('ga_subcategory_id');
+            if (!subSelect) return;
+            subSelect.innerHTML = '<option value="">Loading...</option>';
+            if (!catId) {
+                subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+                return;
+            }
+            fetch(`{{ route('ga-assets.subcategories-ajax') }}?category_id=${catId}`)
+                .then(res => res.json())
+                .then(data => {
+                    let html = '<option value="">Select Subcategory</option>';
+                    data.forEach(item => {
+                        html += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    subSelect.innerHTML = html;
+                });
+        });
+    </script>
 @endsection
