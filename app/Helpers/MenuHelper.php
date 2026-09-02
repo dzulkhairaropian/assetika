@@ -6,7 +6,234 @@ class MenuHelper
 {
     public static function getMenuGroups()
     {
-        return [
+        $user = auth()->user();
+
+        if (! $user) {
+            return [];
+        }
+
+        // Super Admin & Group Admin: full menu
+        $isSuperAdmin = $user->hasRole('super_admin');
+        $isGroupAdmin = $user->hasRole('group_admin');
+        $isItAdmin = $user->hasRole('it_admin');
+        $isGaAdmin = $user->hasRole('ga_admin');
+
+        // Regular User Menu
+        if (! $isSuperAdmin && ! $isGroupAdmin && ! $isItAdmin && ! $isGaAdmin) {
+            return [
+                [
+                    'title' => 'Personal Workspace',
+                    'items' => [
+                        [
+                            'name' => 'My Assets',
+                            'icon' => 'user-assets',
+                            'path' => '/my-assets',
+                        ],
+                        [
+                            'name' => 'Ticketing System',
+                            'icon' => 'ticket',
+                            'path' => '/tickets',
+                        ],
+                        [
+                            'name' => 'Asset Requests',
+                            'icon' => 'ticket',
+                            'subItems' => [
+                                ['name' => 'My Requests', 'path' => '/asset-requests'],
+                                ['name' => 'Request Catalog', 'path' => '/requestable-assets'],
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        // Build Dynamic Menu Groups per Role
+        $groups = [];
+
+        // 1. Overview
+        $dashboards = [];
+        if ($isSuperAdmin || $isGroupAdmin || $isItAdmin) {
+            $dashboards[] = ['name' => 'IT Dashboard', 'path' => '/'];
+            $dashboards[] = ['name' => 'Ticket Dashboard', 'path' => '/ticket-dashboard'];
+            $dashboards[] = ['name' => 'Financial Dashboard', 'path' => '/finance-dashboard'];
+        }
+        if ($isSuperAdmin || $isGroupAdmin || $isGaAdmin) {
+            $dashboards[] = ['name' => 'General Affair Dashboard', 'path' => '/ga-dashboard'];
+        }
+        if (! empty($dashboards)) {
+            $groups[] = [
+                'title' => 'Overview',
+                'items' => [
+                    [
+                        'name' => 'Dashboards',
+                        'icon' => 'dashboard',
+                        'subItems' => $dashboards,
+                    ],
+                ],
+            ];
+        }
+
+        // 2. Assets & Inventory
+        $assetItems = [];
+
+        if ($isSuperAdmin || $isGroupAdmin || $isItAdmin) {
+            $assetItems[] = [
+                'name' => 'IT Assets',
+                'icon' => 'assets',
+                'subItems' => [
+                    ['name' => 'Inventory', 'path' => '/assets'],
+                    ['name' => 'Transactions', 'path' => '/asset-transactions'],
+                    ['name' => 'Transfers', 'path' => '/asset-transfers'],
+                ],
+            ];
+        }
+
+        $assetItems[] = [
+            'name' => 'My Assets',
+            'icon' => 'user-assets',
+            'path' => '/my-assets',
+        ];
+
+        if ($isSuperAdmin || $isGroupAdmin || $isGaAdmin) {
+            $assetItems[] = [
+                'name' => 'GA Assets',
+                'icon' => 'ga-assets',
+                'subItems' => [
+                    ['name' => 'GA Inventory', 'path' => '/ga-assets'],
+                    ['name' => 'GA Categories', 'path' => '/ga-categories'],
+                    ['name' => 'GA Subcategories', 'path' => '/ga-subcategories'],
+                ],
+            ];
+        }
+
+        if ($isSuperAdmin || $isGroupAdmin || $isItAdmin) {
+            $assetItems[] = [
+                'name' => 'Consumables',
+                'icon' => 'consumables',
+                'subItems' => [
+                    ['name' => 'Inventory', 'path' => '/consumables'],
+                    ['name' => 'Transactions', 'path' => '/consumable-transactions'],
+                ],
+            ];
+            $assetItems[] = ['name' => 'Software Licenses', 'icon' => 'license', 'path' => '/licenses'];
+            $assetItems[] = ['name' => 'Components', 'icon' => 'components', 'path' => '/components'];
+            $assetItems[] = ['name' => 'Asset Kits', 'icon' => 'kit', 'path' => '/kits'];
+            $assetItems[] = ['name' => 'Depreciations', 'icon' => 'catalog', 'path' => '/depreciations'];
+            $assetItems[] = ['name' => 'Stock Audit', 'icon' => 'support', 'path' => '/stock-counts'];
+        }
+
+        $groups[] = [
+            'title' => 'Assets & Inventory',
+            'items' => $assetItems,
+        ];
+
+        // 3. Service Desk
+        $serviceDeskItems = [];
+        if ($isSuperAdmin || $isGroupAdmin || $isItAdmin) {
+            $serviceDeskItems[] = ['name' => 'IT Projects', 'icon' => 'dashboard', 'path' => '/projects'];
+        }
+        $serviceDeskItems[] = ['name' => 'Ticketing System', 'icon' => 'ticket', 'path' => '/tickets'];
+
+        $requestSubs = [['name' => 'My Requests', 'path' => '/asset-requests']];
+        if ($isSuperAdmin || $isGroupAdmin || $isItAdmin) {
+            $requestSubs[] = ['name' => 'All Requests', 'path' => '/asset-requests'];
+        }
+        $requestSubs[] = ['name' => 'Request Catalog', 'path' => '/requestable-assets'];
+
+        $serviceDeskItems[] = [
+            'name' => 'Asset Requests',
+            'icon' => 'ticket',
+            'subItems' => $requestSubs,
+        ];
+        $serviceDeskItems[] = ['name' => 'Knowledge Base', 'icon' => 'catalog', 'path' => '/kb'];
+
+        $groups[] = [
+            'title' => 'Service Desk',
+            'items' => $serviceDeskItems,
+        ];
+
+        // 4. Master Data
+        $masterItems = [];
+        $orgSubs = [];
+        if ($isSuperAdmin) {
+            $orgSubs[] = ['name' => 'Holdings / Groups', 'path' => '/groups'];
+        }
+        if ($isSuperAdmin || $isGroupAdmin || $isGaAdmin) {
+            $orgSubs[] = ['name' => 'Companies', 'path' => '/companies'];
+            $orgSubs[] = ['name' => 'Departments', 'path' => '/departments'];
+            $orgSubs[] = ['name' => 'Positions', 'path' => '/positions'];
+            $orgSubs[] = ['name' => 'Locations', 'path' => '/locations'];
+        }
+
+        if (! empty($orgSubs)) {
+            $masterItems[] = [
+                'name' => 'Organization',
+                'icon' => 'org',
+                'subItems' => $orgSubs,
+            ];
+        }
+
+        if ($isSuperAdmin || $isGroupAdmin || $isItAdmin) {
+            $masterItems[] = [
+                'name' => 'Product Catalog',
+                'icon' => 'catalog',
+                'subItems' => [
+                    ['name' => 'Products', 'path' => '/products'],
+                    ['name' => 'Master Categories', 'path' => '/master-categories'],
+                    ['name' => 'Categories', 'path' => '/categories'],
+                    ['name' => 'Brands', 'path' => '/brands'],
+                    ['name' => 'Operating Systems', 'path' => '/operating-systems'],
+                ],
+            ];
+            $masterItems[] = [
+                'name' => 'Configurations',
+                'icon' => 'support',
+                'subItems' => [
+                    ['name' => 'Asset Statuses', 'path' => '/statuses'],
+                    ['name' => 'Vendors', 'path' => '/vendors'],
+                    ['name' => 'Maintenance Types', 'path' => '/maintenance-types'],
+                    ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
+                    ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
+                    ['name' => 'Priorities', 'path' => '/admin/priorities'],
+                    ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
+                    ['name' => 'SLA Policies', 'path' => '/sla-policies'],
+                    ['name' => 'Sources', 'path' => '/admin/sources'],
+                    ['name' => 'Ticket Labels', 'path' => '/admin/labels'],
+                ],
+            ];
+        }
+
+        if (! empty($masterItems)) {
+            $groups[] = [
+                'title' => 'Master Data',
+                'items' => $masterItems,
+            ];
+        }
+
+        // 5. System Administration (Super Admin / Group Admin Only)
+        if ($isSuperAdmin || $isGroupAdmin) {
+            $adminItems = [
+                [
+                    'name' => 'Users & Roles',
+                    'icon' => 'access',
+                    'subItems' => [
+                        ['name' => 'Users', 'path' => '/users'],
+                        ['name' => 'Roles', 'path' => '/roles'],
+                    ],
+                ],
+                ['name' => 'Import Data', 'icon' => 'upload', 'path' => '/import'],
+                ['name' => 'Backups', 'icon' => 'backup', 'path' => '/backups'],
+                ['name' => 'Renewals Expiry', 'icon' => 'support', 'path' => '/renewals'],
+            ];
+
+            $groups[] = [
+                'title' => 'System Administration',
+                'items' => $adminItems,
+            ];
+        }
+
+        return $groups;
+    }
             [
                 'title' => 'Overview',
                 'items' => [
