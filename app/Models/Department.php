@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasDataScope;
 
 class Department extends Model
 {
+    use HasDataScope;
     protected $table = 'departments';
 
     protected $with = ['company'];

@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class GaAssetCategory extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'code',
+        'useful_life_years',
+        'description',
+    ];
 
     public function assets()
     {

@@ -519,8 +519,9 @@ class AssetController extends Controller
         return redirect()->route('assets.index')->with('success', "{$count} assets checked out. " . ($assets->count() < count($request->ids) ? 'Some were already checked out.' : ''));
     }
 
-    public function publicScan(Asset $asset)
+    public function publicScan($assetId)
     {
+        $asset = Asset::withoutGlobalScopes()->findOrFail($assetId);
         $asset->load([
             'product.brand',
             'product.category',

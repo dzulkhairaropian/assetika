@@ -7,7 +7,28 @@ use Illuminate\Support\Facades\Storage;
 
 class GaAsset extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'asset_code',
+        'name',
+        'category_id',
+        'subcategory_id',
+        'brand',
+        'model',
+        'serial_number',
+        'status',
+        'qty',
+        'purchase_date',
+        'purchase_price',
+        'additional_cost',
+        'total_asset_value',
+        'warranty_expiry_date',
+        'current_holder_id',
+        'image_path',
+        'retirement_evidence_path',
+        'retired_at',
+        'retirement_reason',
+        'notes',
+    ];
 
     protected $casts = [
         "qty" => "integer",

@@ -6,7 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class GaAssetVehicle extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'asset_id',
+        'plate_number',
+        'chassis_number',
+        'engine_number',
+        'vehicle_type',
+        'fuel_type',
+        'tax_due_date',
+        'plate_expiry_date',
+        'last_service_date',
+        'insurance_expiry_date',
+        'fuel_consumption',
+        'notes',
+    ];
 
     protected $casts = [
         'tax_due_date' => 'date',

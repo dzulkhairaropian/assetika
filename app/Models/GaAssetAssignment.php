@@ -8,7 +8,18 @@ use Illuminate\Support\Facades\Storage;
 
 class GaAssetAssignment extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'asset_id',
+        'user_id',
+        'checked_out_by_user_id',
+        'supervisor_user_id',
+        'checked_in_by_user_id',
+        'assigned_at',
+        'returned_at',
+        'checkout_evidence',
+        'checkin_evidence',
+        'notes',
+    ];
 
     protected $casts = [
         'assigned_at' => 'datetime',

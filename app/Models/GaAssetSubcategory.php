@@ -8,7 +8,12 @@ use App\Models\GaAsset;
 
 class GaAssetSubcategory extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'category_id',
+        'name',
+        'code',
+        'description',
+    ];
 
     public function category()
     {

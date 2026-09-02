@@ -6,7 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class GaMaintenanceLog extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'asset_id',
+        'maintenance_type_id',
+        'title',
+        'description',
+        'scheduled_date',
+        'completed_date',
+        'cost',
+        'status',
+        'performed_by',
+        'notes',
+    ];
 
     protected $casts = [
         'scheduled_date' => 'date',
