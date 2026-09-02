@@ -31,6 +31,7 @@ class MenuHelper
                         'subItems' => [
                             ['name' => 'Inventory', 'path' => '/assets'],
                             ['name' => 'Transactions', 'path' => '/asset-transactions'],
+                            ['name' => 'Transfers', 'path' => '/asset-transfers'],
                         ],
                     ],
                     [
@@ -117,6 +118,7 @@ class MenuHelper
                         'name' => 'Organization',
                         'icon' => 'org',
                         'subItems' => [
+                            ['name' => 'Holdings / Groups', 'path' => '/groups'],
                             ['name' => 'Companies', 'path' => '/companies'],
                             ['name' => 'Departments', 'path' => '/departments'],
                             ['name' => 'Positions', 'path' => '/positions'],

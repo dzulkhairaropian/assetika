@@ -10,7 +10,7 @@ class CompanyController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Company::withCount('departments');
+        $query = Company::with(['group'])->withCount('departments');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -27,19 +27,26 @@ class CompanyController extends Controller
 
     public function create()
     {
-        return view('pages.master.companies.create');
+        $groups = \App\Models\Group::orderBy('name')->get();
+        return view('pages.master.companies.create', compact('groups'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'group_id' => 'nullable|exists:groups,id',
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:10|unique:companies,code',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('companies/logos', 'public');
+        }
 
         Company::create($validated);
 
@@ -52,19 +59,29 @@ class CompanyController extends Controller
 
     public function edit(Company $company)
     {
-        return view('pages.master.companies.edit', compact('company'));
+        $groups = \App\Models\Group::orderBy('name')->get();
+        return view('pages.master.companies.edit', compact('company', 'groups'));
     }
 
     public function update(Request $request, Company $company)
     {
         $validated = $request->validate([
+            'group_id' => 'nullable|exists:groups,id',
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:10|unique:companies,code,' . $company->id,
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            if ($company->logo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($company->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('companies/logos', 'public');
+        }
 
         $company->update($validated);
 

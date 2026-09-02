@@ -239,6 +239,11 @@ class Asset extends Model
         return $this->hasMany(AssetMaintenance::class)->orderBy('start_date', 'desc');
     }
 
+    public function transfers()
+    {
+        return $this->hasMany(AssetTransfer::class)->orderBy('created_at', 'desc');
+    }
+
     // Checkout helper methods
     public function isCurrentlyCheckedOut(): bool
     {

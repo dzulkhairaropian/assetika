@@ -12,7 +12,7 @@
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
 
-        <form action="{{ route('companies.update', $company) }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
+        <form action="{{ route('companies.update', $company) }}" method="POST" enctype="multipart/form-data" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
             @csrf
             @method('PUT')
 
@@ -25,6 +25,20 @@
                         </h3>
 
                         <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                            <div class="lg:col-span-2">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                    Holding / Group (Optional)
+                                </label>
+                                <select name="group_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                                    <option value="">-- No Group --</option>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}" {{ old('group_id', $company->group_id) == $group->id ? 'selected' : '' }}>
+                                            {{ $group->name }} ({{ $group->code }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Company Code <span class="text-error-500">*</span>
@@ -65,6 +79,20 @@
                                 </label>
                                 <input type="url" name="website" value="{{ old('website', $company->website) }}" placeholder="https://..."
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            </div>
+
+                            <div class="lg:col-span-2">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                    Company Logo (Optional)
+                                </label>
+                                @if($company->logo)
+                                    <div class="mb-2 flex items-center gap-2">
+                                        <img src="{{ Storage::url($company->logo) }}" class="h-8 w-8 rounded object-cover">
+                                        <span class="text-xs text-gray-500">Current logo</span>
+                                    </div>
+                                @endif
+                                <input type="file" name="logo" accept="image/*"
+                                    class="w-full text-xs text-gray-700 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
                             </div>
 
                             <div class="lg:col-span-2">

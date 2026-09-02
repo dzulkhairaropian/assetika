@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Master\GroupController;
 use App\Http\Controllers\Master\CompanyController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\PositionController;
@@ -73,6 +74,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('tickets', \App\Http\Controllers\TicketController::class);
     
     // Master Data Routes
+    Route::post('groups/bulk-delete', [GroupController::class, 'bulkDestroy'])->name('groups.bulk-delete');
+    Route::resource('groups', GroupController::class);
+
     Route::post('companies/bulk-delete', [CompanyController::class, 'bulkDestroy'])->name('companies.bulk-delete');
     Route::post('departments/bulk-delete', [DepartmentController::class, 'bulkDestroy'])->name('departments.bulk-delete');
     Route::post('positions/bulk-delete', [PositionController::class, 'bulkDestroy'])->name('positions.bulk-delete');
@@ -120,6 +124,12 @@ Route::middleware('auth')->group(function () {
     Route::get('consumable-transactions', [ConsumableTransactionController::class, 'index'])->name('consumable-transactions.index');
 
     // IT Asset Management
+    Route::get('asset-transfers', [\App\Http\Controllers\AssetTransferController::class, 'index'])->name('asset-transfers.index');
+    Route::get('asset-transfers/create', [\App\Http\Controllers\AssetTransferController::class, 'create'])->name('asset-transfers.create');
+    Route::post('asset-transfers', [\App\Http\Controllers\AssetTransferController::class, 'store'])->name('asset-transfers.store');
+    Route::post('asset-transfers/{transfer}/approve', [\App\Http\Controllers\AssetTransferController::class, 'approve'])->name('asset-transfers.approve');
+    Route::post('asset-transfers/{transfer}/reject', [\App\Http\Controllers\AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
+
     Route::get('assets/export', [AssetController::class, 'export'])->name('assets.export');
     Route::get('my-assets', [AssetController::class, 'myAssets'])->name('assets.my-assets');
     Route::post('assets/bulk-delete', [AssetController::class, 'bulkDestroy'])->name('assets.bulk-delete');

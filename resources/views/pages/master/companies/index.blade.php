@@ -107,6 +107,7 @@
                             </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Code</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Company Name</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Group</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Departments</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
@@ -134,7 +135,15 @@
                                     <span class="font-mono font-semibold text-gray-900 dark:text-white">{{ $company->code }}</span>
                                 </td>
                                 <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white">
-                                    {{ $company->name }}
+                                    <div class="flex items-center gap-2">
+                                        @if($company->logo)
+                                            <img src="{{ Storage::url($company->logo) }}" class="w-5 h-5 rounded object-cover">
+                                        @endif
+                                        <span>{{ $company->name }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
+                                    {{ $company->group->name ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2.5 font-semibold text-gray-800 dark:text-gray-200">
                                     {{ $company->departments_count ?? 0 }} departments

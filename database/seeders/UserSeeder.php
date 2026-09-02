@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
 
         // Create Roles (Spatie)
         $superAdminRole = Role::updateOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+        $groupAdminRole = Role::updateOrCreate(['name' => 'group_admin', 'guard_name' => 'web']);
         $itAdminRole = Role::updateOrCreate(['name' => 'it_admin', 'guard_name' => 'web']);
         $gaAdminRole = Role::updateOrCreate(['name' => 'ga_admin', 'guard_name' => 'web']);
         $userRole = Role::updateOrCreate(['name' => 'user', 'guard_name' => 'web']);
@@ -31,6 +32,17 @@ class UserSeeder extends Seeder
         // Give all permissions to super_admin
         $allPermissions = Permission::all();
         $superAdminRole->syncPermissions($allPermissions);
+
+        // Give Group Admin permissions across company resources
+        $groupAdminPermissions = Permission::whereIn('name', [
+            'groups.view', 'groups.edit',
+            'companies.view', 'companies.create', 'companies.edit',
+            'departments.view', 'departments.create', 'departments.edit',
+            'users.view', 'users.create', 'users.edit',
+            'assets.view', 'assets.create', 'assets.edit', 'assets.checkout', 'assets.checkin', 'assets.maintenance',
+            'reports.view',
+        ])->get();
+        $groupAdminRole->syncPermissions($groupAdminPermissions);
 
         // Give IT Admin permissions (Asset, Brand, Category, Consumable, MasterCategory, OperatingSystem, Product, Status, Vendor, ConsumableRequest)
         $itPermissions = Permission::where(function($q) {
