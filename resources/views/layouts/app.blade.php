@@ -134,6 +134,32 @@
         @include('layouts.backdrop')
         @include('layouts.sidebar')
 
+        @if(session('welcome_greeting'))
+            <div x-data="{ show: true }"
+                x-init="setTimeout(() => show = false, 5000)"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-x-8"
+                x-transition:enter-end="opacity-100 translate-x-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-x-0"
+                x-transition:leave-end="opacity-0 translate-x-8"
+                class="fixed top-5 right-5 z-[999999] flex max-w-sm items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-md">
+                        <i data-feather="smile" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900 dark:text-white">Welcome Back!</h4>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ session('welcome_greeting') }}</p>
+                    </div>
+                </div>
+                <button @click="show = false" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        @endif
+
         <div class="flex flex-col min-h-screen transition-all duration-300 ease-in-out"
             :class="{
                 'xl:ml-[290px]': $store.sidebar.isExpanded,
@@ -147,7 +173,6 @@
                 @yield('content')
             </main>
         </div>
-
     </div>
 
 </body>

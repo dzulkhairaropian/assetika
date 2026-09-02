@@ -46,56 +46,41 @@ class UserSeeder extends Seeder
 
         // Give IT Admin permissions (Asset, Brand, Category, Consumable, MasterCategory, OperatingSystem, Product, Status, Vendor, ConsumableRequest)
         $itPermissions = Permission::where(function($q) {
-            $q->where('name', 'like', '%:Asset')
-              ->orWhere('name', 'like', '%:Brand')
-              ->orWhere('name', 'like', '%:Category')
-              ->orWhere('name', 'like', '%:Consumable')
-              ->orWhere('name', 'like', '%:MasterCategory')
-              ->orWhere('name', 'like', '%:OperatingSystem')
-              ->orWhere('name', 'like', '%:Product')
-              ->orWhere('name', 'like', '%:Status')
-              ->orWhere('name', 'like', '%:Vendor')
-              ->orWhere('name', 'like', '%:ConsumableRequest');
+            $q->where('name', 'like', 'assets.%')
+              ->orWhere('name', 'like', 'brands.%')
+              ->orWhere('name', 'like', 'categories.%')
+              ->orWhere('name', 'like', 'consumables.%')
+              ->orWhere('name', 'like', 'master-categories.%')
+              ->orWhere('name', 'like', 'operating-systems.%')
+              ->orWhere('name', 'like', 'products.%')
+              ->orWhere('name', 'like', 'statuses.%')
+              ->orWhere('name', 'like', 'vendors.%')
+              ->orWhere('name', 'like', 'components.%')
+              ->orWhere('name', 'like', 'licenses.%')
+              ->orWhere('name', 'like', 'kits.%');
         })->orWhereIn('name', [
-            'View:MyAssets',
-            'View:AssetStatsWidget',
-            'View:ConsumableStatsWidget',
-            'View:AssetStatusChart',
-            'View:LowStockAlertsWidget',
-            'View:WarrantyExpiringWidget',
-            'View:RecentAssetActivitiesWidget',
-            'View:RecentConsumableTransactionsWidget',
-            'View:AssetUserWidget',
-            'View:RequestConsumable',
-            'View:Dashboard'
+            'reports.view',
         ])->get();
         $itAdminRole->syncPermissions($itPermissions);
 
         // Give GA Admin permissions (GaAsset, GaAssetCategory, GaAssetSubcategory, Company, Department, Location, Position)
         $gaPermissions = Permission::where(function($q) {
-            $q->where('name', 'like', '%:GaAsset')
-              ->orWhere('name', 'like', '%:GaAssetCategory')
-              ->orWhere('name', 'like', '%:GaAssetSubcategory')
-              ->orWhere('name', 'like', '%:Company')
-              ->orWhere('name', 'like', '%:Department')
-              ->orWhere('name', 'like', '%:Location')
-              ->orWhere('name', 'like', '%:Position');
+            $q->where('name', 'like', 'ga-%')
+              ->orWhere('name', 'like', 'companies.%')
+              ->orWhere('name', 'like', 'departments.%')
+              ->orWhere('name', 'like', 'locations.%')
+              ->orWhere('name', 'like', 'positions.%');
         })->orWhereIn('name', [
-            'View:GaDashboard',
-            'View:GaAssetsByCategoryChart',
-            'View:GaProcurementSpendChart',
-            'View:GaStatsOverviewWidget',
-            'View:MyAssets'
+            'reports.view',
         ])->get();
         $gaAdminRole->syncPermissions($gaPermissions);
 
         // Give basic permissions to user
         $userPermissions = Permission::whereIn('name', [
-            'View:MyAssets',
-            'View:RequestConsumable',
-            'Create:ConsumableRequest',
-            'ViewAny:ConsumableRequest',
-            'View:ConsumableRequest'
+            'assets.view',
+            'asset-requests.view',
+            'asset-requests.create',
+            'consumables.view',
         ])->get();
         $userRole->syncPermissions($userPermissions);
 

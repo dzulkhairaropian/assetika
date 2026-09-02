@@ -40,9 +40,11 @@ class DataScope implements Scope
             return;
         }
 
-        // Default: Scope by user's company
+        // Default: Scope by user's company (if user has no company_id, block access / empty result)
         if ($user->company_id) {
             $this->scopeByCompany($builder, $model, [$user->company_id]);
+        } else {
+            $builder->whereRaw('1 = 0');
         }
     }
 

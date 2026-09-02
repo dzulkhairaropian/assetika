@@ -14,7 +14,9 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, CanResetPassword;
+    use HasFactory, Notifiable, HasRoles, CanResetPassword {
+        HasRoles::hasPermissionTo as parentHasPermissionTo;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -162,6 +164,15 @@ class User extends Authenticatable
     public function createdTickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'created_by_id');
+    }
+
+    public function hasPermissionTo($permission, $guardName = null): bool
+    {
+        if ($this->hasRole('super_admin')) {
+            return true;
+        }
+
+        return $this->parentHasPermissionTo($permission, $guardName);
     }
 
     public function assignedTickets(): HasMany
