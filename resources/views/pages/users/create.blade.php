@@ -85,43 +85,30 @@
                         <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
                             <!-- Roles -->
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400 font-semibold">
-                                    Role <span class="text-error-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <select name="roles[]" required
-                                        class="dark:bg-gray-950 h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:placeholder:text-white/30 dark:focus:border-brand-800 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                        <option value="">Select Role</option>
-                                        @foreach($roles as $role)
-                                            <option value="{{ $role->id }}" {{ in_array($role->id, old('roles', [])) ? 'selected' : '' }}>
-                                                {{ $role->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <x-form.searchable-select
+                                    name="roles[]"
+                                    label="Role"
+                                    :options="$roles->map(fn($r) => ['id' => $r->id, 'text' => $r->name])->toArray()"
+                                    :selected="old('roles.0')"
+                                    placeholder="Select Role"
+                                    required="true"
+                                />
                                 @error('roles') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <!-- Company -->
                             <div>
-                                @php
-                                    $companyOpts = array_merge([['id' => '', 'text' => 'Select Company']], $companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray());
-                                @endphp
-                                <x-form.searchable-select name="company_id" label="Company" :options="$companyOpts" :selected="old('company_id')" placeholder="Select Company" />
+                                <x-form.searchable-select name="company_id" label="Company" :options="$companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="old('company_id')" placeholder="Select Company" />
                             </div>
 
                             <!-- Department -->
                             <div>
-                                @php
-                                    $deptOpts = array_merge([['id' => '', 'text' => 'Select Department']], $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray());
-                                @endphp
-                                <x-form.searchable-select name="department_id" label="Department" :options="$deptOpts" :selected="old('department_id')" placeholder="Select Department" />
+                                <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray()" :selected="old('department_id')" placeholder="Select Department" />
                             </div>
 
                             <!-- Position -->
                             <div>
-                                @php
-                                    $posOpts = array_merge([['id' => '', 'text' => 'Select Position']], $positions->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray());
+                                <x-form.searchable-select name="position_id" label="Position" :options="$positions->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="old('position_id')" placeholder="Select Position" />
                                 @endphp
                                 <x-form.searchable-select name="position_id" label="Position" :options="$posOpts" :selected="old('position_id')" placeholder="Select Position" />
                             </div>

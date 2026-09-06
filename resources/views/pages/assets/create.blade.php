@@ -224,16 +224,13 @@
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                Depreciation Profile
-                            </label>
-                            <select name="depreciation_id"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                <option value="">-- Select Depreciation --</option>
-                                @foreach($depreciations as $depr)
-                                    <option value="{{ $depr->id }}" {{ old('depreciation_id') == $depr->id ? 'selected' : '' }}>{{ $depr->name }} ({{ $depr->months }} Months)</option>
-                                @endforeach
-                            </select>
+                            <x-form.searchable-select
+                                name="depreciation_id"
+                                label="Depreciation Profile"
+                                :options="$depreciations->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ' (' . $d->months . ' Months)'])->toArray()"
+                                :selected="old('depreciation_id')"
+                                placeholder="Select Depreciation"
+                            />
                             @error('depreciation_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 

@@ -188,69 +188,31 @@
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Status</label>
-                                        <select name="status_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Statuses</option>
-                                            @foreach($statuses as $status)
-                                                <option value="{{ $status->id }}" {{ request('status_id') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Category</label>
-                                        <select name="category_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Categories</option>
-                                            @foreach($categories as $category)
-                                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Product Model</label>
-                                        <select name="product_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Models</option>
-                                            @foreach($products as $product)
-                                                <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="product_id" label="Product Model" :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="request('product_id')" placeholder="All Models" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Department</label>
-                                        <select name="department_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Departments</option>
-                                            @foreach($departments as $dept)
-                                                <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Location</label>
-                                        <select name="location_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Locations</option>
-                                            @foreach($locations as $loc)
-                                                <option value="{{ $loc->id }}" {{ request('location_id') == $loc->id ? 'selected' : '' }}>{{ $loc->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="location_id" label="Location" :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()" :selected="request('location_id')" placeholder="All Locations" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Lifecycle Aging</label>
-                                        <select name="aging"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Ages</option>
-                                            <option value="4years" {{ request('aging') == '4years' ? 'selected' : '' }}>Aged (≥ 4 Years)</option>
-                                            <option value="2years" {{ request('aging') == '2years' ? 'selected' : '' }}>Mid Life (2 - 4 Years)</option>
-                                            <option value="new" {{ request('aging') == 'new' ? 'selected' : '' }}>New (&lt; 2 Years)</option>
-                                        </select>
+                                        <x-form.searchable-select name="aging" label="Lifecycle Aging" :options="[
+                                            ['id' => '4years', 'text' => 'Aged (≥ 4 Years)'],
+                                            ['id' => '2years', 'text' => 'Mid Life (2 - 4 Years)'],
+                                            ['id' => 'new', 'text' => 'New (< 2 Years)']
+                                        ]" :selected="request('aging')" placeholder="All Ages" />
                                     </div>
                                 </div>
 
