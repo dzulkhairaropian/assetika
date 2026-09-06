@@ -85,10 +85,10 @@
                 @php
                     $staffList = $staffUsers ?? $users->filter(fn($u) => $u->hasAnyRole(['it_admin', 'super_admin']));
                     if ($staffList->isEmpty()) $staffList = $users;
-                    $staffOptions = array_merge([['id' => '', 'text' => 'Unassigned']], $staffList->map(fn($u) => [
+                    $staffOptions = $staffList->map(fn($u) => [
                         'id' => $u->id, 
                         'text' => $u->name . ($u->department ? ' (' . $u->department->name . ')' : '')
-                    ])->toArray());
+                    ])->toArray();
                 @endphp
                 <x-form.searchable-select
                     name="assigned_to_id"

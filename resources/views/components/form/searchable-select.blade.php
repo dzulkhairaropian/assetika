@@ -61,10 +61,12 @@
                 class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
         </div>
         <div class="divide-y divide-gray-50 dark:divide-gray-800/50">
-            <div @click="selectOption('')" 
-                 class="cursor-pointer rounded-lg px-3 py-2 text-xs font-medium text-gray-400 hover:bg-gray-50 dark:text-gray-500 dark:hover:bg-gray-800">
-                -- {{ $placeholder }} --
-            </div>
+            <template x-if="!required && placeholder">
+                <div @click="selectOption('')" 
+                     class="cursor-pointer rounded-lg px-3 py-2 text-xs font-medium text-gray-400 hover:bg-gray-50 dark:text-gray-500 dark:hover:bg-gray-800">
+                    -- {{ $placeholder }} --
+                </div>
+            </template>
             <template x-for="item in filteredOptions" :key="item.id">
                 <div @click="selectOption(item.id)" 
                      :class="selectedId == item.id ? 'bg-brand-50 text-brand-600 font-semibold dark:bg-brand-500/10 dark:text-brand-400' : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'"
