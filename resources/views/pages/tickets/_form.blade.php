@@ -59,13 +59,13 @@
 
                 <!-- Ticket Type -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Ticket Type</label>
-                    <select name="ticket_type_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Type</option>
-                        @foreach($ticketTypes as $type)
-                            <option value="{{ $type->id }}" {{ old('ticket_type_id', $ticket?->ticket_type_id ?? ($ticketTypes->where('name', 'Incident')->first()?->id ?? '')) == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="ticket_type_id"
+                        label="Ticket Type"
+                        :options="$ticketTypes->map(fn($t) => ['id' => $t->id, 'text' => $t->name])->toArray()"
+                        :selected="old('ticket_type_id', $ticket?->ticket_type_id ?? ($ticketTypes->where('name', 'Incident')->first()?->id ?? ''))"
+                        placeholder="Select Type"
+                    />
                 </div>
 
                 <!-- Requester -->
@@ -100,68 +100,68 @@
 
                 <!-- ITSM Ticket Category -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">ITSM Category</label>
-                    <select name="ticket_category_id" x-model="selectedCategory" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Category</option>
-                        @foreach($ticketCategories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="ticket_category_id"
+                        label="ITSM Category"
+                        :options="$ticketCategories->map(fn($cat) => ['id' => $cat->id, 'text' => $cat->name])->toArray()"
+                        :selected="old('ticket_category_id', $ticket?->ticket_category_id)"
+                        placeholder="Select Category"
+                    />
                 </div>
 
                 <!-- Priority -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
-                    <select name="priority_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Priority</option>
-                        @foreach($priorities as $priority)
-                            <option value="{{ $priority->id }}" {{ old('priority_id', $ticket?->priority_id ?? ($priorities->where('name', 'Medium')->first()?->id ?? '')) == $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="priority_id"
+                        label="Priority"
+                        :options="$priorities->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()"
+                        :selected="old('priority_id', $ticket?->priority_id ?? ($priorities->where('name', 'Medium')->first()?->id ?? ''))"
+                        placeholder="Select Priority"
+                    />
                 </div>
 
                 <!-- Status -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                    <select name="status_id" x-model="statusId" @change="onStatusChange()" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Status</option>
-                        @foreach($ticketStatuses as $status)
-                            <option value="{{ $status->id }}">{{ $status->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="status_id"
+                        label="Status"
+                        :options="$ticketStatuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()"
+                        :selected="old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? ''))"
+                        placeholder="Select Status"
+                    />
                 </div>
 
                 <!-- Label -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Label</label>
-                    <select name="label_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Label</option>
-                        @foreach($labels as $label)
-                            <option value="{{ $label->id }}" {{ old('label_id', $ticket?->label_id) == $label->id ? 'selected' : '' }}>{{ $label->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="label_id"
+                        label="Label"
+                        :options="$labels->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()"
+                        :selected="old('label_id', $ticket?->label_id)"
+                        placeholder="Select Label"
+                    />
                 </div>
 
                 <!-- Source -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Source</label>
-                    <select name="source_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select Source</option>
-                        @foreach($sources as $source)
-                            <option value="{{ $source->id }}" {{ old('source_id', $ticket?->source_id ?? ($sources->where('name', 'Portal')->first()?->id ?? '')) == $source->id ? 'selected' : '' }}>{{ $source->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="source_id"
+                        label="Source"
+                        :options="$sources->map(fn($src) => ['id' => $src->id, 'text' => $src->name])->toArray()"
+                        :selected="old('source_id', $ticket?->source_id ?? ($sources->where('name', 'Portal')->first()?->id ?? ''))"
+                        placeholder="Select Source"
+                    />
                 </div>
 
                 <!-- SLA Status -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SLA Status</label>
-                    <select name="sla_status_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        <option value="">Select SLA Status</option>
-                        @foreach($slaStatuses as $slaStatus)
-                            <option value="{{ $slaStatus->id }}" {{ old('sla_status_id', $ticket?->sla_status_id ?? ($slaStatuses->where('name', 'Fulfilled')->first()?->id ?? '')) == $slaStatus->id ? 'selected' : '' }}>{{ $slaStatus->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-form.searchable-select
+                        name="sla_status_id"
+                        label="SLA Status"
+                        :options="$slaStatuses->map(fn($sla) => ['id' => $sla->id, 'text' => $sla->name])->toArray()"
+                        :selected="old('sla_status_id', $ticket?->sla_status_id ?? ($slaStatuses->where('name', 'Fulfilled')->first()?->id ?? ''))"
+                        placeholder="Select SLA Status"
+                    />
                 </div>
 
                 <!-- Linked IT Asset -->
