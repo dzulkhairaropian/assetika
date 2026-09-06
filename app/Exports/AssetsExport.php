@@ -9,8 +9,9 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize
+class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithChunkReading
 {
     use Exportable;
 
@@ -19,6 +20,11 @@ class AssetsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
     public function __construct($filters = [])
     {
         $this->filters = $filters;
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000;
     }
 
     public function query()

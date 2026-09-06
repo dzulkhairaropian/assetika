@@ -280,10 +280,10 @@
                 </div>
             </div>
 
-            <div class="max-w-full overflow-x-auto xl:overflow-visible">
+            <div class="max-w-full overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
+                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/90 backdrop-blur dark:border-gray-800 dark:bg-gray-800/90">
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
