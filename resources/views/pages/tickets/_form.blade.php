@@ -9,6 +9,17 @@
     completedStatusId: '{{ $completedStatusId }}',
     completedDate: '{{ old('completed_date', $ticket?->completed_date?->format('Y-m-d')) }}',
     completedTime: '{{ old('completed_time', $ticket?->completed_time?->format('H:i')) }}',
+    setToday() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        this.completedDate = `${yyyy}-${mm}-${dd}`;
+        if (!this.completedTime) this.completedTime = `${hh}:${min}`;
+        this.onDateChange();
+    },
     onStatusChange() {
         const val = parseInt(this.statusId);
         if (this.closedIds.includes(val)) {
@@ -172,8 +183,12 @@
                             $holder = $asset->currentCheckout?->checkedOutToUser?->name ?? $asset->assignedToUser?->name;
                             $dept = $asset->department?->name;
                             $statusName = $asset->status?->name;
-                            $brandModel = optional($asset->product?->brand)->name . ' ' . optional($asset->product)->model;
-                            $deviceName = $asset->device_name ?: trim($brandModel);
+                            $brandName = optional($asset->product?->brand)->name;
+                            $modelName = optional($asset->product)->model;
+                            $productTitle = optional($asset->product)->title ?? optional($asset->product)->name;
+                            $productInfo = array_filter([$productTitle, trim($brandName . ' ' . $modelName)]);
+                            $productStr = !empty($productInfo) ? implode(' / ', array_unique($productInfo)) : '';
+                            $deviceName = $asset->device_name ? $asset->device_name . ($productStr ? ' (' . $productStr . ')' : '') : ($productStr ?: 'Unknown Product');
                             return [
                                 'id' => $asset->id,
                                 'text' => '[' . $asset->asset_tag . '] ' . $deviceName . ' — ' . ($holder ? 'User: ' . $holder : 'Unassigned') . ($dept ? ' ('.$dept.')' : '') . ($statusName ? ' [' . $statusName . ']' : '')
@@ -221,7 +236,12 @@
                 </h3>
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Completed Date</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Completed Date
+                            <button type="button" @click="setToday()" class="ml-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 focus:outline-none">
+                                [Today]
+                            </button>
+                        </label>
                         <input type="date" name="completed_date" x-model="completedDate" @input="onDateChange()" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                     </div>
 
