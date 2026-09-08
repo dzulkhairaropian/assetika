@@ -302,6 +302,11 @@
             <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
                 {{ $ticket ? 'Update Ticket' : 'Save Ticket' }}
             </button>
+            @if(!$ticket)
+                <button type="submit" name="create_another" value="1" class="inline-flex w-full justify-center rounded-lg border border-brand-500 bg-brand-50 px-4 py-2 text-xs font-semibold text-brand-600 hover:bg-brand-100 dark:bg-brand-950 dark:text-brand-300 dark:border-brand-800 transition">
+                    Create Another
+                </button>
+            @endif
             <a href="{{ route('tickets.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                 Cancel
             </a>

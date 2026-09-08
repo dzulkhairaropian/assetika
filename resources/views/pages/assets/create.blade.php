@@ -254,6 +254,27 @@
                             @error('invoice_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Sale Information -->
+                        <div class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-4">
+                            <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300">Sale Details (If Sold)</h4>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Sale Price</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
+                                    <input type="number" step="0.01" name="sale_price" value="{{ old('sale_price') }}" placeholder="0.00"
+                                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Buyer Name</label>
+                                <input type="text" name="buyer_name" value="{{ old('buyer_name') }}" placeholder="e.g. PT Buyer"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            </div>
+                            <div>
+                                <x-form.date-picker id="sale_date" name="sale_date" label="Sale Date" placeholder="Select sale date" defaultDate="{{ old('sale_date') }}" />
+                            </div>
+                        </div>
+
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Notes

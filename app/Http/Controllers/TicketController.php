@@ -274,6 +274,10 @@ class TicketController extends Controller
             ));
         }
 
+        if ($request->has('create_another')) {
+            return redirect()->route('tickets.create')->with('success', 'Ticket created successfully.');
+        }
+
         return redirect()->route('tickets.index')->with('success', 'Ticket created successfully.');
     }
 

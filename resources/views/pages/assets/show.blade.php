@@ -220,6 +220,30 @@
                         <div class="text-xs text-gray-400 italic">No depreciation profile assigned.</div>
                     @endif
                 </div>
+
+                @if(in_array(optional($asset->status)->name, ['Sold', 'For Sale']) || $asset->sale_price)
+                <!-- Sale Details Card -->
+                <div class="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 shadow-sm dark:border-emerald-900/30 dark:bg-emerald-950/10">
+                    <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                        <i data-feather="dollar-sign" class="w-3.5 h-3.5"></i>
+                        Sale Information
+                    </h3>
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-500">Sale Price</span>
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400">Rp {{ number_format($asset->sale_price ?? 0, 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-500">Buyer</span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $asset->buyer_name ?? '-' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-500">Sale Date</span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $asset->sale_date ? $asset->sale_date->format('d M Y') : '-' }}</span>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Main Content -->

@@ -127,6 +127,7 @@
                         ['key' => 'deployed', 'label' => 'Deployed',        'count' => $inventorySummary['deployed'],   'icon' => 'monitor',      'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
                         ['key' => 'service',  'label' => 'Service & Repair','count' => $inventorySummary['in_service'], 'icon' => 'tool',         'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
                         ['key' => 'broken',   'label' => 'Broken',          'count' => $inventorySummary['broken'],     'icon' => 'alert-triangle','badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                        ['key' => 'sold',     'label' => 'Sold / For Sale', 'count' => $inventorySummary['sold'],       'icon' => 'dollar-sign',  'badge' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400'],
                         ['key' => 'aged',     'label' => 'Aged (≥4y)',      'count' => $inventorySummary['aged'],       'icon' => 'clock',        'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
                     ];
                 @endphp
@@ -347,6 +348,19 @@
                                         $statusColor = optional($asset->status)->color;
                                     @endphp
                                     <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
+                                    @if(in_array($statusName, ['Sold', 'For Sale']))
+                                        <div class="mt-1 flex flex-col text-[11px] text-gray-500 dark:text-gray-400">
+                                            @if($asset->sale_price)
+                                                <span class="font-medium text-emerald-600 dark:text-emerald-400">Sale: Rp {{ number_format($asset->sale_price, 0, ',', '.') }}</span>
+                                            @endif
+                                            @if($asset->buyer_name)
+                                                <span>Buyer: {{ $asset->buyer_name }}</span>
+                                            @endif
+                                            @if($asset->sale_date)
+                                                <span>Date: {{ $asset->sale_date->format('d/m/Y') }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5">
                                     <div class="flex flex-col">

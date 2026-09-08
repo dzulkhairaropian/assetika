@@ -25,6 +25,8 @@ class StatusSeeder extends Seeder
             ['name' => 'Borrowed',        'master_category_id' => $itAsset?->id,      'color' => 'info',      'icon' => 'refresh-cw'],
             ['name' => 'Service',         'master_category_id' => $itAsset?->id,      'color' => 'warning',   'icon' => 'tool'],
             ['name' => 'Broken',          'master_category_id' => $itAsset?->id,      'color' => 'danger',    'icon' => 'alert-triangle'],
+            ['name' => 'For Sale',        'master_category_id' => $itAsset?->id,      'color' => 'warning',   'icon' => 'tag'],
+            ['name' => 'Sold',            'master_category_id' => $itAsset?->id,      'color' => 'dark',      'icon' => 'dollar-sign'],
             ['name' => 'Retired',         'master_category_id' => $itAsset?->id,      'color' => 'secondary', 'icon' => 'trash-2'],
 
             // IT Consumable

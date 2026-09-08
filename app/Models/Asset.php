@@ -37,6 +37,9 @@ class Asset extends Model
         'warranty_expiry_date',
         'purchase_cost',
         'invoice_number',
+        'sale_price',
+        'buyer_name',
+        'sale_date',
         'notes',
         'retired_at',
         'retirement_reason',
@@ -53,7 +56,9 @@ class Asset extends Model
         'release_date' => 'date',
         'warranty_expiry_date' => 'date',
         'retired_at' => 'date',
+        'sale_date' => 'date',
         'purchase_cost' => 'decimal:2',
+        'sale_price' => 'decimal:2',
     ];
 
     public function scopeFilter($query, array $filters)

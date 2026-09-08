@@ -169,6 +169,9 @@ class AssetController extends Controller
             'broken' => (clone $query)->whereHas('status', function($q) {
                 $q->whereIn('name', ['Broken']);
             })->count(),
+            'sold' => (clone $query)->whereHas('status', function($q) {
+                $q->whereIn('name', ['Sold', 'For Sale']);
+            })->count(),
             'aged' => (clone $query)->where($agedScope)->count(),
         ];
 
@@ -197,6 +200,11 @@ class AssetController extends Controller
             case 'broken':
                 $query->whereHas('status', function($q) {
                     $q->whereIn('name', ['Broken']);
+                });
+                break;
+            case 'sold':
+                $query->whereHas('status', function($q) {
+                    $q->whereIn('name', ['Sold', 'For Sale']);
                 });
                 break;
             case 'aged':
@@ -278,6 +286,9 @@ class AssetController extends Controller
                 'asset_tag' => 'nullable|string|unique:assets,asset_tag',
                 'device_name' => 'nullable|string',
                 'depreciation_id' => 'nullable|exists:depreciations,id',
+                'sale_price' => 'nullable|numeric',
+                'buyer_name' => 'nullable|string',
+                'sale_date' => 'nullable|date',
             ]);
 
             if (empty($validated['status_id']) || $isDraft) {
@@ -311,6 +322,9 @@ class AssetController extends Controller
                 'depreciation_id' => 'nullable|exists:depreciations,id',
                 'invoice_number' => 'nullable|string',
                 'notes' => 'nullable|string',
+                'sale_price' => 'nullable|numeric',
+                'buyer_name' => 'nullable|string',
+                'sale_date' => 'nullable|date',
             ]);
         }
 
@@ -391,6 +405,9 @@ class AssetController extends Controller
                 'asset_tag' => 'nullable|string|unique:assets,asset_tag,' . $asset->id,
                 'device_name' => 'nullable|string',
                 'depreciation_id' => 'nullable|exists:depreciations,id',
+                'sale_price' => 'nullable|numeric',
+                'buyer_name' => 'nullable|string',
+                'sale_date' => 'nullable|date',
             ]);
 
             $draftStatus = Status::firstOrCreate(
@@ -422,6 +439,9 @@ class AssetController extends Controller
                 'depreciation_id' => 'nullable|exists:depreciations,id',
                 'invoice_number' => 'nullable|string',
                 'notes' => 'nullable|string',
+                'sale_price' => 'nullable|numeric',
+                'buyer_name' => 'nullable|string',
+                'sale_date' => 'nullable|date',
             ]);
         }
 
