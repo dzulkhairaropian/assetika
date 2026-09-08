@@ -234,7 +234,10 @@
                             @endphp
                             <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</td>
+                        <td class="px-4 py-2.5">
+                            <span class="block text-gray-700 dark:text-gray-300 font-medium">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</span>
+                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($checkout->checkedOutToUser)->department)->name ?? '-' }}</span>
+                        </td>
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $checkout->checked_out_at->format('M d, H:i') }}</td>
                     </tr>
                 @empty
@@ -266,7 +269,17 @@
                             @endphp
                             <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">{{ $asset->checkedOutToUser->name ?? optional($asset->currentCheckout?->checkedOutToUser)->name ?? 'Unassigned' }}</td>
+                        <td class="px-4 py-2.5">
+                            @php
+                                $assignedUser = $asset->checkedOutToUser ?? optional($asset->currentCheckout)->checkedOutToUser;
+                            @endphp
+                            <span class="block text-gray-700 dark:text-gray-300 font-medium">{{ $assignedUser->name ?? 'Unassigned' }}</span>
+                            @if($assignedUser && optional($assignedUser->department)->name)
+                                <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ $assignedUser->department->name }}</span>
+                            @elseif(optional($asset->department)->name)
+                                <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ $asset->department->name }}</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             @if($asset->purchase_date)
                                 {{ $asset->purchase_date->format('M d, Y') }}
