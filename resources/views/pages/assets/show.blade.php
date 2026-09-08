@@ -264,6 +264,12 @@
                                 <i data-feather="activity" class="w-3.5 h-3.5"></i>
                                 Movement History
                             </button>
+                            <button @click="activeTab = 'audit_logs'"
+                                :class="activeTab === 'audit_logs' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                                class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
+                                <i data-feather="list" class="w-3.5 h-3.5"></i>
+                                Audit Logs
+                            </button>
                             <button @click="activeTab = 'maintenance'"
                                 :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
@@ -527,17 +533,59 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="6" class="px-4 py-6 text-center text-xs text-gray-400">
-                                                    No support tickets reported for this asset
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                         @empty
+                                             <tr>
+                                                 <td colspan="6" class="px-4 py-6 text-center text-xs text-gray-400">
+                                                     No support tickets reported for this asset
+                                                 </td>
+                                             </tr>
+                                         @endforelse
+                                     </tbody>
+                                 </table>
+                             </div>
+                         </div>
+
+                         <!-- Audit Logs Tab -->
+                         <div x-show="activeTab === 'audit_logs'" class="space-y-4" x-transition>
+                             <div class="overflow-x-auto">
+                                 <table class="w-full text-left text-xs">
+                                     <thead class="border-b border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-950">
+                                         <tr>
+                                             <th class="px-4 py-2.5 font-medium text-gray-500">Date & Time</th>
+                                             <th class="px-4 py-2.5 font-medium text-gray-500">User</th>
+                                             <th class="px-4 py-2.5 font-medium text-gray-500">Event</th>
+                                             <th class="px-4 py-2.5 font-medium text-gray-500">Description</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                         @forelse($asset->activityLogs as $log)
+                                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                                 <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white">
+                                                     {{ $log->created_at->format('d M Y, H:i') }}
+                                                 </td>
+                                                 <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
+                                                     {{ $log->user?->name ?? 'System' }}
+                                                 </td>
+                                                 <td class="px-4 py-2.5">
+                                                     <x-ui.badge :color="$log->event === 'created' ? 'success' : ($log->event === 'deleted' ? 'danger' : 'info')" variant="light" size="sm">
+                                                         {{ strtoupper($log->event) }}
+                                                     </x-ui.badge>
+                                                 </td>
+                                                 <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
+                                                     {{ $log->description }}
+                                                 </td>
+                                             </tr>
+                                         @empty
+                                             <tr>
+                                                 <td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">
+                                                     No activity logs recorded yet
+                                                 </td>
+                                             </tr>
+                                         @endforelse
+                                     </tbody>
+                                 </table>
+                             </div>
+                         </div>
 
                     </div>
                 </div>

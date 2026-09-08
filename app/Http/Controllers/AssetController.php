@@ -342,7 +342,8 @@ class AssetController extends Controller
         $asset->load([
             'product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location', 
             'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType', 
-            'tickets.status', 'tickets.priority', 'tickets.assignedTo'
+            'tickets.status', 'tickets.priority', 'tickets.assignedTo',
+            'activityLogs.user'
         ]);
         return view('pages.assets.show', compact('asset'));
     }
