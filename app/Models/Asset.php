@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use App\Traits\HasDataScope;
+use App\Traits\LogsActivity;
 
 class Asset extends Model
 {
-    use SoftDeletes, HasDataScope;
+    use SoftDeletes, HasDataScope, LogsActivity;
     protected $table = 'assets';
 
     protected $fillable = [
