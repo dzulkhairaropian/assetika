@@ -117,8 +117,8 @@
         />
     </div>
 
-    <!-- Main Grid: Charts & Analytics Breakdown -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
+    <!-- Main Grid: Row 1 - Donut & Pie Charts (Max 3 per row) -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         <!-- Chart 1: Status Distribution -->
         <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
@@ -172,22 +172,7 @@
             @endif
         </div>
 
-        <!-- Chart 3: Hardware Lifecycle & Age Distribution (Bar Chart Baru) -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Age & Lifecycle Distribution</h3>
-                    <p class="text-xs text-gray-400">Hardware age breakdown in years</p>
-                </div>
-            </div>
-            @if(count($assetAgeDistribution['data']) > 0)
-                <div id="assetAgeChart" class="h-64"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
-            @endif
-        </div>
-
-        <!-- Chart 4: Most Used Products -->
+        <!-- Chart 3: Most Used Products -->
         <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
              x-data="{ activeCategory: 'all', categoryLabel: 'All Categories', updateProductChart(catId, label) { this.activeCategory = catId; this.categoryLabel = label; if (window.updateProductChartJS) { window.updateProductChartJS(catId); } } }">
             <div class="flex items-center justify-between mb-4">
@@ -203,6 +188,21 @@
             @endif
         </div>
 
+    </div>
+
+    <!-- Main Grid: Row 2 - Hardware Lifecycle Bar Chart -->
+    <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hardware Lifecycle & Age Distribution</h3>
+                <p class="text-xs text-gray-400">Breakdown of inventory unit counts across age ranges</p>
+            </div>
+        </div>
+        @if(count($assetAgeDistribution['data']) > 0)
+            <div id="assetAgeChart" class="h-64"></div>
+        @else
+            <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
+        @endif
     </div>
 
     <!-- Timeline & Purchases Section -->
