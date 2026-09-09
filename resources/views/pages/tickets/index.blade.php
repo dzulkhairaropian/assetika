@@ -152,7 +152,12 @@
                                 </div>
 
                                 <div>
-                                    <x-form.searchable-select name="ticket_category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('ticket_category_id', request('category_id'))" placeholder="All Categories" />
+                                    @php
+                                        $catOptions = collect([['id' => 'general', 'text' => 'General']])
+                                            ->concat($categories->map(fn($c) => ['id' => (string)$c->id, 'text' => $c->name]))
+                                            ->toArray();
+                                    @endphp
+                                    <x-form.searchable-select name="ticket_category_id" label="Category" :options="$catOptions" :selected="request('ticket_category_id', request('category_id'))" placeholder="All Categories" />
                                 </div>
 
                                 <div>

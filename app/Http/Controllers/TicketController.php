@@ -73,7 +73,11 @@ class TicketController extends Controller
         }
 
         if ($catId = ($request->input('ticket_category_id') ?: $request->input('category_id'))) {
-            $query->where('ticket_category_id', $catId);
+            if ($catId === 'general') {
+                $query->whereNull('ticket_category_id');
+            } else {
+                $query->where('ticket_category_id', $catId);
+            }
         }
 
         if ($companyId = $request->input('company_id')) {

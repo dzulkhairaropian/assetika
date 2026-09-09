@@ -230,9 +230,8 @@
                         </td>
                         <td class="px-4 py-2.5">
                             @if($ticket->asset)
-                                <a href="{{ route('assets.show', $ticket->asset) }}" class="inline-flex items-center gap-1.5 font-semibold text-xs text-gray-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition">
-                                    <i data-feather="hard-drive" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
-                                    <span>{{ $ticket->asset->asset_tag ?? $ticket->asset->name }}</span>
+                                <a href="{{ route('assets.show', $ticket->asset) }}" class="font-semibold text-xs text-gray-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition">
+                                    {{ $ticket->asset->asset_tag ?? $ticket->asset->name }}
                                 </a>
                                 @php
                                     $brandName = optional(optional($ticket->asset->product)->brand)->name;
