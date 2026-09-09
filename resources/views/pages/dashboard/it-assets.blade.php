@@ -275,7 +275,12 @@
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_tag ?? $asset->name }}</span>
-                            <span class="block text-[11px] text-gray-400">{{ optional(optional($asset->product)->brand)->name ?? '-' }}</span>
+                            <span class="block text-[11px] text-gray-400">
+                                {{ optional(optional($asset->product)->brand)->name ?? '' }}
+                                @if(optional($asset->product)->name)
+                                    • {{ $asset->product->name }}
+                                @endif
+                            </span>
                         </td>
                         <td class="px-4 py-2.5">
                             @php
