@@ -104,10 +104,10 @@
                  @click.outside="dropdownOpen = false">
                 <button class="flex items-center gap-2 rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors active:scale-[0.98]"
                    @click.prevent="dropdownOpen = !dropdownOpen">
-                    <div class="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800">
+                    <div class="relative h-9 w-9 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800 shrink-0">
                         <img src="{{ auth()->user()->avatar ?? 'https://www.gravatar.com/avatar/' . md5(auth()->user()->email) . '?d=mp' }}" alt="User" class="h-full w-full object-cover" />
                     </div>
-                    <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 hidden sm:block">{{ auth()->user()->name }}</span>
+                    <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 hidden sm:block truncate max-w-[130px]">{{ auth()->user()->name }}</span>
                     <i data-feather="chevron-down" :class="dropdownOpen ? 'rotate-180' : ''" class="transition-transform duration-200 w-3.5 h-3.5 text-gray-400"></i>
                 </button>
 
