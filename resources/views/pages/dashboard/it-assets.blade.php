@@ -240,7 +240,12 @@
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ optional($checkout->asset)->asset_tag ?? optional($checkout->asset)->name ?? 'Unknown' }}</span>
-                            <span class="block text-[11px] text-gray-400">{{ optional(optional(optional($checkout->asset))->product)->name ?? '-' }}</span>
+                            <span class="block text-[11px] text-gray-400">
+                                {{ optional(optional(optional($checkout->asset)->product)->brand)->name ?? '' }}
+                                @if(optional(optional($checkout->asset)->product)->name)
+                                    • {{ $checkout->asset->product->name }}
+                                @endif
+                            </span>
                         </td>
                         <td class="px-4 py-2.5">
                             @php
