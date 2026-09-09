@@ -9,66 +9,72 @@
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Support & Ticket Operations Center</h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live tracking of service desk tickets, SLA response times, and staff workload.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
-            <!-- Filter Options Toggle Button -->
-            <div class="relative">
-                <button type="button" @click="filterOpen = !filterOpen"
-                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-                    <i data-feather="filter" class="w-4 h-4 text-gray-500"></i>
-                    <span>Filter Options</span>
-                    @if($activeFiltersCount > 0)
-                        <span class="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white ml-0.5">{{ $activeFiltersCount }}</span>
-                    @endif
-                </button>
+	        <div class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
+	            <!-- Filter Options Toggle Button -->
+	            <div class="relative">
+	                <button type="button" @click="filterOpen = !filterOpen"
+	                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
+	                    <i data-feather="filter" class="w-4 h-4 text-gray-500"></i>
+	                    <span>Filter Options</span>
+	                    @if($activeFiltersCount > 0)
+	                        <span class="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white ml-0.5">{{ $activeFiltersCount }}</span>
+	                    @endif
+	                </button>
 
-                <!-- Filter Options Dropdown Panel -->
-                <div x-show="filterOpen" @click.away="filterOpen = false" x-transition
-                    class="absolute right-0 top-full z-50 mt-2 w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
-                    style="display: none;">
-                    <form action="{{ route('ticket-dashboard') }}" method="GET">
-                        <div class="mb-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2.5">
-                            <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-white">Filter Options</h4>
-                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <i data-feather="x" class="w-4 h-4"></i>
-                            </button>
-                        </div>
+	                <!-- Filter Options Dropdown Panel -->
+	                <div x-show="filterOpen" @click.away="filterOpen = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+	                    class="absolute right-0 top-full z-50 mt-2 origin-top-right w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+	                    style="display: none;">
+	                    <form action="{{ route('ticket-dashboard') }}" method="GET">
+	                        <div class="mb-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2.5">
+	                            <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-white">Filter Options</h4>
+	                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+	                                <i data-feather="x" class="w-4 h-4"></i>
+	                            </button>
+	                        </div>
 
-                        <div class="space-y-3 text-left">
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
-                                <select name="status_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                    <option value="">All Statuses</option>
-                                    @foreach($statuses as $status)
-                                        <option value="{{ $status->id }}" {{ (string) $filterStatusId === (string) $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
-                                <select name="priority_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                    <option value="">All Priorities</option>
-                                    @foreach($priorities as $priority)
-                                        <option value="{{ $priority->id }}" {{ (string) $filterPriorityId === (string) $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+	                        <div class="space-y-3 text-left">
+	                            <div>
+	                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
+	                                <select name="status_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+	                                    <option value="">All Statuses</option>
+	                                    @foreach($statuses as $status)
+	                                        <option value="{{ $status->id }}" {{ (string) $filterStatusId === (string) $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+	                                    @endforeach
+	                                </select>
+	                            </div>
+	                            <div>
+	                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
+	                                <select name="priority_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+	                                    <option value="">All Priorities</option>
+	                                    @foreach($priorities as $priority)
+	                                        <option value="{{ $priority->id }}" {{ (string) $filterPriorityId === (string) $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
+	                                    @endforeach
+	                                </select>
+	                            </div>
+	                        </div>
 
-                        <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                            <a href="{{ route('ticket-dashboard') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear All</a>
-                            <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-brand-600">Apply</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+	                        <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
+	                            <a href="{{ route('ticket-dashboard') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear All</a>
+	                            <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 active:scale-[0.97] transition-all duration-150">Apply</button>
+	                        </div>
+	                    </form>
+	                </div>
+	            </div>
 
-            <a href="{{ route('tickets.export', request()->all()) }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-                <i data-feather="download" class="w-4 h-4 text-gray-500"></i> Export
-            </a>
-            <a href="{{ route('tickets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-brand-600">
-                <i data-feather="plus" class="w-4 h-4"></i> New Ticket
-            </a>
-        </div>
+	            <a href="{{ route('tickets.export', request()->all()) }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
+	                <i data-feather="download" class="w-4 h-4 text-gray-500"></i> Export
+	            </a>
+	            <a href="{{ route('tickets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
+	                <i data-feather="plus" class="w-4 h-4"></i> New Ticket
+	            </a>
+	        </div>
     </div>
 
     <!-- 1. Key Metrics Cards Grid -->
