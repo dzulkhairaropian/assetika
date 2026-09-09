@@ -87,7 +87,7 @@ class TicketDashboardController extends Controller
         $myOpenTickets = $applyGlobalFilters(Ticket::where('assigned_to_id', $user->id)->whereIn('status_id', $openStatusIds))->count();
 
         // Tables
-        $recentTickets = $applyGlobalFilters(Ticket::with(['priority', 'status', 'assignedTo.department', 'category', 'ticketCategory']))
+        $recentTickets = $applyGlobalFilters(Ticket::with(['priority', 'status', 'assignedTo.department', 'category', 'ticketCategory', 'asset.product', 'requesterDepartment', 'requesterUser.department']))
             ->latest()
             ->limit(8)
             ->get();

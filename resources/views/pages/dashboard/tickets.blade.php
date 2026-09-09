@@ -203,17 +203,37 @@
             :footerLink="route('tickets.index')"
             footerText="View All Tickets"
         >
-            @forelse($recentTickets as $ticket)
-                <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
-                    <td class="px-4 py-2.5">
-                        <p class="font-medium text-brand-600 dark:text-brand-400">#{{ $ticket->request_id }}</p>
-                    </td>
-                    <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white">
-                        {{ $ticket->requester_name }}
-                    </td>
-                    <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
-                        {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? '-' }}
-                    </td>
+                @forelse($recentTickets as $ticket)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
+                        <td class="px-4 py-2.5">
+                            <a href="{{ route('tickets.show', $ticket) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
+                            @if($ticket->asset)
+                                <span class="block text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                                    <i data-feather="hard-drive" class="inline w-3 h-3 text-gray-400 mr-0.5"></i>
+                                    {{ $ticket->asset->asset_tag ?? $ticket->asset->name }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-2.5">
+                            <div class="flex flex-col">
+                                <span class="font-medium text-gray-900 dark:text-white">
+                                    {{ $ticket->requester_name ?? $ticket->requesterUser?->name }}
+                                </span>
+                                @php
+                                    $reqDept = $ticket->requesterDepartment?->name ?? $ticket->requesterUser?->department?->name;
+                                @endphp
+                                @if($reqDept)
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                        {{ $reqDept }}
+                                    </span>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="px-4 py-2.5 whitespace-nowrap">
+                            <x-ui.badge color="primary" variant="light" size="sm">
+                                {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? '-' }}
+                            </x-ui.badge>
+                        </td>
                     <td class="px-4 py-2.5">
                         <x-ui.badge 
                             size="sm" 
