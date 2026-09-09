@@ -190,26 +190,26 @@
 
     </div>
 
-    <!-- Main Grid: Row 2 - Hardware Lifecycle Bar Chart -->
-    <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hardware Lifecycle & Age Distribution</h3>
-                <p class="text-xs text-gray-400">Breakdown of inventory unit counts across age ranges</p>
-            </div>
-        </div>
-        @if(count($assetAgeDistribution['data']) > 0)
-            <div id="assetAgeChart" class="h-64"></div>
-        @else
-            <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
-        @endif
-    </div>
-
-    <!-- Timeline & Purchases Section -->
+    <!-- Timeline & Lifecycle Section (2-Column Grid) -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         
-        <!-- Timeline Chart: Consumable Usage -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <!-- Chart 1: Hardware Lifecycle & Age Distribution -->
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hardware Lifecycle & Age Distribution</h3>
+                    <p class="text-xs text-gray-400">Inventory unit count by age bracket</p>
+                </div>
+            </div>
+            @if(count($assetAgeDistribution['data']) > 0)
+                <div id="assetAgeChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
+            @endif
+        </div>
+
+        <!-- Chart 2: Consumable Usage Timeline -->
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Consumable Usage Timeline</h3>
