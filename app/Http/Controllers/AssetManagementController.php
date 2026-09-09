@@ -405,6 +405,47 @@ class AssetManagementController extends Controller
             ));
         }
 
+        // Automatic Ticket Creation for Sending to Service/Maintenance
+        $ticketDate = \Illuminate\Support\Carbon::parse($request->start_date);
+        $incType = \App\Models\TicketType::where('code', 'INC')->first() ?? \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $code = strtoupper($incType?->code ?: 'INC');
+        $prefix = $code . '-' . $ticketDate->format('ymd') . '-';
+
+        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->first();
+
+        $nextSeq = 1;
+        if ($latestTicket) {
+            $parts = explode('-', $latestTicket->request_id);
+            $nextSeq = ((int) end($parts)) + 1;
+        }
+
+        $inProgressStatus = \App\Models\TicketStatus::where('name', 'In Progress')->first() ?? \App\Models\TicketStatus::first();
+        $highPriority = \App\Models\Priority::where('name', 'High')->first() ?? \App\Models\Priority::first();
+        $portalSource = \App\Models\Source::first();
+
+        \App\Models\Ticket::create([
+            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+            'ticket_type_id' => $incType?->id,
+            'requester_user_id' => auth()->id(),
+            'requester_name' => auth()->user()?->name,
+            'requester_email' => auth()->user()?->email,
+            'requester_company_id' => auth()->user()?->company_id,
+            'requester_department_id' => auth()->user()?->department_id,
+            'assigned_to_id' => auth()->id(),
+            'created_by_id' => auth()->id(),
+            'asset_id' => $asset->id,
+            'priority_id' => $highPriority?->id,
+            'source_id' => $portalSource?->id,
+            'status_id' => $inProgressStatus?->id,
+            'problem_description' => "[Auto-Generated] Send to Service: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . ". Service Provider: {$request->service_provider}. Problem: {$request->description}",
+            'resolution_notes' => "Service in progress by {$request->service_provider}. Estimated cost: Rp " . number_format((float)$request->cost, 0, ',', '.'),
+            'request_date' => $ticketDate->toDateString(),
+            'request_time' => $ticketDate,
+            'created_at' => $ticketDate,
+        ]);
+
         return redirect()->route('assets.show', $asset)->with('success', 'Asset sent to maintenance successfully.');
     }
 
@@ -451,6 +492,51 @@ class AssetManagementController extends Controller
                 'Maintenance'
             ));
         }
+
+        // Automatic Ticket Creation for Completed Service/Maintenance
+        $ticketDate = \Illuminate\Support\Carbon::parse($request->completion_date);
+        $reqType = \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $code = strtoupper($reqType?->code ?: 'REQ');
+        $prefix = $code . '-' . $ticketDate->format('ymd') . '-';
+
+        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->first();
+
+        $nextSeq = 1;
+        if ($latestTicket) {
+            $parts = explode('-', $latestTicket->request_id);
+            $nextSeq = ((int) end($parts)) + 1;
+        }
+
+        $completedStatus = \App\Models\TicketStatus::where('name', 'Completed')->first() ?? \App\Models\TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
+        $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
+        $portalSource = \App\Models\Source::first();
+
+        \App\Models\Ticket::create([
+            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+            'ticket_type_id' => $reqType?->id,
+            'requester_user_id' => auth()->id(),
+            'requester_name' => auth()->user()?->name,
+            'requester_email' => auth()->user()?->email,
+            'requester_company_id' => auth()->user()?->company_id,
+            'requester_department_id' => auth()->user()?->department_id,
+            'assigned_to_id' => auth()->id(),
+            'created_by_id' => auth()->id(),
+            'asset_id' => $asset->id,
+            'priority_id' => $mediumPriority?->id,
+            'source_id' => $portalSource?->id,
+            'status_id' => $completedStatus?->id,
+            'sla_status_id' => $fulfilledSla?->id,
+            'problem_description' => "[Auto-Generated] Service Completed: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . ". Status: Ready/Available.",
+            'resolution_notes' => "Service successfully completed on {$request->completion_date}. Final cost: Rp " . number_format((float)($request->cost ?? $maintenance->cost), 0, ',', '.') . ". Notes: " . ($request->notes ?? '-'),
+            'request_date' => $ticketDate->toDateString(),
+            'request_time' => $ticketDate,
+            'completed_date' => $ticketDate->toDateString(),
+            'completed_time' => $ticketDate,
+            'created_at' => $ticketDate,
+        ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset maintenance completed successfully.');
     }
