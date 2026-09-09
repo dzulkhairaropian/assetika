@@ -9,19 +9,19 @@
 }" @click.away="closeDropdown()">
     <!-- User Button -->
     <button
-        class="flex items-center gap-2.5 rounded-lg p-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 transition-all duration-150 ease-out active:scale-[0.97]"
+        class="flex items-center gap-2 rounded-xl p-1 border border-transparent hover:border-gray-200/80 hover:bg-gray-50 dark:hover:border-gray-800/80 dark:hover:bg-gray-900 transition-all duration-150 ease-out active:scale-[0.97] h-10"
         @click.prevent="toggleDropdown()"
         type="button"
     >
-        <div class="relative h-9 w-9 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800 shrink-0">
+        <div class="relative h-8 w-8 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 shrink-0">
             <img src="{{ auth()->user()->avatar ?? '/images/avatars/avatar-boy.jpg' }}" alt="User" class="h-full w-full object-cover" />
         </div>
 
-        <span class="block font-semibold text-xs text-gray-800 dark:text-gray-200 truncate max-w-[130px]">{{ auth()->user()->name }}</span>
+        <span class="block font-semibold text-xs text-gray-800 dark:text-gray-200 truncate max-w-[130px] px-0.5">{{ auth()->user()->name }}</span>
 
         <!-- Chevron Icon -->
         <svg
-            class="w-3.5 h-3.5 text-gray-400 transition-transform duration-200"
+            class="w-3.5 h-3.5 text-gray-400 transition-transform duration-200 mr-1"
             :class="{ 'rotate-180': dropdownOpen }"
             fill="none"
             stroke="currentColor"

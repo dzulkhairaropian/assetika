@@ -17,7 +17,7 @@
 }" @click.away="closeDropdown()">
     <!-- Notification Button -->
     <button
-        class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200/90 rounded-full hover:bg-gray-50 hover:text-gray-800 active:scale-95 dark:border-gray-800/90 dark:bg-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white h-9 w-9 transition-all duration-150 ease-out"
+        class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:text-gray-800 active:scale-95 dark:border-gray-800/90 dark:bg-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white h-10 w-10 transition-all duration-150 ease-out shrink-0"
         @click="toggleDropdown()"
         type="button"
         aria-label="Notifications"
