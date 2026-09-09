@@ -14,7 +14,7 @@
         type="button"
     >
         <div class="relative h-9 w-9 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800 shrink-0">
-            <img src="{{ auth()->user()->avatar ?? 'https://www.gravatar.com/avatar/' . md5(auth()->user()->email) . '?d=mp' }}" alt="User" class="h-full w-full object-cover" />
+            <img src="{{ auth()->user()->avatar ?? '/images/avatars/avatar-boy.jpg' }}" alt="User" class="h-full w-full object-cover" />
         </div>
 
         <span class="block font-semibold text-xs text-gray-800 dark:text-gray-200 truncate max-w-[130px]">{{ auth()->user()->name }}</span>
