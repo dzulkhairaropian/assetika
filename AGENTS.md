@@ -48,7 +48,7 @@ composer run setup
 ## Architecture & Conventions
 
 ### Frontend & UI
-- **Design System**: Refer to `DESIGN.md` for design tokens, TailAdmin patterns, color rules (`#465fff`), and typography (`Outfit`).
+- **Design System**: Refer to `docs/DESIGN.md` for design tokens, TailAdmin patterns, color rules (`#465fff`), and typography (`Outfit`).
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/vite` plugin.
 - **Interactivity**: Alpine.js and Livewire v4 primitives.
 - **Icons**: Lucide icons (`lucide`) and Feather icons (`feather-icons`).
