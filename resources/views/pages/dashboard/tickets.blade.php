@@ -199,7 +199,7 @@
         <x-common.dashboard-table
             title="Recent Support Tickets"
             description="Live feed of incoming tickets"
-            :headers="['ID', 'Requester', 'Category', 'Priority', 'Status', 'Assigned To', 'Created']"
+            :headers="['ID', 'Requester', 'Category', 'Linked Asset', 'Priority', 'Status', 'Assigned To', 'Created']"
             :footerLink="route('tickets.index')"
             footerText="View All Tickets"
         >
@@ -207,12 +207,6 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
                         <td class="px-4 py-2.5">
                             <a href="{{ route('tickets.show', $ticket) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
-                            @if($ticket->asset)
-                                <span class="block text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                                    <i data-feather="hard-drive" class="inline w-3 h-3 text-gray-400 mr-0.5"></i>
-                                    {{ $ticket->asset->asset_tag ?? $ticket->asset->name }}
-                                </span>
-                            @endif
                         </td>
                         <td class="px-4 py-2.5">
                             <div class="flex flex-col">
@@ -233,6 +227,19 @@
                             <x-ui.badge color="primary" variant="light" size="sm">
                                 {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? '-' }}
                             </x-ui.badge>
+                        </td>
+                        <td class="px-4 py-2.5">
+                            @if($ticket->asset)
+                                <a href="{{ route('assets.show', $ticket->asset) }}" class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition">
+                                    <i data-feather="hard-drive" class="w-3.5 h-3.5 text-brand-500 shrink-0"></i>
+                                    <span>{{ $ticket->asset->asset_tag ?? $ticket->asset->name }}</span>
+                                </a>
+                                @if($ticket->asset->product?->name)
+                                    <span class="block text-[11px] text-gray-400 truncate max-w-[130px]">{{ $ticket->asset->product->name }}</span>
+                                @endif
+                            @else
+                                <span class="text-xs text-gray-400 dark:text-gray-500">-</span>
+                            @endif
                         </td>
                     <td class="px-4 py-2.5">
                         <x-ui.badge 
@@ -269,7 +276,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="7" class="px-4 py-6 text-center text-xs text-gray-400">No support tickets found</td></tr>
+                <tr><td colspan="8" class="px-4 py-6 text-center text-xs text-gray-400">No support tickets found</td></tr>
             @endforelse
         </x-common.dashboard-table>
     </div>
