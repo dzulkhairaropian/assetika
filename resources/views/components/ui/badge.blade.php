@@ -159,16 +159,6 @@
     @endif
 </span>
 
-    @if($startIcon)
-        <span class="flex shrink-0">
-            {!! $startIcon !!}
-        </span>
-    @endif
-
-    <span class="truncate max-w-[100px] sm:max-w-[150px]">
-        {{ $slot }}
-    </span>
-
     @if($endIcon)
         <span class="flex shrink-0">
             {!! $endIcon !!}
