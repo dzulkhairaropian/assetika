@@ -1,6 +1,25 @@
 @php
     $closedStatusIds = $ticketStatuses->filter(fn($s) => $s->is_closed || in_array($s->name, ['Completed', 'Closed', 'Resolved']))->pluck('id')->toArray();
     $completedStatusId = $ticketStatuses->firstWhere('name', 'Completed')?->id ?? ($ticketStatuses->firstWhere('is_closed', true)?->id ?? 4);
+
+    $allAssetItems = $assets->map(function($asset) {
+        $holderUser = $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser;
+        $holder = $holderUser?->name;
+        $holderId = $holderUser?->id;
+        $dept = $asset->department?->name;
+        $statusName = $asset->status?->name;
+        $brandName = optional($asset->product?->brand)->name;
+        $modelName = optional($asset->product)->model;
+        $productTitle = optional($asset->product)->title ?? optional($asset->product)->name;
+        $productInfo = array_filter([$productTitle, trim($brandName . ' ' . $modelName)]);
+        $productStr = !empty($productInfo) ? implode(' / ', array_unique($productInfo)) : '';
+        $deviceName = $asset->device_name ? $asset->device_name . ($productStr ? ' (' . $productStr . ')' : '') : ($productStr ?: 'Unknown Product');
+        return [
+            'id' => $asset->id,
+            'user_id' => $holderId,
+            'text' => '[' . $asset->asset_tag . '] ' . $deviceName . ' — ' . ($holder ? 'User: ' . $holder : 'Unassigned') . ($dept ? ' ('.$dept.')' : '') . ($statusName ? ' [' . $statusName . ']' : '')
+        ];
+    })->values()->toArray();
 @endphp
 <div class="space-y-4" x-data="{
     selectedCategory: '{{ old('ticket_category_id', $ticket?->ticket_category_id) }}',
@@ -9,6 +28,51 @@
     completedStatusId: '{{ $completedStatusId }}',
     completedDate: '{{ old('completed_date', $ticket?->completed_date?->format('Y-m-d')) }}',
     completedTime: '{{ old('completed_time', $ticket?->completed_time?->format('H:i')) }}',
+    allAssets: {{ json_encode($allAssetItems) }},
+    currentRequesterId: '{{ old('requester_user_id', $ticket?->requester_user_id) }}',
+    currentAssetId: '{{ old('asset_id', $ticket?->asset_id) }}',
+
+    init() {
+        if (this.currentRequesterId) {
+            this.filterAssetsByRequester(this.currentRequesterId, false);
+        }
+    },
+    onRequesterChange(userId) {
+        this.currentRequesterId = userId;
+        this.filterAssetsByRequester(userId, true);
+    },
+    filterAssetsByRequester(userId, autoSelectFirst = true) {
+        if (!userId) {
+            const defaultOptions = [{ id: '', text: 'No Asset Linked' }, ...this.allAssets];
+            this.$dispatch('set-select-options', { name: 'asset_id', options: defaultOptions, selectedId: this.currentAssetId });
+            return;
+        }
+
+        const userAssets = this.allAssets.filter(a => a.user_id == userId);
+        let options = [{ id: '', text: 'No Asset Linked' }];
+
+        if (userAssets.length > 0) {
+            // Put requester's assets first with tag
+            const markedUserAssets = userAssets.map(a => ({
+                id: a.id,
+                text: '★ ' + a.text
+            }));
+            const otherAssets = this.allAssets.filter(a => a.user_id != userId);
+            options = [...options, ...markedUserAssets, ...otherAssets];
+
+            // Auto-select if requested and user has assets
+            let selectId = this.currentAssetId;
+            if (autoSelectFirst || !selectId) {
+                selectId = userAssets[0].id;
+                this.currentAssetId = selectId;
+            }
+
+            this.$dispatch('set-select-options', { name: 'asset_id', options: options, selectedId: selectId });
+        } else {
+            options = [...options, ...this.allAssets];
+            this.$dispatch('set-select-options', { name: 'asset_id', options: options, selectedId: this.currentAssetId });
+        }
+    },
     setToday() {
         const now = new Date();
         const yyyy = now.getFullYear();
@@ -48,7 +112,9 @@
             }
         }
     }
-}">
+}"
+@select-changed.window="if ($event.detail.name === 'requester_user_id') onRequesterChange($event.detail.id); if ($event.detail.name === 'asset_id') currentAssetId = $event.detail.id;"
+>
     <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
         <div>
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">

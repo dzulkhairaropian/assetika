@@ -32,8 +32,20 @@
         this.selectedId = id;
         this.open = false;
         this.search = '';
+        this.$dispatch('select-changed', { name: '{{ $name }}', id: id });
+    },
+    updateOptions(newOptions, newSelectedId = null) {
+        this.options = newOptions;
+        if (newSelectedId !== null) {
+            this.selectedId = newSelectedId;
+        } else if (!this.options.some(o => o.id == this.selectedId)) {
+            this.selectedId = '';
+        }
     }
-}">
+}"
+@set-select-options.window="if ($event.detail.name === '{{ $name }}') updateOptions($event.detail.options, $event.detail.selectedId)"
+@set-selected-id.window="if ($event.detail.name === '{{ $name }}') selectedId = $event.detail.id"
+>
     @if($label)
         <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">
             {{ $label }}
