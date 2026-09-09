@@ -16,6 +16,44 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class AssetManagementController extends Controller
 {
+    private function resolveTicketCategoryForAsset(?Asset $asset): array
+    {
+        if (!$asset) {
+            $defaultCat = \App\Models\TicketCategory::first();
+            return ['category_id' => $defaultCat?->id, 'subcategory_id' => null];
+        }
+
+        $assetCategoryName = optional(optional($asset->product)->category)->name ?? '';
+        $assetCategoryCode = optional(optional($asset->product)->category)->code ?? '';
+
+        $hardwareCat = \App\Models\TicketCategory::where('name', 'Hardware')->orWhere('code', 'HARDWARE')->first();
+        $softwareCat = \App\Models\TicketCategory::where('name', 'Software')->orWhere('code', 'SOFTWARE')->first();
+
+        $targetCat = $hardwareCat ?? \App\Models\TicketCategory::first();
+        $targetSub = null;
+
+        if ($targetCat && $targetCat->id === $hardwareCat?->id) {
+            $subs = \App\Models\TicketSubcategory::where('ticket_category_id', $targetCat->id)->get();
+
+            if (in_array($assetCategoryCode, ['NB', 'LAPTOP']) || str_contains(strtolower($assetCategoryName), 'notebook') || str_contains(strtolower($assetCategoryName), 'laptop')) {
+                $targetSub = $subs->firstWhere('name', 'Laptop / Notebook');
+            } elseif (in_array($assetCategoryCode, ['PC', 'DESKTOP']) || str_contains(strtolower($assetCategoryName), 'desktop') || str_contains(strtolower($assetCategoryName), 'pc')) {
+                $targetSub = $subs->firstWhere('name', 'Desktop PC');
+            } elseif (in_array($assetCategoryCode, ['PR', 'PRINTER', 'SCANNER']) || str_contains(strtolower($assetCategoryName), 'printer')) {
+                $targetSub = $subs->firstWhere('name', 'Printer / Scanner');
+            } elseif (in_array($assetCategoryCode, ['MON', 'MONITOR']) || str_contains(strtolower($assetCategoryName), 'monitor')) {
+                $targetSub = $subs->firstWhere('name', 'Monitor / Display');
+            } else {
+                $targetSub = $subs->firstWhere('name', 'Peripherals (Mouse/Keyboard/Dock)');
+            }
+        }
+
+        return [
+            'category_id' => $targetCat?->id,
+            'subcategory_id' => $targetSub?->id,
+        ];
+    }
+
     public function showCheckout(Request $request, $asset)
     {
         if (!($asset instanceof Asset)) {
@@ -113,6 +151,8 @@ class AssetManagementController extends Controller
         \App\Models\Ticket::create([
             'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $reqType?->id,
+            'ticket_category_id' => $catResolved['category_id'],
+            'ticket_subcategory_id' => $catResolved['subcategory_id'],
             'requester_user_id' => $toUser?->id,
             'requester_name' => $toUser?->name,
             'requester_email' => $toUser?->email,
@@ -226,10 +266,13 @@ class AssetManagementController extends Controller
         $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
         $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
         $portalSource = \App\Models\Source::first();
+        $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
         \App\Models\Ticket::create([
             'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $reqType?->id,
+            'ticket_category_id' => $catResolved['category_id'],
+            'ticket_subcategory_id' => $catResolved['subcategory_id'],
             'requester_user_id' => $toUser?->id,
             'requester_name' => $toUser?->name,
             'requester_email' => $toUser?->email,
@@ -424,10 +467,13 @@ class AssetManagementController extends Controller
         $inProgressStatus = \App\Models\TicketStatus::where('name', 'In Progress')->first() ?? \App\Models\TicketStatus::first();
         $highPriority = \App\Models\Priority::where('name', 'High')->first() ?? \App\Models\Priority::first();
         $portalSource = \App\Models\Source::first();
+        $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
         \App\Models\Ticket::create([
             'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $incType?->id,
+            'ticket_category_id' => $catResolved['category_id'],
+            'ticket_subcategory_id' => $catResolved['subcategory_id'],
             'requester_user_id' => auth()->id(),
             'requester_name' => auth()->user()?->name,
             'requester_email' => auth()->user()?->email,
@@ -513,10 +559,13 @@ class AssetManagementController extends Controller
         $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
         $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
         $portalSource = \App\Models\Source::first();
+        $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
         \App\Models\Ticket::create([
             'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $reqType?->id,
+            'ticket_category_id' => $catResolved['category_id'],
+            'ticket_subcategory_id' => $catResolved['subcategory_id'],
             'requester_user_id' => auth()->id(),
             'requester_name' => auth()->user()?->name,
             'requester_email' => auth()->user()?->email,
