@@ -17,7 +17,7 @@
 }" @click.away="closeDropdown()">
     <!-- Notification Button -->
     <button
-        class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:text-gray-800 active:scale-95 dark:border-gray-800/90 dark:bg-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white h-10 w-10 transition-all duration-150 ease-out shrink-0"
+        class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white h-11 w-11 transition-colors active:scale-95 shrink-0"
         @click="toggleDropdown()"
         type="button"
         aria-label="Notifications"
@@ -25,7 +25,7 @@
         <!-- Notification Badge -->
         <span
             x-show="notifying"
-            class="absolute top-1 right-1 z-1 h-2 w-2 rounded-full bg-brand-500"
+            class="absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-brand-500"
         >
             <span
                 class="absolute inline-flex w-full h-full bg-brand-500 rounded-full opacity-75 -z-1 animate-ping"
@@ -33,7 +33,7 @@
         </span>
 
         <!-- Bell Icon -->
-        <i data-feather="bell" class="w-4 h-4"></i>
+        <i data-feather="bell" class="w-5 h-5"></i>
     </button>
 
     <!-- Dropdown Start -->

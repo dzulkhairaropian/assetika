@@ -7,10 +7,10 @@
         <div class="flex items-center gap-3">
             <!-- Desktop Sidebar Toggle -->
             <button
-                class="z-99999 hidden xl:flex items-center justify-center w-10 h-10 text-gray-500 rounded-xl border border-gray-200/90 bg-white hover:bg-gray-50 hover:text-gray-800 active:scale-95 dark:border-gray-800/90 dark:bg-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white transition-all duration-150 ease-out shrink-0"
-                :class="{ 'bg-gray-100 dark:bg-gray-900': !$store.sidebar.isExpanded }"
+                class="z-99999 hidden xl:flex items-center justify-center w-11 h-11 text-gray-500 rounded-lg border border-gray-200 dark:border-gray-800 dark:text-gray-400 hover:text-brand-500 hover:bg-gray-50 dark:hover:text-white dark:hover:bg-white/[0.03] transition-colors shrink-0 active:scale-95"
+                :class="{ 'bg-gray-100 dark:bg-white/[0.03]': !$store.sidebar.isExpanded }"
                 @click.stop="$store.sidebar.toggleExpanded()" aria-label="Toggle Sidebar">
-                <i data-feather="menu" class="w-4 h-4"></i>
+                <i data-feather="menu" class="w-5 h-5"></i>
             </button>
 
             <!-- Mobile Sidebar Toggle -->
@@ -47,10 +47,10 @@
                 <div class="flex items-center gap-2">
                      <!-- Theme Toggle -->
                     <button
-                        class="relative flex items-center justify-center w-10 h-10 text-gray-500 bg-white border border-gray-200/90 rounded-xl hover:bg-gray-50 hover:text-gray-800 active:scale-95 dark:border-gray-800/90 dark:bg-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white transition-all duration-150 ease-out shrink-0"
+                        class="relative flex items-center justify-center w-11 h-11 text-gray-500 bg-white border border-gray-200 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors active:scale-95 shrink-0"
                         @click="$store.theme.toggle()" aria-label="Toggle dark mode">
-                        <span class="dark:hidden"><i data-feather="moon" class="w-4 h-4"></i></span>
-                        <span class="hidden dark:block"><i data-feather="sun" class="w-4 h-4 text-amber-400"></i></span>
+                        <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
+                        <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5 text-amber-400"></i></span>
                     </button>
 
                     <!-- Notification Dropdown -->
