@@ -52,25 +52,20 @@
         let options = [{ id: '', text: 'No Asset Linked' }];
 
         if (userAssets.length > 0) {
-            // Put requester's assets first with tag
-            const markedUserAssets = userAssets.map(a => ({
-                id: a.id,
-                text: '★ ' + a.text
-            }));
-            const otherAssets = this.allAssets.filter(a => a.user_id != userId);
-            options = [...options, ...markedUserAssets, ...otherAssets];
+            options = [...options, ...userAssets.map(a => ({ id: a.id, text: a.text }))];
 
-            // Auto-select if requested and user has assets
             let selectId = this.currentAssetId;
-            if (autoSelectFirst || !selectId) {
+            // If current asset is not among requester's assets or autoSelectFirst is true on change, select first asset
+            if (autoSelectFirst || !userAssets.some(a => a.id == selectId)) {
                 selectId = userAssets[0].id;
                 this.currentAssetId = selectId;
             }
 
             this.$dispatch('set-select-options', { name: 'asset_id', options: options, selectedId: selectId });
         } else {
-            options = [...options, ...this.allAssets];
-            this.$dispatch('set-select-options', { name: 'asset_id', options: options, selectedId: this.currentAssetId });
+            // User has no assigned assets, only show No Asset Linked
+            this.currentAssetId = '';
+            this.$dispatch('set-select-options', { name: 'asset_id', options: options, selectedId: '' });
         }
     },
     setToday() {
