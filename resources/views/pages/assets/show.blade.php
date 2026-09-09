@@ -597,5 +597,4 @@
 @endsection
 
 @push('scripts')
-@vite('resources/js/asset-labels.js')
 @endpush
