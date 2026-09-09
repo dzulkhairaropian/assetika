@@ -310,6 +310,7 @@
                         </th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Ticket Key / Problem</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Requester</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">SLA Risk</th>
@@ -373,6 +374,11 @@
                                         </span>
                                     @endif
                                 </div>
+                            </td>
+                            <td class="px-4 py-2.5 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                    {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? 'General' }}
+                                </span>
                             </td>
                             <td class="px-4 py-2.5">
                                 @if($ticket->priority)
