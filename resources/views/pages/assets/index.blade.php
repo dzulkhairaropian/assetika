@@ -163,6 +163,7 @@
                             if (request('product_id')) $activeCount++;
                             if (request('department_id')) $activeCount++;
                             if (request('location_id')) $activeCount++;
+                            if (request('year')) $activeCount++;
                             if (request('aging')) $activeCount++;
                         @endphp
 
@@ -209,10 +210,16 @@
                                     </div>
 
                                     <div>
+                                        <x-form.searchable-select name="year" label="Release / Purchase Year" :options="isset($availableYears) ? $availableYears->map(fn($yr) => ['id' => $yr, 'text' => (string)$yr])->toArray() : []" :selected="request('year')" placeholder="All Years" />
+                                    </div>
+
+                                    <div class="col-span-2">
                                         <x-form.searchable-select name="aging" label="Lifecycle Aging" :options="[
-                                            ['id' => '4years', 'text' => 'Aged (≥ 4 Years)'],
-                                            ['id' => '2years', 'text' => 'Mid Life (2 - 4 Years)'],
-                                            ['id' => 'new', 'text' => 'New (< 2 Years)']
+                                            ['id' => '0-1', 'text' => 'New (< 1 Year)'],
+                                            ['id' => '1-2', 'text' => '1 - 2 Years'],
+                                            ['id' => '2-3', 'text' => '2 - 3 Years'],
+                                            ['id' => '3-4', 'text' => '3 - 4 Years'],
+                                            ['id' => '4+',  'text' => 'Aged (≥ 4 Years)']
                                         ]" :selected="request('aging')" placeholder="All Ages" />
                                     </div>
                                 </div>
