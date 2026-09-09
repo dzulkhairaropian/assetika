@@ -376,9 +376,9 @@
                                 </div>
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                <x-ui.badge color="primary" variant="light" size="sm">
                                     {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? 'General' }}
-                                </span>
+                                </x-ui.badge>
                             </td>
                             <td class="px-4 py-2.5">
                                 @if($ticket->priority)
