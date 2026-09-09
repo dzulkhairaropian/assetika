@@ -464,6 +464,39 @@ class DashboardController extends Controller
             ->limit(3)
             ->get();
 
+        // Hardware Lifecycle & Age Distribution Metric
+        $allAssets = Asset::all(['id', 'purchase_date', 'release_date', 'created_at']);
+        $now = now();
+        $ageBuckets = [
+            '< 1 Year'  => 0,
+            '1-2 Years' => 0,
+            '2-3 Years' => 0,
+            '3-4 Years' => 0,
+            '4+ Years'  => 0,
+        ];
+
+        foreach ($allAssets as $ast) {
+            $date = $ast->purchase_date ?? $ast->release_date ?? $ast->created_at;
+            if (!$date) continue;
+            $years = $date->diffInYears($now);
+            if ($years < 1) {
+                $ageBuckets['< 1 Year']++;
+            } elseif ($years < 2) {
+                $ageBuckets['1-2 Years']++;
+            } elseif ($years < 3) {
+                $ageBuckets['2-3 Years']++;
+            } elseif ($years < 4) {
+                $ageBuckets['3-4 Years']++;
+            } else {
+                $ageBuckets['4+ Years']++;
+            }
+        }
+
+        $assetAgeDistribution = [
+            'labels' => array_keys($ageBuckets),
+            'data'   => array_values($ageBuckets),
+        ];
+
         // Financial Metrics
         $totalPurchaseCost = Asset::whereNotNull('purchase_cost')->sum('purchase_cost');
         $allAssetsWithDepr = Asset::with('depreciation')->whereNotNull('purchase_cost')->get();
@@ -515,6 +548,7 @@ class DashboardController extends Controller
             'assetsInService',
             'assetsByLocation',
             'assetsByCategory',
+            'assetAgeDistribution',
             'service',
             'serviceTrend',
             'readyForSale',

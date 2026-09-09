@@ -291,5 +291,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
+
+    // 7. Hardware Lifecycle & Age Distribution Bar Chart
+    const ageCanvas = mountCanvas('#assetAgeChart');
+    const { assetAgeDistribution } = window.chartData || {};
+    if (ageCanvas && assetAgeDistribution && assetAgeDistribution.data?.length) {
+        new Chart(ageCanvas, {
+            type: 'bar',
+            data: {
+                labels: assetAgeDistribution.labels,
+                datasets: [{
+                    label: 'Asset Count',
+                    data: assetAgeDistribution.data,
+                    backgroundColor: ['#12b76a', '#3b82f6', '#06b6d4', '#f79009', '#f04438'],
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => ' ' + ctx.raw + ' units'
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                    y: {
+                        border: { display: false },
+                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                    }
+                }
+            }
+        });
+    }
 });
 

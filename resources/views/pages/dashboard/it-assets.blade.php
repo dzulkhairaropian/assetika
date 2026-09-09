@@ -118,10 +118,10 @@
     </div>
 
     <!-- Main Grid: Charts & Analytics Breakdown -->
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
 
         <!-- Chart 1: Status Distribution -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
              x-data="{ activeStatusCat: 'all', categoryLabel: 'All Categories', updateStatusChart(catId, label) { this.activeStatusCat = catId; this.categoryLabel = label; if (window.updateStatusChartJS) { window.updateStatusChartJS(catId); } } }">
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -157,7 +157,7 @@
         </div>
 
         <!-- Chart 2: Department Distribution -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
              x-data="{ activeDeptCat: 'all', categoryLabel: 'All Categories', updateDeptChart(catId, label) { this.activeDeptCat = catId; this.categoryLabel = label; if (window.updateDeptChartJS) { window.updateDeptChartJS(catId); } } }">
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -172,8 +172,23 @@
             @endif
         </div>
 
-        <!-- Chart 3: Most Used Products -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+        <!-- Chart 3: Hardware Lifecycle & Age Distribution (Bar Chart Baru) -->
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Age & Lifecycle Distribution</h3>
+                    <p class="text-xs text-gray-400">Hardware age breakdown in years</p>
+                </div>
+            </div>
+            @if(count($assetAgeDistribution['data']) > 0)
+                <div id="assetAgeChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
+            @endif
+        </div>
+
+        <!-- Chart 4: Most Used Products -->
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
              x-data="{ activeCategory: 'all', categoryLabel: 'All Categories', updateProductChart(catId, label) { this.activeCategory = catId; this.categoryLabel = label; if (window.updateProductChartJS) { window.updateProductChartJS(catId); } } }">
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -327,14 +342,15 @@
 @push('scripts')
 @if($totalAssets > 0)
 <script>
-    window.chartData = {
-        totalAssets: {{ $totalAssets }},
-        chartData: @json($chartData),
-        chartDataByCategory: @json($chartDataByCategory),
-        deptChartData: @json($deptChartData),
-        deptDataByCategory: @json($deptDataByCategory),
-        productDataByCategory: @json($productDataByCategory),
-        consumableChartData: @json($consumableChartData),
+	    window.chartData = {
+	        totalAssets: {{ $totalAssets }},
+	        chartData: @json($chartData),
+	        chartDataByCategory: @json($chartDataByCategory),
+	        deptChartData: @json($deptChartData),
+	        deptDataByCategory: @json($deptDataByCategory),
+	        productDataByCategory: @json($productDataByCategory),
+	        assetAgeDistribution: @json($assetAgeDistribution),
+	        consumableChartData: @json($consumableChartData),
         consumableDataByCategory: @json($consumableDataByCategory),
         consumableTimelineChartData: @json($consumableTimelineChartData),
         consumableTimelineByCategory: @json($consumableTimelineByCategory),
