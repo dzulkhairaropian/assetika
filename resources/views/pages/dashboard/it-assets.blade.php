@@ -23,7 +23,7 @@
     </div>
 
     <!-- Main Grid of KPI Cards -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'success' : 'error'; @endphp
         <x-common.stat-card
             title="Total Registered Assets"
@@ -63,6 +63,48 @@
             :trendColor="$serviceTrendColor"
             description="Undergoing maintenance"
         />
+    </div>
+
+    <!-- Secondary Alert & Operational KPI Row -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        @php
+            $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
+            $lowStockTrendColor = $lowStockTrend <= 0 ? 'success' : 'error';
+        @endphp
+        <x-common.stat-card
+            title="Low Stock Consumables"
+            icon="package"
+            :value="$lowStockConsumables->count()"
+            :trend="$lowStockTrend"
+            :trendColor="$lowStockTrendColor"
+            description="Items below minimum threshold."
+        />
+
+        @php
+            $brokenTrend = $brokenDisposal > 0 ? 1 : -1;
+            $brokenTrendColor = $brokenTrend <= 0 ? 'success' : 'error';
+        @endphp
+        <x-common.stat-card
+            title="Broken / Disposal Alerts"
+            icon="alert-triangle"
+            :value="$brokenDisposal"
+            :trend="$brokenTrend"
+            :trendColor="$brokenTrendColor"
+            description="Assets marked for decommissioning."
+        />
+
+        @php
+            $agingTrend = $assetsOlderThan4Years->count() > 0 ? 1 : -1;
+            $agingTrendColor = $agingTrend <= 0 ? 'success' : 'error';
+        @endphp
+        <x-common.stat-card
+            title="Aging Assets (4+ Yrs)"
+            icon="clock"
+            :value="$assetsOlderThan4Years->count()"
+            :trend="$agingTrend"
+            :trendColor="$agingTrendColor"
+            description="Hardware nearing end of lifecycle."
+        />
 
         @php $readyForSaleTrendColor = $readyForSaleTrend >= 0 ? 'success' : 'error'; @endphp
         <x-common.stat-card
@@ -71,53 +113,9 @@
             :value="$readyForSale"
             :trend="$readyForSaleTrend"
             :trendColor="$readyForSaleTrendColor"
-            description="Approved & prepared for liquidation"
+            description="Approved for liquidation & sale"
         />
     </div>
-
-    <!-- Alert KPI Row (If any critical issues) -->
-    @if($lowStockConsumables->isNotEmpty() || $assetsInService->isNotEmpty() || $assetsOlderThan4Years->isNotEmpty() || $brokenDisposal > 0)
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            @php
-                $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
-                $lowStockTrendColor = $lowStockTrend <= 0 ? 'success' : 'error';
-            @endphp
-            <x-common.stat-card
-                title="Low Stock Consumables"
-                icon="package"
-                :value="$lowStockConsumables->count()"
-                :trend="$lowStockTrend"
-                :trendColor="$lowStockTrendColor"
-                description="Items below minimum stock threshold."
-            />
-
-            @php
-                $brokenTrend = $brokenDisposal > 0 ? 1 : -1;
-                $brokenTrendColor = $brokenTrend <= 0 ? 'success' : 'error';
-            @endphp
-            <x-common.stat-card
-                title="Broken / Disposal Alerts"
-                icon="alert-triangle"
-                :value="$brokenDisposal"
-                :trend="$brokenTrend"
-                :trendColor="$brokenTrendColor"
-                description="Assets marked for decommissioning."
-            />
-
-            @php
-                $agingTrend = $assetsOlderThan4Years->count() > 0 ? 1 : -1;
-                $agingTrendColor = $agingTrend <= 0 ? 'success' : 'error';
-            @endphp
-            <x-common.stat-card
-                title="Aging Assets (4+ Yrs)"
-                icon="clock"
-                :value="$assetsOlderThan4Years->count()"
-                :trend="$agingTrend"
-                :trendColor="$agingTrendColor"
-                description="Hardware nearing end of lifecycle."
-            />
-        </div>
-    @endif
 
     <!-- Main Grid: Charts & Analytics Breakdown -->
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
