@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Workflow & Git Rules
+
+Before starting any task in `assetika`:
+1. Always run `git pull` first before starting work.
+2. After making changes, list all modified folders and files.
+3. If changes affect views, assets, or frontend components, run `npm run build`.
+4. Commit and `git push` the changes.
+
 ## Repository Overview
 Assetika is an Enterprise Asset & Maintenance Management System built on Laravel 13, Livewire 4, and Tailwind CSS v4 (Vite).
 
