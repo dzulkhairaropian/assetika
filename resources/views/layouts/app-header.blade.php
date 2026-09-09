@@ -33,7 +33,7 @@
         </div>
 
         <!-- Right: Actions -->
-        <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-3">
             <!-- Mobile app-menu toggle -->
             <button
                 class="flex xl:hidden items-center justify-center w-10 h-10 text-gray-500 rounded-xl hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-all duration-200 shrink-0"
@@ -43,19 +43,17 @@
             </button>
 
             <!-- Desktop actions (always visible on xl+) -->
-            <div class="hidden xl:flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                     <!-- Theme Toggle -->
-                    <button
-                        class="relative flex items-center justify-center w-11 h-11 text-gray-500 bg-white border border-gray-200 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors active:scale-95 shrink-0"
-                        @click="$store.theme.toggle()" aria-label="Toggle dark mode">
-                        <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
-                        <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5 text-amber-400"></i></span>
-                    </button>
+            <div class="hidden xl:flex items-center gap-3">
+                <!-- Theme Toggle -->
+                <button
+                    class="relative flex items-center justify-center w-11 h-11 text-gray-500 bg-white border border-gray-200 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors active:scale-95 shrink-0"
+                    @click="$store.theme.toggle()" aria-label="Toggle dark mode">
+                    <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
+                    <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5 text-amber-400"></i></span>
+                </button>
 
-                    <!-- Notification Dropdown -->
-                    <x-header.notification-dropdown />
-                </div>
+                <!-- Notification Dropdown -->
+                <x-header.notification-dropdown />
 
                 <!-- User Dropdown -->
                 <x-header.user-dropdown />
