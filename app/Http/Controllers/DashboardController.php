@@ -497,6 +497,22 @@ class DashboardController extends Controller
             'data'   => array_values($ageBuckets),
         ];
 
+        // Top Hardware Vendors by Volume
+        $topVendorsRaw = \App\Models\Brand::withCount('products')
+            ->select('brands.id', 'brands.name')
+            ->leftJoin('products', 'products.brand_id', '=', 'brands.id')
+            ->leftJoin('assets', 'assets.product_id', '=', 'products.id')
+            ->selectRaw('count(assets.id) as total_assets')
+            ->groupBy('brands.id', 'brands.name')
+            ->orderByDesc('total_assets')
+            ->limit(5)
+            ->get();
+
+        $vendorChartData = [
+            'labels' => $topVendorsRaw->pluck('name')->toArray(),
+            'data'   => $topVendorsRaw->pluck('total_assets')->map(fn($v) => (int)$v)->toArray(),
+        ];
+
         // Financial Metrics
         $totalPurchaseCost = Asset::whereNotNull('purchase_cost')->sum('purchase_cost');
         $allAssetsWithDepr = Asset::with('depreciation')->whereNotNull('purchase_cost')->get();
@@ -549,6 +565,7 @@ class DashboardController extends Controller
             'assetsByLocation',
             'assetsByCategory',
             'assetAgeDistribution',
+            'vendorChartData',
             'service',
             'serviceTrend',
             'readyForSale',

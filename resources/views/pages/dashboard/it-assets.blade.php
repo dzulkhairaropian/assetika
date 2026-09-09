@@ -192,6 +192,7 @@
 
     <!-- Main Grid: Row 2 - Dedicated Bar Chart Row (Same dimension & width as Status Breakdown) -->
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <!-- Chart 1: Hardware Lifecycle & Age -->
         <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -203,6 +204,21 @@
                 <div id="assetAgeChart" class="h-64"></div>
             @else
                 <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
+            @endif
+        </div>
+
+        <!-- Chart 2: Top Hardware Vendors by Volume -->
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Top Hardware Vendors</h3>
+                    <p class="text-xs text-gray-400">Inventory volume by brand / vendor</p>
+                </div>
+            </div>
+            @if(count($vendorChartData['data']) > 0)
+                <div id="vendorAssetChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No vendor volume data available</div>
             @endif
         </div>
     </div>
@@ -352,6 +368,7 @@
 	        deptDataByCategory: @json($deptDataByCategory),
 	        productDataByCategory: @json($productDataByCategory),
 	        assetAgeDistribution: @json($assetAgeDistribution),
+	        vendorChartData: @json($vendorChartData),
 	        consumableChartData: @json($consumableChartData),
         consumableDataByCategory: @json($consumableDataByCategory),
         consumableTimelineChartData: @json($consumableTimelineChartData),

@@ -334,5 +334,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // 8. Top Hardware Vendors Bar Chart
+    const vendorCanvas = mountCanvas('#vendorAssetChart');
+    const { vendorChartData } = window.chartData || {};
+    if (vendorCanvas && vendorChartData && vendorChartData.data?.length) {
+        new Chart(vendorCanvas, {
+            type: 'bar',
+            data: {
+                labels: vendorChartData.labels,
+                datasets: [{
+                    label: 'Units Registered',
+                    data: vendorChartData.data,
+                    backgroundColor: '#465fff',
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => ' ' + ctx.raw + ' units'
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                    y: {
+                        border: { display: false },
+                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                    }
+                }
+            }
+        });
+    }
 });
 
