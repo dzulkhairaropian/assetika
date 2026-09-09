@@ -1,5 +1,5 @@
 <header
-    class="sticky top-0 flex w-full bg-white border-b border-gray-200 z-[9990] dark:border-gray-800 dark:bg-gray-900 transition-colors duration-300"
+    class="sticky top-0 flex w-full bg-white/85 backdrop-blur-md border-b border-gray-200/80 shadow-xs z-[9990] dark:border-gray-800/80 dark:bg-gray-900/85 transition-all duration-200"
     x-data="{ isApplicationMenuOpen: false }">
     <div class="flex items-center justify-between w-full px-4 xl:px-6 py-3 xl:py-4">
 
