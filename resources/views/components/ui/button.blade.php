@@ -9,24 +9,26 @@
 
 @php
     // Base classes
-    $base = 'inline-flex items-center justify-center font-medium gap-2 rounded-lg transition';
+    $base = 'inline-flex items-center justify-center font-semibold gap-2 rounded-lg transition-all duration-150 ease-out active:scale-[0.97] focus:outline-none focus:ring-4 focus:ring-brand-500/20';
 
     // Size map
     $sizeMap = [
-        'sm' => 'px-4 py-3 text-sm',
-        'md' => 'px-5 py-3.5 text-sm',
+        'sm' => 'px-3.5 py-2 text-xs',
+        'md' => 'px-4 py-2.5 text-sm',
     ];
     $sizeClass = $sizeMap[$size] ?? $sizeMap['md'];
 
     // Variant map
     $variantMap = [
-        'primary' => 'bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300',
-        'outline' => 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03] dark:hover:text-gray-300',
+        'primary' => 'bg-brand-500 text-white shadow-sm hover:bg-brand-600 disabled:bg-brand-300',
+        'outline' => 'bg-white text-gray-700 border border-gray-200 shadow-sm hover:bg-gray-50 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900',
+        'danger' => 'bg-error-500 text-white shadow-sm hover:bg-error-600 focus:ring-error-500/20',
+        'secondary' => 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
     ];
     $variantClass = $variantMap[$variant] ?? $variantMap['primary'];
 
     // disabled classes
-    $disabledClass = $disabled ? 'cursor-not-allowed opacity-50' : '';
+    $disabledClass = $disabled ? 'cursor-not-allowed opacity-50 active:scale-100' : '';
 
     // final classes (merge user className too)
     $classes = trim("{$base} {$sizeClass} {$variantClass} {$className} {$disabledClass}");
@@ -36,7 +38,6 @@
     {{ $attributes->merge(['class' => $classes, 'type' => $attributes->get('type', 'button')]) }}
     @if($disabled) disabled @endif
 >
-    {{-- start icon: priority — named slot 'startIcon' first, then startIcon prop if it's a HtmlString --}}
     @if (isset($__env) && $slot->isEmpty() === false) @endif
 
     @hasSection('startIcon')
@@ -47,10 +48,8 @@
         <span class="flex items-center">{!! $startIcon !!}</span>
     @endif
 
-    {{-- main slot --}}
     {{ $slot }}
 
-    {{-- end icon: named slot 'endIcon' first, then endIcon prop --}}
     @hasSection('endIcon')
         <span class="flex items-center">
             @yield('endIcon')
