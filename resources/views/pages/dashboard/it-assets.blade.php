@@ -117,7 +117,7 @@
         />
     </div>
 
-    <!-- Main Grid: Donut, Pie & Bar Analytics Cards (Max 3 per row - Same size as Status Breakdown) -->
+    <!-- Main Grid: Row 1 - Donut & Pie Charts (Max 3 per row) -->
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
         <!-- Chart 1: Status Distribution -->
@@ -172,22 +172,7 @@
             @endif
         </div>
 
-        <!-- Chart 3: Hardware Lifecycle & Age Distribution (Same size as Status Breakdown) -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hardware Lifecycle & Age</h3>
-                    <p class="text-xs text-gray-400">Inventory unit count by age bracket</p>
-                </div>
-            </div>
-            @if(count($assetAgeDistribution['data']) > 0)
-                <div id="assetAgeChart" class="h-64"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
-            @endif
-        </div>
-
-        <!-- Chart 4: Most Used Products -->
+        <!-- Chart 3: Most Used Products -->
         <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
              x-data="{ activeCategory: 'all', categoryLabel: 'All Categories', updateProductChart(catId, label) { this.activeCategory = catId; this.categoryLabel = label; if (window.updateProductChartJS) { window.updateProductChartJS(catId); } } }">
             <div class="flex items-center justify-between mb-4">
@@ -203,6 +188,23 @@
             @endif
         </div>
 
+    </div>
+
+    <!-- Main Grid: Row 2 - Dedicated Bar Chart Row (Same dimension & width as Status Breakdown) -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hardware Lifecycle & Age</h3>
+                    <p class="text-xs text-gray-400">Inventory unit count by age bracket</p>
+                </div>
+            </div>
+            @if(count($assetAgeDistribution['data']) > 0)
+                <div id="assetAgeChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No lifecycle data available</div>
+            @endif
+        </div>
     </div>
 
     <!-- Timeline & Purchases Section -->
