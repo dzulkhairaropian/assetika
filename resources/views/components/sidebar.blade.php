@@ -1,71 +1,82 @@
 <aside :class="sidebarToggle ? 'translate-x-0 lg:w-[90px]' : '-translate-x-full'"
-       class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 dark:border-gray-800 dark:bg-black lg:static lg:translate-x-0">
+       class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200/80 bg-white px-4 dark:border-gray-800/80 dark:bg-gray-950 lg:static lg:translate-x-0 transition-all duration-300 ease-out">
     <!-- Sidebar Header -->
     <div :class="sidebarToggle ? 'justify-center' : 'justify-between'"
-         class="flex items-center gap-2 pt-8 sidebar-header pb-7">
-        <a href="{{ route('dashboard') }}">
-            <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
-                <img class="dark:hidden" src="{{ asset('images/logo.svg') }}" alt="Logo" />
-                <img class="hidden dark:block" src="{{ asset('images/logo-dark.svg') }}" alt="Logo" />
+         class="flex items-center gap-2 pt-6 sidebar-header pb-6 border-b border-gray-100 dark:border-gray-800/60 mb-2">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
+            <span class="logo flex items-center gap-2 font-bold text-lg text-gray-900 dark:text-white" :class="sidebarToggle ? 'hidden' : ''">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white font-extrabold shadow-sm">
+                    A
+                </div>
+                <span class="tracking-tight">Assetika<span class="text-brand-500">.</span></span>
             </span>
-            <img class="logo-icon" :class="sidebarToggle ? 'lg:block' : 'hidden'"
-                 src="{{ asset('images/logo-icon.svg') }}" alt="Logo" />
+            <div class="logo-icon flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white font-extrabold shadow-sm" :class="sidebarToggle ? 'lg:flex' : 'hidden'">
+                A
+            </div>
         </a>
     </div>
 
     <!-- Main Navigation (Scrollable) -->
-    <div class="flex-grow overflow-y-auto duration-300 ease-linear no-scrollbar pb-6">
+    <div class="flex-grow overflow-y-auto duration-300 ease-linear custom-scrollbar pb-6 pr-1">
         <nav x-data="{selected: $persist('Dashboard')}">
             @php
                 $menuGroups = [
-                    'Main' => [
-                        ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'grid'],
-                        ['label' => 'Tickets', 'route' => 'tickets.index', 'icon' => 'file-text'],
+                    'Dashboards' => [
+                        ['label' => 'IT Assets Control', 'route' => 'dashboard', 'icon' => 'grid'],
+                        ['label' => 'GA & Facilities', 'route' => 'ga-dashboard', 'icon' => 'briefcase'],
+                        ['label' => 'Financial Valuation', 'route' => 'finance-dashboard', 'icon' => 'trending-up'],
+                        ['label' => 'Support Tickets', 'route' => 'ticket-dashboard', 'icon' => 'file-text'],
                     ],
-                    'Assetika Sync' => [
-                        ['label' => 'Companies', 'route' => 'admin.sync.index', 'params' => ['table' => 'companies'], 'icon' => 'briefcase'],
-                        ['label' => 'Departments', 'route' => 'admin.sync.index', 'params' => ['table' => 'departments'], 'icon' => 'git-branch'],
-                        ['label' => 'Positions', 'route' => 'admin.sync.index', 'params' => ['table' => 'positions'], 'icon' => 'user-check'],
-                        ['label' => 'Locations', 'route' => 'admin.sync.index', 'params' => ['table' => 'locations'], 'icon' => 'map-pin'],
-                        ['label' => 'Users', 'route' => 'admin.sync.index', 'params' => ['table' => 'users'], 'icon' => 'users'],
-                        ['label' => 'Assets', 'route' => 'admin.sync.index', 'params' => ['table' => 'assets'], 'icon' => 'monitor'],
+                    'Assets Inventory' => [
+                        ['label' => 'IT Hardware', 'route' => 'assets.index', 'icon' => 'hard-drive'],
+                        ['label' => 'GA Assets', 'route' => 'ga-assets.index', 'icon' => 'package'],
+                        ['label' => 'Software Licenses', 'route' => 'licenses.index', 'icon' => 'key'],
+                        ['label' => 'Consumables', 'route' => 'consumables.index', 'icon' => 'box'],
+                        ['label' => 'Component Kits', 'route' => 'kits.index', 'icon' => 'cpu'],
+                        ['label' => 'Renewals & Subscriptions', 'route' => 'renewals.index', 'icon' => 'rotate-cw'],
+                    ],
+                    'Service Desk' => [
+                        ['label' => 'Tickets Feed', 'route' => 'tickets.index', 'icon' => 'ticket'],
+                        ['label' => 'Bulk Checkout', 'route' => 'assets.bulk-checkout', 'icon' => 'log-out'],
                     ],
                     'Master Data' => [
-                        ['label' => 'Priorities', 'route' => 'admin.priorities.index', 'icon' => 'alert-circle'],
-                        ['label' => 'Labels', 'route' => 'admin.labels.index', 'icon' => 'bookmark'],
-                        ['label' => 'Sources', 'route' => 'admin.sources.index', 'icon' => 'globe'],
-                        ['label' => 'Ticket Types', 'route' => 'admin.ticket-types.index', 'icon' => 'layers'],
-                        ['label' => 'Statuses', 'route' => 'admin.ticket-statuses.index', 'icon' => 'check-circle'],
-                        ['label' => 'SLA Statuses', 'route' => 'admin.sla-statuses.index', 'icon' => 'clock'],
+                        ['label' => 'Brands', 'route' => 'brands.index', 'icon' => 'tag'],
+                        ['label' => 'Categories', 'route' => 'categories.index', 'icon' => 'layers'],
+                        ['label' => 'Companies', 'route' => 'companies.index', 'icon' => 'globe'],
+                        ['label' => 'Departments', 'route' => 'departments.index', 'icon' => 'git-branch'],
+                        ['label' => 'Locations', 'route' => 'locations.index', 'icon' => 'map-pin'],
+                        ['label' => 'Vendors', 'route' => 'vendors.index', 'icon' => 'truck'],
+                        ['label' => 'Statuses', 'route' => 'statuses.index', 'icon' => 'check-circle'],
                     ],
-                    'System & Logs' => [
-                        ['label' => 'Comments', 'route' => 'admin.system.comments', 'icon' => 'message-square'],
-                        ['label' => 'Histories', 'route' => 'admin.system.histories', 'icon' => 'activity'],
-                        ['label' => 'Attachments', 'route' => 'admin.system.attachments', 'icon' => 'paperclip'],
-                        ['label' => 'Backup', 'route' => 'admin.system.backup', 'icon' => 'database'],
+                    'System & Sync' => [
+                        ['label' => 'Assetika Sync', 'route' => 'admin.sync.index', 'params' => ['table' => 'assets'], 'icon' => 'refresh-cw'],
+                        ['label' => 'Users & Access', 'route' => 'users.index', 'icon' => 'users'],
+                        ['label' => 'System Backup', 'route' => 'admin.system.backup', 'icon' => 'database'],
                     ]
                 ];
             @endphp
 
             @foreach($menuGroups as $group => $items)
-                <div class="mb-6">
-                    <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
+                <div class="mb-5">
+                    <h3 class="mb-2.5 px-2 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                         <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">{{ $group }}</span>
                     </h3>
-                    <ul class="flex flex-col gap-2">
+                    <ul class="flex flex-col gap-1">
                         @foreach($items as $item)
                             @php
                                 $params = $item['params'] ?? [];
                                 $routeName = $item['route'];
-                                $href = $routeName === '#' ? '#' : route($routeName, $params);
-                                $isActive = request()->routeIs($routeName . '*');
-                                $iconClass = $isActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive';
+                                $href = Route::has($routeName) ? route($routeName, $params) : '#';
+                                $isActive = Route::has($routeName) && request()->routeIs(str_replace('.index', '', $routeName) . '*');
                             @endphp
                             <li>
                                 <a href="{{ $href }}"
-                                   class="menu-item group {{ $isActive ? 'menu-item-active' : 'menu-item-inactive' }}">
-                                    <i data-feather="{{ $item['icon'] }}" class="{{ $iconClass }} size-5"></i>
-                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">{{ $item['label'] }}</span>
+                                   class="group relative flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-150 ease-out active:scale-[0.98] {{ $isActive ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400 font-bold' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900/60 dark:hover:text-white' }}">
+                                    @if($isActive)
+                                        <span class="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-brand-500"></span>
+                                    @endif
+                                    <i data-feather="{{ $item['icon'] }}" class="w-4 h-4 shrink-0 transition-colors {{ $isActive ? 'text-brand-500 dark:text-brand-400' : 'text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-300' }}"></i>
+                                    <span class="menu-item-text truncate" :class="sidebarToggle ? 'lg:hidden' : ''">{{ $item['label'] }}</span>
                                 </a>
                             </li>
                         @endforeach
@@ -76,10 +87,10 @@
     </div>
 
     <!-- Pinned Bottom Section -->
-    <div class="border-t border-gray-200 dark:border-gray-800 p-4">
-        <a href="/profile" class="menu-item group {{ request()->routeIs('profile') ? 'menu-item-active' : 'menu-item-inactive' }}">
-            <i data-feather="user" class="{{ request()->routeIs('profile') ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }} size-5"></i>
-            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Profile</span>
+    <div class="border-t border-gray-200/80 dark:border-gray-800/80 py-3 mt-auto">
+        <a href="/profile" class="group relative flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900/60 dark:hover:text-white transition-all duration-150 ease-out active:scale-[0.98]">
+            <i data-feather="user" class="w-4 h-4 text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Profile Settings</span>
         </a>
     </div>
 </aside>
