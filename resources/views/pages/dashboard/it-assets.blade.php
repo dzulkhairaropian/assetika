@@ -57,7 +57,7 @@
         @php $serviceTrendColor = $serviceTrend >= 0 ? 'success' : 'error'; @endphp
         <x-common.stat-card
             title="In Repair / Service"
-            icon="wrench"
+            icon="tool"
             :value="$service"
             :trend="$serviceTrend"
             :trendColor="$serviceTrendColor"
