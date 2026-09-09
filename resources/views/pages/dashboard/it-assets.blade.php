@@ -23,7 +23,7 @@
     </div>
 
     <!-- Main Grid of KPI Cards -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'success' : 'error'; @endphp
         <x-common.stat-card
             title="Total Registered Assets"
@@ -62,6 +62,16 @@
             :trend="$serviceTrend"
             :trendColor="$serviceTrendColor"
             description="Undergoing maintenance"
+        />
+
+        @php $readyForSaleTrendColor = $readyForSaleTrend >= 0 ? 'success' : 'error'; @endphp
+        <x-common.stat-card
+            title="Ready for Sale"
+            icon="shopping-bag"
+            :value="$readyForSale"
+            :trend="$readyForSaleTrend"
+            :trendColor="$readyForSaleTrendColor"
+            description="Approved & prepared for liquidation"
         />
     </div>
 

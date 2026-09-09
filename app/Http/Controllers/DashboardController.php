@@ -78,6 +78,15 @@ class DashboardController extends Controller
         })->where('created_at', '<', $startOfMonth)->count();
         $serviceTrend = $this->calculateTrend($service, $servicePrev);
 
+        // Ready for Sale metric
+        $readyForSale = Asset::whereHas('status', function($q) {
+            $q->whereIn('name', ['Ready for Sale', 'For Sale', 'Available for Sale']);
+        })->count();
+        $readyForSalePrev = Asset::whereHas('status', function($q) {
+            $q->whereIn('name', ['Ready for Sale', 'For Sale', 'Available for Sale']);
+        })->where('created_at', '<', $startOfMonth)->count();
+        $readyForSaleTrend = $this->calculateTrend($readyForSale, $readyForSalePrev);
+
         $recentCheckouts = AssetCheckout::with(['asset.product.brand', 'asset.department', 'asset.status', 'checkedOutToUser.department'])
             ->latest('checked_out_at')
             ->limit(5)
@@ -508,6 +517,8 @@ class DashboardController extends Controller
             'assetsByCategory',
             'service',
             'serviceTrend',
+            'readyForSale',
+            'readyForSaleTrend',
             'totalPurchaseCost',
             'totalBookValue',
             'totalDepreciated',
