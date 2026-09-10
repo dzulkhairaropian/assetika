@@ -35,7 +35,7 @@
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
                             <label for="name" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                {{ $title }} Name <span class="text-error-500">*</span>
+                                {{ str_contains(strtolower($title), 'status') ? 'Status Name' : $title . ' Name' }} <span class="text-error-500">*</span>
                             </label>
                             <input type="text" name="name" id="name" value="{{ old('name', $item?->name) }}" required placeholder="e.g., In Progress"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
@@ -59,27 +59,11 @@
                             </div>
                         @endif
 
-                        <div class="lg:col-span-2">
-                            <label for="description" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Description</label>
-                            <textarea name="description" id="description" rows="3" placeholder="Enter description..."
-                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('description', $item?->description) }}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Appearance Card -->
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
-                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                        <i data-lucide="palette" class="w-5 h-5 text-brand-500"></i>
-                        Appearance & Branding
-                    </h3>
-
-                    <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
-                            <label for="icon-input" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                Lucide Icon
+                            <label for="status-icon" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Icon (Lucide Icons)
                             </label>
-                            <input type="text" id="icon-input" name="icon" value="{{ old('icon', $item?->icon) }}" placeholder="e.g., circle-check"
+                            <input type="text" id="status-icon" name="icon" value="{{ old('icon', $item?->icon) }}" placeholder="e.g., circle-check"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             <div class="mt-2 flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
                                 @foreach([
@@ -97,7 +81,7 @@
                                     'edit-3', 'activity', 'shield',
                                     'star', 'lock', 'zap'
                                 ] as $iconName)
-                                    <button type="button" onclick="document.getElementById('icon-input').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
+                                    <button type="button" onclick="document.getElementById('status-icon').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
                                         <i data-lucide="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
                                     </button>
                                 @endforeach
@@ -105,12 +89,12 @@
                         </div>
 
                         <div>
-                            <label for="color" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                            <label for="status-color" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Color (Hex / Theme)
                             </label>
                             <div class="flex items-center gap-2 mb-2">
                                 <input type="color" id="color-picker" value="{{ old('color', str_starts_with($item?->color ?? '', '#') ? $item->color : '#465FFF') }}" onchange="document.getElementById('status-color').value = this.value" class="h-9 w-12 cursor-pointer rounded-lg border border-gray-200 bg-transparent p-1 dark:border-gray-800 dark:bg-gray-950" />
-                                <input type="text" id="status-color" name="color" value="{{ old('color', $item?->color ?? '#3B82F6') }}" placeholder="e.g., #10b981 or success"
+                                <input type="text" id="status-color" name="color" value="{{ old('color', $item?->color) }}" placeholder="e.g., #10b981 or success"
                                     class="h-9 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             </div>
                             <div class="mt-2 flex flex-wrap gap-1.5">
@@ -139,6 +123,12 @@
                             <label for="sort_order" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Sort Order</label>
                             <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $item?->sort_order ?? 0) }}" min="0"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label for="description" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Description</label>
+                            <textarea name="description" id="description" rows="3" placeholder="Enter description..."
+                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('description', $item?->description) }}</textarea>
                         </div>
                     </div>
                 </div>
