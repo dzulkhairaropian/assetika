@@ -4,6 +4,7 @@
     <div class="space-y-4" x-data="{
         selectedItems: [],
         selectAll: false,
+        bulkEditModalOpen: false,
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -52,7 +53,12 @@
                     <span x-text="selectedItems.length"></span> {{ $title }}s selected.
                 </span>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <button type="button" @click="bulkEditModalOpen = true"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    Bulk Edit (Change Selected)
+                </button>
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -60,6 +66,30 @@
                 </button>
             </div>
         </div>
+
+        <!-- Quick Filter Tabs -->
+        @if(isset($counts))
+            <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+                @php
+                    $currentActive = request('is_active');
+                @endphp
+                <a href="{{ route($viewName.'.index', request()->except(['is_active', 'page'])) }}"
+                    class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all {{ $currentActive === null || $currentActive === '' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                    <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                    All ({{ $counts['total'] }})
+                </a>
+                <a href="{{ route($viewName.'.index', array_merge(request()->except('page'), ['is_active' => '1'])) }}"
+                    class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all {{ $currentActive === '1' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                    <i data-lucide="circle-check" class="w-3.5 h-3.5 text-green-500"></i>
+                    Active ({{ $counts['active'] }})
+                </a>
+                <a href="{{ route($viewName.'.index', array_merge(request()->except('page'), ['is_active' => '0'])) }}"
+                    class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all {{ $currentActive === '0' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                    <i data-lucide="circle-x" class="w-3.5 h-3.5 text-gray-400"></i>
+                    Inactive ({{ $counts['inactive'] }})
+                </a>
+            </div>
+        @endif
 
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
@@ -206,6 +236,63 @@
             </div>
             <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
                 {{ $items->links() }}
+            </div>
+        </div>
+
+        <!-- Bulk Edit Modal -->
+        <div x-show="bulkEditModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+            <div @click.away="bulkEditModalOpen = false" class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                            <i data-lucide="edit-3" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Bulk Edit {{ $title }}s</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Update <strong x-text="selectedItems.length"></strong> selected items</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="bulkEditModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route($viewName.'.bulk-edit') }}" method="POST" class="mt-4 space-y-4">
+                    @csrf
+                    <template x-for="id in selectedItems" :key="id">
+                        <input type="hidden" name="ids[]" :value="id">
+                    </template>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Active Status (Optional)
+                        </label>
+                        <select name="is_active"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                            <option value="">-- Keep Current Status --</option>
+                            <option value="1">Set Active</option>
+                            <option value="0">Set Inactive</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Change Color / Hex (Optional)
+                        </label>
+                        <input type="text" name="color" placeholder="e.g. #10b981 or primary"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <button type="button" @click="bulkEditModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 transition">
+                            Apply Bulk Update
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

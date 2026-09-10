@@ -238,11 +238,17 @@ Route::middleware('auth')->group(function () {
 
     // Admin Bulk Delete Routes (must be before resource routes)
     Route::post('admin/priorities/bulk-delete', [PriorityController::class, 'bulkDestroy'])->name('admin.priorities.bulk-delete');
+    Route::post('admin/priorities/bulk-edit', [PriorityController::class, 'bulkEdit'])->name('admin.priorities.bulk-edit');
     Route::post('admin/labels/bulk-delete', [LabelController::class, 'bulkDestroy'])->name('admin.labels.bulk-delete');
+    Route::post('admin/labels/bulk-edit', [LabelController::class, 'bulkEdit'])->name('admin.labels.bulk-edit');
     Route::post('admin/sources/bulk-delete', [SourceController::class, 'bulkDestroy'])->name('admin.sources.bulk-delete');
+    Route::post('admin/sources/bulk-edit', [SourceController::class, 'bulkEdit'])->name('admin.sources.bulk-edit');
     Route::post('admin/ticket-types/bulk-delete', [TicketTypeController::class, 'bulkDestroy'])->name('admin.ticket-types.bulk-delete');
+    Route::post('admin/ticket-types/bulk-edit', [TicketTypeController::class, 'bulkEdit'])->name('admin.ticket-types.bulk-edit');
     Route::post('admin/ticket-statuses/bulk-delete', [TicketStatusController::class, 'bulkDestroy'])->name('admin.ticket-statuses.bulk-delete');
+    Route::post('admin/ticket-statuses/bulk-edit', [TicketStatusController::class, 'bulkEdit'])->name('admin.ticket-statuses.bulk-edit');
     Route::post('admin/sla-statuses/bulk-delete', [SlaStatusController::class, 'bulkDestroy'])->name('admin.sla-statuses.bulk-delete');
+    Route::post('admin/sla-statuses/bulk-edit', [SlaStatusController::class, 'bulkEdit'])->name('admin.sla-statuses.bulk-edit');
 
     // Admin CRUD Routes (Ticketing)
     Route::get('admin/ticket-categories', [TicketCategoryController::class, 'index'])->name('admin.ticket-categories.index');

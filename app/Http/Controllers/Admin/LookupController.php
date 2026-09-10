@@ -30,18 +30,32 @@ abstract class LookupController extends Controller
             });
         }
 
-        return $query->latest();
+        if ($request->has('is_active') && $request->input('is_active') !== null && $request->input('is_active') !== '') {
+            $query->where('is_active', (bool) $request->input('is_active'));
+        }
+
+        return $query->orderBy('sort_order')->orderBy('name');
     }
 
     public function index(Request $request): View
     {
-        $items = $this->query($request)->paginate(10)->withQueryString();
+        $model = $this->modelClass();
+        $totalCount = $model::count();
+        $activeCount = $model::where('is_active', true)->count();
+        $inactiveCount = $model::where('is_active', false)->count();
+
+        $items = $this->query($request)->paginate(50)->withQueryString();
 
         return view('admin.lookups.index', [
             'title' => $this->title(),
             'items' => $items,
             'viewName' => $this->viewName(),
             'search' => $request->string('search')->toString(),
+            'counts' => [
+                'total' => $totalCount,
+                'active' => $activeCount,
+                'inactive' => $inactiveCount,
+            ],
         ]);
     }
 
@@ -118,5 +132,37 @@ abstract class LookupController extends Controller
         $model::query()->whereIn('id', $ids)->delete();
 
         return redirect()->route($this->viewName().'.index')->with('success', count($ids).' '.mb_strtolower($this->title()).'(s) deleted.');
+    }
+
+    public function bulkEdit(Request $request): RedirectResponse
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return redirect()->route($this->viewName().'.index')->with('error', 'No items selected.');
+        }
+
+        $request->validate([
+            'ids' => 'required|array',
+            'is_active' => 'nullable|in:0,1',
+            'color' => 'nullable|string|max:255',
+        ]);
+
+        $data = [];
+        if ($request->filled('is_active')) {
+            $data['is_active'] = (bool) $request->input('is_active');
+        }
+        if ($request->filled('color')) {
+            $data['color'] = $request->input('color');
+        }
+
+        if (empty($data)) {
+            return redirect()->route($this->viewName().'.index')->with('error', 'No changes specified for bulk update.');
+        }
+
+        $model = $this->modelClass();
+        $model::query()->whereIn('id', $ids)->update($data);
+
+        return redirect()->route($this->viewName().'.index')->with('success', count($ids).' '.mb_strtolower($this->title()).'(s) updated successfully.');
     }
 }
