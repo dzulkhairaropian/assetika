@@ -110,7 +110,8 @@
                                     <!-- Button -->
                                     <div>
                                         <button type="submit"
-                                            class="bg-brand-500 hover:bg-brand-600 active:scale-[0.98] flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-brand-500/20">
+                                            class="bg-brand-500 hover:bg-brand-600 active:scale-[0.98] flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-brand-500/20">
+                                            <i data-lucide="log-in" class="w-4 h-4"></i>
                                             Sign In
                                         </button>
                                     </div>

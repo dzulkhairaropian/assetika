@@ -85,7 +85,8 @@
                                 <!-- Button -->
                                 <div>
                                     <button type="submit"
-                                        class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition">
+                                        class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition">
+                                        <i data-lucide="user-plus" class="w-4 h-4"></i>
                                         Sign Up
                                     </button>
                                 </div>
