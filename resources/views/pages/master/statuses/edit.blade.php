@@ -53,9 +53,9 @@
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Icon (Feather Icons)
+                                    Icon (Lucide Icons)
                                 </label>
-                                <input type="text" id="status-icon" name="icon" value="{{ old('icon', $status->icon) }}" placeholder="e.g., check-circle"
+                                <input type="text" id="status-icon" name="icon" value="{{ old('icon', $status->icon) }}" placeholder="e.g., circle-check"
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                                 <div class="mt-2 flex flex-wrap gap-1.5">
                                     @foreach([

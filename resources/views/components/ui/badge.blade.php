@@ -5,9 +5,11 @@
     'startIcon' => null,
     'endIcon' => null,
     'featherIcon' => null,
+    'lucideIcon' => null,
 ])
 
 @php
+    $iconName = $lucideIcon ?? $featherIcon;
     $baseStyles = 'inline-flex items-center w-fit px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium capitalize';
 
     $sizeStyles = [
@@ -70,16 +72,16 @@
 @endphp
 
 <span class="{{ $baseStyles }} {{ $sizeClass }} {{ $isCustomStyle ? '' : $colorStyles }} {{ $attributes->get('class') }}" style="{{ $isCustomStyle ? $colorStyles : '' }}" {{ $attributes->except('class') }}>
-    @if($featherIcon)
+    @if($iconName)
         @php
-            $lucideName = match($featherIcon) {
+            $lucideName = match($iconName) {
                 'check-circle', 'check' => 'circle-check',
                 'alert-triangle' => 'triangle-alert',
                 'alert-circle' => 'circle-alert',
                 'x-circle' => 'circle-x',
                 'tool' => 'wrench',
                 'upload-cloud' => 'cloud-upload',
-                default => $featherIcon
+                default => $iconName
             };
         @endphp
         <span class="flex shrink-0">

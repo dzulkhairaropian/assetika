@@ -83,7 +83,7 @@
                     <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">Appearance</h3>
                     <div class="space-y-3">
                         <div>
-                            <label for="icon-input" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Feather Icon</label>
+                            <label for="icon-input" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Lucide Icon</label>
                             <input type="text" id="icon-input" name="icon" value="{{ old('icon', $item?->icon) }}" placeholder="e.g. alert-circle" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                             <div class="mt-2 flex flex-wrap gap-1 max-h-24 overflow-y-auto">
                                 @foreach([
