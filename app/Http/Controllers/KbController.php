@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\KbArticle;
 use App\Models\KbCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class KbController extends Controller
 {
@@ -17,7 +16,7 @@ class KbController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -58,7 +57,7 @@ class KbController extends Controller
         $suggestions = KbArticle::where('is_published', true)
             ->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             })
             ->take(5)
             ->get(['id', 'title', 'slug', 'category_id']);

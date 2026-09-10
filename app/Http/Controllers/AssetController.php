@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AssetsExport;
 use App\Models\Asset;
+use App\Models\Category;
+use App\Models\Department;
+use App\Models\Depreciation;
+use App\Models\Location;
+use App\Models\OperatingSystem;
 use App\Models\Product;
 use App\Models\Status;
-use App\Models\Vendor;
-use App\Models\OperatingSystem;
-use App\Models\Department;
-use App\Models\Location;
-use App\Models\Category;
 use App\Models\User;
-use Illuminate\Http\Request;
-
-use App\Exports\AssetsExport;
-
+use App\Models\Vendor;
 use App\Services\AssetService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AssetController extends Controller
 {
@@ -25,9 +25,10 @@ class AssetController extends Controller
     {
         $this->assetService = $assetService;
     }
+
     public function export(Request $request)
     {
-        return (new AssetsExport($request->all()))->download('assets-' . now()->format('Y-m-d') . '.xlsx');
+        return (new AssetsExport($request->all()))->download('assets-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function index(Request $request)
@@ -45,114 +46,114 @@ class AssetController extends Controller
         }
 
         if ($request->filled('year')) {
-            $year = (int)$request->year;
-            $query->where(function($q) use ($year) {
+            $year = (int) $request->year;
+            $query->where(function ($q) use ($year) {
                 $q->whereYear('release_date', $year)
-                  ->orWhere(function($sub) use ($year) {
-                      $sub->whereNull('release_date')
-                          ->whereYear('purchase_date', $year);
-                  })
-                  ->orWhere(function($sub) use ($year) {
-                      $sub->whereNull('release_date')
-                          ->whereNull('purchase_date')
-                          ->whereYear('created_at', $year);
-                  });
+                    ->orWhere(function ($sub) use ($year) {
+                        $sub->whereNull('release_date')
+                            ->whereYear('purchase_date', $year);
+                    })
+                    ->orWhere(function ($sub) use ($year) {
+                        $sub->whereNull('release_date')
+                            ->whereNull('purchase_date')
+                            ->whereYear('created_at', $year);
+                    });
             });
         }
 
         if ($request->filled('aging')) {
             $aging = $request->aging;
-            $now = \Carbon\Carbon::now();
-            $query->where(function($q) use ($aging, $now) {
-                switch($aging) {
+            $now = Carbon::now();
+            $query->where(function ($q) use ($aging, $now) {
+                switch ($aging) {
                     case '0-1':
                     case 'new':
-                        $q->where(function($sub) use ($now) {
+                        $q->where(function ($sub) use ($now) {
                             $sub->where('release_date', '>', $now->copy()->subYear())
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->where('purchase_date', '>', $now->copy()->subYear());
+                                        ->where('purchase_date', '>', $now->copy()->subYear());
                                 })
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereNull('purchase_date')
-                                         ->where('created_at', '>', $now->copy()->subYear());
+                                        ->whereNull('purchase_date')
+                                        ->where('created_at', '>', $now->copy()->subYear());
                                 });
                         });
                         break;
                     case '1-2':
-                        $q->where(function($sub) use ($now) {
+                        $q->where(function ($sub) use ($now) {
                             $sub->whereBetween('release_date', [$now->copy()->subYears(2), $now->copy()->subYear()])
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereBetween('purchase_date', [$now->copy()->subYears(2), $now->copy()->subYear()]);
+                                        ->whereBetween('purchase_date', [$now->copy()->subYears(2), $now->copy()->subYear()]);
                                 })
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereNull('purchase_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(2), $now->copy()->subYear()]);
+                                        ->whereNull('purchase_date')
+                                        ->whereBetween('created_at', [$now->copy()->subYears(2), $now->copy()->subYear()]);
                                 });
                         });
                         break;
                     case '2-3':
-                        $q->where(function($sub) use ($now) {
+                        $q->where(function ($sub) use ($now) {
                             $sub->whereBetween('release_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)])
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereBetween('purchase_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
+                                        ->whereBetween('purchase_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
                                 })
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereNull('purchase_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
+                                        ->whereNull('purchase_date')
+                                        ->whereBetween('created_at', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
                                 });
                         });
                         break;
                     case '2years':
-                        $q->where(function($sub) use ($now) {
+                        $q->where(function ($sub) use ($now) {
                             $sub->whereBetween('release_date', [$now->copy()->subYears(4), $now->copy()->subYears(2)])
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereBetween('purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(2)]);
+                                        ->whereBetween('purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(2)]);
                                 })
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereNull('purchase_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(4), $now->copy()->subYears(2)]);
+                                        ->whereNull('purchase_date')
+                                        ->whereBetween('created_at', [$now->copy()->subYears(4), $now->copy()->subYears(2)]);
                                 });
                         });
                         break;
                     case '3-4':
-                        $q->where(function($sub) use ($now) {
+                        $q->where(function ($sub) use ($now) {
                             $sub->whereBetween('release_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)])
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereBetween('purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
+                                        ->whereBetween('purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
                                 })
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereNull('purchase_date')
-                                         ->whereBetween('created_at', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
+                                        ->whereNull('purchase_date')
+                                        ->whereBetween('created_at', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
                                 });
                         });
                         break;
                     case '4+':
                     case '4years':
-                        $q->where(function($sub) use ($now) {
+                        $q->where(function ($sub) use ($now) {
                             $sub->where('release_date', '<=', $now->copy()->subYears(4))
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->where('purchase_date', '<=', $now->copy()->subYears(4));
+                                        ->where('purchase_date', '<=', $now->copy()->subYears(4));
                                 })
-                                ->orWhere(function($sub2) use ($now) {
+                                ->orWhere(function ($sub2) use ($now) {
                                     $sub2->whereNull('release_date')
-                                         ->whereNull('purchase_date')
-                                         ->where('created_at', '<=', $now->copy()->subYears(4));
+                                        ->whereNull('purchase_date')
+                                        ->where('created_at', '<=', $now->copy()->subYears(4));
                                 });
                         });
                         break;
                     case 'fully_depreciated':
-                        $q->whereHas('depreciation', function($sub) use ($now) {
+                        $q->whereHas('depreciation', function ($sub) use ($now) {
                             $sub->whereRaw('TIMESTAMPDIFF(MONTH, assets.release_date, ?) >= depreciations.months', [$now->format('Y-m-d')]);
                         });
                         break;
@@ -161,47 +162,47 @@ class AssetController extends Controller
                         break;
                     case 'warranty_expired':
                         $q->whereNotNull('warranty_expiry_date')
-                          ->where('warranty_expiry_date', '<', $now->format('Y-m-d'));
+                            ->where('warranty_expiry_date', '<', $now->format('Y-m-d'));
                         break;
                     case 'warranty_30d':
                         $q->whereNotNull('warranty_expiry_date')
-                          ->whereBetween('warranty_expiry_date', [$now->format('Y-m-d'), $now->copy()->addDays(30)->format('Y-m-d')]);
+                            ->whereBetween('warranty_expiry_date', [$now->format('Y-m-d'), $now->copy()->addDays(30)->format('Y-m-d')]);
                         break;
                 }
             });
         }
 
-        $now = \Carbon\Carbon::now();
+        $now = Carbon::now();
         $now4 = $now->copy()->subYears(4);
         // Matches the pink-row logic in index.blade.php: startDate = release_date ?? purchase_date
-        $agedScope = function($q) use ($now4) {
-            $q->where(function($sub) use ($now4) {
+        $agedScope = function ($q) use ($now4) {
+            $q->where(function ($sub) use ($now4) {
                 $sub->where('release_date', '<=', $now4)
-                    ->orWhere(function($s2) use ($now4) {
+                    ->orWhere(function ($s2) use ($now4) {
                         $s2->whereNull('release_date')
-                           ->where('purchase_date', '<=', $now4);
+                            ->where('purchase_date', '<=', $now4);
                     });
             });
         };
 
         $inventorySummary = [
             'total' => (clone $query)->count(),
-            'draft' => (clone $query)->whereHas('status', function($q) {
+            'draft' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Draft']);
             })->count(),
-            'ready' => (clone $query)->whereHas('status', function($q) {
+            'ready' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Ready to Deploy']);
             })->count(),
-            'deployed' => (clone $query)->whereHas('status', function($q) {
+            'deployed' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Deployed', 'Borrowed']);
             })->count(),
-            'in_service' => (clone $query)->whereHas('status', function($q) {
+            'in_service' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']);
             })->count(),
-            'broken' => (clone $query)->whereHas('status', function($q) {
+            'broken' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Broken']);
             })->count(),
-            'sold' => (clone $query)->whereHas('status', function($q) {
+            'sold' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Sold', 'For Sale']);
             })->count(),
             'aged' => (clone $query)->where($agedScope)->count(),
@@ -210,32 +211,32 @@ class AssetController extends Controller
         // Tab quick filter
         switch ($request->input('tab')) {
             case 'draft':
-                $query->whereHas('status', function($q) {
+                $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Draft']);
                 });
                 break;
             case 'ready':
-                $query->whereHas('status', function($q) {
+                $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Ready to Deploy']);
                 });
                 break;
             case 'deployed':
-                $query->whereHas('status', function($q) {
+                $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Deployed', 'Borrowed']);
                 });
                 break;
             case 'service':
-                $query->whereHas('status', function($q) {
+                $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']);
                 });
                 break;
             case 'broken':
-                $query->whereHas('status', function($q) {
+                $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Broken']);
                 });
                 break;
             case 'sold':
-                $query->whereHas('status', function($q) {
+                $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Sold', 'For Sale']);
                 });
                 break;
@@ -245,18 +246,18 @@ class AssetController extends Controller
         }
 
         $assets = $query->latest()->paginate(50)->withQueryString();
-        $statuses = Status::whereHas('masterCategory', function($q) {
+        $statuses = Status::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();
         $departments = Department::all();
         $locations = Location::all();
-        $products = Product::whereHas('masterCategory', function($q) {
+        $products = Product::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();
-        $categories = Category::whereHas('masterCategory', function($q) {
+        $categories = Category::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();
-        $depreciations = \App\Models\Depreciation::all();
+        $depreciations = Depreciation::all();
 
         // Get distinct years from release_date, purchase_date, and created_at
         $yearsFromRelease = Asset::whereNotNull('release_date')->selectRaw('YEAR(release_date) as yr')->distinct()->pluck('yr');
@@ -274,30 +275,31 @@ class AssetController extends Controller
     public function create()
     {
         $products = Product::with(['category', 'brand'])
-            ->whereHas('masterCategory', function($q) {
+            ->whereHas('masterCategory', function ($q) {
                 $q->where('name', 'IT Asset');
             })->get();
-        $statuses = Status::whereHas('masterCategory', function($q) {
+        $statuses = Status::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();
         $vendors = Vendor::all();
         $operatingSystems = OperatingSystem::all();
         $departments = Department::with('company')->get();
         $locations = Location::all();
-        $depreciations = \App\Models\Depreciation::all();
+        $depreciations = Depreciation::all();
 
-        $productOpts = $products->map(fn($p) => ['id' => $p->id, 'text' => ($p->brand->name ?? '') . ' - ' . $p->model . ' (' . ($p->category->name ?? '') . ')'])->toArray();
-        $statusOpts = $statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray();
-        $vendorOpts = $vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray();
-        $deptOpts = $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray();
-        $locationOpts = $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray();
-        $osOpts = $operatingSystems->map(fn($o) => ['id' => $o->id, 'text' => $o->name])->toArray();
+        $productOpts = $products->map(fn ($p) => ['id' => $p->id, 'text' => ($p->brand->name ?? '').' - '.$p->model.' ('.($p->category->name ?? '').')'])->toArray();
+        $statusOpts = $statuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->toArray();
+        $vendorOpts = $vendors->map(fn ($v) => ['id' => $v->id, 'text' => $v->name])->toArray();
+        $deptOpts = $departments->map(fn ($d) => ['id' => $d->id, 'text' => $d->name.($d->company ? ' - '.$d->company->name : '')])->toArray();
+        $locationOpts = $locations->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->toArray();
+        $osOpts = $operatingSystems->map(fn ($o) => ['id' => $o->id, 'text' => $o->name])->toArray();
 
         return view('pages.assets.create', compact(
             'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
             'productOpts', 'statusOpts', 'vendorOpts', 'deptOpts', 'locationOpts', 'osOpts'
         ));
     }
+
     public function store(Request $request)
     {
         $isDraft = $request->input('is_draft') == '1';
@@ -331,6 +333,7 @@ class AssetController extends Controller
                 'sale_price' => 'nullable|numeric',
                 'buyer_name' => 'nullable|string',
                 'sale_date' => 'nullable|date',
+                'is_components_stripped' => 'nullable|boolean',
             ]);
 
             if (empty($validated['status_id']) || $isDraft) {
@@ -367,6 +370,7 @@ class AssetController extends Controller
                 'sale_price' => 'nullable|numeric',
                 'buyer_name' => 'nullable|string',
                 'sale_date' => 'nullable|date',
+                'is_components_stripped' => 'nullable|boolean',
             ]);
         }
 
@@ -382,35 +386,36 @@ class AssetController extends Controller
     public function show(Asset $asset)
     {
         $asset->load([
-            'product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location', 
-            'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType', 
+            'product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location',
+            'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType',
             'tickets.status', 'tickets.priority', 'tickets.assignedTo',
-            'activityLogs.user'
+            'activityLogs.user',
         ]);
+
         return view('pages.assets.show', compact('asset'));
     }
 
     public function edit(Asset $asset)
     {
         $products = Product::with(['category', 'brand'])
-            ->whereHas('masterCategory', function($q) {
+            ->whereHas('masterCategory', function ($q) {
                 $q->where('name', 'IT Asset');
             })->get();
-        $statuses = Status::whereHas('masterCategory', function($q) {
+        $statuses = Status::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();
         $vendors = Vendor::all();
         $operatingSystems = OperatingSystem::all();
         $departments = Department::with('company')->get();
         $locations = Location::all();
-        $depreciations = \App\Models\Depreciation::all();
+        $depreciations = Depreciation::all();
 
-        $productOpts = $products->map(fn($p) => ['id' => $p->id, 'text' => ($p->brand->name ?? '') . ' - ' . $p->model . ' (' . ($p->category->name ?? '') . ')'])->toArray();
-        $statusOpts = $statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray();
-        $vendorOpts = $vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray();
-        $deptOpts = $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray();
-        $locationOpts = $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray();
-        $osOpts = $operatingSystems->map(fn($o) => ['id' => $o->id, 'text' => $o->name])->toArray();
+        $productOpts = $products->map(fn ($p) => ['id' => $p->id, 'text' => ($p->brand->name ?? '').' - '.$p->model.' ('.($p->category->name ?? '').')'])->toArray();
+        $statusOpts = $statuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->toArray();
+        $vendorOpts = $vendors->map(fn ($v) => ['id' => $v->id, 'text' => $v->name])->toArray();
+        $deptOpts = $departments->map(fn ($d) => ['id' => $d->id, 'text' => $d->name.($d->company ? ' - '.$d->company->name : '')])->toArray();
+        $locationOpts = $locations->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->toArray();
+        $osOpts = $operatingSystems->map(fn ($o) => ['id' => $o->id, 'text' => $o->name])->toArray();
 
         return view('pages.assets.edit', compact(
             'asset', 'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
@@ -430,7 +435,7 @@ class AssetController extends Controller
                 'operating_system_id' => 'nullable|exists:operating_systems,id',
                 'department_id' => 'nullable|exists:departments,id',
                 'location_id' => 'nullable|exists:locations,id',
-                'serial_number' => 'nullable|string|unique:assets,serial_number,' . $asset->id,
+                'serial_number' => 'nullable|string|unique:assets,serial_number,'.$asset->id,
                 'product_number' => 'nullable|string',
                 'user_name' => 'nullable|string',
                 'license_windows' => 'nullable|string',
@@ -445,12 +450,13 @@ class AssetController extends Controller
                 'purchase_cost' => 'nullable|numeric',
                 'invoice_number' => 'nullable|string',
                 'notes' => 'nullable|string',
-                'asset_tag' => 'nullable|string|unique:assets,asset_tag,' . $asset->id,
+                'asset_tag' => 'nullable|string|unique:assets,asset_tag,'.$asset->id,
                 'device_name' => 'nullable|string',
                 'depreciation_id' => 'nullable|exists:depreciations,id',
                 'sale_price' => 'nullable|numeric',
                 'buyer_name' => 'nullable|string',
                 'sale_date' => 'nullable|date',
+                'is_components_stripped' => 'nullable|boolean',
             ]);
 
             $draftStatus = Status::firstOrCreate(
@@ -466,7 +472,7 @@ class AssetController extends Controller
                 'operating_system_id' => 'nullable|exists:operating_systems,id',
                 'department_id' => 'required|exists:departments,id',
                 'location_id' => 'nullable|exists:locations,id',
-                'serial_number' => 'required|string|unique:assets,serial_number,' . $asset->id,
+                'serial_number' => 'required|string|unique:assets,serial_number,'.$asset->id,
                 'product_number' => 'nullable|string',
                 'user_name' => 'nullable|string',
                 'license_windows' => 'nullable|string',
@@ -485,6 +491,7 @@ class AssetController extends Controller
                 'sale_price' => 'nullable|numeric',
                 'buyer_name' => 'nullable|string',
                 'sale_date' => 'nullable|date',
+                'is_components_stripped' => 'nullable|boolean',
             ]);
         }
 
@@ -497,12 +504,14 @@ class AssetController extends Controller
     {
         $asset->load(['product.category', 'product.brand', 'department.company', 'location']);
         $assets = collect([$asset]);
+
         return view('pages.labels.print', compact('assets'));
     }
 
     public function destroy(Asset $asset)
     {
         $asset->delete();
+
         return redirect()->route('assets.index')->with('success', 'Asset deleted successfully.');
     }
 
@@ -537,7 +546,7 @@ class AssetController extends Controller
 
         Asset::whereIn('id', $request->ids)->update($data);
 
-        return redirect()->route('assets.index')->with('success', count($request->ids) . ' assets updated successfully.');
+        return redirect()->route('assets.index')->with('success', count($request->ids).' assets updated successfully.');
     }
 
     public function bulkCheckoutForm(Request $request)
@@ -579,7 +588,7 @@ class AssetController extends Controller
             $count++;
         }
 
-        return redirect()->route('assets.index')->with('success', "{$count} assets checked out. " . ($assets->count() < count($request->ids) ? 'Some were already checked out.' : ''));
+        return redirect()->route('assets.index')->with('success', "{$count} assets checked out. ".($assets->count() < count($request->ids) ? 'Some were already checked out.' : ''));
     }
 
     public function publicScan($assetId)
@@ -592,12 +601,12 @@ class AssetController extends Controller
             'status',
             'location',
             'department.company',
-            'maintenances' => function($q) {
+            'maintenances' => function ($q) {
                 $q->orderBy('start_date', 'desc');
-            }
+            },
         ]);
 
-        $title = ($asset->asset_tag ?? 'Asset') . ' | ' . config('app.name');
+        $title = ($asset->asset_tag ?? 'Asset').' | '.config('app.name');
 
         return view('pages.assets.public-scan', compact('asset', 'title'));
     }
@@ -607,9 +616,9 @@ class AssetController extends Controller
         $userId = auth()->id();
         $assets = Asset::with(['product.category', 'product.brand', 'status', 'location'])
             ->where('assigned_to_user_id', $userId)
-            ->orWhereHas('currentCheckout', function($q) use ($userId) {
+            ->orWhereHas('currentCheckout', function ($q) use ($userId) {
                 $q->where('checked_out_to_user_id', $userId)
-                  ->whereNull('checked_in_at');
+                    ->whereNull('checked_in_at');
             })
             ->latest()
             ->get();

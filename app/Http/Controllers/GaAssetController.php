@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\GaAsset;
+use App\Models\GaAssetAssignment;
 use App\Models\GaAssetCategory;
 use App\Models\GaAssetSubcategory;
-use App\Models\GaAssetAssignment;
-use App\Models\GaMaintenanceLog;
+use App\Models\GaAssetVehicle;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class GaAssetController extends Controller
 {
@@ -20,10 +20,10 @@ class GaAssetController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('asset_code', 'like', "%$search%")
-                  ->orWhere('serial_number', 'like', "%$search%");
+                    ->orWhere('asset_code', 'like', "%$search%")
+                    ->orWhere('serial_number', 'like', "%$search%");
             });
         }
 
@@ -36,7 +36,7 @@ class GaAssetController extends Controller
         }
 
         if ($request->get('filter') === 'tax_due') {
-            $query->whereHas('vehicle', function($v) {
+            $query->whereHas('vehicle', function ($v) {
                 $v->whereNotNull('tax_due_date')->where('tax_due_date', '<=', now()->addDays(30));
             });
         } elseif ($request->get('filter') === 'warranty_expiring') {
@@ -46,7 +46,7 @@ class GaAssetController extends Controller
         $assets = $query->latest()->paginate(25)->withQueryString();
         $categories = GaAssetCategory::all();
 
-        $taxDueVehicles = \App\Models\GaAssetVehicle::with('asset')
+        $taxDueVehicles = GaAssetVehicle::with('asset')
             ->whereNotNull('tax_due_date')
             ->where('tax_due_date', '<=', now()->addDays(30))
             ->get();
@@ -65,7 +65,7 @@ class GaAssetController extends Controller
         $categories = GaAssetCategory::all();
         $subcategories = GaAssetSubcategory::all();
         $statuses = ['Available', 'Deployed', 'In Repair', 'Disposed'];
-        
+
         return view('pages.ga-assets.create', compact('categories', 'subcategories', 'statuses'));
     }
 
@@ -82,7 +82,7 @@ class GaAssetController extends Controller
             'model' => 'nullable|string|max:100',
             'serial_number' => 'nullable|string|max:100',
             'status' => 'required|in:Available,Deployed,In Repair,Disposed',
-            'acquisition_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 5),
+            'acquisition_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 5),
             'acquisition_source' => 'required|in:Pembelian,Hibah,Sewa,Lainnya',
             'purchase_date' => 'required|date',
             'vendor_name' => 'nullable|string|max:150',
@@ -130,6 +130,7 @@ class GaAssetController extends Controller
     {
         $ga_asset->load(['category', 'subcategory', 'vehicle', 'assignments.user', 'maintenanceLogs']);
         $users = User::all();
+
         return view('pages.ga-assets.show', ['asset' => $ga_asset, 'users' => $users]);
     }
 
@@ -145,7 +146,7 @@ class GaAssetController extends Controller
             'ga_asset' => $ga_asset,
             'categories' => $categories,
             'subcategories' => $subcategories,
-            'statuses' => $statuses
+            'statuses' => $statuses,
         ]);
     }
 
@@ -154,7 +155,7 @@ class GaAssetController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:150',
             'qty' => 'required|integer|min:1',
-            'asset_code' => 'required|string|max:50|unique:ga_assets,asset_code,' . $ga_asset->id,
+            'asset_code' => 'required|string|max:50|unique:ga_assets,asset_code,'.$ga_asset->id,
             'inventory_number' => 'nullable|string|max:100',
             'category_id' => 'required|exists:ga_asset_categories,id',
             'subcategory_id' => 'nullable|exists:ga_asset_subcategories,id',
@@ -162,7 +163,7 @@ class GaAssetController extends Controller
             'model' => 'nullable|string|max:100',
             'serial_number' => 'nullable|string|max:100',
             'status' => 'required|in:Available,Deployed,In Repair,Disposed',
-            'acquisition_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 5),
+            'acquisition_year' => 'nullable|integer|min:1900|max:'.(date('Y') + 5),
             'acquisition_source' => 'required|in:Pembelian,Hibah,Sewa,Lainnya',
             'purchase_date' => 'required|date',
             'vendor_name' => 'nullable|string|max:150',
@@ -257,7 +258,7 @@ class GaAssetController extends Controller
         $asset->assignments()->create($validated);
         $asset->update([
             'status' => 'Deployed',
-            'current_holder_id' => $validated['user_id']
+            'current_holder_id' => $validated['user_id'],
         ]);
 
         return redirect()->route('ga-assets.show', $asset)->with('success', 'Asset checked out successfully.');
@@ -288,7 +289,7 @@ class GaAssetController extends Controller
 
         $asset->update([
             'status' => $status,
-            'current_holder_id' => null
+            'current_holder_id' => null,
         ]);
 
         return redirect()->route('ga-assets.show', $asset)->with('success', 'Asset checked in successfully.');
@@ -329,20 +330,20 @@ class GaAssetController extends Controller
 
         if ($asset->vehicle) {
             $data = [];
-            if (!empty($validated['tax_due_date'])) {
+            if (! empty($validated['tax_due_date'])) {
                 $data['tax_due_date'] = $validated['tax_due_date'];
             }
-            if (!empty($validated['plate_expiry_date'])) {
+            if (! empty($validated['plate_expiry_date'])) {
                 $data['plate_expiry_date'] = $validated['plate_expiry_date'];
             }
-            if (!empty($validated['stnk_number'])) {
+            if (! empty($validated['stnk_number'])) {
                 $data['stnk_number'] = $validated['stnk_number'];
             }
             $asset->vehicle->update($data);
         }
 
-        if (!empty($validated['cost']) && $validated['cost'] > 0) {
-            $typeLabel = match($validated['renewal_type']) {
+        if (! empty($validated['cost']) && $validated['cost'] > 0) {
+            $typeLabel = match ($validated['renewal_type']) {
                 'tax' => 'Perpanjangan Pajak STNK (1 Thn)',
                 'plate' => 'Perpanjangan Plat/Kaleng (5 Thn)',
                 'both' => 'Perpanjangan Pajak & Plat Kaleng (5 Thn)',
@@ -352,7 +353,7 @@ class GaAssetController extends Controller
                 'cost' => $validated['cost'],
                 'scheduled_date' => now(),
                 'completed_date' => now(),
-                'notes' => $typeLabel . ($validated['notes'] ? ': ' . $validated['notes'] : ''),
+                'notes' => $typeLabel.($validated['notes'] ? ': '.$validated['notes'] : ''),
             ]);
         }
 
@@ -363,6 +364,7 @@ class GaAssetController extends Controller
     {
         $categoryId = $request->get('category_id');
         $subcategories = GaAssetSubcategory::where('category_id', $categoryId)->get(['id', 'name']);
+
         return response()->json($subcategories);
     }
 
@@ -372,6 +374,7 @@ class GaAssetController extends Controller
         $asset->load(['category', 'subcategory', 'vehicle']);
 
         $pdf = Pdf::loadView('pdf.ga_bast', compact('asset', 'assignment'));
+
         return $pdf->stream("BAST-GA-{$asset->asset_code}-{$assignment->id}.pdf");
     }
 }

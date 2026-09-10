@@ -2,34 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TicketsExport;
 use App\Models\Asset;
-use App\Models\Attachment;
-use App\Models\TicketCategory;
-use App\Models\TicketSubcategory;
+use App\Models\Company;
+use App\Models\Department;
 use App\Models\Label;
 use App\Models\Priority;
+use App\Models\Project;
 use App\Models\SlaStatus;
 use App\Models\Source;
 use App\Models\Ticket;
+use App\Models\TicketCategory;
 use App\Models\TicketComment;
 use App\Models\TicketHistory;
 use App\Models\TicketStatus;
 use App\Models\TicketType;
 use App\Models\User;
-use App\Exports\TicketsExport;
-use App\Models\Company;
-use App\Models\Department;
 use App\Notifications\SystemNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class TicketController extends Controller
 {
     public function export(Request $request)
     {
-        return (new TicketsExport($request->all()))->download('tickets-' . now()->format('Y-m-d') . '.xlsx');
+        return (new TicketsExport($request->all()))->download('tickets-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function index(Request $request): View
@@ -45,22 +44,22 @@ class TicketController extends Controller
         }
 
         if ($startDate = ($request->input('start_date') ?: $request->input('from_date'))) {
-            $query->where(function($q) use ($startDate) {
+            $query->where(function ($q) use ($startDate) {
                 $q->whereDate('request_date', '>=', $startDate)
-                  ->orWhere(function($sub) use ($startDate) {
-                      $sub->whereNull('request_date')
-                          ->whereDate('created_at', '>=', $startDate);
-                  });
+                    ->orWhere(function ($sub) use ($startDate) {
+                        $sub->whereNull('request_date')
+                            ->whereDate('created_at', '>=', $startDate);
+                    });
             });
         }
 
         if ($endDate = ($request->input('end_date') ?: $request->input('to_date'))) {
-            $query->where(function($q) use ($endDate) {
+            $query->where(function ($q) use ($endDate) {
                 $q->whereDate('request_date', '<=', $endDate)
-                  ->orWhere(function($sub) use ($endDate) {
-                      $sub->whereNull('request_date')
-                          ->whereDate('created_at', '<=', $endDate);
-                  });
+                    ->orWhere(function ($sub) use ($endDate) {
+                        $sub->whereNull('request_date')
+                            ->whereDate('created_at', '<=', $endDate);
+                    });
             });
         }
 
@@ -90,28 +89,28 @@ class TicketController extends Controller
 
         $ticketSummary = [
             'total' => (clone $query)->count(),
-            'new' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'New'))->count(),
-            'in_progress' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'In Progress'))->count(),
-            'pending' => (clone $query)->whereHas('status', fn($q) => $q->where('name', 'Pending'))->count(),
+            'new' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'New'))->count(),
+            'in_progress' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'In Progress'))->count(),
+            'pending' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'Pending'))->count(),
             'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
-            'closed' => (clone $query)->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true))->count(),
+            'closed' => (clone $query)->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true))->count(),
         ];
 
         switch ($request->input('tab')) {
             case 'new':
-                $query->whereHas('status', fn($q) => $q->where('name', 'New'));
+                $query->whereHas('status', fn ($q) => $q->where('name', 'New'));
                 break;
             case 'in_progress':
-                $query->whereHas('status', fn($q) => $q->where('name', 'In Progress'));
+                $query->whereHas('status', fn ($q) => $q->where('name', 'In Progress'));
                 break;
             case 'pending':
-                $query->whereHas('status', fn($q) => $q->where('name', 'Pending'));
+                $query->whereHas('status', fn ($q) => $q->where('name', 'Pending'));
                 break;
             case 'unassigned':
                 $query->whereNull('assigned_to_id');
                 break;
             case 'closed':
-                $query->whereHas('status', fn($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true));
+                $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true));
                 break;
         }
 
@@ -146,7 +145,7 @@ class TicketController extends Controller
             'assignedToUser',
             'currentCheckout.checkedOutToUser',
             'department',
-            'status'
+            'status',
         ])->latest('id')->get();
 
         return view('pages.tickets.create', compact(
@@ -189,15 +188,15 @@ class TicketController extends Controller
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
 
-        $ticketDate = !empty($data['created_at']) ? \Illuminate\Support\Carbon::parse($data['created_at']) : now();
-        $ticketType = !empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
+        $ticketDate = ! empty($data['created_at']) ? Carbon::parse($data['created_at']) : now();
+        $ticketType = ! empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
         $requestCode = strtoupper($ticketType?->code ?: 'REQ');
-        $prefix = $requestCode . '-' . $ticketDate->format('ymd') . '-';
-        
-        $latestTicket = Ticket::where('request_id', 'like', $prefix . '%')
+        $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
+
+        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
             ->first();
-            
+
         $nextSeq = 1;
         if ($latestTicket) {
             $parts = explode('-', $latestTicket->request_id);
@@ -207,7 +206,7 @@ class TicketController extends Controller
 
         $dailySequence = str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
 
-        $data['request_id'] = $requestCode . '-' . $ticketDate->format('ymd') . '-' . $dailySequence;
+        $data['request_id'] = $requestCode.'-'.$ticketDate->format('ymd').'-'.$dailySequence;
         $data['request_date'] = $ticketDate->toDateString();
         $data['request_time'] = $ticketDate;
         $data['created_at'] = $ticketDate;
@@ -223,10 +222,10 @@ class TicketController extends Controller
         $data['created_by_id'] = auth()->id();
 
         // If completed_date is provided, auto-set status to Completed
-        if (!empty($data['completed_date'])) {
-            $currentStatus = !empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
-            if (!$currentStatus || !$currentStatus->is_closed) {
-                $completedStatus = TicketStatus::where('name', 'Completed')->first() 
+        if (! empty($data['completed_date'])) {
+            $currentStatus = ! empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
+            if (! $currentStatus || ! $currentStatus->is_closed) {
+                $completedStatus = TicketStatus::where('name', 'Completed')->first()
                     ?? TicketStatus::where('is_closed', true)->first();
                 if ($completedStatus) {
                     $data['status_id'] = $completedStatus->id;
@@ -238,13 +237,13 @@ class TicketController extends Controller
         }
 
         if (empty($data['sla_status_id'])) {
-            $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+            $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
             if ($fulfilledSla) {
                 $data['sla_status_id'] = $fulfilledSla->id;
             }
         }
 
-        $ticket = new Ticket();
+        $ticket = new Ticket;
         $ticket->fill($data);
         $ticket->created_at = $ticketDate;
         $ticket->save();
@@ -265,13 +264,13 @@ class TicketController extends Controller
             'ticket_id' => $ticket->id,
             'user_id' => auth()->id(),
             'action' => 'Created Ticket',
-            'description' => 'Ticket #' . $ticket->request_id . ' created.',
+            'description' => 'Ticket #'.$ticket->request_id.' created.',
         ]);
 
         if ($ticket->assignedTo()->exists()) {
             $ticket->assignedTo->notify(new SystemNotification(
                 'New Ticket Assigned',
-                'Ticket #' . $ticket->request_id . ' has been assigned to you.',
+                'Ticket #'.$ticket->request_id.' has been assigned to you.',
                 route('tickets.show', $ticket),
                 'ticket',
                 'ITSM'
@@ -291,10 +290,10 @@ class TicketController extends Controller
             'ticketType', 'requesterUser', 'requesterCompany', 'requesterDepartment',
             'ticketCategory', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
             'status', 'slaStatus', 'asset.product.brand', 'asset.assignedToUser', 'asset.currentCheckout.checkedOutToUser', 'asset.department', 'asset.status',
-            'attachments', 'comments.user', 'comments.attachments', 'histories.user'
+            'attachments', 'comments.user', 'comments.attachments', 'histories.user',
         ]);
 
-        $projects = \App\Models\Project::latest()->get();
+        $projects = Project::latest()->get();
 
         return view('pages.tickets.show', compact('ticket', 'projects'));
     }
@@ -318,7 +317,7 @@ class TicketController extends Controller
             'assignedToUser',
             'currentCheckout.checkedOutToUser',
             'department',
-            'status'
+            'status',
         ])->latest('id')->get();
 
         return view('pages.tickets.edit', compact(
@@ -363,8 +362,8 @@ class TicketController extends Controller
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
 
-        if (!empty($data['created_at'])) {
-            $ticketDate = \Illuminate\Support\Carbon::parse($data['created_at']);
+        if (! empty($data['created_at'])) {
+            $ticketDate = Carbon::parse($data['created_at']);
             $data['request_date'] = $ticketDate->toDateString();
             $data['request_time'] = $ticketDate;
             $data['created_at'] = $ticketDate;
@@ -379,10 +378,10 @@ class TicketController extends Controller
         }
 
         // If completed_date is provided and status is not explicitly set to a closed status, auto-set status to Completed
-        if (!empty($data['completed_date'])) {
-            $currentStatus = !empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
-            if (!$currentStatus || !$currentStatus->is_closed) {
-                $completedStatus = TicketStatus::where('name', 'Completed')->first() 
+        if (! empty($data['completed_date'])) {
+            $currentStatus = ! empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
+            if (! $currentStatus || ! $currentStatus->is_closed) {
+                $completedStatus = TicketStatus::where('name', 'Completed')->first()
                     ?? TicketStatus::where('is_closed', true)->first();
                 if ($completedStatus) {
                     $data['status_id'] = $completedStatus->id;
@@ -404,12 +403,12 @@ class TicketController extends Controller
                     $data['completed_time'] = now();
                 }
                 if (! isset($data['resolution_time_hours']) || ! $data['resolution_time_hours']) {
-                    $createdAt = isset($data['created_at']) ? \Illuminate\Support\Carbon::parse($data['created_at']) : ($ticket->created_at ?? now());
+                    $createdAt = isset($data['created_at']) ? Carbon::parse($data['created_at']) : ($ticket->created_at ?? now());
                     $hours = $createdAt ? round($createdAt->diffInMinutes(now()) / 60, 2) : 0;
                     $data['resolution_time_hours'] = $hours;
                 }
                 if (empty($data['sla_status_id'])) {
-                    $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+                    $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
                     if ($fulfilledSla) {
                         $data['sla_status_id'] = $fulfilledSla->id;
                     }
@@ -418,8 +417,8 @@ class TicketController extends Controller
         }
 
         $ticket->fill($data);
-        if (!empty($data['created_at'])) {
-            $ticket->created_at = \Illuminate\Support\Carbon::parse($data['created_at']);
+        if (! empty($data['created_at'])) {
+            $ticket->created_at = Carbon::parse($data['created_at']);
         }
         $ticket->save();
 
@@ -439,14 +438,14 @@ class TicketController extends Controller
             'ticket_id' => $ticket->id,
             'user_id' => auth()->id(),
             'action' => 'Updated Ticket',
-            'description' => 'Ticket #' . $ticket->request_id . ' updated.',
+            'description' => 'Ticket #'.$ticket->request_id.' updated.',
         ]);
 
         if (isset($data['status_id']) && $data['status_id'] !== $oldStatusId && $ticket->requesterUser) {
             $newStatus = TicketStatus::find($data['status_id']);
             $ticket->requesterUser->notify(new SystemNotification(
                 'Ticket Status Updated',
-                'Ticket #' . $ticket->request_id . ' status is now ' . ($newStatus?->name ?? 'updated') . '.',
+                'Ticket #'.$ticket->request_id.' status is now '.($newStatus?->name ?? 'updated').'.',
                 route('tickets.show', $ticket),
                 'info',
                 'ITSM'
@@ -493,7 +492,7 @@ class TicketController extends Controller
             'ticket_id' => $ticket->id,
             'user_id' => auth()->id(),
             'action' => 'Comment Added',
-            'description' => ($request->boolean('is_internal') ? 'Internal note' : 'Public comment') . ' added.',
+            'description' => ($request->boolean('is_internal') ? 'Internal note' : 'Public comment').' added.',
         ]);
 
         // Notify relevant user
@@ -502,7 +501,7 @@ class TicketController extends Controller
             if ($recipient) {
                 $recipient->notify(new SystemNotification(
                     'New Ticket Comment',
-                    'New comment on Ticket #' . $ticket->request_id,
+                    'New comment on Ticket #'.$ticket->request_id,
                     route('tickets.show', $ticket),
                     'message-square',
                     'ITSM'

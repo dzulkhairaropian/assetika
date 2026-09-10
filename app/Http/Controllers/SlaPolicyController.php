@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SlaPolicy;
 use App\Models\Priority;
+use App\Models\SlaPolicy;
 use Illuminate\Http\Request;
 
 class SlaPolicyController extends Controller

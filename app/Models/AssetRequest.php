@@ -51,7 +51,7 @@ class AssetRequest extends Model
             return 'Item';
         }
 
-        if ($req instanceof \App\Models\Consumable) {
+        if ($req instanceof Consumable) {
             return $req->product?->name ?? 'Consumable';
         }
 
@@ -63,7 +63,7 @@ class AssetRequest extends Model
      */
     public function getRequestableTypeLabelAttribute(): string
     {
-        return match(class_basename($this->requestable_type)) {
+        return match (class_basename($this->requestable_type)) {
             'Category' => 'Hardware',
             'Consumable' => 'Consumable',
             'License' => 'License',
@@ -78,14 +78,14 @@ class AssetRequest extends Model
      */
     public function getStatusRecordAttribute(): ?Status
     {
-        $name = match($this->status) {
+        $name = match ($this->status) {
             'approved' => 'Fulfilled',
             'rejected' => 'Declined',
             default => 'Pending',
         };
 
         return Status::where('name', $name)
-            ->whereHas('masterCategory', fn($q) => $q->where('name', 'IT Request'))
+            ->whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Request'))
             ->first();
     }
 

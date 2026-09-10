@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\Location;
 use App\Models\StockCount;
 use App\Models\StockCountItem;
 use Illuminate\Http\Request;
@@ -25,7 +25,7 @@ class StockCountController extends Controller
 
     public function create()
     {
-        $locations = \App\Models\Location::orderBy('name')->get();
+        $locations = Location::orderBy('name')->get();
 
         return view('pages.stock-counts.create', compact('locations'));
     }
@@ -56,7 +56,7 @@ class StockCountController extends Controller
 
     public function edit(StockCount $stockCount)
     {
-        $locations = \App\Models\Location::orderBy('name')->get();
+        $locations = Location::orderBy('name')->get();
 
         return view('pages.stock-counts.edit', compact('stockCount', 'locations'));
     }
@@ -105,7 +105,7 @@ class StockCountController extends Controller
             ]);
         }
 
-        return redirect()->route('stock-counts.show', $stockCount)->with('success', count($newIds) . ' assets added to stock count.');
+        return redirect()->route('stock-counts.show', $stockCount)->with('success', count($newIds).' assets added to stock count.');
     }
 
     public function verifyItem(StockCount $stockCount, StockCountItem $item)

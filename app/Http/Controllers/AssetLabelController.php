@@ -19,7 +19,7 @@ class AssetLabelController extends Controller
         $assetsRaw = Asset::whereIn('id', $request->ids)
             ->with(['product.category', 'product.brand', 'department.company', 'location'])
             ->get();
-        
+
         $quantities = $request->input('quantities', []);
         $multiplier = (int) $request->input('copies', 1);
         $assets = collect();

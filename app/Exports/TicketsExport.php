@@ -3,13 +3,13 @@
 namespace App\Exports;
 
 use App\Models\Ticket;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class TicketsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize
+class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
 {
     use Exportable;
 
@@ -34,42 +34,42 @@ class TicketsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoS
             'slaStatus',
             'assignedTo',
             'createdBy',
-            'asset'
+            'asset',
         ]);
 
-        if (!empty($this->filters['from_date'])) {
+        if (! empty($this->filters['from_date'])) {
             $query->whereDate('request_date', '>=', $this->filters['from_date']);
         }
-        if (!empty($this->filters['to_date'])) {
+        if (! empty($this->filters['to_date'])) {
             $query->whereDate('request_date', '<=', $this->filters['to_date']);
         }
-        if (!empty($this->filters['company_id'])) {
+        if (! empty($this->filters['company_id'])) {
             $query->where('requester_company_id', $this->filters['company_id']);
         }
-        if (!empty($this->filters['department_id'])) {
+        if (! empty($this->filters['department_id'])) {
             $query->where('requester_department_id', $this->filters['department_id']);
         }
-        if (!empty($this->filters['ticket_category_id'])) {
+        if (! empty($this->filters['ticket_category_id'])) {
             $query->where('ticket_category_id', $this->filters['ticket_category_id']);
-        } elseif (!empty($this->filters['category_id'])) {
+        } elseif (! empty($this->filters['category_id'])) {
             $query->where('ticket_category_id', $this->filters['category_id']);
         }
-        if (!empty($this->filters['priority_id'])) {
+        if (! empty($this->filters['priority_id'])) {
             $query->where('priority_id', $this->filters['priority_id']);
         }
-        if (!empty($this->filters['status_id'])) {
+        if (! empty($this->filters['status_id'])) {
             $query->where('status_id', $this->filters['status_id']);
         }
-        if (!empty($this->filters['created_by_id'])) {
+        if (! empty($this->filters['created_by_id'])) {
             $query->where('created_by_id', $this->filters['created_by_id']);
         }
-        if (!empty($this->filters['assigned_to_id'])) {
+        if (! empty($this->filters['assigned_to_id'])) {
             $query->where('assigned_to_id', $this->filters['assigned_to_id']);
         }
-        if (!empty($this->filters['year']) && $this->filters['year'] !== 'all') {
+        if (! empty($this->filters['year']) && $this->filters['year'] !== 'all') {
             $query->whereRaw('YEAR(created_at) = ?', [$this->filters['year']]);
         }
-        if (!empty($this->filters['month']) && $this->filters['month'] !== 'all') {
+        if (! empty($this->filters['month']) && $this->filters['month'] !== 'all') {
             $query->whereRaw('MONTH(created_at) = ?', [$this->filters['month']]);
         }
 

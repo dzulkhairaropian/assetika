@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\Position;
-use Spatie\Permission\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -21,10 +21,10 @@ class UserController extends Controller
             ->latest()
             ->paginate(50)
             ->withQueryString();
-        
+
         $roles = Role::all();
         $departments = Department::all();
-        
+
         return view('pages.users.index', compact('users', 'roles', 'departments'));
     }
 
@@ -40,6 +40,7 @@ class UserController extends Controller
         $departments = Department::all();
         $locations = Location::all();
         $positions = Position::all();
+
         return view('pages.users.create', compact('roles', 'companies', 'departments', 'locations', 'positions'));
     }
 
@@ -67,10 +68,10 @@ class UserController extends Controller
             'department_id' => $request->department_id,
             'location_id' => $request->location_id,
             'position_id' => $request->position_id,
-            'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
+            'is_active' => $request->has('is_active') ? (bool) $request->is_active : true,
         ]);
 
-        $roles = collect($request->roles)->map(fn($val) => is_numeric($val) ? (int)$val : $val)->toArray();
+        $roles = collect($request->roles)->map(fn ($val) => is_numeric($val) ? (int) $val : $val)->toArray();
         $user->assignRole($roles);
 
         if ($request->has('create_another')) {
@@ -88,6 +89,7 @@ class UserController extends Controller
         $departments = Department::all();
         $locations = Location::all();
         $positions = Position::all();
+
         return view('pages.users.edit', compact('user', 'roles', 'userRoles', 'companies', 'departments', 'locations', 'positions'));
     }
 
@@ -114,7 +116,7 @@ class UserController extends Controller
             'department_id' => $request->department_id,
             'location_id' => $request->location_id,
             'position_id' => $request->position_id,
-            'is_active' => $request->has('is_active') ? (bool)$request->is_active : false,
+            'is_active' => $request->has('is_active') ? (bool) $request->is_active : false,
         ];
 
         if ($request->filled('password')) {
@@ -122,7 +124,7 @@ class UserController extends Controller
         }
 
         $user->update($data);
-        $roles = collect($request->roles)->map(fn($val) => is_numeric($val) ? (int)$val : $val)->toArray();
+        $roles = collect($request->roles)->map(fn ($val) => is_numeric($val) ? (int) $val : $val)->toArray();
         $user->syncRoles($roles);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
@@ -135,6 +137,7 @@ class UserController extends Controller
         }
 
         $user->delete();
+
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 
@@ -147,7 +150,7 @@ class UserController extends Controller
 
         $ids = array_diff($request->ids, [auth()->id()]);
 
-        if (!empty($ids)) {
+        if (! empty($ids)) {
             User::whereIn('id', $ids)->delete();
         }
 
@@ -162,11 +165,12 @@ class UserController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-        $status = (bool)$request->is_active;
+        $status = (bool) $request->is_active;
 
         User::whereIn('id', $request->ids)->update(['is_active' => $status]);
 
         $statusText = $status ? 'activated' : 'deactivated';
+
         return redirect()->route('users.index')->with('success', "Selected users {$statusText} successfully.");
     }
 }

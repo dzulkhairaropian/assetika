@@ -3,18 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Auth\Passwords\CanResetPassword;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, CanResetPassword {
+    /** @use HasFactory<UserFactory> */
+    use CanResetPassword, HasFactory, HasRoles, Notifiable {
         HasRoles::hasPermissionTo as parentHasPermissionTo;
     }
 
@@ -62,31 +63,31 @@ class User extends Authenticatable
 
     public function scopeFilter($query, array $filters)
     {
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
-            $like = '%' . $search . '%';
+            $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
                 $q->where('name', 'like', $like)
                     ->orWhere('email', 'like', $like)
                     ->orWhere('phone', 'like', $like)
-                    ->orWhereHas('department', fn($d) => $d->where('name', 'like', $like))
-                    ->orWhereHas('company', fn($c) => $c->where('name', 'like', $like))
-                    ->orWhereHas('position', fn($p) => $p->where('name', 'like', $like))
-                    ->orWhereHas('location', fn($l) => $l->where('name', 'like', $like))
-                    ->orWhereHas('roles', fn($r) => $r->where('name', 'like', $like));
+                    ->orWhereHas('department', fn ($d) => $d->where('name', 'like', $like))
+                    ->orWhereHas('company', fn ($c) => $c->where('name', 'like', $like))
+                    ->orWhereHas('position', fn ($p) => $p->where('name', 'like', $like))
+                    ->orWhereHas('location', fn ($l) => $l->where('name', 'like', $like))
+                    ->orWhereHas('roles', fn ($r) => $r->where('name', 'like', $like));
             });
         }
 
-        if (!empty($filters['role'])) {
+        if (! empty($filters['role'])) {
             $query->role($filters['role']);
         }
 
-        if (!empty($filters['department_id'])) {
+        if (! empty($filters['department_id'])) {
             $query->where('department_id', $filters['department_id']);
         }
 
         if (array_key_exists('is_active', $filters) && $filters['is_active'] !== null && $filters['is_active'] !== '') {
-            $query->where('is_active', (bool)$filters['is_active']);
+            $query->where('is_active', (bool) $filters['is_active']);
         }
 
         return $query;
@@ -97,7 +98,7 @@ class User extends Authenticatable
      */
     public function company(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Company::class);
+        return $this->belongsTo(Company::class);
     }
 
     /**
@@ -105,7 +106,7 @@ class User extends Authenticatable
      */
     public function department(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Department::class);
+        return $this->belongsTo(Department::class);
     }
 
     /**
@@ -113,7 +114,7 @@ class User extends Authenticatable
      */
     public function location(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Location::class);
+        return $this->belongsTo(Location::class);
     }
 
     /**
@@ -121,7 +122,7 @@ class User extends Authenticatable
      */
     public function position(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Position::class);
+        return $this->belongsTo(Position::class);
     }
 
     /**
@@ -129,7 +130,7 @@ class User extends Authenticatable
      */
     public function assetCheckouts(): HasMany
     {
-        return $this->hasMany(\App\Models\AssetCheckout::class, 'checked_out_to_user_id');
+        return $this->hasMany(AssetCheckout::class, 'checked_out_to_user_id');
     }
 
     /**
@@ -137,7 +138,7 @@ class User extends Authenticatable
      */
     public function currentAssetCheckouts(): HasMany
     {
-        return $this->hasMany(\App\Models\AssetCheckout::class, 'checked_out_to_user_id')
+        return $this->hasMany(AssetCheckout::class, 'checked_out_to_user_id')
             ->whereNull('checked_in_at');
     }
 
@@ -146,7 +147,7 @@ class User extends Authenticatable
      */
     public function assetCheckoutHistory(): HasMany
     {
-        return $this->hasMany(\App\Models\AssetCheckout::class, 'checked_out_to_user_id')
+        return $this->hasMany(AssetCheckout::class, 'checked_out_to_user_id')
             ->whereNotNull('checked_in_at')
             ->orderBy('checked_in_at', 'desc');
     }
@@ -156,7 +157,7 @@ class User extends Authenticatable
      */
     public function consumableTransactions(): HasMany
     {
-        return $this->hasMany(\App\Models\ConsumableTransaction::class, 'checked_out_to_user_id')
+        return $this->hasMany(ConsumableTransaction::class, 'checked_out_to_user_id')
             ->where('type', 'checkout')
             ->orderBy('transaction_date', 'desc');
     }

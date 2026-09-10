@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Consumable;
-use App\Models\Product;
-use App\Models\Status;
-use App\Models\User;
-use App\Models\ConsumableTransaction;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Consumable;
+use App\Models\ConsumableTransaction;
+use App\Models\Product;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,9 +20,9 @@ class ConsumableController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('product', function($q) use ($search) {
+            $query->whereHas('product', function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('product_type', 'like', "%$search%");
+                    ->orWhere('product_type', 'like', "%$search%");
             });
         }
 
@@ -31,13 +31,13 @@ class ConsumableController extends Controller
         }
 
         if ($request->filled('category_id')) {
-            $query->whereHas('product', function($q) use ($request) {
+            $query->whereHas('product', function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             });
         }
 
         if ($request->filled('brand_id')) {
-            $query->whereHas('product', function($q) use ($request) {
+            $query->whereHas('product', function ($q) use ($request) {
                 $q->where('brand_id', $request->brand_id);
             });
         }
@@ -59,12 +59,12 @@ class ConsumableController extends Controller
         }
 
         $consumables = $query->latest()->paginate(50)->withQueryString();
-        
-        $products = Product::whereHas('masterCategory', function($q) {
+
+        $products = Product::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Consumable');
         })->get();
 
-        $categories = Category::whereHas('masterCategory', function($q) {
+        $categories = Category::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Consumable');
         })->orderBy('name')->get();
 
@@ -77,9 +77,10 @@ class ConsumableController extends Controller
     {
         // Consumables are products with master categories that are consumables
         $products = Product::with(['brand', 'category'])
-            ->whereHas('masterCategory', function($q) {
+            ->whereHas('masterCategory', function ($q) {
                 $q->where('name', 'IT Consumable');
             })->get();
+
         return view('pages.consumables.create', compact('products'));
     }
 
@@ -105,16 +106,17 @@ class ConsumableController extends Controller
     public function edit(Consumable $consumable)
     {
         $products = Product::with(['brand', 'category'])
-            ->whereHas('masterCategory', function($q) {
+            ->whereHas('masterCategory', function ($q) {
                 $q->where('name', 'IT Consumable');
             })->get();
+
         return view('pages.consumables.edit', compact('consumable', 'products'));
     }
 
     public function update(Request $request, Consumable $consumable)
     {
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id|unique:consumables,product_id,' . $consumable->id,
+            'product_id' => 'required|exists:products,id|unique:consumables,product_id,'.$consumable->id,
             'quantity' => 'required|integer|min:0',
             'low_threshold' => 'required|integer|min:0',
             'purchase_cost' => 'nullable|numeric|min:0',
@@ -129,6 +131,7 @@ class ConsumableController extends Controller
     public function destroy(Consumable $consumable)
     {
         $consumable->delete();
+
         return redirect()->route('consumables.index')->with('success', 'Consumable deleted successfully.');
     }
 
@@ -176,15 +179,15 @@ class ConsumableController extends Controller
 
             $consumable->update([
                 'quantity' => $after,
-                'purchase_cost' => $unitCost // Update default purchase cost to latest restock cost
+                'purchase_cost' => $unitCost, // Update default purchase cost to latest restock cost
             ]);
         });
 
         $auth = auth()->user();
         if ($auth) {
-            $auth->notify(new \App\Notifications\SystemNotification(
+            $auth->notify(new SystemNotification(
                 'Consumable Restocked',
-                "{$request->quantity} units of '" . ($consumable->product->name ?? 'Consumable') . "' have been restocked.",
+                "{$request->quantity} units of '".($consumable->product->name ?? 'Consumable')."' have been restocked.",
                 route('consumables.index'),
                 'plus-circle',
                 'Consumable'
@@ -201,6 +204,7 @@ class ConsumableController extends Controller
         }
 
         $users = User::all();
+
         return view('pages.consumables.checkout', compact('consumable', 'users'));
     }
 
@@ -208,7 +212,7 @@ class ConsumableController extends Controller
     {
         $request->validate([
             'checked_out_to_user_id' => 'required|exists:users,id',
-            'quantity' => 'required|integer|min:1|max:' . $consumable->quantity,
+            'quantity' => 'required|integer|min:1|max:'.$consumable->quantity,
             'notes' => 'nullable|string',
             'evidence' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'transaction_date' => 'required|date',
@@ -249,9 +253,9 @@ class ConsumableController extends Controller
 
         $toUser = User::find($request->checked_out_to_user_id);
         if ($toUser) {
-            $toUser->notify(new \App\Notifications\SystemNotification(
+            $toUser->notify(new SystemNotification(
                 'Consumable Checked Out',
-                "{$request->quantity} units of '" . ($consumable->product->name ?? 'Consumable') . "' have been checked out to you.",
+                "{$request->quantity} units of '".($consumable->product->name ?? 'Consumable')."' have been checked out to you.",
                 route('consumables.index'),
                 'shopping-bag',
                 'Consumable'
@@ -282,6 +286,7 @@ class ConsumableController extends Controller
         }
 
         $users = User::all();
+
         return view('pages.consumables.bulk-checkout', compact('consumables', 'users'));
     }
 
@@ -306,7 +311,7 @@ class ConsumableController extends Controller
             if ($qty > $consumable->quantity) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', "Quantity for " . ($consumable->product->name ?? 'Consumable') . " cannot exceed available stock ({$consumable->quantity}).");
+                    ->with('error', 'Quantity for '.($consumable->product->name ?? 'Consumable')." cannot exceed available stock ({$consumable->quantity}).");
             }
         }
 
@@ -349,11 +354,11 @@ class ConsumableController extends Controller
             $details = [];
             foreach ($consumables as $consumable) {
                 $qty = $quantities[$consumable->id];
-                $details[] = "{$qty}x " . ($consumable->product->name ?? 'Consumable');
+                $details[] = "{$qty}x ".($consumable->product->name ?? 'Consumable');
             }
-            $message = "Consumables checked out to you: " . implode(', ', $details);
+            $message = 'Consumables checked out to you: '.implode(', ', $details);
 
-            $toUser->notify(new \App\Notifications\SystemNotification(
+            $toUser->notify(new SystemNotification(
                 'Consumables Checked Out',
                 $message,
                 route('consumables.index'),

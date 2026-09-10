@@ -7,10 +7,11 @@ use App\Models\Department;
 use App\Models\Location;
 use App\Models\Position;
 use App\Models\User;
+use App\Notifications\SystemNotification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -45,31 +46,31 @@ class UserSeeder extends Seeder
         $groupAdminRole->syncPermissions($groupAdminPermissions);
 
         // Give IT Admin permissions (Asset, Brand, Category, Consumable, MasterCategory, OperatingSystem, Product, Status, Vendor, ConsumableRequest)
-        $itPermissions = Permission::where(function($q) {
+        $itPermissions = Permission::where(function ($q) {
             $q->where('name', 'like', 'assets.%')
-              ->orWhere('name', 'like', 'brands.%')
-              ->orWhere('name', 'like', 'categories.%')
-              ->orWhere('name', 'like', 'consumables.%')
-              ->orWhere('name', 'like', 'master-categories.%')
-              ->orWhere('name', 'like', 'operating-systems.%')
-              ->orWhere('name', 'like', 'products.%')
-              ->orWhere('name', 'like', 'statuses.%')
-              ->orWhere('name', 'like', 'vendors.%')
-              ->orWhere('name', 'like', 'components.%')
-              ->orWhere('name', 'like', 'licenses.%')
-              ->orWhere('name', 'like', 'kits.%');
+                ->orWhere('name', 'like', 'brands.%')
+                ->orWhere('name', 'like', 'categories.%')
+                ->orWhere('name', 'like', 'consumables.%')
+                ->orWhere('name', 'like', 'master-categories.%')
+                ->orWhere('name', 'like', 'operating-systems.%')
+                ->orWhere('name', 'like', 'products.%')
+                ->orWhere('name', 'like', 'statuses.%')
+                ->orWhere('name', 'like', 'vendors.%')
+                ->orWhere('name', 'like', 'components.%')
+                ->orWhere('name', 'like', 'licenses.%')
+                ->orWhere('name', 'like', 'kits.%');
         })->orWhereIn('name', [
             'reports.view',
         ])->get();
         $itAdminRole->syncPermissions($itPermissions);
 
         // Give GA Admin permissions (GaAsset, GaAssetCategory, GaAssetSubcategory, Company, Department, Location, Position)
-        $gaPermissions = Permission::where(function($q) {
+        $gaPermissions = Permission::where(function ($q) {
             $q->where('name', 'like', 'ga-%')
-              ->orWhere('name', 'like', 'companies.%')
-              ->orWhere('name', 'like', 'departments.%')
-              ->orWhere('name', 'like', 'locations.%')
-              ->orWhere('name', 'like', 'positions.%');
+                ->orWhere('name', 'like', 'companies.%')
+                ->orWhere('name', 'like', 'departments.%')
+                ->orWhere('name', 'like', 'locations.%')
+                ->orWhere('name', 'like', 'positions.%');
         })->orWhereIn('name', [
             'reports.view',
         ])->get();
@@ -145,7 +146,7 @@ class UserSeeder extends Seeder
         $regularUser->syncRoles([$userRole]);
 
         // Seed notifications
-        $superAdmin->notify(new \App\Notifications\SystemNotification(
+        $superAdmin->notify(new SystemNotification(
             'Welcome to Assetika!',
             'Get started by checking out assets, restocking consumables, and reviewing the master categories.',
             route('dashboard'),

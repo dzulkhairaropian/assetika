@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use App\Traits\LogsActivity;
 
 class License extends Model
 {
     use LogsActivity;
+
     protected $fillable = [
         'name',
         'product_key',

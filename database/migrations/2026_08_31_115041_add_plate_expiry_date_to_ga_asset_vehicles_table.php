@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('ga_asset_vehicles', 'plate_expiry_date')) {
+        if (! Schema::hasColumn('ga_asset_vehicles', 'plate_expiry_date')) {
             Schema::table('ga_asset_vehicles', function (Blueprint $table) {
                 $table->date('plate_expiry_date')->nullable()->after('tax_due_date');
             });

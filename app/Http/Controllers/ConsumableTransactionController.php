@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ConsumableTransactionsExport;
 use App\Models\ConsumableTransaction;
 use Illuminate\Http\Request;
-
-use App\Exports\ConsumableTransactionsExport;
 
 class ConsumableTransactionController extends Controller
 {
     public function export(Request $request)
     {
-        return (new ConsumableTransactionsExport($request->all()))->download('consumable-transactions-' . now()->format('Y-m-d') . '.xlsx');
+        return (new ConsumableTransactionsExport($request->all()))->download('consumable-transactions-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function index(Request $request)
@@ -24,7 +23,7 @@ class ConsumableTransactionController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('consumable.product', function($q) use ($search) {
+            $query->whereHas('consumable.product', function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%");
             });
         }

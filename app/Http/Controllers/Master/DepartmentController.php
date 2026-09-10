@@ -15,9 +15,9 @@ class DepartmentController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('code', 'like', "%$search%");
+                    ->orWhere('code', 'like', "%$search%");
             });
         }
 
@@ -34,6 +34,7 @@ class DepartmentController extends Controller
     public function create()
     {
         $companies = Company::all();
+
         return view('pages.master.departments.create', compact('companies'));
     }
 
@@ -58,6 +59,7 @@ class DepartmentController extends Controller
     public function edit(Department $department)
     {
         $companies = Company::all();
+
         return view('pages.master.departments.edit', compact('department', 'companies'));
     }
 
@@ -65,7 +67,7 @@ class DepartmentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:10|unique:departments,code,' . $department->id,
+            'code' => 'required|string|max:10|unique:departments,code,'.$department->id,
             'company_id' => 'required|exists:companies,id',
             'description' => 'nullable|string',
         ]);
@@ -78,6 +80,7 @@ class DepartmentController extends Controller
     public function destroy(Department $department)
     {
         $department->delete();
+
         return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
     }
 

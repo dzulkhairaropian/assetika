@@ -16,8 +16,8 @@ class CalendarController extends Controller
         $renewals = Renewal::all();
         foreach ($renewals as $renew) {
             $events[] = [
-                'id' => 'renew_' . $renew->id,
-                'title' => '[Expiry] ' . $renew->name,
+                'id' => 'renew_'.$renew->id,
+                'title' => '[Expiry] '.$renew->name,
                 'start' => $renew->expiration_date->format('Y-m-d'),
                 'allDay' => true,
                 'extendedProps' => [
@@ -32,8 +32,8 @@ class CalendarController extends Controller
         $tickets = Ticket::whereNotNull('sla_due_at')->get();
         foreach ($tickets as $t) {
             $events[] = [
-                'id' => 't_' . $t->id,
-                'title' => '[Ticket SLA] #' . $t->request_id,
+                'id' => 't_'.$t->id,
+                'title' => '[Ticket SLA] #'.$t->request_id,
                 'start' => $t->sla_due_at->toIso8601String(),
                 'allDay' => false,
                 'extendedProps' => [

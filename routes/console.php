@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Schedule;
 $settingsPath = storage_path('app/backup_settings.json');
 if (file_exists($settingsPath)) {
     $settings = json_decode(file_get_contents($settingsPath), true);
-    
+
     // Database Backup Schedule
-    if (!empty($settings['db_backup_enabled'])) {
+    if (! empty($settings['db_backup_enabled'])) {
         $dbEvent = Schedule::command('backup:run', ['--only-db' => true, '--disable-notifications' => true]);
         $frequency = $settings['db_backup_frequency'] ?? 'daily';
         $time = $settings['db_backup_time'] ?? '02:00';
-        
+
         switch ($frequency) {
             case 'daily':
                 $dbEvent->dailyAt($time);
@@ -34,11 +34,11 @@ if (file_exists($settingsPath)) {
     }
 
     // Full Backup (Files + DB) Schedule
-    if (!empty($settings['full_backup_enabled'])) {
+    if (! empty($settings['full_backup_enabled'])) {
         $fullEvent = Schedule::command('backup:run', ['--disable-notifications' => true]);
         $frequency = $settings['full_backup_frequency'] ?? 'weekly';
         $time = $settings['full_backup_time'] ?? '03:00';
-        
+
         switch ($frequency) {
             case 'daily':
                 $fullEvent->dailyAt($time);
@@ -51,7 +51,7 @@ if (file_exists($settingsPath)) {
                 break;
         }
     }
-    
+
     // Auto Clean Old Backups (Runs daily)
     Schedule::command('backup:clean', ['--disable-notifications' => true])->dailyAt('01:00');
 } else {

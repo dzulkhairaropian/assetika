@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\OperatingSystem;
 use App\Models\Brand;
+use App\Models\OperatingSystem;
 use Illuminate\Http\Request;
 
 class OperatingSystemController extends Controller
@@ -14,16 +14,18 @@ class OperatingSystemController extends Controller
         $query = OperatingSystem::withCount('assets');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         $operatingSystems = $query->latest()->paginate(50)->withQueryString();
+
         return view('pages.master.operating-systems.index', compact('operatingSystems'));
     }
 
     public function create()
     {
         $brands = Brand::orderBy('name')->get();
+
         return view('pages.master.operating-systems.create', compact('brands'));
     }
 
@@ -47,6 +49,7 @@ class OperatingSystemController extends Controller
     public function edit(OperatingSystem $operatingSystem)
     {
         $brands = Brand::orderBy('name')->get();
+
         return view('pages.master.operating-systems.edit', compact('operatingSystem', 'brands'));
     }
 
@@ -66,6 +69,7 @@ class OperatingSystemController extends Controller
     public function destroy(OperatingSystem $operatingSystem)
     {
         $operatingSystem->delete();
+
         return redirect()->route('operating-systems.index')->with('success', 'Operating System deleted successfully.');
     }
 

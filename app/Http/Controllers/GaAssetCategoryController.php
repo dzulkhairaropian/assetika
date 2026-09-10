@@ -14,7 +14,7 @@ class GaAssetCategoryController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('name', 'like', "%$search%")
-                  ->orWhere('code_prefix', 'like', "%$search%");
+                ->orWhere('code_prefix', 'like', "%$search%");
         }
 
         $categories = $query->latest()->paginate(25)->withQueryString();
@@ -50,7 +50,7 @@ class GaAssetCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code_prefix' => 'required|string|max:255|unique:ga_asset_categories,code_prefix,' . $ga_category->id,
+            'code_prefix' => 'required|string|max:255|unique:ga_asset_categories,code_prefix,'.$ga_category->id,
             'depreciation_method' => 'required|in:straight_line,double_declining,sum_of_years_digits',
             'useful_life_years' => 'required|integer|min:1',
         ]);

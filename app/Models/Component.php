@@ -48,6 +48,7 @@ class Component extends Model
     public function availableQty(): int
     {
         $checkedOut = $this->assets()->sum('component_asset.qty');
+
         return $this->qty - $checkedOut;
     }
 }

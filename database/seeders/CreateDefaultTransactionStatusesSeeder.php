@@ -13,7 +13,7 @@ class CreateDefaultTransactionStatusesSeeder extends Seeder
         $statuses = [
             ['name' => 'Restock',    'master_category' => 'Consumable', 'color' => 'success', 'icon' => 'download'],
             ['name' => 'Checkout',   'master_category' => 'Consumable', 'color' => 'warning', 'icon' => 'shopping-cart'],
-            ['name' => 'Checked Out','master_category' => 'IT Asset',   'color' => 'primary', 'icon' => 'log-out'],
+            ['name' => 'Checked Out', 'master_category' => 'IT Asset',   'color' => 'primary', 'icon' => 'log-out'],
             ['name' => 'Returned',   'master_category' => 'IT Asset',   'color' => 'success', 'icon' => 'log-in'],
         ];
 

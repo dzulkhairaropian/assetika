@@ -13,11 +13,12 @@ class BrandController extends Controller
         $query = Brand::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('code', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%')
+                ->orWhere('code', 'like', '%'.$request->search.'%');
         }
 
         $brands = $query->latest()->paginate(50)->withQueryString();
+
         return view('pages.master.brands.index', compact('brands'));
     }
 
@@ -53,7 +54,7 @@ class BrandController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:brands,code,' . $brand->id,
+            'code' => 'required|string|max:50|unique:brands,code,'.$brand->id,
             'website' => 'nullable|url|max:255',
             'description' => 'nullable|string',
         ]);
@@ -66,6 +67,7 @@ class BrandController extends Controller
     public function destroy(Brand $brand)
     {
         $brand->delete();
+
         return redirect()->route('brands.index')->with('success', 'Brand deleted successfully.');
     }
 

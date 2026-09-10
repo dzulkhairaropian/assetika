@@ -3,13 +3,13 @@
 namespace App\Exports;
 
 use App\Models\AssetCheckout;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class AssetTransactionsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize
+class AssetTransactionsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
 {
     use Exportable;
 
@@ -28,10 +28,10 @@ class AssetTransactionsExport implements FromQuery, WithHeadings, WithMapping, S
             'checkedOutByUser',
             'checkedInByUser',
             'department',
-            'location'
+            'location',
         ]);
 
-        if (!empty($this->filters['type'])) {
+        if (! empty($this->filters['type'])) {
             if ($this->filters['type'] === 'active') {
                 $query->whereNull('checked_in_at');
             } elseif ($this->filters['type'] === 'returned') {
@@ -39,19 +39,19 @@ class AssetTransactionsExport implements FromQuery, WithHeadings, WithMapping, S
             }
         }
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
-            $query->where(function($q) use ($search) {
-                $q->whereHas('asset', function($aq) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('asset', function ($aq) use ($search) {
                     $aq->where('asset_tag', 'like', "%$search%")
-                      ->orWhere('serial_number', 'like', "%$search%")
-                      ->orWhereHas('product', function($pq) use ($search) {
-                          $pq->where('model', 'like', "%$search%");
-                      });
+                        ->orWhere('serial_number', 'like', "%$search%")
+                        ->orWhereHas('product', function ($pq) use ($search) {
+                            $pq->where('model', 'like', "%$search%");
+                        });
                 })
-                ->orWhereHas('checkedOutToUser', function($uq) use ($search) {
-                    $uq->where('name', 'like', "%$search%");
-                });
+                    ->orWhereHas('checkedOutToUser', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%$search%");
+                    });
             });
         }
 

@@ -17,8 +17,8 @@ class ProjectStatusSeeder extends Seeder
             ['name' => 'Planning',  'color' => 'info',    'icon' => 'clock'],
             ['name' => 'Active',    'color' => 'success', 'icon' => 'play-circle'],
             ['name' => 'On Hold',   'color' => 'warning', 'icon' => 'pause-circle'],
-            ['name' => 'Completed','color' => 'primary', 'icon' => 'check-circle'],
-            ['name' => 'Cancelled','color' => 'danger',  'icon' => 'x-circle'],
+            ['name' => 'Completed', 'color' => 'primary', 'icon' => 'check-circle'],
+            ['name' => 'Cancelled', 'color' => 'danger',  'icon' => 'x-circle'],
         ];
 
         foreach ($projectStatuses as $st) {

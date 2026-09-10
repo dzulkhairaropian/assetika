@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
@@ -14,20 +16,22 @@ class CompanyController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('code', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
+                    ->orWhere('code', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
             });
         }
 
         $companies = $query->latest()->paginate(50)->withQueryString();
+
         return view('pages.master.companies.index', compact('companies'));
     }
 
     public function create()
     {
-        $groups = \App\Models\Group::orderBy('name')->get();
+        $groups = Group::orderBy('name')->get();
+
         return view('pages.master.companies.create', compact('groups'));
     }
 
@@ -59,7 +63,8 @@ class CompanyController extends Controller
 
     public function edit(Company $company)
     {
-        $groups = \App\Models\Group::orderBy('name')->get();
+        $groups = Group::orderBy('name')->get();
+
         return view('pages.master.companies.edit', compact('company', 'groups'));
     }
 
@@ -68,7 +73,7 @@ class CompanyController extends Controller
         $validated = $request->validate([
             'group_id' => 'nullable|exists:groups,id',
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:10|unique:companies,code,' . $company->id,
+            'code' => 'required|string|max:10|unique:companies,code,'.$company->id,
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'website' => 'nullable|url|max:255',
@@ -78,7 +83,7 @@ class CompanyController extends Controller
 
         if ($request->hasFile('logo')) {
             if ($company->logo) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($company->logo);
+                Storage::disk('public')->delete($company->logo);
             }
             $validated['logo'] = $request->file('logo')->store('companies/logos', 'public');
         }
@@ -91,6 +96,7 @@ class CompanyController extends Controller
     public function destroy(Company $company)
     {
         $company->delete();
+
         return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
     }
 

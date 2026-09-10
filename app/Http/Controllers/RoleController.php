@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -13,16 +13,18 @@ class RoleController extends Controller
         $query = Role::with('permissions')->withCount('users');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         $roles = $query->latest('id')->paginate(50)->withQueryString();
+
         return view('pages.roles.index', compact('roles'));
     }
 
     public function create()
     {
         $permissions = Permission::all();
+
         return view('pages.roles.create', compact('permissions'));
     }
 
@@ -30,7 +32,7 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name',
-            'permissions' => 'nullable|array'
+            'permissions' => 'nullable|array',
         ]);
 
         $role = Role::create(['name' => $request->name]);
@@ -46,14 +48,15 @@ class RoleController extends Controller
     {
         $permissions = Permission::all();
         $rolePermissions = $role->permissions->pluck('id')->toArray();
+
         return view('pages.roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
     public function update(Request $request, Role $role)
     {
         $request->validate([
-            'name' => 'required|unique:roles,name,' . $role->id,
-            'permissions' => 'nullable|array'
+            'name' => 'required|unique:roles,name,'.$role->id,
+            'permissions' => 'nullable|array',
         ]);
 
         $role->update(['name' => $request->name]);
@@ -66,6 +69,7 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         $role->delete();
+
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\Location;
 use App\Models\Company;
+use App\Models\Location;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
@@ -14,7 +14,7 @@ class LocationController extends Controller
         $query = Location::with('company')->withCount('assets');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('company_id')) {
@@ -30,6 +30,7 @@ class LocationController extends Controller
     public function create()
     {
         $companies = Company::orderBy('name')->get();
+
         return view('pages.master.locations.create', compact('companies'));
     }
 
@@ -53,6 +54,7 @@ class LocationController extends Controller
     public function edit(Location $location)
     {
         $companies = Company::orderBy('name')->get();
+
         return view('pages.master.locations.edit', compact('location', 'companies'));
     }
 
@@ -72,6 +74,7 @@ class LocationController extends Controller
     public function destroy(Location $location)
     {
         $location->delete();
+
         return redirect()->route('locations.index')->with('success', 'Location deleted successfully.');
     }
 

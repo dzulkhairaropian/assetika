@@ -2,11 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Asset;
-use App\Models\Status;
+use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Company;
+use App\Models\Component;
+use App\Models\Consumable;
+use App\Models\Department;
+use App\Models\License;
+use App\Models\Location;
+use App\Models\MasterCategory;
+use App\Models\OperatingSystem;
+use App\Models\Position;
+use App\Models\Product;
+use App\Models\Status;
+use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class ImportController extends Controller
@@ -32,16 +45,22 @@ class ImportController extends Controller
         }
 
         $header = array_shift($rows);
-        if (!$header) return back()->with('error', 'Empty file.');
+        if (! $header) {
+            return back()->with('error', 'Empty file.');
+        }
 
         $errors = [];
         $preview = [];
         $maxPreview = 10;
 
         foreach ($rows as $i => $row) {
-            if (count($row) < count($header)) continue;
+            if (count($row) < count($header)) {
+                continue;
+            }
             $data = array_combine(array_slice($header, 0, count($row)), $row);
-            if ($i < $maxPreview) $preview[] = $data;
+            if ($i < $maxPreview) {
+                $preview[] = $data;
+            }
 
             if ($request->type === 'assets') {
                 $v = Validator::make($data, [
@@ -49,7 +68,9 @@ class ImportController extends Controller
                     'serial_number' => 'nullable|string',
                     'device_name' => 'nullable|string',
                 ]);
-                if ($v->fails()) $errors[] = "Row " . ($i + 2) . ": " . implode(', ', $v->errors()->all());
+                if ($v->fails()) {
+                    $errors[] = 'Row '.($i + 2).': '.implode(', ', $v->errors()->all());
+                }
             }
         }
 
@@ -66,43 +87,52 @@ class ImportController extends Controller
         $rows = json_decode(session('import_rows'), true);
         $type = session('import_type');
 
-        if (!$rows || !$header) return redirect()->route('import.index')->with('error', 'No data to import.');
+        if (! $rows || ! $header) {
+            return redirect()->route('import.index')->with('error', 'No data to import.');
+        }
 
         $validRows = [];
         $skipped = 0;
 
         foreach ($rows as $row) {
-            if (count($row) < count($header)) { $skipped++; continue; }
+            if (count($row) < count($header)) {
+                $skipped++;
+
+                continue;
+            }
             $data = array_combine(array_slice($header, 0, count($row)), $row);
             $validRows[] = $data;
         }
 
         $imported = 0;
         if ($type === 'assets') {
-            $itMasterCat = \App\Models\MasterCategory::where('name', 'IT Asset')->first();
+            $itMasterCat = MasterCategory::where('name', 'IT Asset')->first();
 
             foreach ($validRows as $data) {
-                if (empty($data['serial_number']) && empty($data['asset_tag'])) continue;
+                if (empty($data['serial_number']) && empty($data['asset_tag'])) {
+                    continue;
+                }
 
-                if (!empty($data['serial_number']) && Asset::where('serial_number', $data['serial_number'])->exists()) {
+                if (! empty($data['serial_number']) && Asset::where('serial_number', $data['serial_number'])->exists()) {
                     $skipped++;
+
                     continue;
                 }
 
                 // Resolve Brand & Category & Product
-                $brandId = !empty($data['brand_name']) 
-                    ? \App\Models\Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id 
+                $brandId = ! empty($data['brand_name'])
+                    ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
                     : null;
 
-                $categoryId = !empty($data['category_name'])
-                    ? \App\Models\Category::firstOrCreate(
+                $categoryId = ! empty($data['category_name'])
+                    ? Category::firstOrCreate(
                         ['name' => trim($data['category_name'])],
                         ['master_category_id' => $itMasterCat?->id]
                     )->id
                     : null;
 
-                $modelName = !empty($data['model_name']) ? trim($data['model_name']) : (!empty($data['device_name']) ? trim($data['device_name']) : 'General Model');
-                $product = \App\Models\Product::firstOrCreate(
+                $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : 'General Model');
+                $product = Product::firstOrCreate(
                     ['name' => $modelName],
                     [
                         'brand_id' => $brandId,
@@ -112,43 +142,43 @@ class ImportController extends Controller
                 );
 
                 // Resolve Operating System
-                $osId = !empty($data['operating_system'])
-                    ? \App\Models\OperatingSystem::firstOrCreate(['name' => trim($data['operating_system'])])->id
+                $osId = ! empty($data['operating_system'])
+                    ? OperatingSystem::firstOrCreate(['name' => trim($data['operating_system'])])->id
                     : null;
 
                 // Resolve Vendor
-                $vendorId = !empty($data['vendor_name'])
-                    ? \App\Models\Vendor::firstOrCreate(['name' => trim($data['vendor_name'])])->id
+                $vendorId = ! empty($data['vendor_name'])
+                    ? Vendor::firstOrCreate(['name' => trim($data['vendor_name'])])->id
                     : null;
 
                 // Resolve Status
-                $statusId = !empty($data['status_name'])
+                $statusId = ! empty($data['status_name'])
                     ? Status::where('name', trim($data['status_name']))->first()?->id
                     : null;
 
-                if (!$statusId) {
+                if (! $statusId) {
                     $statusId = Status::where('name', 'Ready to Deploy')->first()?->id ?? Status::first()?->id;
                 }
 
                 // Resolve Company, Department, Location
-                $companyId = !empty($data['company_name'])
-                    ? \App\Models\Company::firstOrCreate(['name' => trim($data['company_name'])])->id
+                $companyId = ! empty($data['company_name'])
+                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
                     : null;
 
-                $departmentId = !empty($data['department_name'])
-                    ? \App\Models\Department::firstOrCreate(
+                $departmentId = ! empty($data['department_name'])
+                    ? Department::firstOrCreate(
                         ['name' => trim($data['department_name'])],
                         ['company_id' => $companyId]
                     )->id
                     : null;
 
-                $locationId = !empty($data['location_name'])
-                    ? \App\Models\Location::firstOrCreate(['name' => trim($data['location_name'])])->id
+                $locationId = ! empty($data['location_name'])
+                    ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
                     : null;
 
                 // Resolve Assigned User
-                $assignedUserId = !empty($data['assigned_user_email'])
-                    ? \App\Models\User::where('email', trim($data['assigned_user_email']))->first()?->id
+                $assignedUserId = ! empty($data['assigned_user_email'])
+                    ? User::where('email', trim($data['assigned_user_email']))->first()?->id
                     : null;
 
                 Asset::create([
@@ -159,61 +189,64 @@ class ImportController extends Controller
                     'department_id' => $departmentId,
                     'location_id' => $locationId,
                     'assigned_to_user_id' => $assignedUserId,
-                    'asset_tag' => !empty($data['asset_tag']) ? trim($data['asset_tag']) : null,
-                    'serial_number' => !empty($data['serial_number']) ? trim($data['serial_number']) : null,
-                    'product_number' => !empty($data['product_number']) ? trim($data['product_number']) : null,
-                    'device_name' => !empty($data['device_name']) ? trim($data['device_name']) : $modelName,
-                    'purchase_date' => !empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
-                    'purchase_cost' => !empty($data['purchase_cost']) ? (float)$data['purchase_cost'] : 0,
-                    'invoice_number' => !empty($data['invoice_number']) ? trim($data['invoice_number']) : null,
-                    'warranty_expiry_date' => !empty($data['warranty_expiry_date']) ? trim($data['warranty_expiry_date']) : null,
-                    'license_windows' => !empty($data['license_windows']) ? trim($data['license_windows']) : null,
-                    'license_office' => !empty($data['license_office']) ? trim($data['license_office']) : null,
-                    'mac_address_wireless' => !empty($data['mac_address_wireless']) ? trim($data['mac_address_wireless']) : null,
-                    'mac_address_ethernet' => !empty($data['mac_address_ethernet']) ? trim($data['mac_address_ethernet']) : null,
-                    'specification' => !empty($data['specification']) ? trim($data['specification']) : null,
-                    'accessories' => !empty($data['accessories']) ? trim($data['accessories']) : null,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'asset_tag' => ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null,
+                    'serial_number' => ! empty($data['serial_number']) ? trim($data['serial_number']) : null,
+                    'product_number' => ! empty($data['product_number']) ? trim($data['product_number']) : null,
+                    'device_name' => ! empty($data['device_name']) ? trim($data['device_name']) : $modelName,
+                    'purchase_date' => ! empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
+                    'purchase_cost' => ! empty($data['purchase_cost']) ? (float) $data['purchase_cost'] : 0,
+                    'invoice_number' => ! empty($data['invoice_number']) ? trim($data['invoice_number']) : null,
+                    'warranty_expiry_date' => ! empty($data['warranty_expiry_date']) ? trim($data['warranty_expiry_date']) : null,
+                    'license_windows' => ! empty($data['license_windows']) ? trim($data['license_windows']) : null,
+                    'license_office' => ! empty($data['license_office']) ? trim($data['license_office']) : null,
+                    'mac_address_wireless' => ! empty($data['mac_address_wireless']) ? trim($data['mac_address_wireless']) : null,
+                    'mac_address_ethernet' => ! empty($data['mac_address_ethernet']) ? trim($data['mac_address_ethernet']) : null,
+                    'specification' => ! empty($data['specification']) ? trim($data['specification']) : null,
+                    'accessories' => ! empty($data['accessories']) ? trim($data['accessories']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'users') {
             foreach ($validRows as $data) {
-                if (empty($data['email'])) continue;
-
-                if (\App\Models\User::where('email', trim($data['email']))->exists()) {
-                    $skipped++;
+                if (empty($data['email'])) {
                     continue;
                 }
 
-                $companyId = !empty($data['company_name']) 
-                    ? \App\Models\Company::firstOrCreate(['name' => trim($data['company_name'])])->id 
+                if (User::where('email', trim($data['email']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $companyId = ! empty($data['company_name'])
+                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
                     : null;
 
-                $departmentId = !empty($data['department_name']) 
-                    ? \App\Models\Department::firstOrCreate(
+                $departmentId = ! empty($data['department_name'])
+                    ? Department::firstOrCreate(
                         ['name' => trim($data['department_name'])],
                         ['company_id' => $companyId]
-                    )->id 
+                    )->id
                     : null;
 
-                $positionId = !empty($data['position_name']) 
-                    ? \App\Models\Position::firstOrCreate(['name' => trim($data['position_name'])])->id 
+                $positionId = ! empty($data['position_name'])
+                    ? Position::firstOrCreate(['name' => trim($data['position_name'])])->id
                     : null;
 
-                $locationId = !empty($data['location_name']) 
-                    ? \App\Models\Location::firstOrCreate(['name' => trim($data['location_name'])])->id 
+                $locationId = ! empty($data['location_name'])
+                    ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
                     : null;
 
-                $isActive = isset($data['is_active']) 
+                $isActive = isset($data['is_active'])
                     ? (in_array(strtolower(trim($data['is_active'])), ['1', 'true', 'active', 'yes']))
                     : true;
 
-                \App\Models\User::create([
-                    'name' => !empty($data['name']) ? trim($data['name']) : 'User',
+                User::create([
+                    'name' => ! empty($data['name']) ? trim($data['name']) : 'User',
                     'email' => trim($data['email']),
-                    'phone' => !empty($data['phone']) ? trim($data['phone']) : null,
-                    'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : null,
+                    'password' => Hash::make('password123'),
                     'department_id' => $departmentId,
                     'company_id' => $companyId,
                     'position_id' => $positionId,
@@ -223,23 +256,25 @@ class ImportController extends Controller
                 $imported++;
             }
         } elseif ($type === 'consumables') {
-            $consumableMasterCat = \App\Models\MasterCategory::where('name', 'IT Consumable')->first();
+            $consumableMasterCat = MasterCategory::where('name', 'IT Consumable')->first();
 
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
+                if (empty($data['name'])) {
+                    continue;
+                }
 
-                $brandId = !empty($data['brand_name'])
-                    ? \App\Models\Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
+                $brandId = ! empty($data['brand_name'])
+                    ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
                     : null;
 
-                $categoryId = !empty($data['category_name'])
-                    ? \App\Models\Category::firstOrCreate(
+                $categoryId = ! empty($data['category_name'])
+                    ? Category::firstOrCreate(
                         ['name' => trim($data['category_name'])],
                         ['master_category_id' => $consumableMasterCat?->id]
                     )->id
                     : null;
 
-                $product = \App\Models\Product::firstOrCreate(
+                $product = Product::firstOrCreate(
                     ['name' => trim($data['name'])],
                     [
                         'brand_id' => $brandId,
@@ -248,245 +283,273 @@ class ImportController extends Controller
                     ]
                 );
 
-                $statusId = !empty($data['status_name'])
+                $statusId = ! empty($data['status_name'])
                     ? Status::where('name', trim($data['status_name']))->first()?->id
                     : (Status::where('name', 'In Stock')->first()?->id ?? Status::first()?->id);
 
-                \App\Models\Consumable::create([
+                Consumable::create([
                     'product_id' => $product->id,
                     'status_id' => $statusId,
-                    'quantity' => (int)($data['quantity'] ?? $data['qty'] ?? 10),
-                    'low_threshold' => (int)($data['min_qty'] ?? 5),
-                    'purchase_cost' => (float)($data['purchase_cost'] ?? 0),
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'quantity' => (int) ($data['quantity'] ?? $data['qty'] ?? 10),
+                    'low_threshold' => (int) ($data['min_qty'] ?? 5),
+                    'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'companies') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Company::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                \App\Models\Company::create([
+                if (Company::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                Company::create([
                     'name' => trim($data['name']),
-                    'code' => !empty($data['code']) ? trim($data['code']) : null,
-                    'email' => !empty($data['email']) ? trim($data['email']) : null,
-                    'phone' => !empty($data['phone']) ? trim($data['phone']) : null,
-                    'website' => !empty($data['website']) ? trim($data['website']) : null,
-                    'address' => !empty($data['address']) ? trim($data['address']) : null,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
+                    'email' => ! empty($data['email']) ? trim($data['email']) : null,
+                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : null,
+                    'website' => ! empty($data['website']) ? trim($data['website']) : null,
+                    'address' => ! empty($data['address']) ? trim($data['address']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'departments') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Department::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                $companyId = !empty($data['company_name'])
-                    ? \App\Models\Company::firstOrCreate(['name' => trim($data['company_name'])])->id
+                if (Department::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $companyId = ! empty($data['company_name'])
+                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
                     : null;
 
-                \App\Models\Department::create([
+                Department::create([
                     'name' => trim($data['name']),
-                    'code' => !empty($data['code']) ? trim($data['code']) : null,
+                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
                     'company_id' => $companyId,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'locations') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Location::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                $companyId = !empty($data['company_name'])
-                    ? \App\Models\Company::firstOrCreate(['name' => trim($data['company_name'])])->id
+                if (Location::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $companyId = ! empty($data['company_name'])
+                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
                     : null;
 
-                \App\Models\Location::create([
+                Location::create([
                     'name' => trim($data['name']),
-                    'code' => !empty($data['code']) ? trim($data['code']) : null,
+                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
                     'company_id' => $companyId,
-                    'address' => !empty($data['address']) ? trim($data['address']) : null,
-                    'city' => !empty($data['city']) ? trim($data['city']) : null,
-                    'state' => !empty($data['state']) ? trim($data['state']) : null,
-                    'zip' => !empty($data['zip']) ? trim($data['zip']) : null,
-                    'country' => !empty($data['country']) ? trim($data['country']) : null,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'address' => ! empty($data['address']) ? trim($data['address']) : null,
+                    'city' => ! empty($data['city']) ? trim($data['city']) : null,
+                    'state' => ! empty($data['state']) ? trim($data['state']) : null,
+                    'zip' => ! empty($data['zip']) ? trim($data['zip']) : null,
+                    'country' => ! empty($data['country']) ? trim($data['country']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'brands') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Brand::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                \App\Models\Brand::create([
+                if (Brand::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                Brand::create([
                     'name' => trim($data['name']),
-                    'website' => !empty($data['website']) ? trim($data['website']) : null,
-                    'support_phone' => !empty($data['support_phone']) ? trim($data['support_phone']) : null,
-                    'support_email' => !empty($data['support_email']) ? trim($data['support_email']) : null,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'website' => ! empty($data['website']) ? trim($data['website']) : null,
+                    'support_phone' => ! empty($data['support_phone']) ? trim($data['support_phone']) : null,
+                    'support_email' => ! empty($data['support_email']) ? trim($data['support_email']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'categories') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Category::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                $masterCategory = !empty($data['master_category_name'])
-                    ? \App\Models\MasterCategory::where('name', trim($data['master_category_name']))->first()
-                    : \App\Models\MasterCategory::first();
+                if (Category::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
 
-                \App\Models\Category::create([
+                    continue;
+                }
+
+                $masterCategory = ! empty($data['master_category_name'])
+                    ? MasterCategory::where('name', trim($data['master_category_name']))->first()
+                    : MasterCategory::first();
+
+                Category::create([
                     'name' => trim($data['name']),
-                    'code' => !empty($data['code']) ? trim($data['code']) : null,
+                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
                     'master_category_id' => $masterCategory?->id,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'positions') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Position::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                $departmentId = !empty($data['department_name'])
-                    ? \App\Models\Department::firstOrCreate(['name' => trim($data['department_name'])])->id
+                if (Position::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $departmentId = ! empty($data['department_name'])
+                    ? Department::firstOrCreate(['name' => trim($data['department_name'])])->id
                     : null;
 
-                \App\Models\Position::create([
+                Position::create([
                     'name' => trim($data['name']),
-                    'code' => !empty($data['code']) ? trim($data['code']) : null,
+                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
                     'department_id' => $departmentId,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'vendors') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Vendor::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                \App\Models\Vendor::create([
+                if (Vendor::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                Vendor::create([
                     'name' => trim($data['name']),
-                    'contact_person' => !empty($data['contact_person']) ? trim($data['contact_person']) : null,
-                    'email' => !empty($data['email']) ? trim($data['email']) : null,
-                    'phone' => !empty($data['phone']) ? trim($data['phone']) : null,
-                    'website' => !empty($data['website']) ? trim($data['website']) : null,
-                    'address' => !empty($data['address']) ? trim($data['address']) : null,
-                    'npwp_number' => !empty($data['npwp_number']) ? trim($data['npwp_number']) : null,
-                    'npwp_name' => !empty($data['npwp_name']) ? trim($data['npwp_name']) : null,
-                    'nib' => !empty($data['nib']) ? trim($data['nib']) : null,
-                    'bank_name' => !empty($data['bank_name']) ? trim($data['bank_name']) : null,
-                    'bank_account_number' => !empty($data['bank_account_number']) ? trim($data['bank_account_number']) : null,
-                    'bank_account_name' => !empty($data['bank_account_name']) ? trim($data['bank_account_name']) : null,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'contact_person' => ! empty($data['contact_person']) ? trim($data['contact_person']) : null,
+                    'email' => ! empty($data['email']) ? trim($data['email']) : null,
+                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : null,
+                    'website' => ! empty($data['website']) ? trim($data['website']) : null,
+                    'address' => ! empty($data['address']) ? trim($data['address']) : null,
+                    'npwp_number' => ! empty($data['npwp_number']) ? trim($data['npwp_number']) : null,
+                    'npwp_name' => ! empty($data['npwp_name']) ? trim($data['npwp_name']) : null,
+                    'nib' => ! empty($data['nib']) ? trim($data['nib']) : null,
+                    'bank_name' => ! empty($data['bank_name']) ? trim($data['bank_name']) : null,
+                    'bank_account_number' => ! empty($data['bank_account_number']) ? trim($data['bank_account_number']) : null,
+                    'bank_account_name' => ! empty($data['bank_account_name']) ? trim($data['bank_account_name']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'products') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
-
-                if (\App\Models\Product::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
+                if (empty($data['name'])) {
                     continue;
                 }
 
-                $brandId = !empty($data['brand_name'])
-                    ? \App\Models\Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
+                if (Product::where('name', trim($data['name']))->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $brandId = ! empty($data['brand_name'])
+                    ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
                     : null;
 
-                $masterCat = !empty($data['master_category_name'])
-                    ? \App\Models\MasterCategory::where('name', trim($data['master_category_name']))->first()
-                    : \App\Models\MasterCategory::first();
+                $masterCat = ! empty($data['master_category_name'])
+                    ? MasterCategory::where('name', trim($data['master_category_name']))->first()
+                    : MasterCategory::first();
 
-                $categoryId = !empty($data['category_name'])
-                    ? \App\Models\Category::firstOrCreate(
+                $categoryId = ! empty($data['category_name'])
+                    ? Category::firstOrCreate(
                         ['name' => trim($data['category_name'])],
                         ['master_category_id' => $masterCat?->id]
                     )->id
                     : null;
 
-                \App\Models\Product::create([
+                Product::create([
                     'name' => trim($data['name']),
                     'brand_id' => $brandId,
                     'category_id' => $categoryId,
                     'master_category_id' => $masterCat?->id,
-                    'product_type' => !empty($data['product_type']) ? trim($data['product_type']) : 'Hardware',
-                    'description' => !empty($data['description']) ? trim($data['description']) : null,
+                    'product_type' => ! empty($data['product_type']) ? trim($data['product_type']) : 'Hardware',
+                    'description' => ! empty($data['description']) ? trim($data['description']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'components') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
+                if (empty($data['name'])) {
+                    continue;
+                }
 
-                $categoryId = !empty($data['category_name'])
-                    ? \App\Models\Category::firstOrCreate(['name' => trim($data['category_name'])])->id
+                $categoryId = ! empty($data['category_name'])
+                    ? Category::firstOrCreate(['name' => trim($data['category_name'])])->id
                     : null;
 
-                $locationId = !empty($data['location_name'])
-                    ? \App\Models\Location::firstOrCreate(['name' => trim($data['location_name'])])->id
+                $locationId = ! empty($data['location_name'])
+                    ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
                     : null;
 
-                \App\Models\Component::create([
+                Component::create([
                     'name' => trim($data['name']),
                     'category_id' => $categoryId,
-                    'manufacturer' => !empty($data['brand_name']) ? trim($data['brand_name']) : null,
-                    'serial' => !empty($data['serial_number']) ? trim($data['serial_number']) : null,
-                    'qty' => (int)($data['quantity'] ?? 1),
-                    'min_qty' => (int)($data['min_qty'] ?? 1),
-                    'purchase_cost' => (float)($data['purchase_cost'] ?? 0),
+                    'manufacturer' => ! empty($data['brand_name']) ? trim($data['brand_name']) : null,
+                    'serial' => ! empty($data['serial_number']) ? trim($data['serial_number']) : null,
+                    'qty' => (int) ($data['quantity'] ?? 1),
+                    'min_qty' => (int) ($data['min_qty'] ?? 1),
+                    'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
                     'location_id' => $locationId,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }
         } elseif ($type === 'licenses') {
             foreach ($validRows as $data) {
-                if (empty($data['name'])) continue;
+                if (empty($data['name'])) {
+                    continue;
+                }
 
-                \App\Models\License::create([
+                License::create([
                     'name' => trim($data['name']),
-                    'product_key' => !empty($data['license_key']) ? trim($data['license_key']) : null,
-                    'seats' => (int)($data['seats'] ?? 1),
-                    'manufacturer' => !empty($data['manufacturer_name']) ? trim($data['manufacturer_name']) : null,
-                    'purchase_cost' => (float)($data['purchase_cost'] ?? 0),
-                    'purchase_date' => !empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
-                    'expiration_date' => !empty($data['expiration_date']) ? trim($data['expiration_date']) : null,
-                    'notes' => !empty($data['notes']) ? trim($data['notes']) : null,
+                    'product_key' => ! empty($data['license_key']) ? trim($data['license_key']) : null,
+                    'seats' => (int) ($data['seats'] ?? 1),
+                    'manufacturer' => ! empty($data['manufacturer_name']) ? trim($data['manufacturer_name']) : null,
+                    'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
+                    'purchase_date' => ! empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
+                    'expiration_date' => ! empty($data['expiration_date']) ? trim($data['expiration_date']) : null,
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
                 $imported++;
             }

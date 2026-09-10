@@ -14,18 +14,18 @@ return new class extends Migration
         Schema::create('asset_transfers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_id')->constrained('assets')->cascadeOnDelete();
-            
+
             $table->foreignId('from_company_id')->constrained('companies');
             $table->foreignId('from_department_id')->nullable()->constrained('departments');
             $table->foreignId('from_location_id')->nullable()->constrained('locations');
-            
+
             $table->foreignId('to_company_id')->constrained('companies');
             $table->foreignId('to_department_id')->nullable()->constrained('departments');
             $table->foreignId('to_location_id')->nullable()->constrained('locations');
-            
+
             $table->foreignId('requested_by_user_id')->constrained('users');
             $table->foreignId('approved_by_user_id')->nullable()->constrained('users');
-            
+
             $table->string('status')->default('pending'); // pending, approved, rejected, completed, cancelled
             $table->text('reason')->nullable();
             $table->text('notes')->nullable();

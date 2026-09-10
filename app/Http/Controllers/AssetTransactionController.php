@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AssetTransactionsExport;
 use App\Models\AssetCheckout;
 use Illuminate\Http\Request;
-
-use App\Exports\AssetTransactionsExport;
 
 class AssetTransactionController extends Controller
 {
     public function export(Request $request)
     {
-        return (new AssetTransactionsExport($request->all()))->download('asset-transactions-' . now()->format('Y-m-d') . '.xlsx');
+        return (new AssetTransactionsExport($request->all()))->download('asset-transactions-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function index(Request $request)
     {
         $query = AssetCheckout::with([
-            'asset.product.brand', 
-            'checkedOutToUser', 
-            'checkedOutByUser', 
-            'checkedInByUser'
+            'asset.product.brand',
+            'checkedOutToUser',
+            'checkedOutByUser',
+            'checkedInByUser',
         ]);
 
         if ($request->filled('type')) {
@@ -33,17 +32,17 @@ class AssetTransactionController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->whereHas('asset', function($aq) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('asset', function ($aq) use ($search) {
                     $aq->where('asset_tag', 'like', "%$search%")
-                      ->orWhere('serial_number', 'like', "%$search%")
-                      ->orWhereHas('product', function($pq) use ($search) {
-                          $pq->where('name', 'like', "%$search%");
-                      });
+                        ->orWhere('serial_number', 'like', "%$search%")
+                        ->orWhereHas('product', function ($pq) use ($search) {
+                            $pq->where('name', 'like', "%$search%");
+                        });
                 })
-                ->orWhereHas('checkedOutToUser', function($uq) use ($search) {
-                    $uq->where('name', 'like', "%$search%");
-                });
+                    ->orWhereHas('checkedOutToUser', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%$search%");
+                    });
             });
         }
 

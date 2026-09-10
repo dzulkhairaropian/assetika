@@ -31,20 +31,20 @@ class GaAsset extends Model
     ];
 
     protected $casts = [
-        "qty" => "integer",
-        "purchase_date" => "date",
-        "purchase_price" => "decimal:2",
-        "additional_cost" => "decimal:2",
-        "total_asset_value" => "decimal:2",
-        "warranty_expiry_date" => "date",
-        "retired_at" => "date",
+        'qty' => 'integer',
+        'purchase_date' => 'date',
+        'purchase_price' => 'decimal:2',
+        'additional_cost' => 'decimal:2',
+        'total_asset_value' => 'decimal:2',
+        'warranty_expiry_date' => 'date',
+        'retired_at' => 'date',
     ];
 
     public function scopeFilter($query, array $filters)
     {
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
-            $like = '%' . $search . '%';
+            $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
                 $q->where('asset_code', 'like', $like)
                     ->orWhere('name', 'like', $like)
@@ -54,11 +54,11 @@ class GaAsset extends Model
             });
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['category_id'])) {
+        if (! empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
@@ -72,49 +72,49 @@ class GaAsset extends Model
 
     public function subcategory()
     {
-        return $this->belongsTo(GaAssetSubcategory::class, "subcategory_id");
+        return $this->belongsTo(GaAssetSubcategory::class, 'subcategory_id');
     }
 
     public function vehicle()
     {
-        return $this->hasOne(GaAssetVehicle::class, "asset_id");
+        return $this->hasOne(GaAssetVehicle::class, 'asset_id');
     }
 
     public function currentHolder()
     {
-        return $this->belongsTo(User::class, "current_holder_id");
+        return $this->belongsTo(User::class, 'current_holder_id');
     }
 
     public function assignments()
     {
-        return $this->hasMany(GaAssetAssignment::class, "asset_id");
+        return $this->hasMany(GaAssetAssignment::class, 'asset_id');
     }
 
     public function maintenanceLogs()
     {
-        return $this->hasMany(GaMaintenanceLog::class, "asset_id");
+        return $this->hasMany(GaMaintenanceLog::class, 'asset_id');
     }
 
     public function getRetirementEvidenceUrlAttribute(): ?string
     {
-        $path = trim((string) ($this->retirement_evidence_path ?? ""));
+        $path = trim((string) ($this->retirement_evidence_path ?? ''));
 
-        if ($path === "") {
+        if ($path === '') {
             return null;
         }
 
-        return Storage::disk("public")->url($path);
+        return Storage::disk('public')->url($path);
     }
 
     public function getStatusObjectAttribute()
     {
-        return \App\Models\Status::where('name', $this->status)->first();
+        return Status::where('name', $this->status)->first();
     }
 
     public function setRetirementEvidencePathAttribute($value): void
     {
         $path = is_string($value) ? trim($value) : $value;
-        $this->attributes["retirement_evidence_path"] = blank($path)
+        $this->attributes['retirement_evidence_path'] = blank($path)
             ? null
             : $path;
     }

@@ -355,6 +355,11 @@
                                         $statusColor = optional($asset->status)->color;
                                     @endphp
                                     <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
+                                    @if($asset->is_components_stripped)
+                                        <div class="mt-1">
+                                            <x-ui.badge color="warning" variant="light" size="sm" featherIcon="cpu">Components Stripped</x-ui.badge>
+                                        </div>
+                                    @endif
                                     @if(in_array($statusName, ['Sold', 'For Sale']))
                                         <div class="mt-1 flex flex-col text-[11px] text-gray-500 dark:text-gray-400">
                                             @if($asset->sale_price)

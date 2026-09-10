@@ -296,7 +296,7 @@ return [
      */
     'monitor_backups' => [
         [
-        'name' => env('BACKUP_NAME', 'assetika-backup'),
+            'name' => env('BACKUP_NAME', 'assetika-backup'),
             'disks' => ['local'],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Renewal;
-use App\Models\Vendor;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 
 class RenewalController extends Controller

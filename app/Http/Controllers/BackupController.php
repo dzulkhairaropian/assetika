@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class BackupController extends Controller
 {
@@ -36,7 +37,7 @@ class BackupController extends Controller
     {
         $backupName = config('backup.backup.name', env('BACKUP_NAME', 'laravel-backup'));
         $disk = Storage::disk('local');
-        
+
         $backups = [];
         $addedNames = [];
 
@@ -60,10 +61,10 @@ class BackupController extends Controller
         // Check fallback storage path (storage/app/{backupName})
         $rootPath = storage_path("app/{$backupName}");
         if (file_exists($rootPath)) {
-            $globFiles = glob($rootPath . '/*.zip');
+            $globFiles = glob($rootPath.'/*.zip');
             foreach ($globFiles as $file) {
                 $baseName = basename($file);
-                if (!isset($addedNames[$baseName])) {
+                if (! isset($addedNames[$baseName])) {
                     $backups[] = [
                         'name' => $baseName,
                         'size' => $this->formatBytes(filesize($file)),
@@ -105,36 +106,38 @@ class BackupController extends Controller
             $output = Artisan::output();
 
             if ($exitCode !== 0) {
-                Log::warning('Spatie backup failed with exit code ' . $exitCode . '. Attempting PDO fallback dump. Output: ' . $output);
-                
+                Log::warning('Spatie backup failed with exit code '.$exitCode.'. Attempting PDO fallback dump. Output: '.$output);
+
                 // Fallback to PDO database backup if type is 'db' or if Spatie fails
                 try {
                     $this->fallbackDbBackup();
+
                     return redirect()->back()->with('success', 'Backup generated successfully (via PDO fallback).');
                 } catch (\Exception $fallbackException) {
-                    Log::error('PDO Fallback backup also failed: ' . $fallbackException->getMessage());
-                    
+                    Log::error('PDO Fallback backup also failed: '.$fallbackException->getMessage());
+
                     $errorMessage = 'Backup failed.';
                     if (preg_match('/Backup failed because:?\s*(.*)/i', $output, $matches)) {
-                        $errorMessage .= ' Reason: ' . trim($matches[1]);
-                    } else if (!empty(trim($output))) {
-                        $errorMessage .= ' Output: ' . trim(strip_tags($output));
+                        $errorMessage .= ' Reason: '.trim($matches[1]);
+                    } elseif (! empty(trim($output))) {
+                        $errorMessage .= ' Output: '.trim(strip_tags($output));
                     }
-                    
+
                     return redirect()->back()->with('error', $errorMessage);
                 }
             }
 
             return redirect()->back()->with('success', 'Backup generated successfully.');
         } catch (\Exception $e) {
-            Log::error('Backup failed: ' . $e->getMessage());
-            
+            Log::error('Backup failed: '.$e->getMessage());
+
             // Try PDO fallback for DB backups
             try {
                 $this->fallbackDbBackup();
+
                 return redirect()->back()->with('success', 'Backup generated successfully (via PDO fallback).');
             } catch (\Exception $fallbackException) {
-                return redirect()->back()->with('error', 'Backup failed: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Backup failed: '.$e->getMessage());
             }
         }
     }
@@ -152,15 +155,15 @@ class BackupController extends Controller
         $zipFileName = "{$backupName}/backup-{$timestamp}.zip";
 
         /** @var \PDO $pdo */
-        $pdo = \Illuminate\Support\Facades\DB::connection($connectionName)->getPdo();
+        $pdo = DB::connection($connectionName)->getPdo();
 
         $sql = "-- Assetika Database Backup (PDO Fallback)\n";
-        $sql .= "-- Host: " . ($dbConfig['host'] ?? env('DB_HOST', '127.0.0.1')) . " Port: " . ($dbConfig['port'] ?? env('DB_PORT', '3306')) . "\n";
+        $sql .= '-- Host: '.($dbConfig['host'] ?? env('DB_HOST', '127.0.0.1')).' Port: '.($dbConfig['port'] ?? env('DB_PORT', '3306'))."\n";
         $sql .= "-- Database: {$database}\n";
-        $sql .= "-- Date: " . $now->format('Y-m-d H:i:s') . "\n\n";
+        $sql .= '-- Date: '.$now->format('Y-m-d H:i:s')."\n\n";
         $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
 
-        $tables = \Illuminate\Support\Facades\DB::connection($connectionName)->select('SHOW TABLES');
+        $tables = DB::connection($connectionName)->select('SHOW TABLES');
         if (empty($tables)) {
             throw new \Exception('No tables found in database.');
         }
@@ -168,33 +171,33 @@ class BackupController extends Controller
         $tableKey = "Tables_in_{$database}";
 
         foreach ($tables as $tableObj) {
-            $arr = (array)$tableObj;
+            $arr = (array) $tableObj;
             $tableName = $arr[$tableKey] ?? current($arr);
-            
+
             $sql .= "DROP TABLE IF EXISTS `{$tableName}`;\n";
 
-            $createTable = \Illuminate\Support\Facades\DB::connection($connectionName)->select("SHOW CREATE TABLE `{$tableName}`");
-            if (!empty($createTable)) {
-                $createSql = ((array)$createTable[0])['Create Table'] ?? '';
-                $sql .= $createSql . ";\n\n";
+            $createTable = DB::connection($connectionName)->select("SHOW CREATE TABLE `{$tableName}`");
+            if (! empty($createTable)) {
+                $createSql = ((array) $createTable[0])['Create Table'] ?? '';
+                $sql .= $createSql.";\n\n";
             }
 
-            $rows = \Illuminate\Support\Facades\DB::connection($connectionName)->table($tableName)->get();
+            $rows = DB::connection($connectionName)->table($tableName)->get();
             if ($rows->count() > 0) {
                 $sql .= "INSERT INTO `{$tableName}` VALUES\n";
                 $inserts = [];
                 foreach ($rows as $row) {
                     $values = [];
-                    foreach ((array)$row as $val) {
+                    foreach ((array) $row as $val) {
                         if ($val === null) {
                             $values[] = 'NULL';
                         } else {
                             $values[] = $pdo->quote($val);
                         }
                     }
-                    $inserts[] = '(' . implode(',', $values) . ')';
+                    $inserts[] = '('.implode(',', $values).')';
                 }
-                $sql .= implode(",\n", $inserts) . ";\n\n";
+                $sql .= implode(",\n", $inserts).";\n\n";
             }
         }
 
@@ -203,14 +206,15 @@ class BackupController extends Controller
         $relativeZipPath = "{$backupName}/backup-{$timestamp}.zip";
         $zipPath = Storage::disk('local')->path($relativeZipPath);
         $zipDir = dirname($zipPath);
-        if (!file_exists($zipDir)) {
+        if (! file_exists($zipDir)) {
             mkdir($zipDir, 0755, true);
         }
 
-        $zip = new \ZipArchive();
+        $zip = new \ZipArchive;
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
             $zip->addFromString($sqlFileName, $sql);
             $zip->close();
+
             return true;
         }
 
@@ -222,7 +226,7 @@ class BackupController extends Controller
         // Safe check
         $fileName = basename($fileName);
         $backupName = config('backup.backup.name', env('BACKUP_NAME', 'laravel-backup'));
-        $filePath = $backupName . '/' . $fileName;
+        $filePath = $backupName.'/'.$fileName;
 
         if (Storage::disk('local')->exists($filePath)) {
             return Storage::disk('local')->download($filePath);
@@ -240,7 +244,7 @@ class BackupController extends Controller
     {
         $fileName = basename($fileName);
         $backupName = config('backup.backup.name', env('BACKUP_NAME', 'laravel-backup'));
-        $filePath = $backupName . '/' . $fileName;
+        $filePath = $backupName.'/'.$fileName;
 
         $deleted = false;
         if (Storage::disk('local')->exists($filePath)) {
@@ -294,6 +298,6 @@ class BackupController extends Controller
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }

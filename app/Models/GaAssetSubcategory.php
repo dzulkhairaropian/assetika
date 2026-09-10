@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\GaAssetCategory;
-use App\Models\GaAsset;
 
 class GaAssetSubcategory extends Model
 {

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\MasterCategory;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -16,7 +16,7 @@ class ProductController extends Controller
         $query = Product::with(['brand', 'category', 'masterCategory']);
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('brand_id')) {
@@ -28,7 +28,7 @@ class ProductController extends Controller
         }
 
         $products = $query->latest()->paginate(50)->withQueryString();
-        
+
         $brands = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
 
@@ -40,6 +40,7 @@ class ProductController extends Controller
         $brands = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
         $masterCategories = MasterCategory::orderBy('name')->get();
+
         return view('pages.master.products.create', compact('brands', 'categories', 'masterCategories'));
     }
 
@@ -68,6 +69,7 @@ class ProductController extends Controller
         $brands = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
         $masterCategories = MasterCategory::orderBy('name')->get();
+
         return view('pages.master.products.edit', compact('product', 'brands', 'categories', 'masterCategories'));
     }
 
@@ -90,6 +92,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 

@@ -61,6 +61,18 @@
                             @error('condition_report') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Component Condition (Stripped / Laptop Kosong) -->
+                        <div class="lg:col-span-2 rounded-lg border border-amber-200/60 bg-amber-50/50 p-3 dark:border-amber-900/30 dark:bg-amber-950/20">
+                            <label class="flex items-start gap-2.5 cursor-pointer">
+                                <input type="checkbox" name="is_components_stripped" value="1" {{ old('is_components_stripped', $asset->is_components_stripped) ? 'checked' : '' }}
+                                    class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                                <div>
+                                    <span class="text-xs font-semibold text-gray-900 dark:text-white">Components Stripped / Empty Laptop (RAM & SSD removed)</span>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Check this option if the laptop is returned in an empty state (RAM, SSD, Hard Drive, etc. removed).</p>
+                                </div>
+                            </label>
+                        </div>
+
                         <!-- Notes -->
                         <div class="lg:col-span-2">
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">

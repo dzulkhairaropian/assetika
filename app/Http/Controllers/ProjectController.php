@@ -9,7 +9,6 @@ use App\Models\ProjectTask;
 use App\Models\Status;
 use App\Models\Ticket;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -28,9 +27,9 @@ class ProjectController extends Controller
         }
 
         if ($status = $request->input('status')) {
-            $query->where(function($q) use ($status) {
+            $query->where(function ($q) use ($status) {
                 $q->where('status', $status)
-                  ->orWhere('status_id', $status);
+                    ->orWhere('status_id', $status);
             });
         }
 
@@ -57,14 +56,16 @@ class ProjectController extends Controller
             'budget' => ['nullable', 'numeric'],
         ]);
 
-        if (empty($data['status_id']) && !empty($data['status'])) {
-            $st = Status::whereHas('masterCategory', fn($q) => $q->where('name', 'Project'))
+        if (empty($data['status_id']) && ! empty($data['status'])) {
+            $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project'))
                 ->where('name', 'like', $data['status'])
                 ->first();
-            if ($st) $data['status_id'] = $st->id;
+            if ($st) {
+                $data['status_id'] = $st->id;
+            }
         }
 
-        $data['code'] = 'PRJ-' . date('Ym') . '-' . strtoupper(substr(uniqid(), -4));
+        $data['code'] = 'PRJ-'.date('Ym').'-'.strtoupper(substr(uniqid(), -4));
 
         Project::create($data);
 
@@ -98,9 +99,11 @@ class ProjectController extends Controller
             'budget' => ['nullable', 'numeric'],
         ]);
 
-        if (!empty($data['status_id'])) {
+        if (! empty($data['status_id'])) {
             $st = Status::find($data['status_id']);
-            if ($st) $data['status'] = strtolower(str_replace(' ', '_', $st->name));
+            if ($st) {
+                $data['status'] = strtolower(str_replace(' ', '_', $st->name));
+            }
         }
 
         $project->update($data);
@@ -129,10 +132,10 @@ class ProjectController extends Controller
             'asset_id' => ['nullable', 'exists:assets,id'],
         ]);
 
-        if (!empty($data['status_id'])) {
+        if (! empty($data['status_id'])) {
             $st = Status::find($data['status_id']);
             if ($st) {
-                $data['status'] = match(strtolower($st->name)) {
+                $data['status'] = match (strtolower($st->name)) {
                     'to do' => 'todo',
                     'in progress' => 'in_progress',
                     'review' => 'review',
@@ -140,11 +143,13 @@ class ProjectController extends Controller
                     default => strtolower(str_replace(' ', '_', $st->name))
                 };
             }
-        } elseif (empty($data['status_id']) && !empty($data['status'])) {
-            $st = Status::whereHas('masterCategory', fn($q) => $q->where('name', 'Project Task'))
+        } elseif (empty($data['status_id']) && ! empty($data['status'])) {
+            $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project Task'))
                 ->where('name', 'like', $data['status'])
                 ->first();
-            if ($st) $data['status_id'] = $st->id;
+            if ($st) {
+                $data['status_id'] = $st->id;
+            }
         }
 
         $project->tasks()->create($data);
@@ -159,30 +164,32 @@ class ProjectController extends Controller
             'status' => ['nullable', 'string'],
         ]);
 
-        if (!empty($validated['status_id'])) {
+        if (! empty($validated['status_id'])) {
             $st = Status::find($validated['status_id']);
             $task->status_id = $st->id;
-            $task->status = match(strtolower($st->name)) {
+            $task->status = match (strtolower($st->name)) {
                 'to do' => 'todo',
                 'in progress' => 'in_progress',
                 'review' => 'review',
                 'done' => 'done',
                 default => strtolower(str_replace(' ', '_', $st->name))
             };
-        } elseif (!empty($validated['status'])) {
+        } elseif (! empty($validated['status'])) {
             $task->status = $validated['status'];
-            $st = Status::whereHas('masterCategory', fn($q) => $q->where('name', 'Project Task'))
+            $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project Task'))
                 ->where('name', 'like', str_replace('_', ' ', $validated['status']))
                 ->first();
-            if ($st) $task->status_id = $st->id;
+            if ($st) {
+                $task->status_id = $st->id;
+            }
         }
 
         $task->save();
 
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => true, 
-                'progress' => $task->project->progress_percentage
+                'success' => true,
+                'progress' => $task->project->progress_percentage,
             ]);
         }
 

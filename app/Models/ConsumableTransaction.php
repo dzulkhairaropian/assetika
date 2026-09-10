@@ -61,7 +61,7 @@ class ConsumableTransaction extends Model
 
     public function getEvidenceUrl(): ?string
     {
-        if (!$this->evidence_file_path) {
+        if (! $this->evidence_file_path) {
             return null;
         }
 

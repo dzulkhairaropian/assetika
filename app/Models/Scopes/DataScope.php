@@ -2,6 +2,8 @@
 
 namespace App\Models\Scopes;
 
+use App\Models\Company;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -13,7 +15,7 @@ class DataScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if (! auth()->check() || $model instanceof \App\Models\User) {
+        if (! auth()->check() || $model instanceof User) {
             return;
         }
 
@@ -32,11 +34,13 @@ class DataScope implements Scope
                 if ($user->company_id) {
                     $this->scopeByCompany($builder, $model, [$user->company_id]);
                 }
+
                 return;
             }
 
-            $companyIds = \App\Models\Company::where('group_id', $groupId)->pluck('id')->toArray();
+            $companyIds = Company::where('group_id', $groupId)->pluck('id')->toArray();
             $this->scopeByCompany($builder, $model, $companyIds);
+
             return;
         }
 
@@ -50,7 +54,7 @@ class DataScope implements Scope
 
     protected function scopeByCompany(Builder $builder, Model $model, array $companyIds): void
     {
-        if ($model instanceof \App\Models\Company) {
+        if ($model instanceof Company) {
             $builder->whereIn('id', $companyIds);
         } elseif (in_array('company_id', $model->getFillable())) {
             $builder->whereIn($model->getTable().'.company_id', $companyIds);

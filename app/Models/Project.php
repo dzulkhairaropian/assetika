@@ -49,13 +49,15 @@ class Project extends Model
     public function getProgressPercentageAttribute(): int
     {
         $total = $this->tasks()->count();
-        if ($total === 0) return 0;
-        
+        if ($total === 0) {
+            return 0;
+        }
+
         $doneCount = $this->tasks()->where(function ($q) {
             $q->where('status', 'done')
-              ->orWhereHas('statusRel', function ($sq) {
-                  $sq->where('name', 'Done');
-              });
+                ->orWhereHas('statusRel', function ($sq) {
+                    $sq->where('name', 'Done');
+                });
         })->count();
 
         return (int) round(($doneCount / $total) * 100);

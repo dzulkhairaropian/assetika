@@ -13,10 +13,11 @@ class PositionController extends Controller
         $query = Position::withCount('users');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         $positions = $query->latest()->paginate(50)->withQueryString();
+
         return view('pages.master.positions.index', compact('positions'));
     }
 
@@ -51,7 +52,7 @@ class PositionController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:positions,code,' . $position->id,
+            'code' => 'required|string|max:50|unique:positions,code,'.$position->id,
             'description' => 'nullable|string',
         ]);
 
@@ -63,6 +64,7 @@ class PositionController extends Controller
     public function destroy(Position $position)
     {
         $position->delete();
+
         return redirect()->route('positions.index')->with('success', 'Position deleted successfully.');
     }
 

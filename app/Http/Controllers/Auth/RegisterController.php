@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
@@ -25,13 +24,13 @@ class RegisterController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $request->fname . ' ' . $request->lname,
+            'name' => $request->fname.' '.$request->lname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
         $user->assignRole('user');
 
-        return redirect()->route('login')->with('registration_success', 'Account created successfully! Welcome aboard, ' . $user->name . '. Please sign in to continue.');
+        return redirect()->route('login')->with('registration_success', 'Account created successfully! Welcome aboard, '.$user->name.'. Please sign in to continue.');
     }
 }

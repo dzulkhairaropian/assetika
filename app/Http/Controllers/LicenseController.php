@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\Brand;
 use App\Models\License;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -30,8 +30,8 @@ class LicenseController extends Controller
 
     public function create()
     {
-        $brands = \App\Models\Brand::orderBy('name')->get();
-        $assets = \App\Models\Asset::with('product.brand')->orderBy('asset_tag')->get();
+        $brands = Brand::orderBy('name')->get();
+        $assets = Asset::with('product.brand')->orderBy('asset_tag')->get();
 
         return view('pages.licenses.create', compact('brands', 'assets'));
     }
@@ -81,7 +81,7 @@ class LicenseController extends Controller
 
     public function edit(License $license)
     {
-        $brands = \App\Models\Brand::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
 
         return view('pages.licenses.edit', compact('license', 'brands'));
     }

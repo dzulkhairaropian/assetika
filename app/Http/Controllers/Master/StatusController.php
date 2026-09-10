@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\Status;
 use App\Models\MasterCategory;
+use App\Models\Status;
 use Illuminate\Http\Request;
 
 class StatusController extends Controller
@@ -31,6 +31,7 @@ class StatusController extends Controller
     public function create()
     {
         $masterCategories = MasterCategory::orderBy('name')->get();
+
         return view('pages.master.statuses.create', compact('masterCategories'));
     }
 
@@ -56,6 +57,7 @@ class StatusController extends Controller
     public function edit(Status $status)
     {
         $masterCategories = MasterCategory::orderBy('name')->get();
+
         return view('pages.master.statuses.edit', compact('status', 'masterCategories'));
     }
 
@@ -77,6 +79,7 @@ class StatusController extends Controller
     public function destroy(Status $status)
     {
         $status->delete();
+
         return redirect()->route('statuses.index')->with('success', 'Status deleted successfully.');
     }
 

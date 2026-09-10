@@ -22,7 +22,7 @@
         }
     @endphp
 
-    <div class="space-y-4" x-data="{ activeTab: 'details' }">
+    <div class="space-y-4" x-data="{ activeTab: 'details', retireModalOpen: false }">
         <x-common.page-breadcrumb pageTitle="Asset Details" :items="[['label' => 'IT Assets', 'url' => route('assets.index')], ['label' => $asset->asset_tag]]" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
@@ -53,6 +53,9 @@
                                 $color = optional($asset->status)->color ?? 'gray';
                             @endphp
                             <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
+                            @if($asset->is_components_stripped)
+                                <x-ui.badge color="warning" variant="light" size="sm" featherIcon="cpu">Components Stripped</x-ui.badge>
+                            @endif
                             @if($yearsOld !== null)
                                 <x-ui.badge :color="$isAged ? 'danger' : 'secondary'" variant="light" size="sm">
                                     {{ $ageDisplay }}
@@ -103,6 +106,13 @@
                                 Maintenance
                             </a>
                         @endif
+                    @endif
+
+                    @if(optional($asset->status)->name !== 'Retired')
+                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-800 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 transition">
+                            <i data-feather="trash-2" class="h-3.5 w-3.5 text-red-400"></i>
+                            Retire Asset
+                        </button>
                     @endif
                 </div>
             </div>
@@ -590,6 +600,80 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- Modal: Retire Asset -->
+        <div x-show="retireModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+            <div @click.away="retireModalOpen = false" class="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500 dark:bg-red-500/10">
+                            <i data-feather="trash-2" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Retire Asset</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Decommission asset <strong>{{ $asset->asset_tag }}</strong></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="retireModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-feather="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('assets.retire.process', $asset) }}" method="POST" class="mt-4 space-y-4">
+                    @csrf
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Retirement Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" name="retired_at" value="{{ date('Y-m-d') }}" required
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Reason for Retirement <span class="text-red-500">*</span>
+                        </label>
+                        <select name="retirement_reason" required
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                            <option value="End of Life / Aged (>= 4 years)">End of Life / Aged (≥ 4 years)</option>
+                            <option value="Broken Beyond Repair">Broken Beyond Repair</option>
+                            <option value="Damaged / Scrapped">Damaged / Scrapped</option>
+                            <option value="Obsolete Technology">Obsolete Technology</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Retirement Notes
+                        </label>
+                        <textarea name="retirement_notes" rows="3" placeholder="Provide additional details regarding retirement..."
+                            class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
+                    </div>
+
+                    <div class="rounded-lg border border-amber-200/60 bg-amber-50/50 p-3 dark:border-amber-900/30 dark:bg-amber-950/20">
+                        <label class="flex items-start gap-2.5 cursor-pointer">
+                            <input type="checkbox" name="is_components_stripped" value="1" {{ $asset->is_components_stripped ? 'checked' : '' }}
+                                class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900">
+                            <div>
+                                <span class="text-xs font-semibold text-gray-900 dark:text-white">Components Stripped / Empty Laptop (RAM & SSD removed)</span>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400">Check this option if RAM, SSD/HDD or parts have been stripped from this unit.</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <button type="button" @click="retireModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 transition">
+                            Confirm Retirement
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 

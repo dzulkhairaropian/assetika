@@ -49,7 +49,7 @@ class PermissionSeeder extends Seeder
             foreach ($actions as $action) {
                 Permission::updateOrCreate([
                     'name' => "{$module}.{$action}",
-                    'guard_name' => 'web'
+                    'guard_name' => 'web',
                 ]);
             }
         }

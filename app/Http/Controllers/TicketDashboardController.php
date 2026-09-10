@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ticket;
+use App\Models\Asset;
+use App\Models\Category;
 use App\Models\Priority;
+use App\Models\Ticket;
 use App\Models\TicketStatus;
 use App\Models\TicketType;
 use App\Models\User;
-use App\Models\Asset;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -37,21 +37,22 @@ class TicketDashboardController extends Controller
 
         // Global Query Filter Callback
         $applyGlobalFilters = function ($query) use ($filterStatusId, $filterPriorityId, $filterCategoryId, $filterYear, $filterMonth) {
-            if (!empty($filterStatusId)) {
+            if (! empty($filterStatusId)) {
                 $query->where('status_id', $filterStatusId);
             }
-            if (!empty($filterPriorityId)) {
+            if (! empty($filterPriorityId)) {
                 $query->where('priority_id', $filterPriorityId);
             }
-            if (!empty($filterCategoryId)) {
+            if (! empty($filterCategoryId)) {
                 $query->where('category_id', $filterCategoryId);
             }
-            if (!empty($filterYear) && $filterYear !== 'all') {
+            if (! empty($filterYear) && $filterYear !== 'all') {
                 $query->whereRaw('YEAR(created_at) = ?', [$filterYear]);
             }
-            if (!empty($filterMonth) && $filterMonth !== 'all') {
+            if (! empty($filterMonth) && $filterMonth !== 'all') {
                 $query->whereRaw('MONTH(created_at) = ?', [$filterMonth]);
             }
+
             return $query;
         };
 
@@ -120,7 +121,7 @@ class TicketDashboardController extends Controller
         ];
 
         // Chart Filter Callback (Supports per-chart filter fallback to global filter)
-        $chartFilter = function ($query, string $yearParam, string $monthParam) use ($request, $filterYear, $filterMonth, $applyGlobalFilters) {
+        $chartFilter = function ($query, string $yearParam, string $monthParam) use ($request, $applyGlobalFilters) {
             $query = $applyGlobalFilters($query);
 
             $year = $request->get($yearParam);
@@ -132,11 +133,12 @@ class TicketDashboardController extends Controller
             if ($month && $month !== 'all') {
                 $query->whereRaw('MONTH(created_at) = ?', [$month]);
             }
+
             return $query;
         };
 
         // 1. Monthly ticket trend
-        $trendYear = (string) $request->get('trend_year', (!empty($filterYear) && $filterYear !== 'all') ? $filterYear : ($ticketYears->first() ?? now()->year));
+        $trendYear = (string) $request->get('trend_year', (! empty($filterYear) && $filterYear !== 'all') ? $filterYear : ($ticketYears->first() ?? now()->year));
         $trendQuery = $applyGlobalFilters(Ticket::selectRaw('MONTH(created_at) as m, count(*) as count')->whereRaw('YEAR(created_at) = ?', [$trendYear]));
         $monthlyCounts = $trendQuery->groupBy('m')->pluck('count', 'm');
 
@@ -170,7 +172,7 @@ class TicketDashboardController extends Controller
         }
 
         $chartStatusData = [
-            'labels' => $ticketsByStatus->keys()->map(fn($id) => $statusesKeyed[$id]?->name ?? 'Unknown')->values()->toArray(),
+            'labels' => $ticketsByStatus->keys()->map(fn ($id) => $statusesKeyed[$id]?->name ?? 'Unknown')->values()->toArray(),
             'data' => $ticketsByStatus->values()->toArray(),
             'colors' => $colors,
         ];
@@ -186,7 +188,7 @@ class TicketDashboardController extends Controller
 
         $prioritiesKeyed = $priorities->keyBy('id');
         $priorityChart = [
-            'labels' => $ticketsByPriority->keys()->map(fn($id) => $prioritiesKeyed[$id]?->name ?? 'Unknown')->values()->toArray(),
+            'labels' => $ticketsByPriority->keys()->map(fn ($id) => $prioritiesKeyed[$id]?->name ?? 'Unknown')->values()->toArray(),
             'data' => $ticketsByPriority->values()->toArray(),
         ];
 
@@ -202,7 +204,7 @@ class TicketDashboardController extends Controller
 
         $categoryNames = Category::whereIn('id', $ticketsByCategory->keys())->pluck('name', 'id');
         $categoryChart = [
-            'labels' => $ticketsByCategory->keys()->map(fn($id) => $categoryNames[$id] ?? 'Unknown')->values()->toArray(),
+            'labels' => $ticketsByCategory->keys()->map(fn ($id) => $categoryNames[$id] ?? 'Unknown')->values()->toArray(),
             'data' => $ticketsByCategory->values()->toArray(),
         ];
 
@@ -218,7 +220,7 @@ class TicketDashboardController extends Controller
 
         $userNames = User::whereIn('id', $ticketsByUser->keys())->pluck('name', 'id');
         $requesterChart = [
-            'labels' => $ticketsByUser->keys()->map(fn($id) => $userNames[$id] ?? 'Unknown')->values()->toArray(),
+            'labels' => $ticketsByUser->keys()->map(fn ($id) => $userNames[$id] ?? 'Unknown')->values()->toArray(),
             'data' => $ticketsByUser->values()->toArray(),
         ];
 
@@ -233,7 +235,7 @@ class TicketDashboardController extends Controller
 
         $ticketTypes = TicketType::all()->keyBy('id');
         $typeChart = [
-            'labels' => $ticketsByType->keys()->map(fn($id) => $ticketTypes[$id]?->name ?? 'Unknown')->values()->toArray(),
+            'labels' => $ticketsByType->keys()->map(fn ($id) => $ticketTypes[$id]?->name ?? 'Unknown')->values()->toArray(),
             'data' => $ticketsByType->values()->toArray(),
         ];
 
@@ -255,7 +257,7 @@ class TicketDashboardController extends Controller
 
         // Active filters count for UI badge indicator
         $activeFiltersCount = collect([$filterStatusId, $filterPriorityId, $filterCategoryId, $filterYear, $filterMonth])
-            ->filter(fn($v) => !empty($v) && $v !== 'all')
+            ->filter(fn ($v) => ! empty($v) && $v !== 'all')
             ->count();
 
         return view('pages.dashboard.tickets', compact(
@@ -314,6 +316,7 @@ class TicketDashboardController extends Controller
         if ($previous === 0) {
             return $current > 0 ? 100 : 0;
         }
+
         return round((($current - $previous) / $previous) * 100, 1);
     }
 
@@ -340,13 +343,13 @@ class TicketDashboardController extends Controller
         }
 
         return match ($color) {
-            'primary'   => '#3b82f6',
-            'success'   => '#22c55e',
+            'primary' => '#3b82f6',
+            'success' => '#22c55e',
             'danger', 'error' => '#ef4444',
             'warning', 'orange' => '#f97316',
-            'info', 'cyan'      => '#06b6d4',
-            'purple'    => '#8b5cf6',
-            default     => '#64748b',
+            'info', 'cyan' => '#06b6d4',
+            'purple' => '#8b5cf6',
+            default => '#64748b',
         };
     }
 }

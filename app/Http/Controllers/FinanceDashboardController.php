@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class FinanceDashboardController extends Controller
 {
@@ -15,11 +14,11 @@ class FinanceDashboardController extends Controller
     {
         // 1. Core Financial Stat Metrics
         $totalPurchaseCost = (float) Asset::whereNotNull('purchase_cost')->sum('purchase_cost');
-        
+
         $assetsWithDepr = Asset::with('depreciation')->whereNotNull('purchase_cost')->get();
         $totalBookValue = (float) $assetsWithDepr->sum(fn ($a) => $a->book_value ?? $a->purchase_cost);
         $totalDepreciated = max(0, $totalPurchaseCost - $totalBookValue);
-        
+
         $totalAssetsWithCost = Asset::whereNotNull('purchase_cost')->where('purchase_cost', '>', 0)->count();
         $avgAssetCost = $totalAssetsWithCost > 0 ? ($totalPurchaseCost / $totalAssetsWithCost) : 0;
 
@@ -67,7 +66,7 @@ class FinanceDashboardController extends Controller
 
         $categoryChartData = [
             'labels' => $costByCategory->pluck('name')->toArray(),
-            'data' => $costByCategory->pluck('total_cost')->map(fn($v) => (float) $v)->toArray(),
+            'data' => $costByCategory->pluck('total_cost')->map(fn ($v) => (float) $v)->toArray(),
         ];
 
         // 4. Asset Value by Department (Top 5 Departments)
@@ -82,7 +81,7 @@ class FinanceDashboardController extends Controller
 
         $departmentChartData = [
             'labels' => $costByDepartment->pluck('name')->toArray(),
-            'data' => $costByDepartment->pluck('total_cost')->map(fn($v) => (float) $v)->toArray(),
+            'data' => $costByDepartment->pluck('total_cost')->map(fn ($v) => (float) $v)->toArray(),
         ];
 
         // 5. Recent High-Value Asset Purchases (Top 5 Highest Cost Assets)

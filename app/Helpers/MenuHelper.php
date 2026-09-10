@@ -237,7 +237,7 @@ class MenuHelper
 
     public static function getIconSvg($icon)
     {
-        return match($icon) {
+        return match ($icon) {
             'dashboard' => '<i data-feather="layout" class="w-6 h-6"></i>',
             'ga-dashboard' => '<i data-feather="home" class="w-6 h-6"></i>',
             'ga-assets' => '<i data-feather="briefcase" class="w-6 h-6"></i>',

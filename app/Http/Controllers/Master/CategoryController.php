@@ -15,9 +15,9 @@ class CategoryController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('code', 'like', "%$search%");
+                    ->orWhere('code', 'like', "%$search%");
             });
         }
 
@@ -34,6 +34,7 @@ class CategoryController extends Controller
     public function create()
     {
         $masterCategories = MasterCategory::orderBy('name')->get();
+
         return view('pages.master.categories.create', compact('masterCategories'));
     }
 
@@ -58,6 +59,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $masterCategories = MasterCategory::orderBy('name')->get();
+
         return view('pages.master.categories.edit', compact('category', 'masterCategories'));
     }
 
@@ -65,7 +67,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:categories,code,' . $category->id,
+            'code' => 'required|string|max:50|unique:categories,code,'.$category->id,
             'master_category_id' => 'required|exists:master_categories,id',
             'description' => 'nullable|string',
         ]);
@@ -78,6 +80,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
+
         return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
     }
 

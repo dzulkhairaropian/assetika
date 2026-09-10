@@ -10,9 +10,13 @@ class SystemNotification extends Notification
     use Queueable;
 
     protected $title;
+
     protected $message;
+
     protected $url;
+
     protected $icon;
+
     protected $category;
 
     /**

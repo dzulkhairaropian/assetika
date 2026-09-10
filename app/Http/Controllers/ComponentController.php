@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Component;
+use App\Models\Location;
 use Illuminate\Http\Request;
 
 class ComponentController extends Controller
@@ -19,7 +21,7 @@ class ComponentController extends Controller
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('serial', 'like', "%$search%")
                     ->orWhere('model_number', 'like', "%$search%")
-                    ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%$search%"));
+                    ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%$search%"));
             });
         }
 
@@ -30,11 +32,11 @@ class ComponentController extends Controller
 
     public function create()
     {
-        $categories = \App\Models\Category::whereHas('masterCategory', function ($q) {
+        $categories = Category::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Component');
         })->orderBy('name')->get();
-        $brands = \App\Models\Brand::orderBy('name')->get();
-        $locations = \App\Models\Location::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
+        $locations = Location::orderBy('name')->get();
 
         return view('pages.components.create', compact('categories', 'brands', 'locations'));
     }
@@ -77,11 +79,11 @@ class ComponentController extends Controller
 
     public function edit(Component $component)
     {
-        $categories = \App\Models\Category::whereHas('masterCategory', function ($q) {
+        $categories = Category::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Component');
         })->orderBy('name')->get();
-        $brands = \App\Models\Brand::orderBy('name')->get();
-        $locations = \App\Models\Location::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
+        $locations = Location::orderBy('name')->get();
 
         return view('pages.components.edit', compact('component', 'categories', 'brands', 'locations'));
     }
@@ -159,12 +161,12 @@ class ComponentController extends Controller
     {
         $checkout = $component->assets()->where('asset_id', $asset->id)->first();
 
-        if (!$checkout) {
+        if (! $checkout) {
             return back()->with('error', 'Asset does not have this component checked out.');
         }
 
         $request->validate([
-            'qty' => 'required|integer|min:1|max:' . $checkout->pivot->qty,
+            'qty' => 'required|integer|min:1|max:'.$checkout->pivot->qty,
         ]);
 
         if ($request->qty < $checkout->pivot->qty) {

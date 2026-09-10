@@ -5,35 +5,45 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetCheckout;
 use App\Models\AssetMaintenance;
-use App\Models\User;
-use App\Models\Location;
 use App\Models\Department;
+use App\Models\Location;
+use App\Models\Priority;
+use App\Models\SlaStatus;
+use App\Models\Source;
 use App\Models\Status;
+use App\Models\Ticket;
+use App\Models\TicketCategory;
+use App\Models\TicketStatus;
+use App\Models\TicketSubcategory;
+use App\Models\TicketType;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\SystemNotification;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class AssetManagementController extends Controller
 {
     private function resolveTicketCategoryForAsset(?Asset $asset): array
     {
-        if (!$asset) {
-            $defaultCat = \App\Models\TicketCategory::first();
+        if (! $asset) {
+            $defaultCat = TicketCategory::first();
+
             return ['category_id' => $defaultCat?->id, 'subcategory_id' => null];
         }
 
         $assetCategoryName = optional(optional($asset->product)->category)->name ?? '';
         $assetCategoryCode = optional(optional($asset->product)->category)->code ?? '';
 
-        $hardwareCat = \App\Models\TicketCategory::where('name', 'Hardware')->orWhere('code', 'HARDWARE')->first();
-        $softwareCat = \App\Models\TicketCategory::where('name', 'Software')->orWhere('code', 'SOFTWARE')->first();
+        $hardwareCat = TicketCategory::where('name', 'Hardware')->orWhere('code', 'HARDWARE')->first();
+        $softwareCat = TicketCategory::where('name', 'Software')->orWhere('code', 'SOFTWARE')->first();
 
-        $targetCat = $hardwareCat ?? \App\Models\TicketCategory::first();
+        $targetCat = $hardwareCat ?? TicketCategory::first();
         $targetSub = null;
 
         if ($targetCat && $targetCat->id === $hardwareCat?->id) {
-            $subs = \App\Models\TicketSubcategory::where('ticket_category_id', $targetCat->id)->get();
+            $subs = TicketSubcategory::where('ticket_category_id', $targetCat->id)->get();
 
             if (in_array($assetCategoryCode, ['NB', 'LAPTOP']) || str_contains(strtolower($assetCategoryName), 'notebook') || str_contains(strtolower($assetCategoryName), 'laptop')) {
                 $targetSub = $subs->firstWhere('name', 'Laptop / Notebook');
@@ -56,7 +66,7 @@ class AssetManagementController extends Controller
 
     public function showCheckout(Request $request, $asset)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -74,7 +84,7 @@ class AssetManagementController extends Controller
 
     public function processCheckout(Request $request, $asset)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -118,9 +128,9 @@ class AssetManagementController extends Controller
 
         $toUser = User::find($request->checked_out_to_user_id);
         if ($toUser) {
-            $toUser->notify(new \App\Notifications\SystemNotification(
+            $toUser->notify(new SystemNotification(
                 'Asset Checked Out',
-                "Asset '{$asset->tag} - " . ($asset->product->name ?? 'Item') . "' has been checked out to you.",
+                "Asset '{$asset->tag} - ".($asset->product->name ?? 'Item')."' has been checked out to you.",
                 route('assets.show', $asset->id),
                 'arrow-up-right',
                 'Asset'
@@ -128,28 +138,29 @@ class AssetManagementController extends Controller
         }
 
         // Automatic Ticket Creation for Checkout
-        $ticketDate = \Illuminate\Support\Carbon::parse($request->checked_out_at);
-        $reqType = \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $ticketDate = Carbon::parse($request->checked_out_at);
+        $reqType = TicketType::where('code', 'REQ')->first() ?? TicketType::first();
         $requestCode = strtoupper($reqType?->code ?: 'REQ');
-        $prefix = $requestCode . '-' . $ticketDate->format('ymd') . '-';
-        
-        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+        $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
+
+        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
             ->first();
-            
+
         $nextSeq = 1;
         if ($latestTicket) {
             $parts = explode('-', $latestTicket->request_id);
             $nextSeq = ((int) end($parts)) + 1;
         }
 
-        $completedStatus = \App\Models\TicketStatus::where('name', 'Completed')->first() ?? \App\Models\TicketStatus::where('is_closed', true)->first();
-        $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
-        $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
-        $portalSource = \App\Models\Source::first();
+        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
+        $mediumPriority = Priority::where('name', 'Medium')->first();
+        $portalSource = Source::first();
+        $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
-        \App\Models\Ticket::create([
-            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+        Ticket::create([
+            'request_id' => $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -165,7 +176,7 @@ class AssetManagementController extends Controller
             'source_id' => $portalSource?->id,
             'status_id' => $completedStatus?->id,
             'sla_status_id' => $fulfilledSla?->id,
-            'problem_description' => "[Auto-Generated] Checkout Asset: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . " ke " . ($toUser?->name ?? 'User'),
+            'problem_description' => "[Auto-Generated] Checkout Asset: {$asset->asset_tag} - ".($asset->product->name ?? 'Asset').' ke '.($toUser?->name ?? 'User'),
             'resolution_notes' => 'Asset successfully checked out and handed over.',
             'request_date' => $ticketDate->toDateString(),
             'request_time' => $ticketDate,
@@ -179,15 +190,15 @@ class AssetManagementController extends Controller
 
     public function showCheckin(Request $request, $asset)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
-        if (!$asset->isCurrentlyCheckedOut()) {
+        if (! $asset->isCurrentlyCheckedOut()) {
             return redirect()->back()->with('error', 'Asset is not checked out.');
         }
 
-        $statuses = Status::whereHas('masterCategory', function($q) {
+        $statuses = Status::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();
 
@@ -196,7 +207,7 @@ class AssetManagementController extends Controller
 
     public function processCheckin(Request $request, $asset)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -206,6 +217,7 @@ class AssetManagementController extends Controller
             'condition_report' => 'required|string',
             'checkin_notes' => 'nullable|string',
             'checkin_evidence' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'is_components_stripped' => 'nullable|boolean',
         ]);
 
         $checkout = $asset->currentCheckout;
@@ -233,13 +245,14 @@ class AssetManagementController extends Controller
             'current_checkout_id' => null,
             'assigned_to_user_id' => null,
             'status_id' => $selectedStatus->id,
+            'is_components_stripped' => $request->boolean('is_components_stripped'),
         ]);
 
         $toUser = User::find($toUserId);
         if ($toUser) {
-            $toUser->notify(new \App\Notifications\SystemNotification(
+            $toUser->notify(new SystemNotification(
                 'Asset Checked In',
-                "Asset '{$asset->tag} - " . ($asset->product->name ?? 'Item') . "' has been checked in / returned.",
+                "Asset '{$asset->tag} - ".($asset->product->name ?? 'Item')."' has been checked in / returned.",
                 route('assets.show', $asset->id),
                 'arrow-down-left',
                 'Asset'
@@ -247,29 +260,29 @@ class AssetManagementController extends Controller
         }
 
         // Automatic Ticket Creation for Checkin
-        $ticketDate = \Illuminate\Support\Carbon::parse($request->checked_in_at);
-        $reqType = \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $ticketDate = Carbon::parse($request->checked_in_at);
+        $reqType = TicketType::where('code', 'REQ')->first() ?? TicketType::first();
         $requestCode = strtoupper($reqType?->code ?: 'REQ');
-        $prefix = $requestCode . '-' . $ticketDate->format('ymd') . '-';
-        
-        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+        $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
+
+        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
             ->first();
-            
+
         $nextSeq = 1;
         if ($latestTicket) {
             $parts = explode('-', $latestTicket->request_id);
             $nextSeq = ((int) end($parts)) + 1;
         }
 
-        $completedStatus = \App\Models\TicketStatus::where('name', 'Completed')->first() ?? \App\Models\TicketStatus::where('is_closed', true)->first();
-        $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
-        $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
-        $portalSource = \App\Models\Source::first();
+        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
+        $mediumPriority = Priority::where('name', 'Medium')->first();
+        $portalSource = Source::first();
         $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
-        \App\Models\Ticket::create([
-            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+        Ticket::create([
+            'request_id' => $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -285,8 +298,8 @@ class AssetManagementController extends Controller
             'source_id' => $portalSource?->id,
             'status_id' => $completedStatus?->id,
             'sla_status_id' => $fulfilledSla?->id,
-            'problem_description' => "[Auto-Generated] Checkin Asset: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . " dari " . ($toUser?->name ?? 'User') . ". Kondisi: " . $request->condition_report,
-            'resolution_notes' => 'Asset checked in and status updated to ' . $selectedStatus->name . '.',
+            'problem_description' => "[Auto-Generated] Checkin Asset: {$asset->asset_tag} - ".($asset->product->name ?? 'Asset').' dari '.($toUser?->name ?? 'User').'. Kondisi: '.$request->condition_report,
+            'resolution_notes' => 'Asset checked in and status updated to '.$selectedStatus->name.'.',
             'request_date' => $ticketDate->toDateString(),
             'request_time' => $ticketDate,
             'completed_date' => $ticketDate->toDateString(),
@@ -299,7 +312,7 @@ class AssetManagementController extends Controller
 
     public function showBAST(Request $request, $asset, AssetCheckout $checkout)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -311,73 +324,75 @@ class AssetManagementController extends Controller
         $receiver_position = $receiver->position->name ?? '-';
         $receiver_supervisor_position = $receiver_supervisor->position->name ?? '-';
 
-        $companyCode = $receiver->company?->code ?? ($giver->company?->code ?? "DB");
-        $companyName = $receiver->company?->name ?? ($giver->company?->name ?? "PT. INVENTORY SYSTEM");
+        $companyCode = $receiver->company?->code ?? ($giver->company?->code ?? 'DB');
+        $companyName = $receiver->company?->name ?? ($giver->company?->name ?? 'PT. INVENTORY SYSTEM');
 
         // Determine if checkout is returned
         if ($checkout->checked_in_at !== null) {
             $returnedAt = $checkout->checked_in_at;
             $yearVal = $returnedAt->year;
-            $sequence = AssetCheckout::whereYear("checked_in_at", $yearVal)
-                ->where("id", "<=", $checkout->id)
-                ->whereNotNull("checked_in_at")
+            $sequence = AssetCheckout::whereYear('checked_in_at', $yearVal)
+                ->where('id', '<=', $checkout->id)
+                ->whereNotNull('checked_in_at')
                 ->count();
 
             $data = [
-                "sequence_number" => str_pad((string)$sequence, 3, "0", STR_PAD_LEFT),
-                "company_code" => $companyCode,
-                "company_name" => $companyName,
-                "checkout" => $checkout,
-                "day" => $returnedAt->translatedFormat("l"),
-                "date" => $returnedAt->translatedFormat("d"),
-                "month" => $returnedAt->translatedFormat("F"),
-                "year" => $returnedAt->translatedFormat("Y"),
-                "asset" => $asset,
-                "user" => $receiver,
-                "user_position" => $receiver_position,
-                "admin" => $giver,
-                "admin_position" => $giver_position,
-                "receiver" => $receiver,
-                "receiver_position" => $receiver_position,
-                "receiver_supervisor" => $receiver_supervisor,
-                "receiver_supervisor_position" => $receiver_supervisor_position,
+                'sequence_number' => str_pad((string) $sequence, 3, '0', STR_PAD_LEFT),
+                'company_code' => $companyCode,
+                'company_name' => $companyName,
+                'checkout' => $checkout,
+                'day' => $returnedAt->translatedFormat('l'),
+                'date' => $returnedAt->translatedFormat('d'),
+                'month' => $returnedAt->translatedFormat('F'),
+                'year' => $returnedAt->translatedFormat('Y'),
+                'asset' => $asset,
+                'user' => $receiver,
+                'user_position' => $receiver_position,
+                'admin' => $giver,
+                'admin_position' => $giver_position,
+                'receiver' => $receiver,
+                'receiver_position' => $receiver_position,
+                'receiver_supervisor' => $receiver_supervisor,
+                'receiver_supervisor_position' => $receiver_supervisor_position,
             ];
 
-            $pdf = Pdf::loadView("pdf.bast_checkin", $data);
-            return $pdf->stream("BAST-IT-RETURN-{$receiver->name}-{$returnedAt->format("Ymd")}.pdf");
+            $pdf = Pdf::loadView('pdf.bast_checkin', $data);
+
+            return $pdf->stream("BAST-IT-RETURN-{$receiver->name}-{$returnedAt->format('Ymd')}.pdf");
         } else {
             $checkedOutAt = $checkout->checked_out_at ?? now();
             $yearVal = $checkedOutAt->year;
-            $sequence = AssetCheckout::whereYear("checked_out_at", $yearVal)
-                ->where("id", "<=", $checkout->id)
+            $sequence = AssetCheckout::whereYear('checked_out_at', $yearVal)
+                ->where('id', '<=', $checkout->id)
                 ->count();
 
             $data = [
-                "sequence_number" => str_pad((string)$sequence, 3, "0", STR_PAD_LEFT),
-                "company_code" => $companyCode,
-                "company_name" => $companyName,
-                "checkout" => $checkout,
-                "day" => $checkedOutAt->translatedFormat("l"),
-                "date" => $checkedOutAt->translatedFormat("d"),
-                "month" => $checkedOutAt->translatedFormat("F"),
-                "year" => $checkedOutAt->translatedFormat("Y"),
-                "asset" => $asset,
-                "giver" => $giver,
-                "giver_position" => $giver_position,
-                "receiver" => $receiver,
-                "receiver_position" => $receiver_position,
-                "receiver_supervisor" => $receiver_supervisor,
-                "receiver_supervisor_position" => $receiver_supervisor_position,
+                'sequence_number' => str_pad((string) $sequence, 3, '0', STR_PAD_LEFT),
+                'company_code' => $companyCode,
+                'company_name' => $companyName,
+                'checkout' => $checkout,
+                'day' => $checkedOutAt->translatedFormat('l'),
+                'date' => $checkedOutAt->translatedFormat('d'),
+                'month' => $checkedOutAt->translatedFormat('F'),
+                'year' => $checkedOutAt->translatedFormat('Y'),
+                'asset' => $asset,
+                'giver' => $giver,
+                'giver_position' => $giver_position,
+                'receiver' => $receiver,
+                'receiver_position' => $receiver_position,
+                'receiver_supervisor' => $receiver_supervisor,
+                'receiver_supervisor_position' => $receiver_supervisor_position,
             ];
 
-            $pdf = Pdf::loadView("pdf.bast", $data);
-            return $pdf->stream("BAST-IT-{$receiver->name}-{$checkedOutAt->format("Ymd")}.pdf");
+            $pdf = Pdf::loadView('pdf.bast', $data);
+
+            return $pdf->stream("BAST-IT-{$receiver->name}-{$checkedOutAt->format('Ymd')}.pdf");
         }
     }
 
     public function showMaintenance(Request $request, $asset)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -388,7 +403,7 @@ class AssetManagementController extends Controller
 
     public function processMaintenance(Request $request, $asset)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -406,8 +421,8 @@ class AssetManagementController extends Controller
             $checkout->update([
                 'checked_in_at' => $request->start_date ?? now(),
                 'checked_in_by_user_id' => auth()->id(),
-                'condition_report' => 'Sent to maintenance: ' . ($request->description ?? 'No description'),
-                'checkin_notes' => 'Auto-checkin from maintenance dispatch. ' . ($request->notes ?? ''),
+                'condition_report' => 'Sent to maintenance: '.($request->description ?? 'No description'),
+                'checkin_notes' => 'Auto-checkin from maintenance dispatch. '.($request->notes ?? ''),
             ]);
 
             $asset->update([
@@ -439,9 +454,9 @@ class AssetManagementController extends Controller
 
         $auth = auth()->user();
         if ($auth) {
-            $auth->notify(new \App\Notifications\SystemNotification(
+            $auth->notify(new SystemNotification(
                 'Asset Sent to Maintenance',
-                "Asset '{$asset->tag} - " . ($asset->product->name ?? 'Item') . "' is now In Repair.",
+                "Asset '{$asset->tag} - ".($asset->product->name ?? 'Item')."' is now In Repair.",
                 route('assets.show', $asset->id),
                 'wrench',
                 'Maintenance'
@@ -449,12 +464,12 @@ class AssetManagementController extends Controller
         }
 
         // Automatic Ticket Creation for Sending to Service/Maintenance
-        $ticketDate = \Illuminate\Support\Carbon::parse($request->start_date);
-        $incType = \App\Models\TicketType::where('code', 'INC')->first() ?? \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $ticketDate = Carbon::parse($request->start_date);
+        $incType = TicketType::where('code', 'INC')->first() ?? TicketType::where('code', 'REQ')->first() ?? TicketType::first();
         $code = strtoupper($incType?->code ?: 'INC');
-        $prefix = $code . '-' . $ticketDate->format('ymd') . '-';
+        $prefix = $code.'-'.$ticketDate->format('ymd').'-';
 
-        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
             ->first();
 
@@ -464,13 +479,13 @@ class AssetManagementController extends Controller
             $nextSeq = ((int) end($parts)) + 1;
         }
 
-        $inProgressStatus = \App\Models\TicketStatus::where('name', 'In Progress')->first() ?? \App\Models\TicketStatus::first();
-        $highPriority = \App\Models\Priority::where('name', 'High')->first() ?? \App\Models\Priority::first();
-        $portalSource = \App\Models\Source::first();
+        $inProgressStatus = TicketStatus::where('name', 'In Progress')->first() ?? TicketStatus::first();
+        $highPriority = Priority::where('name', 'High')->first() ?? Priority::first();
+        $portalSource = Source::first();
         $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
-        \App\Models\Ticket::create([
-            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+        Ticket::create([
+            'request_id' => $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $incType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -485,8 +500,8 @@ class AssetManagementController extends Controller
             'priority_id' => $highPriority?->id,
             'source_id' => $portalSource?->id,
             'status_id' => $inProgressStatus?->id,
-            'problem_description' => "[Auto-Generated] Send to Service: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . ". Service Provider: {$request->service_provider}. Problem: {$request->description}",
-            'resolution_notes' => "Service in progress by {$request->service_provider}. Estimated cost: Rp " . number_format((float)$request->cost, 0, ',', '.'),
+            'problem_description' => "[Auto-Generated] Send to Service: {$asset->asset_tag} - ".($asset->product->name ?? 'Asset').". Service Provider: {$request->service_provider}. Problem: {$request->description}",
+            'resolution_notes' => "Service in progress by {$request->service_provider}. Estimated cost: Rp ".number_format((float) $request->cost, 0, ',', '.'),
             'request_date' => $ticketDate->toDateString(),
             'request_time' => $ticketDate,
             'created_at' => $ticketDate,
@@ -497,7 +512,7 @@ class AssetManagementController extends Controller
 
     public function showCompleteMaintenance(Request $request, $asset, AssetMaintenance $maintenance)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -506,7 +521,7 @@ class AssetManagementController extends Controller
 
     public function processCompleteMaintenance(Request $request, $asset, AssetMaintenance $maintenance)
     {
-        if (!($asset instanceof Asset)) {
+        if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
         }
 
@@ -530,9 +545,9 @@ class AssetManagementController extends Controller
 
         $auth = auth()->user();
         if ($auth) {
-            $auth->notify(new \App\Notifications\SystemNotification(
+            $auth->notify(new SystemNotification(
                 'Maintenance Completed',
-                "Maintenance for '{$asset->tag} - " . ($asset->product->name ?? 'Item') . "' has been completed.",
+                "Maintenance for '{$asset->tag} - ".($asset->product->name ?? 'Item')."' has been completed.",
                 route('assets.show', $asset->id),
                 'check-circle',
                 'Maintenance'
@@ -540,12 +555,12 @@ class AssetManagementController extends Controller
         }
 
         // Automatic Ticket Creation for Completed Service/Maintenance
-        $ticketDate = \Illuminate\Support\Carbon::parse($request->completion_date);
-        $reqType = \App\Models\TicketType::where('code', 'REQ')->first() ?? \App\Models\TicketType::first();
+        $ticketDate = Carbon::parse($request->completion_date);
+        $reqType = TicketType::where('code', 'REQ')->first() ?? TicketType::first();
         $code = strtoupper($reqType?->code ?: 'REQ');
-        $prefix = $code . '-' . $ticketDate->format('ymd') . '-';
+        $prefix = $code.'-'.$ticketDate->format('ymd').'-';
 
-        $latestTicket = \App\Models\Ticket::where('request_id', 'like', $prefix . '%')
+        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
             ->first();
 
@@ -555,14 +570,14 @@ class AssetManagementController extends Controller
             $nextSeq = ((int) end($parts)) + 1;
         }
 
-        $completedStatus = \App\Models\TicketStatus::where('name', 'Completed')->first() ?? \App\Models\TicketStatus::where('is_closed', true)->first();
-        $fulfilledSla = \App\Models\SlaStatus::where('code', 'FULFILLED')->first();
-        $mediumPriority = \App\Models\Priority::where('name', 'Medium')->first();
-        $portalSource = \App\Models\Source::first();
+        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
+        $mediumPriority = Priority::where('name', 'Medium')->first();
+        $portalSource = Source::first();
         $catResolved = $this->resolveTicketCategoryForAsset($asset);
 
-        \App\Models\Ticket::create([
-            'request_id' => $prefix . str_pad((string)$nextSeq, 3, '0', STR_PAD_LEFT),
+        Ticket::create([
+            'request_id' => $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT),
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -578,8 +593,8 @@ class AssetManagementController extends Controller
             'source_id' => $portalSource?->id,
             'status_id' => $completedStatus?->id,
             'sla_status_id' => $fulfilledSla?->id,
-            'problem_description' => "[Auto-Generated] Service Completed: {$asset->asset_tag} - " . ($asset->product->name ?? 'Asset') . ". Status: Ready/Available.",
-            'resolution_notes' => "Service successfully completed on {$request->completion_date}. Final cost: Rp " . number_format((float)($request->cost ?? $maintenance->cost), 0, ',', '.') . ". Notes: " . ($request->notes ?? '-'),
+            'problem_description' => "[Auto-Generated] Service Completed: {$asset->asset_tag} - ".($asset->product->name ?? 'Asset').'. Status: Ready/Available.',
+            'resolution_notes' => "Service successfully completed on {$request->completion_date}. Final cost: Rp ".number_format((float) ($request->cost ?? $maintenance->cost), 0, ',', '.').'. Notes: '.($request->notes ?? '-'),
             'request_date' => $ticketDate->toDateString(),
             'request_time' => $ticketDate,
             'completed_date' => $ticketDate->toDateString(),
@@ -588,5 +603,47 @@ class AssetManagementController extends Controller
         ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset maintenance completed successfully.');
+    }
+
+    public function processRetire(Request $request, $asset)
+    {
+        if (! ($asset instanceof Asset)) {
+            $asset = Asset::findOrFail($asset);
+        }
+
+        $request->validate([
+            'retired_at' => 'required|date',
+            'retirement_reason' => 'required|string',
+            'retirement_notes' => 'nullable|string',
+            'is_components_stripped' => 'nullable|boolean',
+        ]);
+
+        $retiredStatus = Status::where('name', 'Retired')->first()
+            ?? Status::where('name', 'like', '%retired%')->first();
+
+        if ($asset->isCurrentlyCheckedOut()) {
+            $checkout = $asset->currentCheckout;
+            if ($checkout) {
+                $checkout->update([
+                    'checked_in_at' => $request->retired_at,
+                    'checked_in_by_user_id' => auth()->id(),
+                    'condition_report' => 'Retired: '.$request->retirement_reason,
+                    'checkin_status_id' => $retiredStatus?->id,
+                    'checkin_notes' => 'Auto checked-in upon retirement: '.($request->retirement_notes ?? '-'),
+                ]);
+            }
+        }
+
+        $asset->update([
+            'status_id' => $retiredStatus ? $retiredStatus->id : $asset->status_id,
+            'retired_at' => $request->retired_at,
+            'retirement_reason' => $request->retirement_reason,
+            'retirement_notes' => $request->retirement_notes,
+            'is_components_stripped' => $request->boolean('is_components_stripped'),
+            'current_checkout_id' => null,
+            'assigned_to_user_id' => null,
+        ]);
+
+        return redirect()->route('assets.show', $asset)->with('success', 'Asset has been successfully retired.');
     }
 }

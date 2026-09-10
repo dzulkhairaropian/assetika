@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Asset;
 use App\Models\AssetRequest;
 use App\Models\Category;
 use App\Models\Consumable;
+use App\Models\License;
 use Illuminate\Http\Request;
 
 class AssetRequestController extends Controller
@@ -18,9 +17,9 @@ class AssetRequestController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->whereHas('user', fn($u) => $u->where('name', 'like', "%$search%"))
-                  ->orWhere('notes', 'like', "%$search%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn ($u) => $u->where('name', 'like', "%$search%"))
+                    ->orWhere('notes', 'like', "%$search%");
             });
         }
 
@@ -32,14 +31,14 @@ class AssetRequestController extends Controller
             'total' => (clone $query)->count(),
             'hardware' => (clone $query)->where('requestable_type', Category::class)->count(),
             'consumable' => (clone $query)->where('requestable_type', Consumable::class)->count(),
-            'license' => (clone $query)->where('requestable_type', \App\Models\License::class)->count(),
+            'license' => (clone $query)->where('requestable_type', License::class)->count(),
         ];
 
         if ($tab = $request->input('tab')) {
-            match($tab) {
+            match ($tab) {
                 'hardware' => $query->where('requestable_type', Category::class),
                 'consumable' => $query->where('requestable_type', Consumable::class),
-                'license' => $query->where('requestable_type', \App\Models\License::class),
+                'license' => $query->where('requestable_type', License::class),
                 default => null,
             };
         }
@@ -52,9 +51,9 @@ class AssetRequestController extends Controller
     // User catalog to request items
     public function catalog()
     {
-        $categories = Category::whereHas('masterCategory', fn($q) => $q->where('name', 'IT Asset'))->orderBy('name')->get();
+        $categories = Category::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))->orderBy('name')->get();
         $consumables = Consumable::with('product')->get();
-        $licenses = \App\Models\License::orderBy('name')->get();
+        $licenses = License::orderBy('name')->get();
         $myRequests = AssetRequest::where('user_id', auth()->id())->with('requestable')->latest()->take(10)->get();
 
         return view('pages.requests.catalog', compact('categories', 'consumables', 'licenses', 'myRequests'));
@@ -70,10 +69,10 @@ class AssetRequestController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $type = match($request->requestable_type) {
+        $type = match ($request->requestable_type) {
             'category' => Category::class,
             'consumable' => Consumable::class,
-            'license' => \App\Models\License::class,
+            'license' => License::class,
         };
 
         AssetRequest::create([

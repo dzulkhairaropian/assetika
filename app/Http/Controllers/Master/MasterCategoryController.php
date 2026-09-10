@@ -13,10 +13,11 @@ class MasterCategoryController extends Controller
         $query = MasterCategory::withCount('categories');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         $masterCategories = $query->latest()->paginate(50)->withQueryString();
+
         return view('pages.master.master-categories.index', compact('masterCategories'));
     }
 
@@ -61,6 +62,7 @@ class MasterCategoryController extends Controller
     public function destroy(MasterCategory $masterCategory)
     {
         $masterCategory->delete();
+
         return redirect()->route('master-categories.index')->with('success', 'Master Category deleted successfully.');
     }
 

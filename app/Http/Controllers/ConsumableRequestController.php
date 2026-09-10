@@ -15,10 +15,10 @@ class ConsumableRequestController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('request_number', 'like', "%$search%")
-                  ->orWhereHas('requester', fn($u) => $u->where('name', 'like', "%$search%"))
-                  ->orWhere('notes', 'like', "%$search%");
+                    ->orWhereHas('requester', fn ($u) => $u->where('name', 'like', "%$search%"))
+                    ->orWhere('notes', 'like', "%$search%");
             });
         }
 
@@ -29,11 +29,11 @@ class ConsumableRequestController extends Controller
         $requests = $query->latest('requested_at')->paginate(50)->withQueryString();
 
         $summary = [
-            'total'     => (clone $query)->count(),
-            'pending'   => (clone $query)->where('status', ConsumableRequestStatus::PENDING->value)->count(),
-            'approved'  => (clone $query)->where('status', ConsumableRequestStatus::APPROVED->value)->count(),
+            'total' => (clone $query)->count(),
+            'pending' => (clone $query)->where('status', ConsumableRequestStatus::PENDING->value)->count(),
+            'approved' => (clone $query)->where('status', ConsumableRequestStatus::APPROVED->value)->count(),
             'completed' => (clone $query)->where('status', ConsumableRequestStatus::COMPLETED->value)->count(),
-            'rejected'  => (clone $query)->where('status', ConsumableRequestStatus::REJECTED->value)->count(),
+            'rejected' => (clone $query)->where('status', ConsumableRequestStatus::REJECTED->value)->count(),
         ];
 
         return view('pages.consumable-requests.index', compact('requests', 'summary'));
@@ -42,6 +42,7 @@ class ConsumableRequestController extends Controller
     public function show(ConsumableRequest $consumable_request)
     {
         $consumable_request->load(['requester', 'department', 'location', 'processedBy', 'items.consumable.product.brand']);
+
         return view('pages.consumable-requests.show', ['request' => $consumable_request]);
     }
 
@@ -77,12 +78,12 @@ class ConsumableRequestController extends Controller
                         'type' => 'checkout',
                         'quantity' => $item->quantity_requested,
                         'transaction_date' => now(),
-                        'checkout_notes' => 'Fulfilled from Consumable Request #' . $consumable_request->request_number,
+                        'checkout_notes' => 'Fulfilled from Consumable Request #'.$consumable_request->request_number,
                     ]);
                 }
             }
 
-            return back()->with('success', 'Consumable request #' . $consumable_request->request_number . ' approved and stock deducted.');
+            return back()->with('success', 'Consumable request #'.$consumable_request->request_number.' approved and stock deducted.');
         } elseif ($action === 'reject') {
             $consumable_request->update([
                 'status' => ConsumableRequestStatus::REJECTED,
@@ -91,13 +92,13 @@ class ConsumableRequestController extends Controller
                 'admin_notes' => $request->admin_notes,
             ]);
 
-            return back()->with('success', 'Consumable request #' . $consumable_request->request_number . ' rejected.');
+            return back()->with('success', 'Consumable request #'.$consumable_request->request_number.' rejected.');
         } elseif ($action === 'complete') {
             $consumable_request->update([
                 'status' => ConsumableRequestStatus::COMPLETED,
             ]);
 
-            return back()->with('success', 'Consumable request #' . $consumable_request->request_number . ' marked as completed.');
+            return back()->with('success', 'Consumable request #'.$consumable_request->request_number.' marked as completed.');
         } elseif ($action === 'reopen') {
             $consumable_request->update([
                 'status' => ConsumableRequestStatus::PENDING,
@@ -105,7 +106,7 @@ class ConsumableRequestController extends Controller
                 'processed_at' => null,
             ]);
 
-            return back()->with('success', 'Consumable request #' . $consumable_request->request_number . ' reopened to pending.');
+            return back()->with('success', 'Consumable request #'.$consumable_request->request_number.' reopened to pending.');
         }
 
         return back()->with('error', 'Invalid action.');
@@ -114,6 +115,7 @@ class ConsumableRequestController extends Controller
     public function destroy(ConsumableRequest $consumable_request)
     {
         $consumable_request->delete();
+
         return redirect()->route('consumable-requests.index')->with('success', 'Request deleted successfully.');
     }
 }

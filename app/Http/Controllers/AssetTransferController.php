@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetTransfer;
 use App\Models\Company;
-use App\Models\Department;
-use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

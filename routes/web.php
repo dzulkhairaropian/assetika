@@ -1,54 +1,67 @@
 <?php
 
-use App\Http\Controllers\Master\GroupController;
-use App\Http\Controllers\Master\CompanyController;
-use App\Http\Controllers\Master\DepartmentController;
-use App\Http\Controllers\Master\PositionController;
-use App\Http\Controllers\Master\LocationController;
-use App\Http\Controllers\Master\BrandController;
-use App\Http\Controllers\Master\MasterCategoryController;
-use App\Http\Controllers\Master\CategoryController;
-use App\Http\Controllers\Master\StatusController;
-use App\Http\Controllers\Master\VendorController;
-use App\Http\Controllers\Master\OperatingSystemController;
-use App\Http\Controllers\Master\ProductController;
-use App\Http\Controllers\Master\DepreciationController;
-use App\Http\Controllers\Master\MaintenanceTypeController;
-use App\Http\Controllers\ComponentController;
-use App\Http\Controllers\LicenseController;
-use App\Http\Controllers\KitController;
-use App\Http\Controllers\ImportController;
-use App\Http\Controllers\StockCountController;
+use App\Http\Controllers\Admin\LabelController;
+use App\Http\Controllers\Admin\PriorityController;
+use App\Http\Controllers\Admin\SlaStatusController;
+use App\Http\Controllers\Admin\SourceController;
+use App\Http\Controllers\Admin\TicketCategoryController;
+use App\Http\Controllers\Admin\TicketStatusController;
+use App\Http\Controllers\Admin\TicketTypeController;
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AssetLabelController;
+use App\Http\Controllers\AssetManagementController;
 use App\Http\Controllers\AssetRequestController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FinanceDashboardController;
+use App\Http\Controllers\AssetTransactionController;
+use App\Http\Controllers\AssetTransferController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\ConsumableController;
 use App\Http\Controllers\ConsumableRequestController;
 use App\Http\Controllers\ConsumableTransactionController;
-use App\Http\Controllers\AssetController;
-use App\Http\Controllers\AssetManagementController;
-use App\Http\Controllers\BackupController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinanceDashboardController;
+use App\Http\Controllers\GaAssetCategoryController;
+use App\Http\Controllers\GaAssetController;
+use App\Http\Controllers\GaAssetSubcategoryController;
 use App\Http\Controllers\GaDashboardController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\KbController;
+use App\Http\Controllers\KitController;
+use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\Master\BrandController;
+use App\Http\Controllers\Master\CategoryController;
+use App\Http\Controllers\Master\CompanyController;
+use App\Http\Controllers\Master\DepartmentController;
+use App\Http\Controllers\Master\DepreciationController;
+use App\Http\Controllers\Master\GroupController;
+use App\Http\Controllers\Master\LocationController;
+use App\Http\Controllers\Master\MaintenanceTypeController;
+use App\Http\Controllers\Master\MasterCategoryController;
+use App\Http\Controllers\Master\OperatingSystemController;
+use App\Http\Controllers\Master\PositionController;
+use App\Http\Controllers\Master\ProductController;
+use App\Http\Controllers\Master\StatusController;
+use App\Http\Controllers\Master\VendorController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RenewalController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SlaPolicyController;
+use App\Http\Controllers\StockCountController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketDashboardController;
-use App\Http\Controllers\Admin\PriorityController;
-use App\Http\Controllers\Admin\LabelController;
-use App\Http\Controllers\Admin\SourceController;
-use App\Http\Controllers\Admin\TicketStatusController;
-use App\Http\Controllers\Admin\TicketTypeController;
-use App\Http\Controllers\Admin\SlaStatusController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\Auth\PasswordResetController;
 
 Route::middleware('guest')->group(function () {
     Route::get('signin', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('signin', [LoginController::class, 'login']);
-    
+
     Route::get('signup', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('signup', [RegisterController::class, 'register']);
 
@@ -68,11 +81,11 @@ Route::middleware('auth')->group(function () {
     Route::get('finance-dashboard', [FinanceDashboardController::class, 'index'])->name('finance-dashboard');
     Route::get('ga-dashboard', [GaDashboardController::class, 'index'])->name('ga-dashboard');
     Route::get('ticket-dashboard', [TicketDashboardController::class, 'index'])->name('ticket-dashboard');
-    Route::get('tickets/export', [\App\Http\Controllers\TicketController::class, 'export'])->name('tickets.export');
-    Route::post('tickets/{ticket}/comment', [\App\Http\Controllers\TicketController::class, 'comment'])->name('tickets.comment');
-    Route::post('tickets/bulk-delete', [\App\Http\Controllers\TicketController::class, 'bulkDestroy'])->name('tickets.bulk-delete');
-    Route::resource('tickets', \App\Http\Controllers\TicketController::class);
-    
+    Route::get('tickets/export', [TicketController::class, 'export'])->name('tickets.export');
+    Route::post('tickets/{ticket}/comment', [TicketController::class, 'comment'])->name('tickets.comment');
+    Route::post('tickets/bulk-delete', [TicketController::class, 'bulkDestroy'])->name('tickets.bulk-delete');
+    Route::resource('tickets', TicketController::class);
+
     // Master Data Routes
     Route::post('groups/bulk-delete', [GroupController::class, 'bulkDestroy'])->name('groups.bulk-delete');
     Route::resource('groups', GroupController::class);
@@ -124,11 +137,11 @@ Route::middleware('auth')->group(function () {
     Route::get('consumable-transactions', [ConsumableTransactionController::class, 'index'])->name('consumable-transactions.index');
 
     // IT Asset Management
-    Route::get('asset-transfers', [\App\Http\Controllers\AssetTransferController::class, 'index'])->name('asset-transfers.index');
-    Route::get('asset-transfers/create', [\App\Http\Controllers\AssetTransferController::class, 'create'])->name('asset-transfers.create');
-    Route::post('asset-transfers', [\App\Http\Controllers\AssetTransferController::class, 'store'])->name('asset-transfers.store');
-    Route::post('asset-transfers/{transfer}/approve', [\App\Http\Controllers\AssetTransferController::class, 'approve'])->name('asset-transfers.approve');
-    Route::post('asset-transfers/{transfer}/reject', [\App\Http\Controllers\AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
+    Route::get('asset-transfers', [AssetTransferController::class, 'index'])->name('asset-transfers.index');
+    Route::get('asset-transfers/create', [AssetTransferController::class, 'create'])->name('asset-transfers.create');
+    Route::post('asset-transfers', [AssetTransferController::class, 'store'])->name('asset-transfers.store');
+    Route::post('asset-transfers/{transfer}/approve', [AssetTransferController::class, 'approve'])->name('asset-transfers.approve');
+    Route::post('asset-transfers/{transfer}/reject', [AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
 
     Route::get('assets/export', [AssetController::class, 'export'])->name('assets.export');
     Route::get('my-assets', [AssetController::class, 'myAssets'])->name('assets.my-assets');
@@ -136,12 +149,12 @@ Route::middleware('auth')->group(function () {
     Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
     Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');
     Route::post('assets/bulk-checkout', [AssetController::class, 'bulkCheckout'])->name('assets.bulk-checkout.process');
-    Route::post('labels/generate', [\App\Http\Controllers\AssetLabelController::class, 'generate'])->name('labels.generate');
-    Route::get('labels/{asset}/print', [\App\Http\Controllers\AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
+    Route::post('labels/generate', [AssetLabelController::class, 'generate'])->name('labels.generate');
+    Route::get('labels/{asset}/print', [AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
     Route::get('assets/{asset}/print-label', [AssetController::class, 'printLabel'])->name('assets.print-label');
     Route::resource('assets', AssetController::class);
-    Route::get('asset-transactions/export', [\App\Http\Controllers\AssetTransactionController::class, 'export'])->name('asset-transactions.export');
-    Route::get('asset-transactions', [\App\Http\Controllers\AssetTransactionController::class, 'index'])->name('asset-transactions.index');
+    Route::get('asset-transactions/export', [AssetTransactionController::class, 'export'])->name('asset-transactions.export');
+    Route::get('asset-transactions', [AssetTransactionController::class, 'index'])->name('asset-transactions.index');
     Route::prefix('assets/{asset}')->group(function () {
         Route::get('checkout', [AssetManagementController::class, 'showCheckout'])->name('assets.checkout');
         Route::post('checkout', [AssetManagementController::class, 'processCheckout'])->name('assets.checkout.process');
@@ -152,6 +165,7 @@ Route::middleware('auth')->group(function () {
         Route::post('maintenance', [AssetManagementController::class, 'processMaintenance'])->name('assets.maintenance.process');
         Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
         Route::post('maintenance/{maintenance}/complete', [AssetManagementController::class, 'processCompleteMaintenance'])->name('assets.maintenance.complete.process');
+        Route::post('retire', [AssetManagementController::class, 'processRetire'])->name('assets.retire.process');
     });
 
     // Component Management
@@ -193,20 +207,20 @@ Route::middleware('auth')->group(function () {
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
 
     // Notification Routes
-    Route::post('notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     // GA Asset Management Routes
-    Route::resource('ga-categories', \App\Http\Controllers\GaAssetCategoryController::class);
-    Route::resource('ga-subcategories', \App\Http\Controllers\GaAssetSubcategoryController::class);
-    Route::get('ga-assets/subcategories-ajax', [\App\Http\Controllers\GaAssetController::class, 'getSubcategoriesAjax'])->name('ga-assets.subcategories-ajax');
-    Route::post('ga-assets/bulk-delete', [\App\Http\Controllers\GaAssetController::class, 'bulkDestroy'])->name('ga-assets.bulk-delete');
-    Route::resource('ga-assets', \App\Http\Controllers\GaAssetController::class);
-    Route::get('ga-assets/{asset}/bast/{assignment}', [\App\Http\Controllers\GaAssetController::class, 'showBAST'])->name('ga-assets.bast');
-    Route::post('ga-assets/{asset}/renew-tax', [\App\Http\Controllers\GaAssetController::class, 'renewVehicleTax'])->name('ga-assets.renew-tax');
-    Route::post('ga-assets/{asset}/checkout', [\App\Http\Controllers\GaAssetController::class, 'checkout'])->name('ga-assets.checkout');
-    Route::post('ga-assets/{asset}/checkin', [\App\Http\Controllers\GaAssetController::class, 'checkin'])->name('ga-assets.checkin');
-    Route::post('ga-assets/{asset}/maintenance', [\App\Http\Controllers\GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');
+    Route::resource('ga-categories', GaAssetCategoryController::class);
+    Route::resource('ga-subcategories', GaAssetSubcategoryController::class);
+    Route::get('ga-assets/subcategories-ajax', [GaAssetController::class, 'getSubcategoriesAjax'])->name('ga-assets.subcategories-ajax');
+    Route::post('ga-assets/bulk-delete', [GaAssetController::class, 'bulkDestroy'])->name('ga-assets.bulk-delete');
+    Route::resource('ga-assets', GaAssetController::class);
+    Route::get('ga-assets/{asset}/bast/{assignment}', [GaAssetController::class, 'showBAST'])->name('ga-assets.bast');
+    Route::post('ga-assets/{asset}/renew-tax', [GaAssetController::class, 'renewVehicleTax'])->name('ga-assets.renew-tax');
+    Route::post('ga-assets/{asset}/checkout', [GaAssetController::class, 'checkout'])->name('ga-assets.checkout');
+    Route::post('ga-assets/{asset}/checkin', [GaAssetController::class, 'checkin'])->name('ga-assets.checkin');
+    Route::post('ga-assets/{asset}/maintenance', [GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');
 
     // User & Role Management
     Route::post('users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('users.bulk-delete');
@@ -230,31 +244,31 @@ Route::middleware('auth')->group(function () {
     Route::post('admin/sla-statuses/bulk-delete', [SlaStatusController::class, 'bulkDestroy'])->name('admin.sla-statuses.bulk-delete');
 
     // Admin CRUD Routes (Ticketing)
-    Route::get('admin/ticket-categories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'index'])->name('admin.ticket-categories.index');
-    Route::post('admin/ticket-categories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'storeCategory'])->name('admin.ticket-categories.store');
-    Route::delete('admin/ticket-categories/{category}', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'destroyCategory'])->name('admin.ticket-categories.destroy');
-    Route::post('admin/ticket-subcategories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'storeSubcategory'])->name('admin.ticket-subcategories.store');
-    Route::delete('admin/ticket-subcategories/{subcategory}', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'destroySubcategory'])->name('admin.ticket-subcategories.destroy');
-    Route::get('api/ticket-categories/{category}/subcategories', [\App\Http\Controllers\Admin\TicketCategoryController::class, 'getSubcategories'])->name('api.ticket-categories.subcategories');
+    Route::get('admin/ticket-categories', [TicketCategoryController::class, 'index'])->name('admin.ticket-categories.index');
+    Route::post('admin/ticket-categories', [TicketCategoryController::class, 'storeCategory'])->name('admin.ticket-categories.store');
+    Route::delete('admin/ticket-categories/{category}', [TicketCategoryController::class, 'destroyCategory'])->name('admin.ticket-categories.destroy');
+    Route::post('admin/ticket-subcategories', [TicketCategoryController::class, 'storeSubcategory'])->name('admin.ticket-subcategories.store');
+    Route::delete('admin/ticket-subcategories/{subcategory}', [TicketCategoryController::class, 'destroySubcategory'])->name('admin.ticket-subcategories.destroy');
+    Route::get('api/ticket-categories/{category}/subcategories', [TicketCategoryController::class, 'getSubcategories'])->name('api.ticket-categories.subcategories');
 
     // Calendar Page
     Route::get('calendar', function () {
         return view('pages.calender');
     })->name('calendar.index');
-    Route::get('api/calendar/events', [\App\Http\Controllers\CalendarController::class, 'events'])->name('api.calendar.events');
-    Route::post('api/calendar/events', [\App\Http\Controllers\CalendarController::class, 'store'])->name('api.calendar.store');
-    Route::put('api/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'update'])->name('api.calendar.update');
-    Route::delete('api/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'destroy'])->name('api.calendar.destroy');
-    Route::get('kb/suggestions', [\App\Http\Controllers\KbController::class, 'suggestions'])->name('kb.suggestions');
+    Route::get('api/calendar/events', [CalendarController::class, 'events'])->name('api.calendar.events');
+    Route::post('api/calendar/events', [CalendarController::class, 'store'])->name('api.calendar.store');
+    Route::put('api/calendar/events/{id}', [CalendarController::class, 'update'])->name('api.calendar.update');
+    Route::delete('api/calendar/events/{id}', [CalendarController::class, 'destroy'])->name('api.calendar.destroy');
+    Route::get('kb/suggestions', [KbController::class, 'suggestions'])->name('kb.suggestions');
     // Projects & Operations
-    Route::resource('projects', \App\Http\Controllers\ProjectController::class);
-    Route::post('projects/{project}/tasks', [\App\Http\Controllers\ProjectController::class, 'storeTask'])->name('projects.store-task');
-    Route::patch('project-tasks/{task}/status', [\App\Http\Controllers\ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
-    Route::delete('project-tasks/{task}', [\App\Http\Controllers\ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
+    Route::resource('projects', ProjectController::class);
+    Route::post('projects/{project}/tasks', [ProjectController::class, 'storeTask'])->name('projects.store-task');
+    Route::patch('project-tasks/{task}/status', [ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
+    Route::delete('project-tasks/{task}', [ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
 
-    Route::resource('kb', \App\Http\Controllers\KbController::class);
-    Route::resource('sla-policies', \App\Http\Controllers\SlaPolicyController::class)->only(['index', 'store']);
-    Route::resource('renewals', \App\Http\Controllers\RenewalController::class);
+    Route::resource('kb', KbController::class);
+    Route::resource('sla-policies', SlaPolicyController::class)->only(['index', 'store']);
+    Route::resource('renewals', RenewalController::class);
 
     Route::resource('admin/priorities', PriorityController::class, ['names' => 'admin.priorities']);
     Route::resource('admin/labels', LabelController::class, ['names' => 'admin.labels']);
@@ -262,6 +276,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('admin/ticket-types', TicketTypeController::class, ['names' => 'admin.ticket-types']);
     Route::resource('admin/ticket-statuses', TicketStatusController::class, ['names' => 'admin.ticket-statuses']);
     Route::resource('admin/sla-statuses', SlaStatusController::class, ['names' => 'admin.sla-statuses']);
-    
+
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });

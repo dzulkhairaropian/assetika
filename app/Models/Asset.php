@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
+use App\Traits\HasDataScope;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use App\Traits\HasDataScope;
-use App\Traits\LogsActivity;
 
 class Asset extends Model
 {
-    use SoftDeletes, HasDataScope, LogsActivity;
+    use HasDataScope, LogsActivity, SoftDeletes;
+
     protected $table = 'assets';
 
     protected $fillable = [
@@ -33,6 +34,7 @@ class Asset extends Model
         'mac_address_ethernet',
         'specification',
         'accessories',
+        'is_components_stripped',
         'purchase_date',
         'release_date',
         'warranty_expiry_date',
@@ -53,6 +55,7 @@ class Asset extends Model
     ];
 
     protected $casts = [
+        'is_components_stripped' => 'boolean',
         'purchase_date' => 'date',
         'release_date' => 'date',
         'warranty_expiry_date' => 'date',
@@ -64,9 +67,9 @@ class Asset extends Model
 
     public function scopeFilter($query, array $filters)
     {
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
-            $like = '%' . $search . '%';
+            $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
                 $q->where('asset_tag', 'like', $like)
                     ->orWhere('serial_number', 'like', $like)
@@ -114,35 +117,35 @@ class Asset extends Model
             });
         }
 
-        if (!empty($filters['status_id'])) {
+        if (! empty($filters['status_id'])) {
             $query->where('status_id', $filters['status_id']);
         }
 
-        if (!empty($filters['department_id'])) {
+        if (! empty($filters['department_id'])) {
             $query->where('department_id', $filters['department_id']);
         }
 
-        if (!empty($filters['location_id'])) {
+        if (! empty($filters['location_id'])) {
             $query->where('location_id', $filters['location_id']);
         }
 
-        if (!empty($filters['product_id'])) {
+        if (! empty($filters['product_id'])) {
             $query->where('product_id', $filters['product_id']);
         }
 
-        if (!empty($filters['category_id'])) {
+        if (! empty($filters['category_id'])) {
             $query->whereHas('product', function ($q) use ($filters) {
                 $q->where('category_id', $filters['category_id']);
             });
         }
 
-        if (!empty($filters['brand_id'])) {
+        if (! empty($filters['brand_id'])) {
             $query->whereHas('product', function ($q) use ($filters) {
                 $q->where('brand_id', $filters['brand_id']);
             });
         }
 
-        if (!empty($filters['company_id'])) {
+        if (! empty($filters['company_id'])) {
             $query->whereHas('department', function ($q) use ($filters) {
                 $q->where('company_id', $filters['company_id']);
             });
@@ -344,7 +347,7 @@ class Asset extends Model
 
         // Create a pattern that matches the year portion of the date code
         // For example, if dateCode is "250101", we match "25%" to get all assets from 2025
-        $yearPattern = substr($dateCode, 0, 2) . '%';
+        $yearPattern = substr($dateCode, 0, 2).'%';
 
         // Count assets with the same company, category and year in the asset tag
         $count = static::query()
@@ -404,7 +407,7 @@ class Asset extends Model
 
     public function getBookValueAttribute(): ?float
     {
-        if (!$this->purchase_cost || !$this->depreciation || !$this->release_date) {
+        if (! $this->purchase_cost || ! $this->depreciation || ! $this->release_date) {
             return $this->purchase_cost ? (float) $this->purchase_cost : null;
         }
 

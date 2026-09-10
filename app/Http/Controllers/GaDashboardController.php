@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\GaAsset;
 use App\Models\GaAssetAssignment;
 use App\Models\GaMaintenanceLog;
-use App\Models\GaAssetCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +18,7 @@ class GaDashboardController extends Controller
         $isTotalAssetsDummy = $realTotalAssets === 0;
         $totalAssets = $isTotalAssetsDummy ? 142 : $realTotalAssets;
 
-        $realAssetValue = (float) GaAsset::all()->sum(fn($a) => $a->total_asset_value * $a->qty);
+        $realAssetValue = (float) GaAsset::all()->sum(fn ($a) => $a->total_asset_value * $a->qty);
         $isTotalAssetValueDummy = $realAssetValue === 0.0;
         $totalAssetValue = $isTotalAssetValueDummy ? 850000000 : $realAssetValue;
 
@@ -73,12 +72,12 @@ class GaDashboardController extends Controller
             $statusChart = [
                 'labels' => ['Available', 'Deployed', 'Maintenance', 'Retired'],
                 'data' => [65, 45, 18, 14],
-                'colors' => ['#22c55e', '#3b82f6', '#f97316', '#ef4444']
+                'colors' => ['#22c55e', '#3b82f6', '#f97316', '#ef4444'],
             ];
         } else {
             $statusChart = [
-                'labels' => $statusesRaw->pluck('status')->map(fn($s) => ucfirst($s))->toArray(),
-                'data' => $statusesRaw->pluck('total_qty')->map(fn($val) => (int)$val)->toArray(),
+                'labels' => $statusesRaw->pluck('status')->map(fn ($s) => ucfirst($s))->toArray(),
+                'data' => $statusesRaw->pluck('total_qty')->map(fn ($val) => (int) $val)->toArray(),
                 'colors' => $statusesRaw->map(function ($item) {
                     return match (strtolower($item->status)) {
                         'available', 'ready' => '#22c55e',
@@ -87,7 +86,7 @@ class GaDashboardController extends Controller
                         'retired', 'disposal', 'broken' => '#ef4444',
                         default => '#8b5cf6'
                     };
-                })->toArray()
+                })->toArray(),
             ];
         }
 
@@ -104,8 +103,8 @@ class GaDashboardController extends Controller
         }
 
         $categoriesRaw = $categoryQuery->get()
-            ->groupBy(fn($a) => $a->category->name ?? 'Uncategorized')
-            ->map(fn($group) => $group->sum('qty'));
+            ->groupBy(fn ($a) => $a->category->name ?? 'Uncategorized')
+            ->map(fn ($group) => $group->sum('qty'));
 
         $isCategoryChartDummy = $categoriesRaw->isEmpty();
         if ($isCategoryChartDummy) {
@@ -116,7 +115,7 @@ class GaDashboardController extends Controller
         } else {
             $categoryChart = [
                 'labels' => $categoriesRaw->keys()->toArray(),
-                'data' => $categoriesRaw->values()->map(fn($val) => (int)$val)->toArray(),
+                'data' => $categoriesRaw->values()->map(fn ($val) => (int) $val)->toArray(),
             ];
         }
 
@@ -124,7 +123,7 @@ class GaDashboardController extends Controller
         $conditionChart = [
             'labels' => ['Excellent', 'Good', 'Fair', 'Needs Repair', 'Critical'],
             'data' => [52, 48, 26, 12, 4],
-            'colors' => ['#22c55e', '#3b82f6', '#06b6d4', '#f97316', '#ef4444']
+            'colors' => ['#22c55e', '#3b82f6', '#06b6d4', '#f97316', '#ef4444'],
         ];
 
         // 5. Spend Trend / Purchase Timeline (Line Chart)
@@ -133,8 +132,8 @@ class GaDashboardController extends Controller
         $monthlySpend = GaAsset::whereNotNull('purchase_date')
             ->whereRaw('YEAR(purchase_date) = ?', [$selectedYear])
             ->get()
-            ->groupBy(fn($a) => (int) $a->purchase_date->format('m'))
-            ->map(fn($group) => $group->sum(fn($a) => $a->total_asset_value * $a->qty));
+            ->groupBy(fn ($a) => (int) $a->purchase_date->format('m'))
+            ->map(fn ($group) => $group->sum(fn ($a) => $a->total_asset_value * $a->qty));
 
         $purchaseLabels = [];
         $purchaseData = [];
@@ -191,7 +190,7 @@ class GaDashboardController extends Controller
         $greetings = [
             'Here is the latest overview of your General Affairs assets and facilities.',
             'Track GA inventory, assignments, vehicles, and scheduled maintenance.',
-            'Here is what is happening across your GA facilities today.'
+            'Here is what is happening across your GA facilities today.',
         ];
         $randomGreeting = $greetings[array_rand($greetings)];
 

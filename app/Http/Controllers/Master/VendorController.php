@@ -15,20 +15,21 @@ class VendorController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('contact_person', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%")
-                  ->orWhere('phone', 'like', "%$search%")
-                  ->orWhere('npwp_number', 'like', "%$search%")
-                  ->orWhere('npwp_name', 'like', "%$search%")
-                  ->orWhere('nib', 'like', "%$search%")
-                  ->orWhere('bank_name', 'like', "%$search%")
-                  ->orWhere('bank_account_number', 'like', "%$search%");
+                    ->orWhere('contact_person', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('npwp_number', 'like', "%$search%")
+                    ->orWhere('npwp_name', 'like', "%$search%")
+                    ->orWhere('nib', 'like', "%$search%")
+                    ->orWhere('bank_name', 'like', "%$search%")
+                    ->orWhere('bank_account_number', 'like', "%$search%");
             });
         }
 
         $vendors = $query->latest()->paginate(50)->withQueryString();
+
         return view('pages.master.vendors.index', compact('vendors'));
     }
 
@@ -79,9 +80,9 @@ class VendorController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:vendors,email,' . $vendor->id,
+            'email' => 'nullable|email|max:255|unique:vendors,email,'.$vendor->id,
             'contact_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:50|unique:vendors,phone,' . $vendor->id,
+            'phone' => 'nullable|string|max:50|unique:vendors,phone,'.$vendor->id,
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
             'npwp_number' => 'nullable|string|max:100',
@@ -113,6 +114,7 @@ class VendorController extends Controller
             Storage::disk('public')->delete($vendor->npwp_photo);
         }
         $vendor->delete();
+
         return redirect()->route('vendors.index')->with('success', 'Vendor deleted successfully.');
     }
 

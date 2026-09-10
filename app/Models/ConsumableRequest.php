@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ConsumableRequestStatus;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,7 +38,7 @@ class ConsumableRequest extends Model
             if (empty($model->requested_at)) {
                 $model->requested_at = now();
             }
-            
+
             // Generate request number based on requested_at date
             if (empty($model->request_number)) {
                 $model->request_number = self::generateRequestNumber($model->requested_at);
@@ -47,17 +48,17 @@ class ConsumableRequest extends Model
 
     /**
      * Generate a unique request number in format: CR/YYMMDD/001
-     * 
+     *
      * Sequence resets daily based on the requested date.
      * This allows proper sequencing for backdated requests.
-     * 
-     * @param \Carbon\Carbon|string|null $date The date to use for generating the number (defaults to now)
+     *
+     * @param  Carbon|string|null  $date  The date to use for generating the number (defaults to now)
      * @return string The generated request number
      */
-    public static function generateRequestNumber(\Carbon\Carbon|string|null $date = null): string
+    public static function generateRequestNumber(Carbon|string|null $date = null): string
     {
-        $date = $date ? \Carbon\Carbon::parse($date) : now();
-        
+        $date = $date ? Carbon::parse($date) : now();
+
         $prefix = 'CR';
         $dateString = $date->format('ymd'); // YYMMDD format
 

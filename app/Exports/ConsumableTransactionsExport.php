@@ -3,14 +3,14 @@
 namespace App\Exports;
 
 use App\Models\ConsumableTransaction;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ConsumableTransactionsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithChunkReading
+class ConsumableTransactionsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithHeadings, WithMapping
 {
     use Exportable;
 
@@ -31,16 +31,16 @@ class ConsumableTransactionsExport implements FromQuery, WithHeadings, WithMappi
         $query = ConsumableTransaction::with([
             'consumable.product.brand',
             'user',
-            'checkedOutToUser'
+            'checkedOutToUser',
         ]);
 
-        if (!empty($this->filters['type'])) {
+        if (! empty($this->filters['type'])) {
             $query->where('type', $this->filters['type']);
         }
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
-            $query->whereHas('consumable.product', function($q) use ($search) {
+            $query->whereHas('consumable.product', function ($q) use ($search) {
                 $q->where('model', 'like', "%$search%");
             });
         }

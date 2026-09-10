@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Component;
 use App\Models\Consumable;
@@ -61,28 +60,36 @@ class KitController extends Controller
         if ($request->has('assets')) {
             $sync = [];
             foreach ($request->assets as $item) {
-                if (!empty($item['id'])) $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
             $kit->assets()->sync($sync);
         }
         if ($request->has('licenses')) {
             $sync = [];
             foreach ($request->licenses as $item) {
-                if (!empty($item['id'])) $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
             $kit->licenses()->sync($sync);
         }
         if ($request->has('components')) {
             $sync = [];
             foreach ($request->components as $item) {
-                if (!empty($item['id'])) $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
             $kit->components()->sync($sync);
         }
         if ($request->has('consumables')) {
             $sync = [];
             foreach ($request->consumables as $item) {
-                if (!empty($item['id'])) $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
             $kit->consumables()->sync($sync);
         }
@@ -124,7 +131,9 @@ class KitController extends Controller
         $syncAssets = [];
         if ($request->has('assets')) {
             foreach ($request->assets as $item) {
-                if (!empty($item['id'])) $syncAssets[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $syncAssets[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
         }
         $kit->assets()->sync($syncAssets);
@@ -132,7 +141,9 @@ class KitController extends Controller
         $syncLicenses = [];
         if ($request->has('licenses')) {
             foreach ($request->licenses as $item) {
-                if (!empty($item['id'])) $syncLicenses[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $syncLicenses[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
         }
         $kit->licenses()->sync($syncLicenses);
@@ -140,7 +151,9 @@ class KitController extends Controller
         $syncComponents = [];
         if ($request->has('components')) {
             foreach ($request->components as $item) {
-                if (!empty($item['id'])) $syncComponents[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $syncComponents[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
         }
         $kit->components()->sync($syncComponents);
@@ -148,7 +161,9 @@ class KitController extends Controller
         $syncConsumables = [];
         if ($request->has('consumables')) {
             foreach ($request->consumables as $item) {
-                if (!empty($item['id'])) $syncConsumables[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                if (! empty($item['id'])) {
+                    $syncConsumables[$item['id']] = ['qty' => $item['qty'] ?? 1];
+                }
             }
         }
         $kit->consumables()->sync($syncConsumables);
@@ -196,6 +211,7 @@ class KitController extends Controller
         foreach ($kit->assets as $asset) {
             if ($asset->isCurrentlyCheckedOut()) {
                 $errors[] = "Asset {$asset->name} is already checked out.";
+
                 continue;
             }
 
@@ -218,6 +234,7 @@ class KitController extends Controller
             $available = $license->availableSeats();
             if ($available <= 0) {
                 $errors[] = "License {$license->name} has no available seats.";
+
                 continue;
             }
 

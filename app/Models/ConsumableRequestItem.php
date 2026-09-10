@@ -41,14 +41,14 @@ class ConsumableRequestItem extends Model
 
     public function isPartiallyFulfilled(): bool
     {
-        return $this->quantity_fulfilled !== null 
-            && $this->quantity_fulfilled > 0 
+        return $this->quantity_fulfilled !== null
+            && $this->quantity_fulfilled > 0
             && $this->quantity_fulfilled < $this->quantity_requested;
     }
 
     public function isFullyFulfilled(): bool
     {
-        return $this->quantity_fulfilled !== null 
+        return $this->quantity_fulfilled !== null
             && $this->quantity_fulfilled >= $this->quantity_requested;
     }
 }

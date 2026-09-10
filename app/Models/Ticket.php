@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\LogsActivity;
 
 class Ticket extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'request_id',
@@ -62,9 +62,9 @@ class Ticket extends Model
 
     public function scopeFilter($query, array $filters)
     {
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
-            $like = '%' . $search . '%';
+            $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
                 $q->where('request_id', 'like', $like)
                     ->orWhere('problem_description', 'like', $like)
@@ -73,19 +73,19 @@ class Ticket extends Model
             });
         }
 
-        if (!empty($filters['status_id'])) {
+        if (! empty($filters['status_id'])) {
             $query->where('status_id', $filters['status_id']);
         }
 
-        if (!empty($filters['priority_id'])) {
+        if (! empty($filters['priority_id'])) {
             $query->where('priority_id', $filters['priority_id']);
         }
 
-        if (!empty($filters['assigned_to_id'])) {
+        if (! empty($filters['assigned_to_id'])) {
             $query->where('assigned_to_id', $filters['assigned_to_id']);
         }
 
-        if (!empty($filters['ticket_category_id'])) {
+        if (! empty($filters['ticket_category_id'])) {
             $query->where('ticket_category_id', $filters['ticket_category_id']);
         }
 

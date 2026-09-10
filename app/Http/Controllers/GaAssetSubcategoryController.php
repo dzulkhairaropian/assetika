@@ -15,7 +15,7 @@ class GaAssetSubcategoryController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('name', 'like', "%$search%")
-                  ->orWhereHas('category', fn($q) => $q->where('name', 'like', "%$search%"));
+                ->orWhereHas('category', fn ($q) => $q->where('name', 'like', "%$search%"));
         }
 
         if ($request->filled('category_id')) {
@@ -31,6 +31,7 @@ class GaAssetSubcategoryController extends Controller
     public function create()
     {
         $categories = GaAssetCategory::all();
+
         return view('pages.ga-subcategories.create', compact('categories'));
     }
 
@@ -49,9 +50,10 @@ class GaAssetSubcategoryController extends Controller
     public function edit(GaAssetSubcategory $ga_subcategory)
     {
         $categories = GaAssetCategory::all();
+
         return view('pages.ga-subcategories.edit', [
             'subcategory' => $ga_subcategory,
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 

@@ -2,16 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Models\Asset;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Company;
 use App\Models\Department;
-use App\Models\User;
-use App\Models\Asset;
-use App\Models\Status;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\MasterCategory;
-use App\Models\Brand;
 use App\Models\Location;
+use App\Models\MasterCategory;
+use App\Models\Product;
+use App\Models\Status;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

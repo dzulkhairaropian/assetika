@@ -22,7 +22,7 @@ class LoginController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        if ($user && !($user->is_active ?? true)) {
+        if ($user && ! ($user->is_active ?? true)) {
             return back()->withErrors([
                 'email' => 'Your account is inactive. Please contact administrator.',
             ])->onlyInput('email');
@@ -42,10 +42,10 @@ class LoginController extends Controller
             $roleName = auth()->user()->roles->pluck('name')->first() ?? 'User';
 
             $messages = [
-                "{$greetingTime}, " . auth()->user()->name . "! Ready to manage assets today?",
-                "{$greetingTime}, " . auth()->user()->name . "! Logged in as " . strtoupper($roleName) . ".",
-                "{$greetingTime}, " . auth()->user()->name . "! Have a productive session in Assetika.",
-                "{$greetingTime}, " . auth()->user()->name . "! Everything is set and ready to go.",
+                "{$greetingTime}, ".auth()->user()->name.'! Ready to manage assets today?',
+                "{$greetingTime}, ".auth()->user()->name.'! Logged in as '.strtoupper($roleName).'.',
+                "{$greetingTime}, ".auth()->user()->name.'! Have a productive session in Assetika.',
+                "{$greetingTime}, ".auth()->user()->name.'! Everything is set and ready to go.',
             ];
 
             $randomGreeting = $messages[array_rand($messages)];

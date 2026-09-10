@@ -28,7 +28,7 @@ class CategorySeeder extends Seeder
                 ['code' => $cat['code']],
                 [
                     'name' => $cat['name'],
-                    'master_category_id' => $cat['master_id']
+                    'master_category_id' => $cat['master_id'],
                 ]
             );
         }
