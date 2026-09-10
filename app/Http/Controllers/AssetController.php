@@ -202,6 +202,9 @@ class AssetController extends Controller
             'broken' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Broken']);
             })->count(),
+            'retired' => (clone $query)->whereHas('status', function ($q) {
+                $q->whereIn('name', ['Retired', 'Disposal']);
+            })->count(),
             'sold' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Sold', 'For Sale']);
             })->count(),
@@ -233,6 +236,11 @@ class AssetController extends Controller
             case 'broken':
                 $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Broken']);
+                });
+                break;
+            case 'retired':
+                $query->whereHas('status', function ($q) {
+                    $q->whereIn('name', ['Retired', 'Disposal']);
                 });
                 break;
             case 'sold':

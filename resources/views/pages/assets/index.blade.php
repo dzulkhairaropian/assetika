@@ -127,6 +127,7 @@
                         ['key' => 'deployed', 'label' => 'Deployed',        'count' => $inventorySummary['deployed'],   'icon' => 'monitor',      'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
                         ['key' => 'service',  'label' => 'Service & Repair','count' => $inventorySummary['in_service'], 'icon' => 'tool',         'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
                         ['key' => 'broken',   'label' => 'Broken',          'count' => $inventorySummary['broken'],     'icon' => 'alert-triangle','badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                        ['key' => 'retired',  'label' => 'Retired',         'count' => $inventorySummary['retired'],    'icon' => 'trash-2',      'badge' => 'bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400'],
                         ['key' => 'sold',     'label' => 'Sold / For Sale', 'count' => $inventorySummary['sold'],       'icon' => 'dollar-sign',  'badge' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400'],
                         ['key' => 'aged',     'label' => 'Aged (≥4y)',      'count' => $inventorySummary['aged'],       'icon' => 'clock',        'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
                     ];
