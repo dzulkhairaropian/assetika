@@ -85,13 +85,17 @@
                                 @foreach([
                                     'circle-check', 'circle-x', 'circle-alert', 'triangle-alert',
                                     'user', 'user-check', 'users', 'bookmark',
-                                    'refresh-cw', 'loader', 'clock',
+                                    'refresh-cw', 'rotate-ccw', 'loader', 'clock',
                                     'check', 'x', 'thumbs-up',
                                     'wrench', 'settings', 'monitor',
                                     'file-text', 'archive', 'package',
                                     'trash-2', 'help-circle', 'info',
                                     'log-in', 'log-out', 'eye',
-                                    'tag', 'flag', 'disc', 'zap'
+                                    'download', 'search', 'database',
+                                    'key', 'cpu', 'wifi',
+                                    'dollar-sign', 'bell', 'plus',
+                                    'edit-3', 'activity', 'shield',
+                                    'star', 'lock', 'zap'
                                 ] as $iconName)
                                     <button type="button" onclick="document.getElementById('icon-input').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
                                         <i data-lucide="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
@@ -104,9 +108,9 @@
                             <label for="color" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Color (Hex / Theme)
                             </label>
-                            <div class="flex items-center gap-2">
-                                <input type="color" id="color-picker" value="{{ old('color', $item?->color ?? '#3B82F6') }}" onchange="document.getElementById('status-color').value = this.value" class="h-9 w-12 cursor-pointer rounded-lg border border-gray-200 bg-transparent p-1 dark:border-gray-800 dark:bg-gray-950" />
-                                <input type="text" id="status-color" name="color" value="{{ old('color', $item?->color ?? '#3B82F6') }}" placeholder="e.g., #10b981 or primary"
+                            <div class="flex items-center gap-2 mb-2">
+                                <input type="color" id="color-picker" value="{{ old('color', str_starts_with($item?->color ?? '', '#') ? $item->color : '#465FFF') }}" onchange="document.getElementById('status-color').value = this.value" class="h-9 w-12 cursor-pointer rounded-lg border border-gray-200 bg-transparent p-1 dark:border-gray-800 dark:bg-gray-950" />
+                                <input type="text" id="status-color" name="color" value="{{ old('color', $item?->color ?? '#3B82F6') }}" placeholder="e.g., #10b981 or success"
                                     class="h-9 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                             </div>
                             <div class="mt-2 flex flex-wrap gap-1.5">
@@ -119,8 +123,11 @@
                                     'info' => '#0BA5EC',
                                     'light' => '#E4E7EC',
                                     'dark' => '#1D2939',
+                                    'orange' => '#FB6514',
+                                    'emerald' => '#10B981',
+                                    'purple' => '#8B5CF6',
                                 ] as $name => $hex)
-                                    <button type="button" onclick="document.getElementById('status-color').value = '{{ $hex }}'; document.getElementById('color-picker').value = '{{ $hex }}';" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
+                                    <button type="button" onclick="document.getElementById('status-color').value = '{{ $name }}'; document.getElementById('color-picker').value = '{{ $hex }}';" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
                                         <span class="w-3 h-3 rounded-full" style="background-color: {{ $hex }}"></span>
                                         {{ $name }}
                                     </button>
