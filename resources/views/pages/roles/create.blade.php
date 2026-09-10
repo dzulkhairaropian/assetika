@@ -19,7 +19,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
                     <div>
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-feather="shield" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="shield" class="w-5 h-5 text-brand-500"></i>
                             General Information
                         </h3>
 
@@ -53,8 +53,8 @@
                             <label class="font-medium text-gray-800 dark:text-white/90">Permissions</label>
                             <button type="button" @click="toggleAll()" 
                                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-500 hover:text-brand-600 transition-colors bg-brand-50/50 dark:bg-brand-500/10 px-3 py-1.5 rounded-lg border border-brand-100 dark:border-brand-500/20">
-                                <i data-feather="check-square" class="w-3.5 h-3.5" x-show="!allChecked"></i>
-                                <i data-feather="square" class="w-3.5 h-3.5" x-show="allChecked" style="display:none;"></i>
+                                <i data-lucide="check-square" class="w-3.5 h-3.5" x-show="!allChecked"></i>
+                                <i data-lucide="square" class="w-3.5 h-3.5" x-show="allChecked" style="display:none;"></i>
                                 <span x-text="allChecked ? 'Deselect All' : 'Select All'">Select All</span>
                             </button>
                         </div>
@@ -116,7 +116,7 @@
             <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="save" class="w-5 h-5 text-brand-500"></i>
                         Actions
                     </h3>
                     <div class="space-y-3">

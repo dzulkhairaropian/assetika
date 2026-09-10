@@ -19,7 +19,7 @@
                 <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
                     <div>
                         <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                            <i data-feather="cpu" class="w-4 h-4 text-brand-500"></i>
+                            <i data-lucide="cpu" class="w-4 h-4 text-brand-500"></i>
                             Component Information
                         </h3>
 
@@ -131,7 +131,7 @@
             <div class="space-y-4">
                 <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        <i data-feather="save" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="save" class="w-4 h-4 text-brand-500"></i>
                         Actions
                     </h3>
                     <div class="space-y-2.5">

@@ -13,11 +13,11 @@
     <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-3 dark:border-gray-800">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <i data-feather="box" class="w-4 h-4 text-brand-500"></i> {{ $kit->name }}
+                <i data-lucide="box" class="w-4 h-4 text-brand-500"></i> {{ $kit->name }}
             </h3>
             <div class="flex gap-2">
-                <a href="{{ route('kits.checkout-form', $kit) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition"><i data-feather="share" class="w-3.5 h-3.5"></i> Checkout Kit</a>
-                <a href="{{ route('kits.edit', $kit) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition"><i data-feather="edit-2" class="w-3.5 h-3.5"></i> Edit</a>
+                <a href="{{ route('kits.checkout-form', $kit) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition"><i data-lucide="share" class="w-3.5 h-3.5"></i> Checkout Kit</a>
+                <a href="{{ route('kits.edit', $kit) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit</a>
             </div>
         </div>
         @if($kit->description) <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">{{ $kit->description }}</p> @endif

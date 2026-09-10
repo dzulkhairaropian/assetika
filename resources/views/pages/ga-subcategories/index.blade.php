@@ -22,7 +22,7 @@
                     <form action="{{ route('ga-subcategories.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
-                                <i data-feather="search" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search subcategories..."
                                 class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
@@ -43,7 +43,7 @@
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('ga-subcategories.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            <i data-feather="plus" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Add Subcategory
                         </a>
                     </div>
@@ -78,7 +78,7 @@
                                 <td class="px-4 py-2.5 text-end">
                                     <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
                                         <button type="button" @click="open = !open" class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
-                                            <i data-feather="more-vertical" class="w-4 h-4"></i>
+                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
                                         </button>
 
                                         <div x-show="open"
@@ -87,7 +87,7 @@
                                             style="display: none;">
                                             
                                             <a href="{{ route('ga-subcategories.edit', $sub) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-feather="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
+                                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
                                                 Edit
                                             </a>
 
@@ -97,7 +97,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
-                                                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                                     Delete
                                                 </button>
                                             </form>

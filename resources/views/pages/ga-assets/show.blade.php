@@ -17,7 +17,7 @@
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-3.5">
                     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                        <i data-feather="briefcase" class="h-6 w-6"></i>
+                        <i data-lucide="briefcase" class="h-6 w-6"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -25,7 +25,7 @@
                              @php
                                    $color = optional($asset->statusObject)->color;
                                    $icon = optional($asset->statusObject)->icon;
-                                   $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-feather='{$icon}' class='w-3 h-3'></i>") : null;
+                                   $iconHtml = $icon ? new \Illuminate\Support\HtmlString("<i data-lucide='{$icon}' class='w-3 h-3'></i>") : null;
                                    $statusName = optional($asset->statusObject)->name;
                                @endphp
                                <x-ui.badge :color="$color" variant="light" size="sm" :startIcon="$iconHtml">{{ $statusName }}</x-ui.badge>
@@ -36,31 +36,31 @@
 
                 <div class="flex flex-wrap items-center gap-2">
                     <a href="{{ route('ga-assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-                        <i data-feather="edit-3" class="h-3.5 w-3.5"></i>
+                        <i data-lucide="edit-3" class="h-3.5 w-3.5"></i>
                         Edit
                     </a>
                     
                     @if($asset->status === 'Available')
                         <button type="button" @click="checkoutOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-success-600">
-                            <i data-feather="log-out" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
                             Checkout
                         </button>
                     @elseif(in_array($asset->status, ['Deployed', 'In Use', 'In Repair']))
                         <button type="button" @click="checkinOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-warning-600">
-                            <i data-feather="log-in" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="log-in" class="h-3.5 w-3.5"></i>
                             Checkin
                         </button>
                     @endif
                     
                     @if($asset->vehicle)
                         <button type="button" @click="renewTaxOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-blue-700">
-                            <i data-feather="file-text" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="file-text" class="h-3.5 w-3.5"></i>
                             Perpanjang STNK / Kaleng
                         </button>
                     @endif
 
                     <button type="button" @click="maintOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-amber-600">
-                        <i data-feather="tool" class="h-3.5 w-3.5"></i>
+                        <i data-lucide="tool" class="h-3.5 w-3.5"></i>
                         Maintenance
                     </button>
                 </div>
@@ -77,7 +77,7 @@
                         <div class="space-y-3">
                             <div class="flex items-center gap-2.5">
                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                    <i data-feather="user" class="h-4 w-4"></i>
+                                    <i data-lucide="user" class="h-4 w-4"></i>
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold text-gray-900 dark:text-white">{{ $asset->currentHolder->name }}</p>
@@ -99,7 +99,7 @@
                     @else
                         <div class="flex flex-col items-center justify-center py-5 text-center">
                             <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                <i data-feather="user-minus" class="h-5 w-5"></i>
+                                <i data-lucide="user-minus" class="h-5 w-5"></i>
                             </div>
                             <p class="text-xs text-gray-400 italic">Not currently assigned</p>
                         </div>
@@ -278,7 +278,7 @@
                                                 <td class="px-4 py-2.5 text-right">
                                                     <a href="{{ route('ga-assets.bast', [$asset, $assign]) }}" target="_blank"
                                                         class="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
-                                                        <i data-feather="file-text" class="w-3 h-3 text-brand-500"></i> BAST PDF
+                                                        <i data-lucide="file-text" class="w-3 h-3 text-brand-500"></i> BAST PDF
                                                     </a>
                                                 </td>
                                             </tr>

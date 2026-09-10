@@ -48,7 +48,7 @@
             class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
-                <i data-feather="info" class="w-4 h-4 text-brand-500"></i>
+                <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
                 <span class="text-xs font-semibold text-brand-700 dark:text-brand-400">
                     <span x-text="selectedItems.length"></span> items selected.
                 </span>
@@ -56,7 +56,7 @@
             <div class="flex items-center gap-3">
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
-                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
@@ -69,7 +69,7 @@
                     <form action="{{ route('components.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
-                                <i data-feather="search" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components..."
                                 class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
@@ -81,7 +81,7 @@
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('components.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            <i data-feather="plus" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Add Component
                         </a>
                     </div>
@@ -168,15 +168,15 @@
                                 <td class="px-4 py-2.5 text-end">
                                     <div class="flex items-center justify-end gap-2 text-gray-500">
                                         <a href="{{ route('components.show', $component) }}" class="hover:text-brand-600 transition" title="View">
-                                            <i data-feather="eye" class="w-4 h-4"></i>
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
                                         </a>
                                         <a href="{{ route('components.edit', $component) }}" class="hover:text-brand-600 transition" title="Edit">
-                                            <i data-feather="edit-3" class="w-4 h-4"></i>
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </a>
                                         <form action="{{ route('components.destroy', $component) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="hover:text-red-600 transition" title="Delete">
-                                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -187,7 +187,7 @@
                                 <td colspan="7" class="px-4 py-8 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-1.5">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-feather="cpu" class="w-5 h-5"></i>
+                                            <i data-lucide="cpu" class="w-5 h-5"></i>
                                         </div>
                                         <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No components found</p>
                                         <p class="text-[11px] text-gray-400 dark:text-gray-500">Add hardware components like RAM, SSD, GPU to track stock and assignments.</p>

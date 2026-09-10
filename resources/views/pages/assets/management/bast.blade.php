@@ -5,11 +5,11 @@
     <!-- Print Header / Navigation -->
     <div class="no-print mb-8 flex items-center justify-between border-b pb-4">
         <a href="{{ route('assets.show', $asset) }}" class="flex items-center gap-2 text-gray-500 hover:text-gray-700">
-            <i data-feather="arrow-left" class="h-4 w-4"></i>
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>
             Back to Asset
         </a>
         <button onclick="window.print()" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90 transition-all">
-            <i data-feather="printer" class="h-4 w-4"></i>
+            <i data-lucide="printer" class="h-4 w-4"></i>
             Print Document
         </button>
     </div>
@@ -168,7 +168,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        feather.replace();
+        if (window.createIcons && window.lucideIcons) {
+            createIcons({ icons: lucideIcons });
+        }
     });
 </script>
 @endsection

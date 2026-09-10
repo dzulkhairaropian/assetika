@@ -18,11 +18,11 @@
             {{-- Previous --}}
             @if ($paginator->onFirstPage())
                 <span aria-disabled="true" class="flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-600">
-                    <i data-feather="chevron-left" class="h-4 w-4"></i>
+                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-500 transition-colors hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-brand-500 dark:hover:text-brand-400" aria-label="{{ __('pagination.previous') }}">
-                    <i data-feather="chevron-left" class="h-4 w-4"></i>
+                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
                 </a>
             @endif
 
@@ -46,11 +46,11 @@
             {{-- Next --}}
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-500 transition-colors hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-brand-500 dark:hover:text-brand-400" aria-label="{{ __('pagination.next') }}">
-                    <i data-feather="chevron-right" class="h-4 w-4"></i>
+                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
                 </a>
             @else
                 <span aria-disabled="true" class="flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-600">
-                    <i data-feather="chevron-right" class="h-4 w-4"></i>
+                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
                 </span>
             @endif
         </div>

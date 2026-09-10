@@ -7,7 +7,7 @@
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div class="mb-5 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-800">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 dark:bg-green-500/10">
-                    <i data-feather="check-circle" class="h-5 w-5"></i>
+                    <i data-lucide="circle-check" class="h-5 w-5"></i>
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Complete Maintenance</h2>
@@ -46,7 +46,7 @@
                 <!-- Section: Completion Details -->
                 <div>
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                        <i data-feather="info" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
                         Completion Details
                     </h3>
                     <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2">

@@ -11,10 +11,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-                <i data-feather="download" class="w-4 h-4"></i> Export Valuation
+                <i data-lucide="download" class="w-4 h-4"></i> Export Valuation
             </a>
             <a href="{{ route('depreciations.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
-                <i data-feather="settings" class="w-4 h-4"></i> Depreciation Config
+                <i data-lucide="settings" class="w-4 h-4"></i> Depreciation Config
             </a>
         </div>
     </div>
@@ -64,9 +64,9 @@
                 <!-- Year Selector -->
                 <div class="relative shrink-0" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
                     <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-                        <i data-feather="calendar" class="w-3 h-3 text-brand-500"></i>
+                        <i data-lucide="calendar" class="w-3 h-3 text-brand-500"></i>
                         <span>Year: {{ $selectedYear }}</span>
-                        <i data-feather="chevron-down" class="w-3 h-3"></i>
+                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
                     </button>
                     <div x-show="dropdownOpen" class="absolute right-0 mt-1.5 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50 flex flex-col gap-0.5 w-max max-h-56 overflow-y-auto" style="display: none;">
                         @foreach($purchaseYears as $year)

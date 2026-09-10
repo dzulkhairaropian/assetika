@@ -14,7 +14,7 @@
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:col-span-1">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <i data-feather="key" class="w-4 h-4 text-brand-500"></i> License Info
+                <i data-lucide="key" class="w-4 h-4 text-brand-500"></i> License Info
             </h3>
             <dl class="space-y-2.5">
                 <div><dt class="text-[11px] font-medium text-gray-400">Name</dt><dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $license->name }}</dd></div>
@@ -26,14 +26,14 @@
                 <div><dt class="text-[11px] font-medium text-gray-400">Cost</dt><dd class="text-xs font-semibold text-gray-900 dark:text-white">Rp {{ number_format($license->purchase_cost, 0, ',', '.') ?: '-' }}</dd></div>
             </dl>
             <div class="mt-5 flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-                <a href="{{ route('licenses.edit', $license) }}" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition"><i data-feather="edit-2" class="w-3.5 h-3.5"></i> Edit</a>
+                <a href="{{ route('licenses.edit', $license) }}" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit</a>
                 <a href="{{ route('licenses.index') }}" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">Back</a>
             </div>
         </div>
 
         <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:col-span-2">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <i data-feather="users" class="w-4 h-4 text-brand-500"></i> Seat Assignments
+                <i data-lucide="users" class="w-4 h-4 text-brand-500"></i> Seat Assignments
             </h3>
 
             @if($license->availableSeats() > 0)

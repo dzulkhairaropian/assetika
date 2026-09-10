@@ -14,7 +14,7 @@
 	            <div class="relative">
 	                <button type="button" @click="filterOpen = !filterOpen"
 	                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-	                    <i data-feather="filter" class="w-4 h-4 text-gray-500"></i>
+	                    <i data-lucide="filter" class="w-4 h-4 text-gray-500"></i>
 	                    <span>Filter Options</span>
 	                    @if($activeFiltersCount > 0)
 	                        <span class="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white ml-0.5">{{ $activeFiltersCount }}</span>
@@ -35,7 +35,7 @@
 	                        <div class="mb-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2.5">
 	                            <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-white">Filter Options</h4>
 	                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-	                                <i data-feather="x" class="w-4 h-4"></i>
+	                                <i data-lucide="x" class="w-4 h-4"></i>
 	                            </button>
 	                        </div>
 
@@ -69,10 +69,10 @@
 	            </div>
 
 	            <a href="{{ route('tickets.export', request()->all()) }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-	                <i data-feather="download" class="w-4 h-4 text-gray-500"></i> Export
+	                <i data-lucide="download" class="w-4 h-4 text-gray-500"></i> Export
 	            </a>
 	            <a href="{{ route('tickets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
-	                <i data-feather="plus" class="w-4 h-4"></i> New Ticket
+	                <i data-lucide="plus" class="w-4 h-4"></i> New Ticket
 	            </a>
 	        </div>
     </div>

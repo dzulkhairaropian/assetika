@@ -20,7 +20,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
                     <div>
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
                             General Information
                         </h3>
 
@@ -74,7 +74,7 @@
                                         'pen-tool'
                                     ] as $iconName)
                                         <button type="button" onclick="document.getElementById('status-icon').value = '{{ $iconName }}'" class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-400">
-                                            <i data-feather="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
+                                            <i data-lucide="{{ $iconName }}" class="w-3 h-3"></i> {{ $iconName }}
                                         </button>
                                     @endforeach
                                 </div>
@@ -121,7 +121,7 @@
             <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="save" class="w-5 h-5 text-brand-500"></i>
                         Actions
                     </h3>
                     <div class="space-y-3">

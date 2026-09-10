@@ -58,7 +58,7 @@
 
             <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-5 flex justify-end">
                 <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                    <i data-feather="save" class="w-4 h-4"></i>
+                    <i data-lucide="save" class="w-4 h-4"></i>
                     Save SLA Policies
                 </button>
             </div>

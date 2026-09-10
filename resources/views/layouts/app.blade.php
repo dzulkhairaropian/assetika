@@ -147,7 +147,7 @@
                 class="fixed top-5 right-5 z-[999999] flex max-w-sm items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl dark:border-gray-800 dark:bg-gray-900">
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-md">
-                        <i data-feather="smile" class="w-5 h-5"></i>
+                        <i data-lucide="smile" class="w-5 h-5"></i>
                     </div>
                     <div>
                         <h4 class="text-xs font-bold text-gray-900 dark:text-white">Welcome Back!</h4>
@@ -155,7 +155,7 @@
                     </div>
                 </div>
                 <button @click="show = false" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800">
-                    <i data-feather="x" class="w-4 h-4"></i>
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
         @endif

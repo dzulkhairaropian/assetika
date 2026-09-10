@@ -19,7 +19,7 @@
             {{-- Component Info --}}
             <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:col-span-1">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    <i data-feather="cpu" class="w-4 h-4 text-brand-500"></i>
+                    <i data-lucide="cpu" class="w-4 h-4 text-brand-500"></i>
                     Component Info
                 </h3>
 
@@ -62,7 +62,7 @@
 
                 <div class="mt-5 flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
                     <a href="{{ route('components.edit', $component) }}" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
-                        <i data-feather="edit-2" class="w-3.5 h-3.5"></i> Edit
+                        <i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit
                     </a>
                     <a href="{{ route('components.index') }}" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                         Back
@@ -74,7 +74,7 @@
             <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:col-span-2">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i data-feather="package" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="package" class="w-4 h-4 text-brand-500"></i>
                         Stock & Assignments
                     </h3>
                     <div class="flex items-center gap-3">

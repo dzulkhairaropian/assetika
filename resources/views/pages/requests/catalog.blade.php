@@ -25,21 +25,21 @@
                         <button @click="catalogTab = 'hardware'"
                             :class="catalogTab === 'hardware' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                             class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all">
-                            <i data-feather="hard-drive" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="hard-drive" class="w-3.5 h-3.5"></i>
                             Hardware Categories
                             <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">{{ $categories->count() }}</span>
                         </button>
                         <button @click="catalogTab = 'consumable'"
                             :class="catalogTab === 'consumable' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                             class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all">
-                            <i data-feather="package" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="package" class="w-3.5 h-3.5"></i>
                             Consumables
                             <span class="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">{{ $consumables->count() }}</span>
                         </button>
                         <button @click="catalogTab = 'license'"
                             :class="catalogTab === 'license' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                             class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all">
-                            <i data-feather="key" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="key" class="w-3.5 h-3.5"></i>
                             Licenses
                             <span class="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-600 dark:bg-green-500/15 dark:text-green-400">{{ $licenses->count() }}</span>
                         </button>
@@ -74,7 +74,7 @@
                                                 class="h-8 w-14 rounded-lg border border-gray-200 bg-gray-50 px-2 text-center text-xs font-semibold text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"
                                                 title="Quantity">
                                             <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
-                                                <i data-feather="shopping-cart" class="w-3.5 h-3.5"></i> Request
+                                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Request
                                             </button>
                                         </form>
                                     </td>
@@ -132,7 +132,7 @@
                                     <td class="px-4 py-2.5 text-end">
                                         @if($conOut)
                                             <span class="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-400 dark:bg-gray-800 dark:text-gray-500">
-                                                <i data-feather="x-circle" class="w-3.5 h-3.5"></i> Unavailable
+                                                <i data-lucide="circle-x" class="w-3.5 h-3.5"></i> Unavailable
                                             </span>
                                         @else
                                             <form action="{{ route('asset-requests.store') }}" method="POST" class="inline-flex items-center gap-1.5 justify-end">
@@ -143,7 +143,7 @@
                                                     class="h-8 w-14 rounded-lg border border-gray-200 bg-gray-50 px-2 text-center text-xs font-semibold text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"
                                                     title="Quantity">
                                                 <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
-                                                    <i data-feather="shopping-cart" class="w-3.5 h-3.5"></i> Request
+                                                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Request
                                                 </button>
                                             </form>
                                         @endif
@@ -196,7 +196,7 @@
                                     <td class="px-4 py-2.5 text-end">
                                         @if($licAvail <= 0)
                                             <span class="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-400 dark:bg-gray-800 dark:text-gray-500">
-                                                <i data-feather="x-circle" class="w-3.5 h-3.5"></i> Unavailable
+                                                <i data-lucide="circle-x" class="w-3.5 h-3.5"></i> Unavailable
                                             </span>
                                         @else
                                             <form action="{{ route('asset-requests.store') }}" method="POST" class="inline-flex items-center gap-1.5 justify-end">
@@ -207,7 +207,7 @@
                                                     class="h-8 w-14 rounded-lg border border-gray-200 bg-gray-50 px-2 text-center text-xs font-semibold text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"
                                                     title="Quantity">
                                                 <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
-                                                    <i data-feather="shopping-cart" class="w-3.5 h-3.5"></i> Request
+                                                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Request
                                                 </button>
                                             </form>
                                         @endif
@@ -231,7 +231,7 @@
             <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                 <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
                     <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        <i data-feather="clock" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="clock" class="w-4 h-4 text-brand-500"></i>
                         My Recent Requests
                     </h3>
                 </div>
@@ -256,7 +256,7 @@
                     @empty
                         <div class="flex flex-col items-center justify-center py-6 text-center">
                             <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                <i data-feather="inbox" class="w-5 h-5"></i>
+                                <i data-lucide="inbox" class="w-5 h-5"></i>
                             </div>
                             <p class="mt-2 text-xs font-semibold text-gray-700 dark:text-gray-300">No requests submitted yet</p>
                             <p class="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">Request an item from the catalog to track it here.</p>

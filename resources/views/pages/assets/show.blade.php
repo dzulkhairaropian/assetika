@@ -31,7 +31,7 @@
 
         @if($isAged)
             <div class="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-red-800 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400">
-                <i data-feather="alert-triangle" class="h-4 w-4 shrink-0"></i>
+                <i data-lucide="triangle-alert" class="h-4 w-4 shrink-0"></i>
                 <div class="text-xs">
                     <strong>Aging Alert:</strong> This asset is {{ $ageDisplay }} (Released on {{ $asset->release_date->format('d M Y') }}). It has reached or exceeded its 4-year lifecycle since release and may require replacement or retirement.
                 </div>
@@ -43,7 +43,7 @@
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-3.5">
                     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                        <i data-feather="monitor" class="h-6 w-6"></i>
+                        <i data-lucide="monitor" class="h-6 w-6"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -68,25 +68,25 @@
 
                 <div class="flex flex-wrap items-center gap-2">
                     <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-feather="printer" class="h-3.5 w-3.5"></i>
+                        <i data-lucide="printer" class="h-3.5 w-3.5"></i>
                         Print Sticker
                     </a>
                     <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-feather="edit-3" class="h-3.5 w-3.5"></i>
+                        <i data-lucide="edit-3" class="h-3.5 w-3.5"></i>
                         Edit
                     </a>
                     @if($asset->isCurrentlyCheckedOut())
                         <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-orange-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-orange-600 transition">
-                            <i data-feather="log-in" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="log-in" class="h-3.5 w-3.5"></i>
                             Check-in
                         </a>
                         <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-600 transition">
-                            <i data-feather="tool" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="tool" class="h-3.5 w-3.5"></i>
                             Maintenance
                         </a>
                     @else
                         <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-green-700 transition">
-                            <i data-feather="log-out" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
                             Check-out
                         </a>
 
@@ -96,13 +96,13 @@
                             @endphp
                             @if($activeMaintenance)
                                 <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                                    <i data-feather="check-circle" class="h-3.5 w-3.5"></i>
+                                    <i data-lucide="circle-check" class="h-3.5 w-3.5"></i>
                                     Complete Maintenance
                                 </a>
                             @endif
                         @else
                             <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-600 transition">
-                                <i data-feather="tool" class="h-3.5 w-3.5"></i>
+                                <i data-lucide="tool" class="h-3.5 w-3.5"></i>
                                 Maintenance
                             </a>
                         @endif
@@ -110,7 +110,7 @@
 
                     @if(optional($asset->status)->name !== 'Retired')
                         <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-800 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 transition">
-                            <i data-feather="trash-2" class="h-3.5 w-3.5 text-red-400"></i>
+                            <i data-lucide="trash-2" class="h-3.5 w-3.5 text-red-400"></i>
                             Retire Asset
                         </button>
                     @endif
@@ -136,7 +136,7 @@
                         <div class="space-y-3">
                             <div class="flex items-center gap-2.5">
                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                    <i data-feather="user" class="h-4 w-4"></i>
+                                    <i data-lucide="user" class="h-4 w-4"></i>
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold text-gray-900 dark:text-white">{{ $asset->currentCheckout->checkedOutToUser->name ?? '-' }}</p>
@@ -161,7 +161,7 @@
                     @else
                         <div class="flex flex-col items-center justify-center py-5 text-center">
                             <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                <i data-feather="user-minus" class="h-5 w-5"></i>
+                                <i data-lucide="user-minus" class="h-5 w-5"></i>
                             </div>
                             <p class="text-xs text-gray-400 italic">Not currently assigned</p>
                         </div>
@@ -235,7 +235,7 @@
                 <!-- Sale Details Card -->
                 <div class="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 shadow-sm dark:border-emerald-900/30 dark:bg-emerald-950/10">
                     <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                        <i data-feather="dollar-sign" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="dollar-sign" class="w-3.5 h-3.5"></i>
                         Sale Information
                     </h3>
                     <div class="space-y-2.5">
@@ -265,31 +265,31 @@
                             <button @click="activeTab = 'details'"
                                 :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
-                                <i data-feather="file-text" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                                 Details
                             </button>
                             <button @click="activeTab = 'history'"
                                 :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
-                                <i data-feather="activity" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="activity" class="w-3.5 h-3.5"></i>
                                 Movement History
                             </button>
                             <button @click="activeTab = 'audit_logs'"
                                 :class="activeTab === 'audit_logs' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
-                                <i data-feather="list" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="list" class="w-3.5 h-3.5"></i>
                                 Audit Logs
                             </button>
                             <button @click="activeTab = 'maintenance'"
                                 :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
-                                <i data-feather="tool" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="tool" class="w-3.5 h-3.5"></i>
                                 Maintenance History
                             </button>
                             <button @click="activeTab = 'tickets'"
                                 :class="activeTab === 'tickets' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
-                                <i data-feather="life-buoy" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="life-buoy" class="w-3.5 h-3.5"></i>
                                 Support Tickets
                                 @if($asset->tickets->count() > 0)
                                     <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
@@ -307,7 +307,7 @@
                             <!-- Product Info -->
                             <div>
                                 <h4 class="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2.5 dark:border-gray-800 dark:text-white">
-                                    <i data-feather="package" class="h-4 w-4 text-brand-500"></i>
+                                    <i data-lucide="package" class="h-4 w-4 text-brand-500"></i>
                                     Product Information
                                 </h4>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -337,7 +337,7 @@
                             <!-- Technical Specs -->
                             <div>
                                 <h4 class="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2.5 dark:border-gray-800 dark:text-white">
-                                    <i data-feather="cpu" class="h-4 w-4 text-brand-500"></i>
+                                    <i data-lucide="cpu" class="h-4 w-4 text-brand-500"></i>
                                     Technical Specifications
                                 </h4>
                                 <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-950">
@@ -348,7 +348,7 @@
                             <!-- Financial Data -->
                             <div>
                                 <h4 class="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2.5 dark:border-gray-800 dark:text-white">
-                                    <i data-feather="dollar-sign" class="h-4 w-4 text-brand-500"></i>
+                                    <i data-lucide="dollar-sign" class="h-4 w-4 text-brand-500"></i>
                                     Financial Data
                                 </h4>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -377,7 +377,7 @@
                             @if($asset->notes)
                                 <div>
                                     <h4 class="mb-3 flex items-center gap-1.5 text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2.5 dark:border-gray-800 dark:text-white">
-                                        <i data-feather="file-text" class="h-4 w-4 text-brand-500"></i>
+                                        <i data-lucide="file-text" class="h-4 w-4 text-brand-500"></i>
                                         Notes
                                     </h4>
                                     <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 text-xs text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 italic">
@@ -436,7 +436,7 @@
                                                 </td>
                                                 <td class="px-4 py-2.5 text-end">
                                                     <a href="{{ route('assets.bast', [$asset, $history]) }}" target="_blank" class="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700 transition">
-                                                        <i data-feather="download-cloud" class="h-3.5 w-3.5"></i>
+                                                        <i data-lucide="download-cloud" class="h-3.5 w-3.5"></i>
                                                         BAST
                                                     </a>
                                                 </td>
@@ -539,7 +539,7 @@
                                                 </td>
                                                 <td class="px-4 py-2.5 text-end">
                                                     <a href="{{ route('tickets.show', $t) }}" class="text-gray-500 hover:text-brand-600 transition" title="View Ticket">
-                                                        <i data-feather="eye" class="w-4 h-4 inline-block"></i>
+                                                        <i data-lucide="eye" class="w-4 h-4 inline-block"></i>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -610,7 +610,7 @@
                 <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
                     <div class="flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500 dark:bg-red-500/10">
-                            <i data-feather="trash-2" class="h-5 w-5"></i>
+                            <i data-lucide="trash-2" class="h-5 w-5"></i>
                         </div>
                         <div>
                             <h3 class="text-base font-bold text-gray-900 dark:text-white">Retire Asset</h3>
@@ -618,7 +618,7 @@
                         </div>
                     </div>
                     <button type="button" @click="retireModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i data-feather="x" class="h-5 w-5"></i>
+                        <i data-lucide="x" class="h-5 w-5"></i>
                     </button>
                 </div>
 

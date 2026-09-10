@@ -93,7 +93,7 @@
                                     'tool', 'user', 'users', 'x-circle', 'zap'
                                 ] as $i)
                                     <button type="button" onclick="document.getElementById('icon-input').value = '{{ $i }}'" class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                        <i data-feather="{{ $i }}" class="w-3 h-3"></i> {{ $i }}
+                                        <i data-lucide="{{ $i }}" class="w-3 h-3"></i> {{ $i }}
                                     </button>
                                 @endforeach
                             </div>
@@ -139,7 +139,7 @@
 
                 <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        <i data-feather="save" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="save" class="w-4 h-4 text-brand-500"></i>
                         Actions
                     </h3>
                     <div class="space-y-2.5">

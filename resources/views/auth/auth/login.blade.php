@@ -51,8 +51,8 @@
                                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                                     <span @click="showPassword = !showPassword"
                                           class="absolute z-30 text-gray-500 -translate-y-1/2 cursor-pointer right-4 top-1/2 dark:text-gray-400">
-                                        <i x-show="!showPassword" data-feather="eye" class="size-5"></i>
-                                        <i x-show="showPassword" data-feather="eye-off" class="size-5"></i>
+                                        <i x-show="!showPassword" data-lucide="eye" class="size-5"></i>
+                                        <i x-show="showPassword" data-lucide="eye-off" class="size-5"></i>
                                     </span>
                                 </div>
                             </div>
@@ -112,8 +112,8 @@
             <div class="fixed z-50 bottom-6 right-6">
                 <button class="flex items-center justify-center text-white rounded-full size-14 bg-brand-500 hover:bg-brand-600"
                         @click="darkMode = !darkMode">
-                    <i data-feather="sun" class="hidden dark:block size-5"></i>
-                    <i data-feather="moon" class="dark:hidden size-5"></i>
+                    <i data-lucide="sun" class="hidden dark:block size-5"></i>
+                    <i data-lucide="moon" class="dark:hidden size-5"></i>
                 </button>
             </div>
         </div>

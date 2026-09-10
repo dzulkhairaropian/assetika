@@ -37,7 +37,7 @@
                     @endphp
                     <a href="{{ $tabUrl }}"
                        class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
-                        <i data-feather="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
                         {{ $tab['label'] }}
                         <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
                     </a>
@@ -48,7 +48,7 @@
                 <form action="{{ route('asset-requests.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
                     <div class="relative flex items-center">
                         <span class="absolute left-2.5 text-gray-400">
-                            <i data-feather="search" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="search" class="w-3.5 h-3.5"></i>
                         </span>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search requester or item..."
                             class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
@@ -59,7 +59,7 @@
                     <div class="relative" @click.away="filterOpen = false">
                         <button type="button" @click="filterOpen = !filterOpen"
                             class="relative inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <i data-feather="sliders" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
                             Filters
                             @if($activeCount > 0)
                                 <span class="inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
@@ -73,7 +73,7 @@
                             <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
                                 <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-white">Filter Options</h4>
                                 <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                    <i data-feather="x" class="w-4 h-4"></i>
+                                    <i data-lucide="x" class="w-4 h-4"></i>
                                 </button>
                             </div>
 
@@ -103,7 +103,7 @@
 
                 <div class="flex items-center gap-2">
                     <a href="{{ route('requestable-assets.catalog') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                        <i data-feather="grid" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="grid" class="w-3.5 h-3.5"></i>
                         Request Catalog
                     </a>
                 </div>
@@ -146,11 +146,11 @@
                                         @csrf
                                         <button name="action" value="approve" type="submit"
                                             class="inline-flex items-center gap-1 rounded-lg bg-green-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-green-700 transition">
-                                            <i data-feather="check" class="w-3 h-3"></i> Approve
+                                            <i data-lucide="circle-check" class="w-3 h-3"></i> Approve
                                         </button>
                                         <button name="action" value="reject" type="submit"
                                             class="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700 transition">
-                                            <i data-feather="x" class="w-3 h-3"></i> Reject
+                                            <i data-lucide="x" class="w-3 h-3"></i> Reject
                                         </button>
                                     </form>
                                 @else
@@ -163,7 +163,7 @@
                             <td colspan="5" class="px-4 py-8 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-1.5">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                        <i data-feather="inbox" class="w-5 h-5"></i>
+                                        <i data-lucide="inbox" class="w-5 h-5"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No asset requests found</p>
                                     <p class="text-[11px] text-gray-400 dark:text-gray-500">Asset requests submitted by users will appear here for processing.</p>

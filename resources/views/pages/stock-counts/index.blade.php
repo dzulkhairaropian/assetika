@@ -19,7 +19,7 @@
                     <form action="{{ route('stock-counts.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
-                                <i data-feather="search" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search stock counts..."
                                 class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
@@ -31,7 +31,7 @@
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('stock-counts.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            <i data-feather="plus" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Start Stock Count
                         </a>
                     </div>
@@ -68,13 +68,13 @@
                                 <td class="px-4 py-2.5 text-end">
                                     <div class="flex items-center justify-end gap-2 text-gray-500">
                                         <a href="{{ route('stock-counts.show', $sc) }}" class="hover:text-brand-600 transition" title="View">
-                                            <i data-feather="eye" class="w-4 h-4"></i>
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
                                         </a>
                                         <form action="{{ route('stock-counts.destroy', $sc) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="hover:text-red-600 transition" title="Delete">
-                                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -85,7 +85,7 @@
                                 <td colspan="5" class="px-4 py-8 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-1.5">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-feather="clipboard" class="w-5 h-5"></i>
+                                            <i data-lucide="clipboard" class="w-5 h-5"></i>
                                         </div>
                                         <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No stock count sessions found</p>
                                         <p class="text-[11px] text-gray-400 dark:text-gray-500">Start a stock count session to audit physical inventory.</p>

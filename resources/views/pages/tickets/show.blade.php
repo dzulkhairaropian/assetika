@@ -16,7 +16,7 @@
         <div class="flex gap-2">
             @if(isset($projects) && $projects->count() > 0)
                 <button type="button" @click="openProjectModal = true" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 transition">
-                    <i data-feather="layout" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="layout" class="w-3.5 h-3.5"></i>
                     Add to Project Task
                 </button>
             @endif
@@ -49,7 +49,7 @@
                         <div class="flex flex-wrap gap-2">
                             @foreach($ticket->attachments as $attachment)
                                 <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
-                                    <i data-feather="file" class="w-3.5 h-3.5 text-brand-500"></i>
+                                    <i data-lucide="file" class="w-3.5 h-3.5 text-brand-500"></i>
                                     <span>{{ $attachment->filename }}</span>
                                 </a>
                             @endforeach
@@ -125,7 +125,7 @@
                                 <div class="mt-2 pt-1.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
                                     @foreach($comment->attachments as $attachment)
                                         <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-medium text-brand-600 hover:underline">
-                                            <i data-feather="paperclip" class="w-3 h-3"></i>
+                                            <i data-lucide="paperclip" class="w-3 h-3"></i>
                                             {{ $attachment->filename }}
                                         </a>
                                     @endforeach
@@ -236,7 +236,7 @@
                 <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Convert Ticket to Project Task</h3>
                     <button type="button" @click="openProjectModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i data-feather="x" class="w-4 h-4"></i>
+                        <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
 

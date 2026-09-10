@@ -33,7 +33,7 @@
 
             <div class="flex items-center gap-2">
                 <button type="button" @click="openTaskModal = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                    <i data-feather="plus" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                     Add Task
                 </button>
             </div>
@@ -45,7 +45,7 @@
             <div class="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 dark:border-gray-800 dark:bg-gray-950/40 space-y-2">
                 <div class="flex items-center justify-between text-xs">
                     <span class="font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                        <i data-feather="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i>
+                        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-500"></i>
                         Overall Progress
                     </span>
                     <span class="font-mono font-bold text-xs text-brand-600 dark:text-brand-400" id="progressVal">{{ $project->progress_percentage }}%</span>
@@ -85,7 +85,7 @@
     <div class="space-y-3">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-gray-800 dark:text-white flex items-center gap-1.5">
-                <i data-feather="columns" class="w-4 h-4 text-brand-500"></i>
+                <i data-lucide="columns" class="w-4 h-4 text-brand-500"></i>
                 Kanban Task Board
             </h2>
             <span class="text-xs text-gray-500 dark:text-gray-400">Drag & drop tasks between columns to update status</span>
@@ -142,7 +142,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-gray-400 hover:text-error-500 transition">
-                                            <i data-feather="x" class="w-3.5 h-3.5"></i>
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -169,12 +169,12 @@
                                     <div class="flex flex-wrap gap-1 text-[10px] pt-1">
                                         @if($task->asset)
                                             <span class="inline-flex items-center gap-1 rounded bg-purple-50 text-purple-700 px-1.5 py-0.5 dark:bg-purple-500/10 dark:text-purple-300">
-                                                <i data-feather="monitor" class="w-2.5 h-2.5"></i> {{ $task->asset->asset_tag }}
+                                                <i data-lucide="monitor" class="w-2.5 h-2.5"></i> {{ $task->asset->asset_tag }}
                                             </span>
                                         @endif
                                         @if($task->ticket)
                                             <span class="inline-flex items-center gap-1 rounded bg-emerald-50 text-emerald-700 px-1.5 py-0.5 dark:bg-emerald-500/10 dark:text-emerald-300">
-                                                <i data-feather="ticket" class="w-2.5 h-2.5"></i> #{{ $task->ticket->request_id }}
+                                                <i data-lucide="ticket" class="w-2.5 h-2.5"></i> #{{ $task->ticket->request_id }}
                                             </span>
                                         @endif
                                     </div>
@@ -197,7 +197,7 @@
             <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Add Task to Project</h3>
                 <button type="button" @click="openTaskModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                    <i data-feather="x" class="w-4 h-4"></i>
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 

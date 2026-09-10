@@ -75,7 +75,7 @@
                                     @if($isActive)
                                         <span class="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-brand-500"></span>
                                     @endif
-                                    <i data-feather="{{ $item['icon'] }}" class="w-4 h-4 shrink-0 transition-colors {{ $isActive ? 'text-brand-500 dark:text-brand-400' : 'text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-300' }}"></i>
+                                    <i data-lucide="{{ $item['icon'] }}" class="w-4 h-4 shrink-0 transition-colors {{ $isActive ? 'text-brand-500 dark:text-brand-400' : 'text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-300' }}"></i>
                                     <span class="menu-item-text truncate" :class="sidebarToggle ? 'lg:hidden' : ''">{{ $item['label'] }}</span>
                                 </a>
                             </li>
@@ -89,7 +89,7 @@
     <!-- Pinned Bottom Section -->
     <div class="border-t border-gray-200/80 dark:border-gray-800/80 py-3 mt-auto">
         <a href="/profile" class="group relative flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900/60 dark:hover:text-white transition-all duration-150 ease-out active:scale-[0.98]">
-            <i data-feather="user" class="w-4 h-4 text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+            <i data-lucide="user" class="w-4 h-4 text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Profile Settings</span>
         </a>
     </div>

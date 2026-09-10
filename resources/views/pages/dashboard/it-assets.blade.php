@@ -11,13 +11,13 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
-                <i data-feather="plus" class="w-4 h-4"></i> Add IT Asset
+                <i data-lucide="plus" class="w-4 h-4"></i> Add IT Asset
             </a>
             <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-                <i data-feather="download" class="w-4 h-4"></i> Export Data
+                <i data-lucide="download" class="w-4 h-4"></i> Export Data
             </a>
             <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-                <i data-feather="log-out" class="w-4 h-4"></i> Bulk Checkout
+                <i data-lucide="log-out" class="w-4 h-4"></i> Bulk Checkout
             </a>
         </div>
     </div>
@@ -131,7 +131,7 @@
                 <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
                     <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-all duration-150 ease-out">
                         <span x-text="categoryLabel">All Categories</span>
-                        <i data-feather="chevron-down" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
+                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
                     </button>
                     <div x-show="dropdownOpen"
                          x-transition:enter="transition ease-out duration-150"
@@ -183,7 +183,7 @@
                 <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
                     <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-all duration-150 ease-out">
                         <span x-text="categoryLabel">All Categories</span>
-                        <i data-feather="chevron-down" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
+                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
                     </button>
                     <div x-show="dropdownOpen"
                          x-transition:enter="transition ease-out duration-150"

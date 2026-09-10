@@ -67,7 +67,7 @@
                 <div class="divide-y divide-gray-100 p-6 dark:divide-gray-800">
                     <div class="space-y-4 pb-6">
                         <h4 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-400">
-                            <i data-feather="info" class="h-4 w-4 text-brand-500"></i>
+                            <i data-lucide="info" class="h-4 w-4 text-brand-500"></i>
                             Asset Identity
                         </h4>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -96,7 +96,7 @@
 
                     <div class="space-y-4 py-6">
                         <h4 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-400">
-                            <i data-feather="user" class="h-4 w-4 text-brand-500"></i>
+                            <i data-lucide="user" class="h-4 w-4 text-brand-500"></i>
                             Current Holder
                         </h4>
                         @if($asset->isCurrentlyCheckedOut())
@@ -116,7 +116,7 @@
                             </div>
                         @else
                             <div class="flex items-center gap-2.5 rounded-2xl border border-gray-100 bg-gray-50 p-4 text-xs italic text-gray-500 dark:border-gray-800 dark:bg-white/[0.01]">
-                                <i data-feather="info" class="h-4 w-4 text-gray-400"></i>
+                                <i data-lucide="info" class="h-4 w-4 text-gray-400"></i>
                                 This asset is currently in stock.
                             </div>
                         @endif
@@ -124,7 +124,7 @@
 
                     <div class="space-y-4 py-6">
                         <h4 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-400">
-                            <i data-feather="sliders" class="h-4 w-4 text-brand-500"></i>
+                            <i data-lucide="sliders" class="h-4 w-4 text-brand-500"></i>
                             Hardware Specifications
                         </h4>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -157,7 +157,7 @@
                     @if($activeRepair)
                         <div class="space-y-4 py-6">
                             <h4 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-red-500">
-                                <i data-feather="tool" class="h-4 w-4"></i>
+                                <i data-lucide="tool" class="h-4 w-4"></i>
                                 Maintenance Information
                             </h4>
                             <div class="space-y-3 rounded-2xl border border-red-100 bg-red-50/30 p-4 text-sm dark:border-red-950/20 dark:bg-red-950/5">

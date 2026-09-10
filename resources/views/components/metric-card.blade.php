@@ -24,21 +24,21 @@
         'error' => 'bg-error-50 dark:bg-error-500/10',
     ];
     
-    $featherIcons = [
+    $lucideIcons = [
         'ticket' => 'tag',
         'open' => 'folder',
-        'warning' => 'alert-triangle',
+        'warning' => 'triangle-alert',
         'clock' => 'clock',
         'users' => 'users',
         'user' => 'user',
     ];
     
-    $featherIcon = $featherIcons[$icon] ?? 'help-circle';
+    $lucideIcon = $lucideIcons[$icon] ?? 'help-circle';
 @endphp
 
 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
     <div class="flex h-12 w-12 items-center justify-center rounded-xl {{ $bgColors[$color] }}">
-        <i data-feather="{{ $featherIcon }}" class="{{ $iconColors[$color] }} size-6"></i>
+        <i data-lucide="{{ $lucideIcon }}" class="{{ $iconColors[$color] }} size-6"></i>
     </div>
 
     <div class="mt-5 flex items-end justify-between">
@@ -53,9 +53,9 @@
                 {{ $trendColor === 'error' ? 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500' : '' }}
                 {{ $trendColor === 'warning' ? 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500' : '' }}">
                 @if($trendDirection === 'up')
-                    <i data-feather="arrow-up" class="size-3"></i>
+                    <i data-lucide="arrow-up" class="size-3"></i>
                 @else
-                    <i data-feather="arrow-down" class="size-3"></i>
+                    <i data-lucide="arrow-down" class="size-3"></i>
                 @endif
                 {{ $trend }}
             </span>

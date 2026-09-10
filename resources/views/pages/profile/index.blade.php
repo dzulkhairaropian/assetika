@@ -28,7 +28,7 @@
                         <div class="w-full space-y-3 border-t border-gray-100 dark:border-gray-800 pt-4 text-xs">
                             <div class="flex items-center gap-2.5">
                                 <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-50 dark:bg-gray-950 text-gray-400">
-                                    <i data-feather="mail" class="w-3.5 h-3.5"></i>
+                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
                                 </span>
                                 <div class="flex flex-col">
                                     <span class="text-[10px] text-gray-400 uppercase tracking-wider">Email</span>
@@ -37,7 +37,7 @@
                             </div>
                             <div class="flex items-center gap-2.5">
                                 <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-50 dark:bg-gray-950 text-gray-400">
-                                    <i data-feather="phone" class="w-3.5 h-3.5"></i>
+                                    <i data-lucide="phone" class="w-3.5 h-3.5"></i>
                                 </span>
                                 <div class="flex flex-col">
                                     <span class="text-[10px] text-gray-400 uppercase tracking-wider">Phone</span>
@@ -46,7 +46,7 @@
                             </div>
                             <div class="flex items-center gap-2.5">
                                 <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-50 dark:bg-gray-950 text-gray-400">
-                                    <i data-feather="home" class="w-3.5 h-3.5"></i>
+                                    <i data-lucide="home" class="w-3.5 h-3.5"></i>
                                 </span>
                                 <div class="flex flex-col">
                                     <span class="text-[10px] text-gray-400 uppercase tracking-wider">Department</span>
@@ -68,7 +68,7 @@
                         <!-- Section: Personal Information -->
                         <div>
                             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                                <i data-feather="user" class="w-4 h-4 text-brand-500"></i>
+                                <i data-lucide="user" class="w-4 h-4 text-brand-500"></i>
                                 Personal Information
                             </h3>
                             <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2">
@@ -106,7 +106,7 @@
                         <!-- Section: Organization Details -->
                         <div>
                             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                                <i data-feather="home" class="w-4 h-4 text-brand-500"></i>
+                                <i data-lucide="home" class="w-4 h-4 text-brand-500"></i>
                                 Organization Details
                             </h3>
                             <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2">
@@ -173,7 +173,7 @@
                         <!-- Section: Security Settings -->
                         <div>
                             <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                                <i data-feather="lock" class="w-4 h-4 text-brand-500"></i>
+                                <i data-lucide="lock" class="w-4 h-4 text-brand-500"></i>
                                 Security Settings
                             </h3>
                             <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2">

@@ -20,7 +20,7 @@
                     <!-- Section: General Information -->
                     <div>
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                        <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
                         General Information
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -61,7 +61,7 @@
                                 <input type="text" name="serial_number" value="{{ old('serial_number') }}" placeholder="Enter serial number" required
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                                 <button type="button" onclick="generateSN()" title="Generate Random Serial Number" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:bg-gray-50 hover:text-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-                                    <i data-feather="shuffle" class="w-3.5 h-3.5"></i>
+                                    <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
                                 </button>
                             </div>
                             @error('serial_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
@@ -104,7 +104,7 @@
                 <hr class="border-gray-100 dark:border-gray-800">
                 <div class="pt-2">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                        <i data-feather="wifi" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="wifi" class="w-5 h-5 text-brand-500"></i>
                         Network Information
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -132,7 +132,7 @@
                 <hr class="border-gray-100 dark:border-gray-800">
                 <div class="pt-2">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                        <i data-feather="key" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="key" class="w-5 h-5 text-brand-500"></i>
                         Software Licenses
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -160,7 +160,7 @@
                 <hr class="border-gray-100 dark:border-gray-800">
                 <div class="pt-2">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                        <i data-feather="cpu" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="cpu" class="w-5 h-5 text-brand-500"></i>
                         Technical Specifications
                     </h3>
                     <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
@@ -208,7 +208,7 @@
                 <!-- Section: Financial Information -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-feather="dollar-sign" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="dollar-sign" class="w-5 h-5 text-brand-500"></i>
                         Financial Information
                     </h3>
                     <div class="space-y-4">
@@ -300,7 +300,7 @@
 
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="save" class="w-5 h-5 text-brand-500"></i>
                         Actions
                     </h3>
                     <div class="space-y-3">

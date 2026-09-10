@@ -20,7 +20,7 @@
                 <form action="{{ route('kb.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
                     <div class="relative flex items-center">
                         <span class="absolute left-2.5 text-gray-400">
-                            <i data-feather="search" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="search" class="w-3.5 h-3.5"></i>
                         </span>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search articles..."
                             class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
@@ -79,7 +79,7 @@
                             <td class="px-4 py-2.5 text-end">
                                 <div class="flex items-center justify-end gap-2 text-gray-500">
                                     <a href="{{ route('kb.show', $article) }}" class="hover:text-brand-600 transition" title="View Article">
-                                        <i data-feather="eye" class="w-4 h-4"></i>
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
                                     </a>
                                 </div>
                             </td>
@@ -89,7 +89,7 @@
                             <td colspan="5" class="px-4 py-8 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-1.5">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                        <i data-feather="inbox" class="w-5 h-5"></i>
+                                        <i data-lucide="inbox" class="w-5 h-5"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No Knowledge Base articles found</p>
                                     <p class="text-[11px] text-gray-400 dark:text-gray-500">Try adjusting your search criteria.</p>

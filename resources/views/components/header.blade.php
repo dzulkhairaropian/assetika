@@ -46,8 +46,8 @@
                 <button class="relative flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200/90 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-800 active:scale-95 transition-all duration-150 ease-out dark:border-gray-800/90 dark:bg-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white"
                         @click.prevent="$store.theme.toggle()"
                         aria-label="Toggle Dark Mode">
-                    <i data-feather="sun" class="hidden dark:block w-4 h-4"></i>
-                    <i data-feather="moon" class="dark:hidden w-4 h-4"></i>
+                    <i data-lucide="sun" class="hidden dark:block w-4 h-4"></i>
+                    <i data-lucide="moon" class="dark:hidden w-4 h-4"></i>
                 </button>
 
                 <!-- Notification Dropdown -->
@@ -60,7 +60,7 @@
                               class="absolute top-1 right-1 z-1 h-2 w-2 rounded-full bg-brand-500">
                             <span class="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-75"></span>
                         </span>
-                        <i data-feather="bell" class="w-4 h-4"></i>
+                        <i data-lucide="bell" class="w-4 h-4"></i>
                     </button>
 
                     <!-- Dropdown -->
@@ -76,7 +76,7 @@
                         <div class="mb-2 flex items-center justify-between border-b border-gray-100 pb-2.5 dark:border-gray-800">
                             <h5 class="text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-white">Notifications</h5>
                             <button @click="dropdownOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <i data-feather="x" class="w-4 h-4"></i>
+                                <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         </div>
                         <ul class="custom-scrollbar flex h-auto flex-col overflow-y-auto space-y-1">
@@ -108,7 +108,7 @@
                         <img src="{{ auth()->user()->avatar ?? 'https://www.gravatar.com/avatar/' . md5(auth()->user()->email) . '?d=mp' }}" alt="User" class="h-full w-full object-cover" />
                     </div>
                     <span class="text-xs font-semibold text-gray-800 dark:text-gray-200 hidden sm:block truncate max-w-[130px]">{{ auth()->user()->name }}</span>
-                    <i data-feather="chevron-down" :class="dropdownOpen ? 'rotate-180' : ''" class="transition-transform duration-200 w-3.5 h-3.5 text-gray-400"></i>
+                    <i data-lucide="chevron-down" :class="dropdownOpen ? 'rotate-180' : ''" class="transition-transform duration-200 w-3.5 h-3.5 text-gray-400"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
@@ -128,7 +128,7 @@
                     <ul class="flex flex-col gap-0.5">
                         <li>
                             <a href="/profile" class="group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-brand-400 transition-colors">
-                                <i data-feather="user" class="w-4 h-4 text-gray-400 group-hover:text-brand-500"></i>
+                                <i data-lucide="user" class="w-4 h-4 text-gray-400 group-hover:text-brand-500"></i>
                                 Edit Profile
                             </a>
                         </li>
@@ -137,7 +137,7 @@
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
                             <button type="submit" class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors">
-                                <i data-feather="log-out" class="w-4 h-4 text-error-500"></i>
+                                <i data-lucide="log-out" class="w-4 h-4 text-error-500"></i>
                                 Sign out
                             </button>
                         </form>

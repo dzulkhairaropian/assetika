@@ -61,7 +61,7 @@
             class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
             style="display: none;">
             <div class="flex items-center gap-2">
-                <i data-feather="info" class="w-4 h-4 text-brand-500"></i>
+                <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
                 <span class="text-xs font-semibold text-brand-700 dark:text-brand-400">
                     <span x-text="selectedItems.length"></span> users selected.
                 </span>
@@ -69,17 +69,17 @@
             <div class="flex flex-wrap items-center gap-2">
                 <button type="button" @click="submitBulkStatus(1)"
                     class="inline-flex items-center justify-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700">
-                    <i data-feather="check-circle" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="circle-check" class="w-3.5 h-3.5"></i>
                     Set Active
                 </button>
                 <button type="button" @click="submitBulkStatus(0)"
                     class="inline-flex items-center justify-center gap-1 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-600">
-                    <i data-feather="x-circle" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="circle-x" class="w-3.5 h-3.5"></i>
                     Set Inactive
                 </button>
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected users?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700">
-                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
@@ -92,7 +92,7 @@
                     <form action="{{ route('users.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
-                                <i data-feather="search" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search users..."
                                 class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
@@ -108,7 +108,7 @@
                         <div class="relative" @click.away="filterOpen = false">
                             <button type="button" @click="filterOpen = !filterOpen"
                                 class="relative inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                                <i data-feather="sliders" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
                                 Filters
                                 @if($activeCount > 0)
                                     <span class="inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
@@ -122,7 +122,7 @@
                                 <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
                                     <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-white">Filter Options</h4>
                                     <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                        <i data-feather="x" class="w-4 h-4"></i>
+                                        <i data-lucide="x" class="w-4 h-4"></i>
                                     </button>
                                 </div>
 
@@ -175,7 +175,7 @@
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            <i data-feather="user-plus" class="w-3.5 h-3.5"></i>
+                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
                             Add User
                         </a>
                     </div>
@@ -276,14 +276,14 @@
                                 <td class="px-4 py-2.5 text-end">
                                     <div class="flex items-center justify-end gap-2 text-gray-500">
                                         <a href="{{ route('users.edit', $user) }}" class="hover:text-brand-600 transition" title="Edit">
-                                            <i data-feather="edit-3" class="w-4 h-4"></i>
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </a>
                                         @if($user->id !== auth()->id())
                                             <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="hover:text-red-600 transition" title="Delete">
-                                                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                 </button>
                                             </form>
                                         @endif
@@ -295,7 +295,7 @@
                                 <td colspan="6" class="px-4 py-8 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-1.5">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-feather="users" class="w-5 h-5"></i>
+                                            <i data-lucide="users" class="w-5 h-5"></i>
                                         </div>
                                         <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No users found</p>
                                         <p class="text-[11px] text-gray-400 dark:text-gray-500">Invite or register users to access this asset management platform.</p>

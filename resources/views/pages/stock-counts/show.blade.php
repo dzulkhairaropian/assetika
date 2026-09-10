@@ -16,7 +16,7 @@
             </div>
             <div class="flex items-center gap-2">
                 @if($stockCount->status !== 'completed')
-                    <a href="{{ route('stock-counts.add-assets', $stockCount) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition"><i data-feather="plus" class="w-3.5 h-3.5"></i> Add Assets</a>
+                    <a href="{{ route('stock-counts.add-assets', $stockCount) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Assets</a>
                     <form action="{{ route('stock-counts.complete', $stockCount) }}" method="POST" class="inline-flex">@csrf<button class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-green-700 transition">Mark Completed</button></form>
                 @endif
                 <a href="{{ route('stock-counts.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">Back</a>

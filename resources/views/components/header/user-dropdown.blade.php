@@ -56,7 +56,7 @@
                     href="/profile"
                     class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-brand-400 transition-colors"
                 >
-                    <i data-feather="user" class="w-4 h-4 text-gray-400 group-hover:text-brand-500"></i>
+                    <i data-lucide="user" class="w-4 h-4 text-gray-400 group-hover:text-brand-500"></i>
                     Edit Profile
                 </a>
             </li>
@@ -70,7 +70,7 @@
                     type="submit"
                     class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors"
                 >
-                    <i data-feather="log-out" class="w-4 h-4 text-error-500"></i>
+                    <i data-lucide="log-out" class="w-4 h-4 text-error-500"></i>
                     Sign out
                 </button>
             </form>

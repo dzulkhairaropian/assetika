@@ -21,7 +21,7 @@
                     {{-- General Information --}}
                     <div>
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-feather="info" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
                             General Information
                         </h3>
 
@@ -87,7 +87,7 @@
                     {{-- Tax & Legal Information --}}
                     <div class="pt-2">
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-feather="file-text" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="file-text" class="w-5 h-5 text-brand-500"></i>
                             Tax & Legal Information
                         </h3>
 
@@ -128,7 +128,7 @@
                                 <p class="mt-1 text-xs text-gray-400 italic">JPG, PNG, or PDF up to 4MB</p>
                                 @if($vendor->npwp_photo)
                                     <a href="{{ asset('storage/' . $vendor->npwp_photo) }}" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400">
-                                        <i data-feather="file-text" class="w-3.5 h-3.5"></i> View current NPWP document
+                                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i> View current NPWP document
                                     </a>
                                 @endif
                                 @error('npwp_photo') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
@@ -141,7 +141,7 @@
                     {{-- Bank Information --}}
                     <div class="pt-2">
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-feather="credit-card" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="credit-card" class="w-5 h-5 text-brand-500"></i>
                             Bank Information
                         </h3>
 
@@ -189,7 +189,7 @@
             <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-feather="save" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="save" class="w-5 h-5 text-brand-500"></i>
                         Actions
                     </h3>
                     <div class="space-y-3">

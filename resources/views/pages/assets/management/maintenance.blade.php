@@ -7,7 +7,7 @@
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div class="mb-5 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-800">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
-                    <i data-feather="tool" class="h-5 w-5"></i>
+                    <i data-lucide="tool" class="h-5 w-5"></i>
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Send to Maintenance</h2>
@@ -21,7 +21,7 @@
                 <!-- Section: Maintenance Details -->
                 <div>
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                        <i data-feather="info" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
                         Maintenance Details
                     </h3>
                     <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2">
@@ -89,7 +89,7 @@
                 <!-- Section: Handover Documentation -->
                 <div>
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                        <i data-feather="file-text" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
                         Documentation
                     </h3>
                     <div>
@@ -99,7 +99,7 @@
                         <div class="relative flex items-center justify-center w-full">
                             <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-950 hover:bg-gray-100 dark:border-gray-800 transition">
                                 <div class="flex flex-col items-center justify-center pt-4 pb-4">
-                                    <i data-feather="upload-cloud" class="w-6 h-6 mb-1 text-gray-400"></i>
+                                    <i data-lucide="cloud-upload" class="w-6 h-6 mb-1 text-gray-400"></i>
                                     <p class="mb-1 text-xs text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
                                     <p class="text-[11px] text-gray-400">PNG, JPG or PDF (MAX. 5MB)</p>
                                 </div>

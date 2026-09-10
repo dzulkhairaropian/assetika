@@ -69,7 +69,7 @@
                                 <td colspan="6" class="px-4 py-8 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-1.5">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-feather="hard-drive" class="w-5 h-5"></i>
+                                            <i data-lucide="hard-drive" class="w-5 h-5"></i>
                                         </div>
                                         <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">You don't have any assigned assets</p>
                                         <p class="text-[11px] text-gray-400 dark:text-gray-500">Assets assigned directly to you will appear here.</p>

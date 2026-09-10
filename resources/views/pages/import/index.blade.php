@@ -20,7 +20,7 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
             <div>
                 <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                    <i data-feather="upload-cloud" class="w-5 h-5 text-brand-500"></i>
+                    <i data-lucide="cloud-upload" class="w-5 h-5 text-brand-500"></i>
                     Upload Spreadsheet File
                 </h3>
 
@@ -64,7 +64,7 @@
                             <div class="relative flex items-center justify-center w-full">
                                 <label class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-gray-100/50 dark:bg-white/[0.02] dark:border-gray-700 dark:hover:border-gray-600 transition">
                                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <i data-feather="file-text" class="w-8 h-8 mb-2 text-brand-500"></i>
+                                        <i data-lucide="file-text" class="w-8 h-8 mb-2 text-brand-500"></i>
                                         <p class="mb-1 text-sm text-gray-700 dark:text-gray-300"><span class="font-semibold text-brand-500">Click to upload</span> or drag and drop</p>
                                         <p class="text-xs text-gray-400">CSV or TXT files (MAX. 10MB)</p>
                                     </div>
@@ -77,7 +77,7 @@
 
                     <div class="pt-2 flex justify-end">
                         <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600 shadow-theme-xs">
-                            <i data-feather="eye" class="w-4 h-4"></i> Preview & Validate Import
+                            <i data-lucide="eye" class="w-4 h-4"></i> Preview & Validate Import
                         </button>
                     </div>
                 </form>
@@ -88,7 +88,7 @@
         <div class="space-y-6">
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                 <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                    <i data-feather="download" class="w-5 h-5 text-brand-500"></i>
+                    <i data-lucide="download" class="w-5 h-5 text-brand-500"></i>
                     Sample Templates
                 </h3>
                 <p class="mb-5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -99,95 +99,95 @@
                     <a href="{{ route('import.template', 'assets') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="hard-drive" class="w-4 h-4 text-brand-500"></i> IT Assets Template
+                            <i data-lucide="hard-drive" class="w-4 h-4 text-brand-500"></i> IT Assets Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'consumables') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-amber-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="package" class="w-4 h-4 text-amber-500"></i> Consumables Template
+                            <i data-lucide="package" class="w-4 h-4 text-amber-500"></i> Consumables Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'components') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-indigo-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="cpu" class="w-4 h-4 text-indigo-500"></i> Components Template
+                            <i data-lucide="cpu" class="w-4 h-4 text-indigo-500"></i> Components Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'licenses') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-emerald-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="key" class="w-4 h-4 text-emerald-500"></i> Licenses Template
+                            <i data-lucide="key" class="w-4 h-4 text-emerald-500"></i> Licenses Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'users') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-purple-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="users" class="w-4 h-4 text-purple-500"></i> Users Template
+                            <i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Users Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
 
                     <div class="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 pt-3 pb-0.5">Master Data</div>
                     <a href="{{ route('import.template', 'companies') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="briefcase" class="w-4 h-4 text-blue-500"></i> Companies Template
+                            <i data-lucide="briefcase" class="w-4 h-4 text-blue-500"></i> Companies Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'departments') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="layers" class="w-4 h-4 text-teal-500"></i> Departments Template
+                            <i data-lucide="layers" class="w-4 h-4 text-teal-500"></i> Departments Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'locations') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="map-pin" class="w-4 h-4 text-rose-500"></i> Locations Template
+                            <i data-lucide="map-pin" class="w-4 h-4 text-rose-500"></i> Locations Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'positions') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="award" class="w-4 h-4 text-orange-500"></i> Positions Template
+                            <i data-lucide="award" class="w-4 h-4 text-orange-500"></i> Positions Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'brands') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="tag" class="w-4 h-4 text-cyan-500"></i> Brands Template
+                            <i data-lucide="tag" class="w-4 h-4 text-cyan-500"></i> Brands Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'categories') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="grid" class="w-4 h-4 text-sky-500"></i> Categories Template
+                            <i data-lucide="grid" class="w-4 h-4 text-sky-500"></i> Categories Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'products') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="box" class="w-4 h-4 text-violet-500"></i> Products Template
+                            <i data-lucide="box" class="w-4 h-4 text-violet-500"></i> Products Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                     <a href="{{ route('import.template', 'vendors') }}"
                        class="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:border-brand-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03] transition">
                         <span class="flex items-center gap-2">
-                            <i data-feather="truck" class="w-4 h-4 text-amber-600"></i> Vendors Template
+                            <i data-lucide="truck" class="w-4 h-4 text-amber-600"></i> Vendors Template
                         </span>
-                        <i data-feather="download-cloud" class="w-4 h-4 text-gray-400"></i>
+                        <i data-lucide="download-cloud" class="w-4 h-4 text-gray-400"></i>
                     </a>
                 </div>
             </div>

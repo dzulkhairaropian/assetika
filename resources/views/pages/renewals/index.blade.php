@@ -34,7 +34,7 @@
 
                 <div class="flex items-center gap-3">
                     <a href="{{ route('renewals.create') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                        <i data-feather="plus" class="w-4 h-4"></i>
+                        <i data-lucide="plus" class="w-4 h-4"></i>
                         Add Renewal Item
                     </a>
                 </div>
@@ -104,13 +104,13 @@
                             <td class="px-5 py-4 sm:px-6 text-right">
                                 <div class="flex items-center justify-end gap-3 text-gray-500">
                                     <a href="{{ route('renewals.edit', $item) }}" class="transition-colors hover:text-brand-500" title="Edit">
-                                        <i data-feather="edit-3" class="w-5 h-5"></i>
+                                        <i data-lucide="edit-3" class="w-5 h-5"></i>
                                     </a>
                                     <form action="{{ route('renewals.destroy', $item) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
-                                            <i data-feather="trash-2" class="w-5 h-5"></i>
+                                            <i data-lucide="trash-2" class="w-5 h-5"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -121,7 +121,7 @@
                             <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-2">
                                     <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 text-gray-400 dark:bg-gray-800/50">
-                                        <i data-feather="inbox" class="w-6 h-6"></i>
+                                        <i data-lucide="inbox" class="w-6 h-6"></i>
                                     </div>
                                     <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No renewal items found</p>
                                     <p class="text-xs text-gray-400 dark:text-gray-500">Add a new renewal item to start tracking expiration dates.</p>

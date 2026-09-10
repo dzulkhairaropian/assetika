@@ -187,8 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
         new Chart(reqCanvas, createHBarConfig(requesterChart.labels, requesterChart.data, chartColors.green));
     }
 
-    if (window.feather) {
-        window.feather.replace();
+    if (window.createIcons && window.lucideIcons) {
+        window.createIcons({ icons: window.lucideIcons });
     }
 });
 

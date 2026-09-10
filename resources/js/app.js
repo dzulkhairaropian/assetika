@@ -1,7 +1,7 @@
 import "./bootstrap";
 import Alpine from "alpinejs";
 import { Chart, registerables } from "chart.js";
-import feather from "feather-icons";
+import { createIcons, icons } from "lucide";
 
 // flatpickr
 import flatpickr from "flatpickr";
@@ -71,7 +71,8 @@ Chart.defaults.color = "#64748b";
 
 window.Alpine = Alpine;
 window.Chart = Chart;
-window.feather = feather;
+window.createIcons = createIcons;
+window.lucideIcons = icons;
 window.flatpickr = flatpickr;
 window.FullCalendar = Calendar;
 
@@ -79,7 +80,7 @@ Alpine.start();
 
 // Initialize components on DOM ready
 document.addEventListener("DOMContentLoaded", () => {
-    feather.replace();
+    createIcons({ icons });
 
     // Map imports
     if (document.querySelector("#mapOne")) {

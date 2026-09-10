@@ -22,7 +22,7 @@
                 <!-- Manual Actions Card -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-3 flex items-center gap-2">
-                        <i data-feather="play" class="w-5 h-5 text-brand-500"></i>
+                        <i data-lucide="play" class="w-5 h-5 text-brand-500"></i>
                         Manual Backup Trigger
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">
@@ -34,7 +34,7 @@
                             @csrf
                             <input type="hidden" name="type" value="db">
                             <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03]">
-                                <i data-feather="database" class="w-4 h-4 text-brand-500"></i>
+                                <i data-lucide="database" class="w-4 h-4 text-brand-500"></i>
                                 Backup Database Only
                             </button>
                         </form>
@@ -43,7 +43,7 @@
                             @csrf
                             <input type="hidden" name="type" value="full">
                             <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                                <i data-feather="archive" class="w-4 h-4"></i>
+                                <i data-lucide="archive" class="w-4 h-4"></i>
                                 Backup Application & Database
                             </button>
                         </form>
@@ -55,7 +55,7 @@
                     {{-- Card Header Toolbar --}}
                     <div class="border-b border-gray-100 p-4 dark:border-gray-800 sm:p-5 flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <i data-feather="rotate-cw" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="rotate-cw" class="w-5 h-5 text-brand-500"></i>
                             <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">Backup History</h3>
                         </div>
                         <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
@@ -111,13 +111,13 @@
                                         <td class="px-5 py-4 sm:px-6">
                                             <div class="flex items-center justify-end gap-3 text-gray-500">
                                                 <a href="{{ route('backups.download', $backup['name']) }}" class="transition-colors hover:text-brand-500" title="Download">
-                                                    <i data-feather="download" class="w-5 h-5"></i>
+                                                    <i data-lucide="download" class="w-5 h-5"></i>
                                                 </a>
                                                 <form action="{{ route('backups.destroy', $backup['name']) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this backup file?')" class="inline-flex">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
-                                                        <i data-feather="trash-2" class="w-5 h-5"></i>
+                                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -128,7 +128,7 @@
                                         <td colspan="4" class="px-6 py-12 text-center">
                                             <div class="flex flex-col items-center justify-center space-y-2">
                                                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                                    <i data-feather="archive" class="w-6 h-6"></i>
+                                                    <i data-lucide="archive" class="w-6 h-6"></i>
                                                 </div>
                                                 <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No Backups Found</p>
                                                 <p class="text-xs text-gray-400 dark:text-gray-500">Trigger a manual backup or wait for the automated schedule.</p>
@@ -147,7 +147,7 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
                     <div>
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-feather="clock" class="w-5 h-5 text-brand-500"></i>
+                            <i data-lucide="clock" class="w-5 h-5 text-brand-500"></i>
                             Backup Schedules
                         </h3>
 
@@ -217,7 +217,7 @@
                             </div>
 
                             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                                <i data-feather="save" class="w-4 h-4"></i>
+                                <i data-lucide="save" class="w-4 h-4"></i>
                                 Save Schedule
                             </button>
                         </form>

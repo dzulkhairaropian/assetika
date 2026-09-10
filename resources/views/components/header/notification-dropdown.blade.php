@@ -33,7 +33,7 @@
         </span>
 
         <!-- Bell Icon -->
-        <i data-feather="bell" class="w-5 h-5"></i>
+        <i data-lucide="bell" class="w-5 h-5"></i>
     </button>
 
     <!-- Dropdown Start -->
@@ -60,7 +60,7 @@
             </div>
 
             <button @click="closeDropdown()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" type="button">
-                <i data-feather="x" class="w-4 h-4"></i>
+                <i data-lucide="x" class="w-4 h-4"></i>
             </button>
         </div>
 
@@ -79,7 +79,7 @@
                             @php
                                 $iconName = $notification->data['icon'] ?? 'bell';
                             @endphp
-                            <i data-feather="{{ $iconName }}" class="w-4 h-4"></i>
+                            <i data-lucide="{{ $iconName }}" class="w-4 h-4"></i>
                         </div>
 
                         <div class="block overflow-hidden">
@@ -100,7 +100,7 @@
             @empty
                 <li class="flex flex-col items-center justify-center p-6 text-center text-gray-400 dark:text-gray-500 h-full my-auto">
                     <div class="p-2.5 bg-gray-50 dark:bg-gray-900 rounded-full mb-2">
-                        <i data-feather="bell-off" class="w-6 h-6 text-gray-400"></i>
+                        <i data-lucide="bell-off" class="w-6 h-6 text-gray-400"></i>
                     </div>
                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No new notifications</p>
                     <p class="text-[11px] mt-0.5 text-gray-400">We will notify you when something happens.</p>

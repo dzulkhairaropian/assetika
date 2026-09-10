@@ -38,7 +38,7 @@
                     @endphp
                     <a href="{{ $tabUrl }}"
                        class="flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all {{ $isActive ? 'bg-white text-gray-700 shadow-sm dark:bg-gray-800 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
-                        <i data-feather="{{ $tab['icon'] }}" class="w-4 h-4"></i>
+                        <i data-lucide="{{ $tab['icon'] }}" class="w-4 h-4"></i>
                         {{ $tab['label'] }}
                         <span class="rounded-full px-2 py-0.5 text-xs font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
                     </a>
@@ -49,7 +49,7 @@
                 <form action="{{ route('consumable-requests.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                     <div class="relative flex items-center">
                         <span class="absolute left-3 text-gray-400">
-                            <i data-feather="search" class="w-4 h-4"></i>
+                            <i data-lucide="search" class="w-4 h-4"></i>
                         </span>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search request #, requester..."
                             class="h-10 w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
@@ -151,11 +151,11 @@
                                         @csrf
                                         <button name="action" value="approve" type="submit"
                                             class="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600">
-                                            <i data-feather="check" class="w-3.5 h-3.5"></i> Approve
+                                            <i data-lucide="circle-check" class="w-3.5 h-3.5"></i> Approve
                                         </button>
                                         <button name="action" value="reject" type="submit"
                                             class="inline-flex items-center gap-1 rounded-lg bg-error-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-error-600">
-                                            <i data-feather="x" class="w-3.5 h-3.5"></i> Reject
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i> Reject
                                         </button>
                                     </form>
                                 @else
@@ -168,7 +168,7 @@
                             <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-2">
                                     <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                        <i data-feather="package" class="w-6 h-6"></i>
+                                        <i data-lucide="package" class="w-6 h-6"></i>
                                     </div>
                                     <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No consumable requests found</p>
                                     <p class="text-xs text-gray-400 dark:text-gray-500">Consumable stock requests submitted by users will appear here for approval.</p>

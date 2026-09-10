@@ -149,8 +149,8 @@
                 class="inline-flex items-center justify-center text-white transition-colors rounded-full size-14 bg-brand-500 hover:bg-brand-600"
                 @click="$store.theme.toggle()"
                 aria-label="Toggle dark mode">
-                <span class="dark:hidden"><i data-feather="moon" class="w-5 h-5"></i></span>
-                <span class="hidden dark:block"><i data-feather="sun" class="w-5 h-5"></i></span>
+                <span class="dark:hidden"><i data-lucide="moon" class="w-5 h-5"></i></span>
+                <span class="hidden dark:block"><i data-lucide="sun" class="w-5 h-5"></i></span>
             </button>
         </div>
     </div>

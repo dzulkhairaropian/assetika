@@ -10,7 +10,7 @@
             <p class="text-xs text-gray-500">Manage Ticket Categories and Subcategories specifically for Support Ticketing.</p>
         </div>
         <button @click="openAddCat = true" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-            <i data-feather="plus" class="w-4 h-4"></i> Add Category
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Category
         </button>
     </div>
 
@@ -40,7 +40,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-1 text-gray-400 hover:text-error-500" title="Delete">
-                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </form>
                     </div>
@@ -58,7 +58,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-gray-400 hover:text-error-500">
-                                    <i data-feather="x" class="w-3.5 h-3.5"></i>
+                                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
                                 </button>
                             </form>
                         </div>

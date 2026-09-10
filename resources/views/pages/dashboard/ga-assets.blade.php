@@ -11,10 +11,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
-                <i data-feather="plus" class="w-4 h-4"></i> Add GA Asset
+                <i data-lucide="plus" class="w-4 h-4"></i> Add GA Asset
             </a>
             <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-                <i data-feather="briefcase" class="w-4 h-4"></i> Inventory List
+                <i data-lucide="briefcase" class="w-4 h-4"></i> Inventory List
             </a>
         </div>
     </div>
@@ -378,8 +378,8 @@
             });
         }
 
-        if (window.feather) {
-            window.feather.replace();
+        if (window.createIcons && window.lucideIcons) {
+            window.createIcons({ icons: window.lucideIcons });
         }
     });
 </script>

@@ -111,11 +111,10 @@ window.addEventListener('resize', checkMobile);">
 
     @yield('content')
 
-    {{-- <script src="https://unpkg.com/feather-icons"></script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.feather) {
-                feather.replace();
+            if (window.createIcons && window.lucideIcons) {
+                createIcons({ icons: lucideIcons });
             }
         });
     </script>
