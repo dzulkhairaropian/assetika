@@ -65,7 +65,7 @@
                             </label>
                             <input type="text" id="status-icon" name="icon" value="{{ old('icon', $item?->icon) }}" placeholder="e.g., circle-check"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                            <div class="mt-2 flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
+                            <div class="mt-2 flex flex-wrap gap-1.5">
                                 @foreach([
                                     'circle-check', 'circle-x', 'circle-alert', 'triangle-alert',
                                     'user', 'user-check', 'users', 'bookmark',
