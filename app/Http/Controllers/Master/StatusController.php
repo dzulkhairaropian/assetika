@@ -22,8 +22,8 @@ class StatusController extends Controller
             $query->where('master_category_id', $request->master_category_id);
         }
 
-        $statuses = $query->latest()->paginate(50)->withQueryString();
-        $masterCategories = MasterCategory::all();
+        $statuses = $query->orderBy('master_category_id')->orderBy('name')->paginate(50)->withQueryString();
+        $masterCategories = MasterCategory::withCount('statuses')->orderBy('name')->get();
 
         return view('pages.master.statuses.index', compact('statuses', 'masterCategories'));
     }
@@ -93,5 +93,25 @@ class StatusController extends Controller
         Status::whereIn('id', $request->ids)->delete();
 
         return redirect()->route('statuses.index')->with('success', 'Selected statuses deleted successfully.');
+    }
+
+    public function bulkEdit(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:statuses,id',
+            'master_category_id' => 'nullable|exists:master_categories,id',
+            'color' => 'nullable|string|max:50',
+        ]);
+
+        $data = array_filter($request->only(['master_category_id', 'color']));
+
+        if (empty($data)) {
+            return back()->with('error', 'No changes specified for bulk update.');
+        }
+
+        Status::whereIn('id', $request->ids)->update($data);
+
+        return redirect()->route('statuses.index')->with('success', count($request->ids).' statuses updated successfully.');
     }
 }

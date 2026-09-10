@@ -4,6 +4,7 @@
     <div class="space-y-4" x-data="{
         selectedItems: [],
         selectAll: false,
+        bulkEditModalOpen: false,
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -21,14 +22,17 @@
             this.selectAll = this.selectedItems.length === document.querySelectorAll('.row-checkbox').length;
         }
     }">
-        <x-common.page-breadcrumb pageTitle="Asset Statuses" />
+        <x-common.page-breadcrumb pageTitle="Asset & Module Statuses" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Manage asset status labels (Ready, Deployed, Service, Broken) for tracking lifecycle states.
+            Manage status labels across modules (IT Assets, GA Assets, Consumables, Requests).
         </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
+        @endif
+        @if(session('error'))
+            <x-ui.alert variant="error" message="{{ session('error') }}" />
         @endif
 
         <!-- Bulk Delete Form -->
@@ -50,13 +54,43 @@
                     <span x-text="selectedItems.length"></span> items selected.
                 </span>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <button type="button" @click="bulkEditModalOpen = true"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    Bulk Edit (Change Selected)
+                </button>
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
+        </div>
+
+        <!-- Master Category Filter Tabs -->
+        <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+            @php
+                $currentCat = request('master_category_id');
+            @endphp
+            <a href="{{ route('statuses.index', request()->except(['master_category_id', 'page'])) }}"
+                class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all {{ empty($currentCat) ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                All Categories
+            </a>
+            @foreach($masterCategories as $mc)
+                @php
+                    $isActive = $currentCat == $mc->id;
+                    $url = route('statuses.index', array_merge(request()->except('page'), ['master_category_id' => $mc->id]));
+                @endphp
+                <a href="{{ $url }}"
+                    class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                    <span>{{ $mc->name }}</span>
+                    <span class="rounded-full bg-gray-200/70 px-1.5 py-0.5 text-[10px] font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                        {{ $mc->statuses_count }}
+                    </span>
+                </a>
+            @endforeach
         </div>
 
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
@@ -106,8 +140,9 @@
                                 </label>
                             </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status Label</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Master Category</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Color</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assets Count</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Usage Count</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
@@ -135,8 +170,21 @@
                                         {{ $status->name }}
                                     </x-ui.badge>
                                 </td>
-                                <td class="px-4 py-2.5 font-mono text-gray-600 dark:text-gray-400">
-                                    {{ $status->color ?? '-' }}
+                                <td class="px-4 py-2.5">
+                                    @if($status->masterCategory)
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                            <i data-lucide="tag" class="w-3 h-3 text-slate-400"></i>
+                                            {{ $status->masterCategory->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-block h-3.5 w-3.5 rounded-full border border-gray-200 dark:border-gray-700" style="background-color: {{ $status->color ?? '#94a3b8' }}"></span>
+                                        <code class="font-mono text-[11px] text-gray-600 dark:text-gray-400">{{ $status->color ?? 'default' }}</code>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-2.5 font-semibold text-gray-800 dark:text-gray-200">
                                     @php
@@ -195,6 +243,74 @@
             {{-- Pagination Footer --}}
             <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
                 {{ $statuses->links() }}
+            </div>
+        </div>
+
+        <!-- Bulk Edit Modal -->
+        <div x-show="bulkEditModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+            <div @click.away="bulkEditModalOpen = false" class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
+                            <i data-lucide="edit-3" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Bulk Edit Statuses</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Update <strong x-text="selectedItems.length"></strong> selected status items</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="bulkEditModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('statuses.bulk-edit') }}" method="POST" class="mt-4 space-y-4">
+                    @csrf
+                    <template x-for="id in selectedItems" :key="id">
+                        <input type="hidden" name="ids[]" :value="id">
+                    </template>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Change Master Category (Optional)
+                        </label>
+                        <select name="master_category_id"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                            <option value="">-- Keep Current Category --</option>
+                            @foreach($masterCategories as $mc)
+                                <option value="{{ $mc->id }}">{{ $mc->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Change Color / Theme (Optional)
+                        </label>
+                        <select name="color"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                            <option value="">-- Keep Current Color --</option>
+                            <option value="primary">Primary (Blue)</option>
+                            <option value="success">Success (Green)</option>
+                            <option value="warning">Warning (Orange)</option>
+                            <option value="danger">Danger (Red)</option>
+                            <option value="info">Info (Cyan)</option>
+                            <option value="secondary">Secondary (Gray)</option>
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <button type="button" @click="bulkEditModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 transition">
+                            Apply Bulk Update
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

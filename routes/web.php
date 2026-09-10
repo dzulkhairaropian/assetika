@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
     Route::post('master-categories/bulk-delete', [MasterCategoryController::class, 'bulkDestroy'])->name('master-categories.bulk-delete');
     Route::post('categories/bulk-delete', [CategoryController::class, 'bulkDestroy'])->name('categories.bulk-delete');
     Route::post('statuses/bulk-delete', [StatusController::class, 'bulkDestroy'])->name('statuses.bulk-delete');
+    Route::post('statuses/bulk-edit', [StatusController::class, 'bulkEdit'])->name('statuses.bulk-edit');
     Route::post('vendors/bulk-delete', [VendorController::class, 'bulkDestroy'])->name('vendors.bulk-delete');
     Route::post('operating-systems/bulk-delete', [OperatingSystemController::class, 'bulkDestroy'])->name('operating-systems.bulk-delete');
     Route::post('products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');

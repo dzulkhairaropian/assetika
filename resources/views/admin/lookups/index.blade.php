@@ -136,10 +136,12 @@
                                     </label>
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    <div class="flex flex-col">
-                                        <span class="block font-semibold text-gray-900 dark:text-white">{{ $item->name }}</span>
+                                    <div class="flex flex-col gap-0.5">
+                                        <x-ui.badge :color="$item->color ?? 'gray'" variant="light" size="sm" :featherIcon="$item->icon">
+                                            {{ $item->name }}
+                                        </x-ui.badge>
                                         @if($item->description)
-                                            <span class="text-[11px] text-gray-400">{{ Str::limit($item->description, 60) }}</span>
+                                            <span class="text-[11px] text-gray-400 mt-0.5">{{ Str::limit($item->description, 60) }}</span>
                                         @endif
                                     </div>
                                 </td>
