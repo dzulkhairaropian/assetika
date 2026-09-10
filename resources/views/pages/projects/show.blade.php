@@ -96,7 +96,7 @@
                 (object)['id' => null, 'name' => 'To Do', 'color' => 'light', 'icon' => 'circle', 'slug' => 'todo'],
                 (object)['id' => null, 'name' => 'In Progress', 'color' => 'primary', 'icon' => 'loader', 'slug' => 'in_progress'],
                 (object)['id' => null, 'name' => 'Review', 'color' => 'warning', 'icon' => 'eye', 'slug' => 'review'],
-                (object)['id' => null, 'name' => 'Done', 'color' => 'success', 'icon' => 'check-circle', 'slug' => 'done'],
+                (object)['id' => null, 'name' => 'Done', 'color' => 'success', 'icon' => 'circle-check', 'slug' => 'done'],
             ]);
         @endphp
 

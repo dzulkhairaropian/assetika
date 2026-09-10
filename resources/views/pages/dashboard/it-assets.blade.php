@@ -37,7 +37,7 @@
         @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'success' : 'error'; @endphp
         <x-common.stat-card
             title="Ready to Deploy"
-            icon="check-circle"
+            icon="circle-check"
             :value="$readyToDeploy"
             :trend="$readyToDeployTrend"
             :trendColor="$readyToDeployTrendColor"

@@ -181,7 +181,7 @@
                         <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($log->cost, 0, ',', '.') }}</td>
                         <td class="px-4 py-2.5">
                             @if($log->completed_date)
-                                <x-ui.badge color="success" variant="light" size="sm" featherIcon="check-circle">Completed</x-ui.badge>
+                                <x-ui.badge color="success" variant="light" size="sm" featherIcon="circle-check">Completed</x-ui.badge>
                             @else
                                 <x-ui.badge color="warning" variant="light" size="sm" featherIcon="clock">Scheduled</x-ui.badge>
                             @endif

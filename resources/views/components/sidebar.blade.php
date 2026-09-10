@@ -46,7 +46,7 @@
                         ['label' => 'Departments', 'route' => 'departments.index', 'icon' => 'git-branch'],
                         ['label' => 'Locations', 'route' => 'locations.index', 'icon' => 'map-pin'],
                         ['label' => 'Vendors', 'route' => 'vendors.index', 'icon' => 'truck'],
-                        ['label' => 'Statuses', 'route' => 'statuses.index', 'icon' => 'check-circle'],
+                        ['label' => 'Statuses', 'route' => 'statuses.index', 'icon' => 'circle-check'],
                     ],
                     'System & Sync' => [
                         ['label' => 'Assetika Sync', 'route' => 'admin.sync.index', 'params' => ['table' => 'assets'], 'icon' => 'refresh-cw'],

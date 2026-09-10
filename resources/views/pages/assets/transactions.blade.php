@@ -115,7 +115,7 @@
                                         @if($tx->checked_in_at)
                                             <x-ui.badge color="success" variant="light" size="sm" featherIcon="rotate-ccw">Returned</x-ui.badge>
                                         @else
-                                            <x-ui.badge color="primary" variant="light" size="sm" featherIcon="check-circle">Active Checkout</x-ui.badge>
+                                            <x-ui.badge color="primary" variant="light" size="sm" featherIcon="circle-check">Active Checkout</x-ui.badge>
                                         @endif
                                     @endif
                                 </td>

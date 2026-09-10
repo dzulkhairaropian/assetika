@@ -266,7 +266,7 @@
                                             default => 'gray'
                                         };
                                         $icon = $statusObj->icon ?? match($statusName) {
-                                            'Available' => 'check-circle',
+                                            'Available' => 'circle-check',
                                             'Deployed', 'In Use' => 'monitor',
                                             'In Repair', 'Maintenance' => 'tool',
                                             'Disposed', 'Broken' => 'alert-triangle',

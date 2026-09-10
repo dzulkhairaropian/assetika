@@ -75,7 +75,7 @@
     @if($iconName)
         @php
             $lucideName = match($iconName) {
-                'check-circle', 'check' => 'circle-check',
+                'circle-check', 'check' => 'circle-check',
                 'alert-triangle' => 'triangle-alert',
                 'alert-circle' => 'circle-alert',
                 'x-circle' => 'circle-x',

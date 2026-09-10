@@ -70,7 +70,7 @@
                     ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $ticketSummary['in_progress'], 'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
                     ['key' => 'pending',     'label' => 'Pending',     'count' => $ticketSummary['pending'],     'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
                     ['key' => 'unassigned',  'label' => 'Unassigned',  'count' => $ticketSummary['unassigned'],  'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
-                    ['key' => 'closed',      'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],      'icon' => 'check-circle', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
+                    ['key' => 'closed',      'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],      'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
                 ];
             @endphp
             <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
@@ -329,7 +329,7 @@
                             $isOverdue = !($ticket->status?->is_closed) && $ticket->created_at->diffInDays(now()) >= 3;
                             $priorityIcon = $ticket->priority?->icon ?: 'flag';
                             $statusIcon = $ticket->status?->icon ?: 'disc';
-                            $slaIcon = $isOverdue ? 'alert-circle' : 'check-circle';
+                            $slaIcon = $isOverdue ? 'alert-circle' : 'circle-check';
                             
                             $rowBg = 'hover:bg-gray-50/50 dark:hover:bg-white/[0.02]';
                             if ($isOverdue) {
@@ -412,7 +412,7 @@
                                     <x-ui.badge 
                                         size="sm" 
                                         :color="$ticket->slaStatus->color ?? ($isOverdue ? 'danger' : 'success')"
-                                        :featherIcon="$ticket->slaStatus->icon ?: ($isOverdue ? 'alert-circle' : 'check-circle')"
+                                        :featherIcon="$ticket->slaStatus->icon ?: ($isOverdue ? 'alert-circle' : 'circle-check')"
                                     >
                                         {{ $ticket->slaStatus->name }}
                                     </x-ui.badge>
@@ -420,7 +420,7 @@
                                     <x-ui.badge 
                                         size="sm" 
                                         :color="$isOverdue ? 'danger' : 'success'"
-                                        :featherIcon="$isOverdue ? 'alert-circle' : 'check-circle'"
+                                        :featherIcon="$isOverdue ? 'alert-circle' : 'circle-check'"
                                     >
                                         {{ $isOverdue ? 'SLA Risk' : 'On Track' }}
                                     </x-ui.badge>

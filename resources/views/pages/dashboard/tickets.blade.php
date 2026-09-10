@@ -102,7 +102,7 @@
         @php $resolvedTrendColor = $resolvedTrend >= 0 ? 'success' : 'error'; @endphp
         <x-common.stat-card
             title="Resolved Tickets"
-            icon="check-circle"
+            icon="circle-check"
             :value="$resolved"
             :trend="$resolvedTrend"
             :trendColor="$resolvedTrendColor"

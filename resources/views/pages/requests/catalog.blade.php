@@ -126,7 +126,7 @@
                                         @elseif($conLow)
                                             <x-ui.badge color="warning" variant="light" size="sm" featherIcon="alert-circle">Low: {{ $con->quantity }} left</x-ui.badge>
                                         @else
-                                            <x-ui.badge color="success" variant="light" size="sm" featherIcon="check-circle">{{ $con->quantity }} available</x-ui.badge>
+                                            <x-ui.badge color="success" variant="light" size="sm" featherIcon="circle-check">{{ $con->quantity }} available</x-ui.badge>
                                         @endif
                                     </td>
                                     <td class="px-4 py-2.5 text-end">

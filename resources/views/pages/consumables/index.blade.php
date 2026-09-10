@@ -63,7 +63,7 @@
                     $tabFilters = array_filter(request()->except(['page', 'tab', 'status']));
                     $tabs = [
                         ['key' => null,           'label' => 'All Consumables', 'count' => $consumableSummary['total'],        'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
-                        ['key' => 'in_stock',     'label' => 'In Stock',        'count' => $consumableSummary['in_stock'],     'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'in_stock',     'label' => 'In Stock',        'count' => $consumableSummary['in_stock'],     'icon' => 'circle-check', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
                         ['key' => 'low_stock',    'label' => 'Low Stock',       'count' => $consumableSummary['low_stock'],    'icon' => 'alert-circle', 'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
                         ['key' => 'out_of_stock', 'label' => 'Out of Stock',   'count' => $consumableSummary['out_of_stock'], 'icon' => 'x-circle',     'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
                     ];
@@ -269,7 +269,7 @@
                                     @php
                                         $statusName = optional($consumable->status)->name ?? ($consumable->quantity <= 0 ? 'Out of Stock' : ($consumable->quantity <= $consumable->low_threshold ? 'Low Stock' : 'In Stock'));
                                         $statusColor = optional($consumable->status)->color ?? ($consumable->quantity <= 0 ? 'danger' : ($consumable->quantity <= $consumable->low_threshold ? 'warning' : 'success'));
-                                        $statusIcon = optional($consumable->status)->icon ?? ($consumable->quantity <= 0 ? 'x-circle' : ($consumable->quantity <= $consumable->low_threshold ? 'alert-circle' : 'check-circle'));
+                                        $statusIcon = optional($consumable->status)->icon ?? ($consumable->quantity <= 0 ? 'x-circle' : ($consumable->quantity <= $consumable->low_threshold ? 'alert-circle' : 'circle-check'));
                                     @endphp
                                     <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="$statusIcon">{{ $statusName }}</x-ui.badge>
                                 </td>

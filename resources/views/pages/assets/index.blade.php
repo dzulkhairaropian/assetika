@@ -123,7 +123,7 @@
                     $tabs = [
                         ['key' => null,       'label' => 'All Assets',      'count' => $inventorySummary['total'],      'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
                         ['key' => 'draft',    'label' => 'Draft',           'count' => $inventorySummary['draft'],      'icon' => 'file-text',    'badge' => 'bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-400'],
-                        ['key' => 'ready',    'label' => 'Ready to Deploy', 'count' => $inventorySummary['ready'],      'icon' => 'check-circle', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'ready',    'label' => 'Ready to Deploy', 'count' => $inventorySummary['ready'],      'icon' => 'circle-check', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
                         ['key' => 'deployed', 'label' => 'Deployed',        'count' => $inventorySummary['deployed'],   'icon' => 'monitor',      'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
                         ['key' => 'service',  'label' => 'Service & Repair','count' => $inventorySummary['in_service'], 'icon' => 'tool',         'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
                         ['key' => 'broken',   'label' => 'Broken',          'count' => $inventorySummary['broken'],     'icon' => 'alert-triangle','badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
