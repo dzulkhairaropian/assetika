@@ -58,21 +58,29 @@
                 @endif
             </div>
 
-            <!-- Resolution & Internal Notes -->
+            <!-- Resolution & Internal Notes / Lessons Learned (LL) -->
             @if($ticket->resolution_notes || $ticket->internal_notes)
-                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3">
+                <div class="rounded-xl border border-emerald-200 bg-emerald-50/20 p-4 shadow-sm dark:border-emerald-900/30 dark:bg-emerald-950/10 space-y-3">
                     @if($ticket->resolution_notes)
                         <div>
-                            <h4 class="text-[11px] font-semibold uppercase text-green-600 dark:text-green-400 mb-1">Resolution Summary</h4>
-                            <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 bg-green-50/50 p-3 rounded-lg dark:bg-green-950/20">
+                            <div class="flex items-center gap-1.5 mb-1.5">
+                                <i data-lucide="book-open-check" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                                    Resolution & Lessons Learned (LL)
+                                </h4>
+                            </div>
+                            <div class="whitespace-pre-wrap text-xs text-gray-800 dark:text-gray-200 bg-white p-3.5 rounded-lg border border-emerald-100 dark:bg-gray-900 dark:border-emerald-900/30 shadow-2xs">
                                 {{ $ticket->resolution_notes }}
                             </div>
                         </div>
                     @endif
                     @if($ticket->internal_notes)
-                        <div>
-                            <h4 class="text-[11px] font-semibold uppercase text-orange-600 dark:text-orange-400 mb-1">Internal Notes</h4>
-                            <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 bg-orange-50/50 p-3 rounded-lg dark:bg-orange-950/20">
+                        <div class="{{ $ticket->resolution_notes ? 'pt-2 border-t border-emerald-100 dark:border-emerald-900/20' : '' }}">
+                            <div class="flex items-center gap-1.5 mb-1 text-amber-600 dark:text-amber-400">
+                                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                                <h4 class="text-[11px] font-semibold uppercase tracking-wider">Internal Notes</h4>
+                            </div>
+                            <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 bg-amber-50/50 p-3 rounded-lg dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/20">
                                 {{ $ticket->internal_notes }}
                             </div>
                         </div>

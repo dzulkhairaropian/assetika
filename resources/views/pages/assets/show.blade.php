@@ -396,6 +396,7 @@
                                             <th class="px-4 py-2.5 font-medium text-gray-500">User / Dept</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Date Out</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Date In</th>
+                                            <th class="px-4 py-2.5 font-medium text-gray-500">Duration</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Status</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Condition</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500 text-end">BAST</th>
@@ -418,6 +419,16 @@
                                                         <span class="text-gray-600 dark:text-gray-400">{{ $history->checked_in_at?->format('d M Y') ?? '-' }}</span>
                                                     @else
                                                         <x-ui.badge color="primary" variant="light" size="sm">Current</x-ui.badge>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">
+                                                    @if($history->checked_out_at)
+                                                        {{ $history->checked_out_at->diffForHumans($history->checked_in_at ?? now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
+                                                        @if(!$history->checked_in_at)
+                                                            <span class="text-[10px] text-brand-600 dark:text-brand-400 font-normal">(Active)</span>
+                                                        @endif
+                                                    @else
+                                                        -
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-2.5">
@@ -443,7 +454,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="px-4 py-6 text-center text-xs text-gray-400">
+                                                <td colspan="7" class="px-4 py-6 text-center text-xs text-gray-400">
                                                     No movement history found
                                                 </td>
                                             </tr>
@@ -462,6 +473,7 @@
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Provider</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Start Date</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Completion Date</th>
+                                            <th class="px-4 py-2.5 font-medium text-gray-500">Duration</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Cost</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Notes</th>
                                         </tr>
@@ -482,6 +494,16 @@
                                                         <x-ui.badge color="warning" variant="light" size="sm">In Repair</x-ui.badge>
                                                     @endif
                                                 </td>
+                                                <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">
+                                                    @if($maint->start_date)
+                                                        {{ $maint->start_date->diffForHumans($maint->completion_date ?? now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
+                                                        @if(!$maint->completion_date)
+                                                            <span class="text-[10px] text-amber-600 dark:text-amber-400 font-normal">(Ongoing)</span>
+                                                        @endif
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td class="px-4 py-2.5 font-semibold text-gray-900 dark:text-white">
                                                     {{ $maint->cost ? 'Rp ' . number_format($maint->cost, 0, ',', '.') : '-' }}
                                                 </td>
@@ -491,7 +513,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="px-4 py-6 text-center text-xs text-gray-400">
+                                                <td colspan="6" class="px-4 py-6 text-center text-xs text-gray-400">
                                                     No maintenance history found
                                                 </td>
                                             </tr>
@@ -511,6 +533,7 @@
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Requester</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Problem Summary</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Priority</th>
+                                            <th class="px-4 py-2.5 font-medium text-gray-500">Response / Resolution</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500">Status</th>
                                             <th class="px-4 py-2.5 font-medium text-gray-500 text-end">Action</th>
                                         </tr>
@@ -532,6 +555,16 @@
                                                         {{ $t->priority?->name ?? 'Normal' }}
                                                     </x-ui.badge>
                                                 </td>
+                                                <td class="px-4 py-2.5 text-[11px]">
+                                                    <div class="flex flex-col gap-0.5">
+                                                        <span class="text-gray-600 dark:text-gray-300">
+                                                            Resp: <span class="font-medium text-gray-900 dark:text-white">{{ $t->response_time_minutes ? $t->response_time_minutes . 'm' : '-' }}</span>
+                                                        </span>
+                                                        <span class="text-gray-600 dark:text-gray-300">
+                                                            Res: <span class="font-medium text-gray-900 dark:text-white">{{ $t->resolution_time_hours ? $t->resolution_time_hours . 'h' : '-' }}</span>
+                                                        </span>
+                                                    </div>
+                                                </td>
                                                 <td class="px-4 py-2.5">
                                                     <x-ui.badge :color="$t->status?->color ?? 'primary'" variant="light" size="sm" :featherIcon="$t->status?->icon ?: 'disc'">
                                                         {{ $t->status?->name ?? 'Open' }}
@@ -545,7 +578,7 @@
                                             </tr>
                                          @empty
                                              <tr>
-                                                 <td colspan="6" class="px-4 py-6 text-center text-xs text-gray-400">
+                                                 <td colspan="7" class="px-4 py-6 text-center text-xs text-gray-400">
                                                      No support tickets reported for this asset
                                                  </td>
                                              </tr>
