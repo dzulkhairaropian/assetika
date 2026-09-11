@@ -24,44 +24,52 @@
 
     <!-- Main Grid of KPI Cards -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Total Registered Assets"
             icon="hard-drive"
             :value="$totalAssets"
             :trend="$totalAssetsTrend"
             :trendColor="$totalAssetsTrendColor"
             description="Total IT hardware inventory"
+            color="brand"
+            :url="route('assets.index')"
         />
 
-        @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Ready to Deploy"
             icon="circle-check"
             :value="$readyToDeploy"
             :trend="$readyToDeployTrend"
             :trendColor="$readyToDeployTrendColor"
             description="Available for immediate setup"
+            color="success"
+            :url="route('assets.index', ['status_id' => $readyStatusId])"
         />
 
-        @php $deployedTrendColor = $deployedTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $deployedTrendColor = $deployedTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Active Deployed"
             icon="user-check"
             :value="$deployed"
             :trend="$deployedTrend"
             :trendColor="$deployedTrendColor"
             description="Assigned to employees & offices"
+            color="info"
+            :url="route('assets.index', ['status_id' => $deployedStatusId])"
         />
 
-        @php $serviceTrendColor = $serviceTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $serviceTrendColor = $serviceTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="In Repair / Service"
             icon="tool"
             :value="$service"
             :trend="$serviceTrend"
             :trendColor="$serviceTrendColor"
             description="Undergoing maintenance"
+            color="warning"
+            :url="route('assets.index', ['status_id' => $serviceStatusId])"
         />
     </div>
 
@@ -69,51 +77,59 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @php
             $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
-            $lowStockTrendColor = $lowStockTrend <= 0 ? 'success' : 'error';
+            $lowStockTrendColor = $lowStockTrend <= 0 ? 'emerald' : 'red';
         @endphp
-        <x-common.stat-card
+        <x-common.small-box
             title="Low Stock Consumables"
             icon="package"
             :value="$lowStockConsumables->count()"
             :trend="$lowStockTrend"
             :trendColor="$lowStockTrendColor"
-            description="Items below minimum threshold."
+            description="Items below minimum threshold"
+            color="danger"
+            :url="route('consumables.index', ['status' => 'low_stock'])"
         />
 
         @php
             $brokenTrend = $brokenDisposal > 0 ? 1 : -1;
-            $brokenTrendColor = $brokenTrend <= 0 ? 'success' : 'error';
+            $brokenTrendColor = $brokenTrend <= 0 ? 'emerald' : 'red';
         @endphp
-        <x-common.stat-card
+        <x-common.small-box
             title="Broken / Disposal Alerts"
             icon="alert-triangle"
             :value="$brokenDisposal"
             :trend="$brokenTrend"
             :trendColor="$brokenTrendColor"
-            description="Assets marked for decommissioning."
+            description="Assets marked for decommissioning"
+            color="danger"
+            :url="route('assets.index', ['status_id' => $brokenStatusId])"
         />
 
         @php
             $agingTrend = $assetsOlderThan4Years->count() > 0 ? 1 : -1;
-            $agingTrendColor = $agingTrend <= 0 ? 'success' : 'error';
+            $agingTrendColor = $agingTrend <= 0 ? 'emerald' : 'red';
         @endphp
-        <x-common.stat-card
+        <x-common.small-box
             title="Aging Assets (4+ Yrs)"
             icon="clock"
             :value="$assetsOlderThan4Years->count()"
             :trend="$agingTrend"
             :trendColor="$agingTrendColor"
-            description="Hardware nearing end of lifecycle."
+            description="Hardware nearing end of lifecycle"
+            color="warning"
+            :url="route('assets.index')"
         />
 
-        @php $readyForSaleTrendColor = $readyForSaleTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $readyForSaleTrendColor = $readyForSaleTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Ready for Sale"
             icon="shopping-bag"
             :value="$readyForSale"
             :trend="$readyForSaleTrend"
             :trendColor="$readyForSaleTrendColor"
             description="Approved for liquidation & sale"
+            color="success"
+            :url="route('assets.index', ['status_id' => $readyForSaleStatusId])"
         />
     </div>
 

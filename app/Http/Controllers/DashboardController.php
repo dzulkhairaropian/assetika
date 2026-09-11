@@ -530,6 +530,14 @@ class DashboardController extends Controller
         $totalBookValue = $allAssetsWithDepr->sum(fn ($a) => $a->bookValue ?? $a->purchase_cost);
         $totalDepreciated = max(0, $totalPurchaseCost - $totalBookValue);
 
+        // Status Map for Small-Box Navigation Links
+        $statusMap = Status::pluck('id', 'name');
+        $readyStatusId = $statusMap['Ready to Deploy'] ?? null;
+        $deployedStatusId = $statusMap['Deployed'] ?? null;
+        $serviceStatusId = $statusMap['Service'] ?? null;
+        $brokenStatusId = $statusMap['Broken'] ?? null;
+        $readyForSaleStatusId = $statusMap['Ready for Sale'] ?? ($statusMap['For Sale'] ?? null);
+
         // Alert Metrics
         $lowStockComponents = Component::whereRaw('qty <= min_qty')->get();
         $expiringLicenses = License::whereNotNull('expiration_date')
@@ -585,7 +593,12 @@ class DashboardController extends Controller
             'totalBookValue',
             'totalDepreciated',
             'lowStockComponents',
-            'expiringLicenses'
+            'expiringLicenses',
+            'readyStatusId',
+            'deployedStatusId',
+            'serviceStatusId',
+            'brokenStatusId',
+            'readyForSaleStatusId'
         ));
     }
 }
