@@ -21,65 +21,81 @@
 
     <!-- 1. Core GA KPI Cards Grid -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-common.stat-card
+        <x-common.small-box
             title="Total GA Assets"
             icon="hard-drive"
             :value="number_format($totalAssets)"
             description="Total physical GA assets"
+            color="brand"
+            :url="route('ga-assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Total Capital Value"
             icon="dollar-sign"
             value="Rp {{ number_format($totalAssetValue, 0, ',', '.') }}"
             description="Capitalized valuation"
+            color="success"
+            :url="route('ga-assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Active Assignments"
             icon="user-check"
             :value="number_format($activeAssignments)"
             description="Assets currently checked out"
+            color="info"
+            :url="route('ga-assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Pending Maintenance"
             icon="wrench"
             :value="number_format($pendingMaintenance)"
             description="Scheduled repairs"
+            color="warning"
+            :url="route('ga-assets.index')"
         />
     </div>
 
     <!-- 2. Fleet & Facilities KPI Grid -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-common.stat-card
+        <x-common.small-box
             title="Vehicles Fleet"
             icon="truck"
             :value="number_format($totalVehicles)"
             description="Cars, vans & delivery bikes"
+            color="brand"
+            :url="route('ga-assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Tax Due Alerts"
             icon="alert-triangle"
             :value="number_format($upcomingVehicleTaxes)"
             :trend="1"
-            trendColor="warning"
+            trendColor="amber"
             description="Vehicle taxes expiring in 30 days"
+            color="danger"
+            :url="route('ga-assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Active Reservations"
             icon="calendar"
             :value="number_format($activeReservations)"
             description="Room & vehicle schedules"
+            color="info"
+            :url="route('ga-assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Maintenance Spend"
             icon="activity"
-            value="Rp {{ number_format($monthlyMaintenanceSpend, 0, ',', '.') }}"
-            description="Total maintenance cost this month"
+            value="Rp {{ number_format($maintenanceSpend, 0, ',', '.') }}"
+            description="Total repairs expenditure"
+            color="warning"
+            :url="route('ga-assets.index')"
         />
     </div>
 

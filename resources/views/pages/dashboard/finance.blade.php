@@ -21,32 +21,40 @@
 
     <!-- 1. Key Financial KPI Grid -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-common.stat-card
+        <x-common.small-box
             title="Total Purchase Cost"
             icon="dollar-sign"
             value="Rp {{ number_format($totalPurchaseCost, 0, ',', '.') }}"
             description="Initial acquisition cost of all assets"
+            color="brand"
+            :url="route('assets.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Current Book Value"
             icon="trending-up"
             value="Rp {{ number_format($totalBookValue, 0, ',', '.') }}"
             description="Remaining net value after depreciation"
+            color="success"
+            :url="route('depreciations.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Total Depreciated"
             icon="trending-down"
             value="Rp {{ number_format($totalDepreciated, 0, ',', '.') }}"
             description="Accumulated value loss to date"
+            color="danger"
+            :url="route('depreciations.index')"
         />
 
-        <x-common.stat-card
+        <x-common.small-box
             title="Avg Asset Cost"
             icon="pie-chart"
             value="Rp {{ number_format($avgAssetCost, 0, ',', '.') }}"
             description="Average cost per registered unit"
+            color="info"
+            :url="route('assets.index')"
         />
     </div>
 

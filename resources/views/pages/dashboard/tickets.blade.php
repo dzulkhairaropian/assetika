@@ -79,68 +79,82 @@
 
     <!-- 1. Key Metrics Cards Grid -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @php $totalTicketsTrendColor = $totalTicketsTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $totalTicketsTrendColor = $totalTicketsTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Total Tickets"
             icon="ticket"
             :value="$totalTickets"
             :trend="$totalTicketsTrend"
             :trendColor="$totalTicketsTrendColor"
             description="All support tickets ever created"
+            color="brand"
+            :url="route('tickets.index')"
         />
 
-        @php $openTicketsTrendColor = $openTicketsTrend <= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $openTicketsTrendColor = $openTicketsTrend <= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Open Tickets"
             icon="alert-circle"
             :value="$openTickets"
             :trend="$openTicketsTrend"
             :trendColor="$openTicketsTrendColor"
             description="Active tickets needing resolution"
+            color="danger"
+            :url="route('tickets.index')"
         />
 
-        @php $resolvedTrendColor = $resolvedTrend >= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $resolvedTrendColor = $resolvedTrend >= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Resolved Tickets"
             icon="circle-check"
             :value="$resolved"
             :trend="$resolvedTrend"
             :trendColor="$resolvedTrendColor"
             description="Closed tickets this period"
+            color="success"
+            :url="route('tickets.index')"
         />
 
-        @php $unassignedTrendColor = $unassignedTrend <= 0 ? 'success' : 'error'; @endphp
-        <x-common.stat-card
+        @php $unassignedTrendColor = $unassignedTrend <= 0 ? 'emerald' : 'red'; @endphp
+        <x-common.small-box
             title="Unassigned Tickets"
             icon="user-x"
             :value="$unassigned"
             :trend="$unassignedTrend"
             :trendColor="$unassignedTrendColor"
             description="Awaiting staff allocation"
+            color="warning"
+            :url="route('tickets.index')"
         />
     </div>
 
     <!-- 2. Performance Metric Cards Grid -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <x-common.stat-card
+        <x-common.small-box
             title="My Assigned Tickets"
             icon="user"
             :value="$myTickets"
             description="{{ $myOpenTickets }} open tickets pending"
+            color="info"
+            :url="route('tickets.index')"
         />
         @php $avgResolution = round($avgResolution, 1); @endphp
-        <x-common.stat-card
+        <x-common.small-box
             title="Avg Resolution Time"
             icon="clock"
             value="{{ $avgResolution }} hrs"
             description="Turnaround time from open to close"
+            color="brand"
+            :url="route('tickets.index')"
         />
         @php $rate = $totalTickets > 0 ? round(($resolved / $totalTickets) * 100, 1) : 0; @endphp
-        <x-common.stat-card
+        <x-common.small-box
             title="SLA Resolution Rate"
             icon="activity"
             value="{{ $rate }}%"
             description="Overall ticket completion efficiency"
+            color="success"
+            :url="route('tickets.index')"
         />
     </div>
 
