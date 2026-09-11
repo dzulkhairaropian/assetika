@@ -92,7 +92,7 @@
         <x-common.small-box
             title="Maintenance Spend"
             icon="activity"
-            value="Rp {{ number_format($maintenanceSpend, 0, ',', '.') }}"
+            value="Rp {{ number_format($monthlyMaintenanceSpend, 0, ',', '.') }}"
             description="Total repairs expenditure"
             color="warning"
             :url="route('ga-assets.index')"
