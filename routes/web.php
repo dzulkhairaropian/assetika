@@ -268,6 +268,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('api/calendar/events/{id}', [CalendarController::class, 'destroy'])->name('api.calendar.destroy');
     Route::get('kb/suggestions', [KbController::class, 'suggestions'])->name('kb.suggestions');
     // Projects & Operations
+    Route::post('projects/bulk-delete', [ProjectController::class, 'bulkDestroy'])->name('projects.bulk-delete');
     Route::resource('projects', ProjectController::class);
     Route::post('projects/{project}/tasks', [ProjectController::class, 'storeTask'])->name('projects.store-task');
     Route::patch('project-tasks/{task}/status', [ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');

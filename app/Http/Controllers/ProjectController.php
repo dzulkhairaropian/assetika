@@ -202,4 +202,16 @@ class ProjectController extends Controller
 
         return redirect()->back()->with('success', 'Task deleted.');
     }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->input('ids', []);
+        if (! empty($ids)) {
+            Project::whereIn('id', $ids)->delete();
+
+            return redirect()->back()->with('success', count($ids).' projects deleted successfully.');
+        }
+
+        return redirect()->back()->with('error', 'No projects selected for deletion.');
+    }
 }
