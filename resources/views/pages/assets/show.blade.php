@@ -495,11 +495,11 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium">
-                                                    @if($maint->start_date)
-                                                        {{ $maint->start_date->diffForHumans($maint->completion_date ?? now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
-                                                        @if(!$maint->completion_date)
-                                                            <span class="text-[10px] text-amber-600 dark:text-amber-400 font-normal">(Ongoing)</span>
-                                                        @endif
+                                                    @if($maint->completion_date)
+                                                        {{ $maint->start_date?->diffForHumans($maint->completion_date, ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
+                                                    @elseif($maint->created_at)
+                                                        {{ $maint->created_at->diffForHumans(now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
+                                                        <span class="text-[10px] text-amber-600 dark:text-amber-400 font-normal">(Ongoing)</span>
                                                     @else
                                                         -
                                                     @endif
