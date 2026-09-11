@@ -70,4 +70,32 @@ class Project extends Model
 
         return (int) round($totalScore / $total);
     }
+
+    public function syncAutoStatus(): void
+    {
+        // Don't override if manually set to on_hold or cancelled
+        if (in_array(strtolower($this->status), ['on_hold', 'cancelled'])) {
+            return;
+        }
+
+        $progress = $this->progress_percentage;
+        $projectMC = MasterCategory::where('name', 'Project')->first();
+        $statuses = $projectMC ? Status::where('master_category_id', $projectMC->id)->pluck('id', 'name') : collect();
+
+        if ($progress >= 100) {
+            $newStatus = 'completed';
+            $newStatusId = $statuses['Completed'] ?? ($statuses['Done'] ?? null);
+        } elseif ($progress > 0) {
+            $newStatus = 'in_progress';
+            $newStatusId = $statuses['In Progress'] ?? null;
+        } else {
+            $newStatus = 'planning';
+            $newStatusId = $statuses['Planning'] ?? null;
+        }
+
+        $this->update([
+            'status' => $newStatus,
+            'status_id' => $newStatusId ?? $this->status_id,
+        ]);
+    }
 }

@@ -153,6 +153,7 @@ class ProjectController extends Controller
         }
 
         $project->tasks()->create($data);
+        $project->syncAutoStatus();
 
         return redirect()->back()->with('success', 'Task added to project.');
     }
@@ -186,10 +187,17 @@ class ProjectController extends Controller
 
         $task->save();
 
+        $project = $task->project;
+        $project->syncAutoStatus();
+
         if ($request->wantsJson()) {
+            $stRel = $project->statusRel;
+
             return response()->json([
                 'success' => true,
-                'progress' => $task->project->progress_percentage,
+                'progress' => $project->progress_percentage,
+                'status_name' => $stRel ? $stRel->name : ucfirst(str_replace('_', ' ', $project->status)),
+                'status_color' => $stRel ? $stRel->color : 'info',
             ]);
         }
 
@@ -198,7 +206,9 @@ class ProjectController extends Controller
 
     public function destroyTask(ProjectTask $task): RedirectResponse
     {
+        $project = $task->project;
         $task->delete();
+        $project->syncAutoStatus();
 
         return redirect()->back()->with('success', 'Task deleted.');
     }
