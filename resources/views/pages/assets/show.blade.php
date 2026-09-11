@@ -389,6 +389,80 @@
 
                         <!-- History Tab -->
                         <div x-show="activeTab === 'history'" class="space-y-4" x-transition>
+                            @php
+                                $totalMinutes = 0;
+                                $userDurations = [];
+                                foreach ($asset->checkoutHistory as $h) {
+                                    $start = $h->checked_out_at;
+                                    $end = $h->checked_in_at ?? now();
+                                    if ($start) {
+                                        $diff = $start->diffInMinutes($end);
+                                        $totalMinutes += $diff;
+                                        $uName = $h->checkedOutToUser?->name ?? 'Unknown';
+                                        $userDurations[$uName] = ($userDurations[$uName] ?? 0) + $diff;
+                                    }
+                                }
+                                arsort($userDurations);
+                                $topUser = !empty($userDurations) ? key($userDurations) : null;
+                                $topMinutes = !empty($userDurations) ? current($userDurations) : 0;
+
+                                // Format Total Duration
+                                $totalDays = (int) floor($totalMinutes / 1440);
+                                $totalMonths = (int) floor($totalDays / 30);
+                                $remainingDays = $totalDays % 30;
+
+                                if ($totalMonths >= 12) {
+                                    $totalY = (int) floor($totalMonths / 12);
+                                    $totalM = $totalMonths % 12;
+                                    $totalDisplay = $totalY . 'y ' . ($totalM > 0 ? $totalM . 'm' : '');
+                                } elseif ($totalMonths >= 1) {
+                                    $totalDisplay = $totalMonths . 'm ' . ($remainingDays > 0 ? $remainingDays . 'd' : '');
+                                } else {
+                                    $totalDisplay = $totalDays > 0 ? $totalDays . ' days' : '< 1 day';
+                                }
+
+                                // Format Top User Duration
+                                $topDays = (int) floor($topMinutes / 1440);
+                                $topMonths = (int) floor($topDays / 30);
+                                if ($topMonths >= 1) {
+                                    $topDisplay = $topMonths . ' ' . Str::plural('month', $topMonths);
+                                } else {
+                                    $topDisplay = $topDays > 0 ? $topDays . ' ' . Str::plural('day', $topDays) : '< 1 day';
+                                }
+                            @endphp
+
+                            @if($asset->checkoutHistory->count() > 0)
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-950">
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                            <i data-lucide="clock" class="h-4 w-4"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-medium uppercase text-gray-400">Total Utilization Time</p>
+                                            <p class="text-xs font-bold text-gray-900 dark:text-white">
+                                                {{ $totalDisplay }}
+                                                <span class="text-[11px] font-normal text-gray-500">({{ $asset->checkoutHistory->count() }} {{ Str::plural('assignment', $asset->checkoutHistory->count()) }})</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-950">
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                            <i data-lucide="award" class="h-4 w-4"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-medium uppercase text-gray-400">Top Holder</p>
+                                            <p class="text-xs font-bold text-gray-900 dark:text-white">
+                                                {{ $topUser ?? '-' }}
+                                                @if($topUser)
+                                                    <span class="text-[11px] font-normal text-gray-500">({{ $topDisplay }} total)</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs">
                                     <thead class="border-b border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-950">
