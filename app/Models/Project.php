@@ -48,18 +48,26 @@ class Project extends Model
 
     public function getProgressPercentageAttribute(): int
     {
-        $total = $this->tasks()->count();
+        $tasks = $this->tasks()->with('statusRel')->get();
+        $total = $tasks->count();
         if ($total === 0) {
             return 0;
         }
 
-        $doneCount = $this->tasks()->where(function ($q) {
-            $q->where('status', 'done')
-                ->orWhereHas('statusRel', function ($sq) {
-                    $sq->where('name', 'Done');
-                });
-        })->count();
+        $totalScore = 0;
+        foreach ($tasks as $t) {
+            $stName = strtolower($t->statusRel?->name ?? $t->status ?? '');
+            if (str_contains($stName, 'done') || str_contains($stName, 'completed')) {
+                $totalScore += 100;
+            } elseif (str_contains($stName, 'review')) {
+                $totalScore += 80;
+            } elseif (str_contains($stName, 'progress') || str_contains($stName, 'doing')) {
+                $totalScore += 50;
+            } else {
+                $totalScore += 0; // To Do / Backlog
+            }
+        }
 
-        return (int) round(($doneCount / $total) * 100);
+        return (int) round($totalScore / $total);
     }
 }
