@@ -141,20 +141,52 @@
                                     {{ Str::limit($kit->description, 80) }}
                                 </td>
                                 <td class="px-4 py-2.5 text-end">
-                                    <div class="flex items-center justify-end gap-2 text-gray-500">
-                                        <a href="{{ route('kits.show', $kit) }}" class="hover:text-brand-600 transition" title="View">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </a>
-                                        <a href="{{ route('kits.edit', $kit) }}" class="hover:text-brand-600 transition" title="Edit">
-                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                        </a>
-                                        <form action="{{ route('kits.destroy', $kit) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="inline-flex">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="hover:text-red-600 transition" title="Delete">
-                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                            </button>
-                                        </form>
+                                    <div x-data="{
+                                        open: false,
+                                        dropdownStyle: '',
+                                        toggle(e) {
+                                            this.open = !this.open;
+                                            if (this.open) {
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                const menuHeight = 120;
+                                                const spaceBelow = window.innerHeight - rect.bottom;
+                                                const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
+                                                const left = Math.max(10, rect.right - 144);
+                                                this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999;`;
+                                            }
+                                        }
+                                    }" @click.away="open = false" @scroll.window="open = false" class="inline-block text-left">
+                                        <button type="button" @click="toggle($event)" class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
+                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                        </button>
+
+                                        <div x-show="open"
+                                            x-transition
+                                            :style="dropdownStyle"
+                                            class="w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+                                            style="display: none;">
+                                            
+                                            <a href="{{ route('kits.show', $kit) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-lucide="eye" class="w-3.5 h-3.5 text-gray-400"></i>
+                                                View Details
+                                            </a>
+
+                                            <a href="{{ route('kits.edit', $kit) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
+                                                Edit
+                                            </a>
+
+                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                            <form action="{{ route('kits.destroy', $kit) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
+                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
