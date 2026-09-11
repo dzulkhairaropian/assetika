@@ -46,17 +46,18 @@
             </div>
         </div>
 
-        <!-- Standard Table View (Matching Asset Index Specs) -->
+        <!-- Standard Table View (Matching Asset Index & AdminLTE Projects Specs) -->
         <div class="max-w-full overflow-x-auto xl:overflow-visible">
             <table class="min-w-full text-xs">
                 <thead>
                     <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Code</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Project Name</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Owner</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Project</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Progress</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Team</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Budget</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Due Date</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
                         <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                     </tr>
                 </thead>
@@ -64,26 +65,14 @@
                     @forelse($projects as $project)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
                             <td class="px-4 py-2.5">
-                                <span class="font-mono text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2 py-0.5 rounded">{{ $project->code }}</span>
-                            </td>
-                            <td class="px-4 py-2.5">
-                                <a href="{{ route('projects.show', $project) }}" class="font-medium text-gray-900 dark:text-white hover:text-brand-600 transition">
-                                    {{ $project->name }}
-                                </a>
-                                @if($project->description)
-                                    <p class="text-[11px] text-gray-400 dark:text-gray-500 line-clamp-1 max-w-md">{{ $project->description }}</p>
-                                @endif
-                            </td>
-                            <td class="px-4 py-2.5">
                                 <div class="flex flex-col">
-                                    <span class="font-medium text-gray-800 dark:text-gray-200">
-                                        {{ $project->owner?->name ?: '-' }}
-                                    </span>
-                                    @if($project->owner && $project->owner->department)
-                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
-                                            {{ $project->owner->department->name }}
-                                        </span>
-                                    @endif
+                                    <a href="{{ route('projects.show', $project) }}" class="font-semibold text-gray-900 hover:text-brand-600 dark:text-white transition">
+                                        {{ $project->name }}
+                                    </a>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="font-mono text-[10px] font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-1.5 py-0.2 rounded">{{ $project->code }}</span>
+                                        <span class="text-[11px] text-gray-400 dark:text-gray-500">• {{ $project->owner?->name ?? 'Unassigned' }}</span>
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-4 py-2.5">
@@ -97,16 +86,47 @@
                                     {{ $stName }}
                                 </x-ui.badge>
                             </td>
+                            <td class="px-4 py-2.5 w-44">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1 bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-brand-500 h-1.5 rounded-full transition-all duration-300" style="width: {{ $project->progress_percentage }}%"></div>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-gray-700 dark:text-gray-300 w-9 text-end">{{ $project->progress_percentage }}%</span>
+                                </div>
+                            </td>
                             <td class="px-4 py-2.5">
                                 @php
-                                    $prColor = match($project->priority) {
+                                    $teamMembers = $project->tasks->pluck('assignedTo')->filter()->unique('id')->take(4);
+                                @endphp
+                                <div class="flex items-center -space-x-1.5">
+                                    @forelse($teamMembers as $member)
+                                        @php
+                                            $initials = strtoupper(substr($member->name, 0, 2));
+                                        @endphp
+                                        <span title="{{ $member->name }}" class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 ring-2 ring-white dark:bg-brand-500/20 dark:text-brand-300 dark:ring-gray-900">
+                                            {{ $initials }}
+                                        </span>
+                                    @empty
+                                        <span class="text-[11px] text-gray-400 italic">No team</span>
+                                    @endforelse
+                                </div>
+                            </td>
+                            <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                {{ $project->budget ? 'Rp ' . number_format($project->budget, 0, ',', '.') : '-' }}
+                            </td>
+                            <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                {{ $project->due_date ? $project->due_date->format('d M Y') : '-' }}
+                            </td>
+                            <td class="px-4 py-2.5">
+                                @php
+                                    $prColor = match(strtolower($project->priority)) {
                                         'low' => 'info',
                                         'medium' => 'warning',
-                                        'high' => 'error',
-                                        'urgent' => 'error',
+                                        'high' => 'danger',
+                                        'urgent' => 'danger',
                                         default => 'secondary'
                                     };
-                                    $prIcon = match($project->priority) {
+                                    $prIcon = match(strtolower($project->priority)) {
                                         'urgent' => 'alert-triangle',
                                         default => 'flag'
                                     };
@@ -114,17 +134,6 @@
                                 <x-ui.badge :color="$prColor" variant="light" size="sm" :featherIcon="$prIcon">
                                     {{ ucfirst($project->priority ?: 'medium') }}
                                 </x-ui.badge>
-                            </td>
-                            <td class="px-4 py-2.5 w-48">
-                                <div class="space-y-1">
-                                    <div class="flex justify-between text-[11px] font-medium">
-                                        <span class="text-gray-500 dark:text-gray-400">{{ $project->tasks->count() }} Tasks</span>
-                                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ $project->progress_percentage }}%</span>
-                                    </div>
-                                    <div class="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                                        <div class="bg-brand-500 h-1.5 rounded-full transition-all duration-300" style="width: {{ $project->progress_percentage }}%"></div>
-                                    </div>
-                                </div>
                             </td>
                             <td class="px-4 py-2.5 text-end">
                                 <div x-data="{
@@ -173,7 +182,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-8 text-center">
+                            <td colspan="8" class="px-4 py-8 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-1.5">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                         <i data-lucide="inbox" class="w-5 h-5"></i>

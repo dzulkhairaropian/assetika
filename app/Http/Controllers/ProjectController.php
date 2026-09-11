@@ -17,7 +17,7 @@ class ProjectController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Project::with(['owner.department', 'statusRel', 'tasks.statusRel']);
+        $query = Project::with(['owner.department', 'statusRel', 'tasks.statusRel', 'tasks.assignedTo']);
 
         if ($search = $request->string('search')->trim()->toString()) {
             $query->where(function ($q) use ($search) {
