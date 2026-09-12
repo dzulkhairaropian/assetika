@@ -50,6 +50,14 @@
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Model Number / Spec
+                                </label>
+                                <input type="text" name="model_number" value="{{ old('model_number', $component->model_number) }}" placeholder="e.g. Latitude 3410 Battery"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Serial Number / Batch No.
                                 </label>
                                 <input type="text" name="serial" value="{{ old('serial', $component->serial) }}" placeholder="Serial / Batch number"
@@ -86,6 +94,14 @@
                                     Purchase Date
                                 </label>
                                 <input type="date" name="purchase_date" value="{{ old('purchase_date', optional($component->purchase_date)->format('Y-m-d')) }}"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Release Date (Pemasangan)
+                                </label>
+                                <input type="date" name="release_date" value="{{ old('release_date', optional($component->release_date)->format('Y-m-d')) }}"
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                             </div>
 

@@ -85,11 +85,13 @@ class ComponentController extends Controller
         $validated = $request->validate([
             'component_tag' => 'nullable|string|max:255|unique:components,component_tag',
             'product_id' => 'required|exists:products,id',
+            'model_number' => 'nullable|string|max:255',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
             'min_qty' => 'nullable|integer|min:0',
             'purchase_cost' => 'nullable|numeric|min:0',
             'purchase_date' => 'nullable|date',
+            'release_date' => 'nullable|date',
             'warranty_months' => 'nullable|integer|min:0',
             'vendor_id' => 'nullable|exists:vendors,id',
             'location_id' => 'nullable|exists:locations,id',
@@ -100,7 +102,9 @@ class ComponentController extends Controller
         $validated['name'] = $product->name;
         $validated['category_id'] = $product->category_id;
         $validated['manufacturer'] = $product->brand?->name;
-        $validated['model_number'] = $product->product_type ?? $product->name;
+        if (empty($validated['model_number'])) {
+            $validated['model_number'] = $product->product_type ?? $product->name;
+        }
 
         Component::create($validated);
 
@@ -150,11 +154,13 @@ class ComponentController extends Controller
         $validated = $request->validate([
             'component_tag' => 'nullable|string|max:255|unique:components,component_tag,'.$component->id,
             'product_id' => 'required|exists:products,id',
+            'model_number' => 'nullable|string|max:255',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
             'min_qty' => 'nullable|integer|min:0',
             'purchase_cost' => 'nullable|numeric|min:0',
             'purchase_date' => 'nullable|date',
+            'release_date' => 'nullable|date',
             'warranty_months' => 'nullable|integer|min:0',
             'vendor_id' => 'nullable|exists:vendors,id',
             'location_id' => 'nullable|exists:locations,id',
@@ -165,7 +171,9 @@ class ComponentController extends Controller
         $validated['name'] = $product->name;
         $validated['category_id'] = $product->category_id;
         $validated['manufacturer'] = $product->brand?->name;
-        $validated['model_number'] = $product->product_type ?? $product->name;
+        if (empty($validated['model_number'])) {
+            $validated['model_number'] = $product->product_type ?? $product->name;
+        }
 
         $component->update($validated);
 

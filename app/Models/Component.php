@@ -20,6 +20,7 @@ class Component extends Model
         'min_qty',
         'purchase_cost',
         'purchase_date',
+        'release_date',
         'warranty_months',
         'vendor_id',
         'location_id',
@@ -44,6 +45,7 @@ class Component extends Model
         'min_qty' => 'integer',
         'purchase_cost' => 'decimal:2',
         'purchase_date' => 'date',
+        'release_date' => 'date',
         'warranty_months' => 'integer',
     ];
 
