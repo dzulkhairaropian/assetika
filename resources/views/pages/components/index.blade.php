@@ -123,10 +123,10 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Name</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Tag / Name</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Model / Serial</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Qty / Available</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assigned To Asset</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Qty / Avail</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Location</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
@@ -152,22 +152,31 @@
                                     </label>
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    <a href="{{ route('components.show', $component) }}" class="block font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                                    <span class="block font-mono text-[11px] font-bold text-gray-900 dark:text-white">{{ $component->component_tag ?? '-' }}</span>
+                                    <a href="{{ route('components.show', $component) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
                                         {{ $component->name }}
                                     </a>
-                                    @if($component->product)
-                                        <span class="inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                                            <i data-lucide="package" class="w-3 h-3 text-gray-400"></i>
-                                            {{ $component->product->name }}
-                                        </span>
-                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300">
                                     {{ $component->category?->name ?? '-' }}
+                                    @if($component->manufacturer)
+                                        <span class="block text-[11px] text-gray-400">{{ $component->manufacturer }}</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    <span class="block font-medium text-gray-800 dark:text-gray-200">{{ $component->model_number ?? '-' }}</span>
-                                    <span class="text-[11px] text-gray-400 font-mono">{{ $component->serial ?? '' }}</span>
+                                    @if($component->assets->isNotEmpty())
+                                        <div class="flex flex-wrap gap-1 max-w-xs">
+                                            @foreach($component->assets as $assignedAsset)
+                                                <a href="{{ route('assets.show', $assignedAsset) }}" class="inline-flex items-center gap-1 rounded border border-brand-200 bg-brand-50/80 px-1.5 py-0.5 text-[11px] font-medium text-brand-700 hover:bg-brand-100 dark:border-brand-900/40 dark:bg-brand-500/10 dark:text-brand-300 transition">
+                                                    <i data-lucide="laptop" class="w-3 h-3"></i>
+                                                    {{ $assignedAsset->asset_tag ?? $assignedAsset->name }}
+                                                    <span class="font-bold">({{ $assignedAsset->pivot->qty }}x)</span>
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 text-[11px] italic">In Stock (Unassigned)</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5">
                                     <div class="flex items-center gap-1.5">

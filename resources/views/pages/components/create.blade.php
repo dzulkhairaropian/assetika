@@ -41,6 +41,15 @@
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Component Tag
+                                </label>
+                                <input type="text" name="component_tag" value="{{ old('component_tag') }}" placeholder="Auto-generated if empty (e.g. CMP/BATT/260912/001)"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white font-mono" />
+                                @error('component_tag') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Serial Number / Batch No.
                                 </label>
                                 <input type="text" name="serial" value="{{ old('serial') }}" placeholder="e.g. SN-BAT-3410-001"

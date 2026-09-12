@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Component extends Model
 {
     protected $fillable = [
+        'component_tag',
         'name',
         'product_id',
         'category_id',
@@ -25,6 +26,18 @@ class Component extends Model
         'notes',
         'image',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($component) {
+            if (empty($component->component_tag)) {
+                $categoryCode = strtoupper(substr($component->category?->code ?? $component->category?->name ?? 'CMP', 0, 4));
+                $dateCode = now()->format('ymd');
+                $count = static::query()->whereDate('created_at', now()->toDateString())->count() + 1;
+                $component->component_tag = sprintf('CMP/%s/%s/%s', $categoryCode, $dateCode, str_pad((string) $count, 3, '0', STR_PAD_LEFT));
+            }
+        });
+    }
 
     protected $casts = [
         'qty' => 'integer',

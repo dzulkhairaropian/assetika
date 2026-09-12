@@ -25,6 +25,10 @@
 
                 <dl class="space-y-2.5">
                     <div>
+                        <dt class="text-[11px] font-medium text-gray-400">Component Tag</dt>
+                        <dd class="text-xs font-mono font-bold text-gray-900 dark:text-white">{{ $component->component_tag ?? '-' }}</dd>
+                    </div>
+                    <div>
                         <dt class="text-[11px] font-medium text-gray-400">Name</dt>
                         <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $component->name }}</dd>
                     </div>
@@ -124,7 +128,7 @@
                         <span class="text-[11px] text-gray-400">Generates auto-ticket for maintenance</span>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
                         <div class="sm:col-span-2">
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
                             <x-form.searchable-select
@@ -136,6 +140,11 @@
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Quantity <span class="text-red-500">*</span></label>
                             <input type="number" name="qty" value="1" min="1" max="{{ $available }}" required
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Release / Installation Date</label>
+                            <input type="date" name="release_date" value="{{ date('Y-m-d') }}"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
                         </div>
                     </div>
@@ -171,7 +180,14 @@
                                 @foreach($checkouts as $checkout)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
                                         <td class="px-3 py-2">
-                                            <a href="{{ route('assets.show', $checkout) }}" class="font-medium text-brand-600 hover:underline dark:text-brand-400">{{ $checkout->name }}</a>
+                                            <a href="{{ route('assets.show', $checkout) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 flex items-center gap-1.5">
+                                                <i data-lucide="laptop" class="w-3.5 h-3.5 text-brand-500"></i>
+                                                {{ $checkout->name }}
+                                                <span class="font-mono text-[11px] text-gray-400">({{ $checkout->asset_tag }})</span>
+                                            </a>
+                                            @if($checkout->assignedToUser)
+                                                <span class="block text-[11px] text-gray-500">User: {{ $checkout->assignedToUser->name }}</span>
+                                            @endif
                                         </td>
                                         <td class="px-3 py-2 font-semibold text-gray-900 dark:text-white">{{ $checkout->pivot->qty }}</td>
                                         <td class="px-3 py-2 text-gray-500">{{ $checkout->pivot->checked_out_at ? \Carbon\Carbon::parse($checkout->pivot->checked_out_at)->format('d M Y') : '-' }}</td>

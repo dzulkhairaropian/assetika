@@ -18,22 +18,25 @@ use App\Models\TicketStatus;
 use App\Models\TicketSubcategory;
 use App\Models\TicketType;
 use App\Models\Vendor;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ComponentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor']);
+        $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assets.assignedToUser']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
+                    ->orWhere('component_tag', 'like', "%$search%")
                     ->orWhere('serial', 'like', "%$search%")
                     ->orWhere('model_number', 'like', "%$search%")
                     ->orWhereHas('product', fn ($p) => $p->where('name', 'like', "%$search%"))
-                    ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%$search%"));
+                    ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%$search%"))
+                    ->orWhereHas('assets', fn ($a) => $a->where('asset_tag', 'like', "%$search%")->orWhere('name', 'like', "%$search%"));
             });
         }
 
@@ -80,6 +83,7 @@ class ComponentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'component_tag' => 'nullable|string|max:255|unique:components,component_tag',
             'product_id' => 'required|exists:products,id',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
@@ -144,6 +148,7 @@ class ComponentController extends Controller
     public function update(Request $request, Component $component)
     {
         $validated = $request->validate([
+            'component_tag' => 'nullable|string|max:255|unique:components,component_tag,'.$component->id,
             'product_id' => 'required|exists:products,id',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
@@ -191,6 +196,7 @@ class ComponentController extends Controller
         $request->validate([
             'asset_id' => 'required|exists:assets,id',
             'qty' => 'required|integer|min:1',
+            'release_date' => 'nullable|date',
             'notes' => 'nullable|string',
         ]);
 
@@ -200,17 +206,18 @@ class ComponentController extends Controller
         }
 
         $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($request->asset_id);
+        $checkoutDate = $request->filled('release_date') ? Carbon::parse($request->release_date) : now();
 
         $existing = $component->assets()->where('asset_id', $asset->id)->first();
         if ($existing) {
             $component->assets()->updateExistingPivot($asset->id, [
                 'qty' => $existing->pivot->qty + $request->qty,
-                'checked_out_at' => now(),
+                'checked_out_at' => $checkoutDate,
             ]);
         } else {
             $component->assets()->attach($asset->id, [
                 'qty' => $request->qty,
-                'checked_out_at' => now(),
+                'checked_out_at' => $checkoutDate,
             ]);
         }
 
@@ -220,7 +227,8 @@ class ComponentController extends Controller
             $component,
             $request->qty,
             'installed',
-            $request->notes
+            $request->notes,
+            $checkoutDate
         );
 
         return back()->with('success', "{$request->qty}x {$component->name} checked out & installed to {$asset->name} ({$asset->asset_tag}). Maintenance ticket generated.");
@@ -259,9 +267,9 @@ class ComponentController extends Controller
         return back()->with('success', "{$request->qty}x {$component->name} checked in & removed from {$asset->name} ({$asset->asset_tag}). Maintenance ticket generated.");
     }
 
-    private function createAutomaticTicketForComponent(Asset $asset, Component $component, int $qty, string $action, ?string $notes = null): void
+    private function createAutomaticTicketForComponent(Asset $asset, Component $component, int $qty, string $action, ?string $notes = null, ?Carbon $customDate = null): void
     {
-        $ticketDate = now();
+        $ticketDate = $customDate ?? now();
         $prefix = 'TCK-'.date('Ym').'-';
         $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderBy('id', 'desc')
