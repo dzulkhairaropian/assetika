@@ -11,6 +11,7 @@ use App\Models\Priority;
 use App\Models\Product;
 use App\Models\SlaStatus;
 use App\Models\Source;
+use App\Models\Status;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\TicketStatus;
@@ -24,7 +25,7 @@ class ComponentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser']);
+        $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser', 'status']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -47,20 +48,25 @@ class ComponentController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($request->filled('status_id')) {
+            $query->where('status_id', $request->status_id);
         }
 
         $components = $query->latest()->paginate(50)->withQueryString();
 
-        $products = Product::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Component'))
+        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
+
+        $products = Product::where('master_category_id', $componentMasterCat?->id)
             ->orderBy('name')
             ->get();
-        $categories = Category::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Component'))
+        $categories = Category::where('master_category_id', $componentMasterCat?->id)
+            ->orderBy('name')
+            ->get();
+        $statuses = Status::where('master_category_id', $componentMasterCat?->id)
             ->orderBy('name')
             ->get();
 
-        return view('pages.components.index', compact('components', 'products', 'categories'));
+        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses'));
     }
 
     public function create()
@@ -77,13 +83,17 @@ class ComponentController extends Controller
             'text' => $p->name.($p->brand ? ' ('.$p->brand->name.')' : '').($p->category ? ' - '.$p->category->name : ''),
         ])->values()->all();
 
+        $statuses = Status::where('master_category_id', $componentMasterCat?->id)->orderBy('name')->get();
+        $statusOpts = $statuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
+        $readyStatus = $statuses->firstWhere('name', 'Ready') ?? $statuses->first();
+
         $locations = Location::orderBy('name')->get();
         $locationOpts = $locations->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->values()->all();
 
         $vendors = Vendor::orderBy('name')->get();
         $vendorOpts = $vendors->map(fn ($v) => ['id' => $v->id, 'text' => $v->name])->values()->all();
 
-        return view('pages.components.create', compact('productOpts', 'locationOpts', 'vendorOpts'));
+        return view('pages.components.create', compact('productOpts', 'statusOpts', 'readyStatus', 'locationOpts', 'vendorOpts'));
     }
 
     public function store(Request $request)
@@ -91,6 +101,7 @@ class ComponentController extends Controller
         $validated = $request->validate([
             'component_tag' => 'nullable|string|max:255|unique:components,component_tag',
             'product_id' => 'required|exists:products,id',
+            'status_id' => 'nullable|exists:statuses,id',
             'model_number' => 'nullable|string|max:255',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:1',
@@ -103,6 +114,15 @@ class ComponentController extends Controller
             'location_id' => 'nullable|exists:locations,id',
             'notes' => 'nullable|string',
         ]);
+
+        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
+        if (empty($validated['status_id'])) {
+            $defaultStatus = Status::where('master_category_id', $componentMasterCat?->id)->where('name', 'Ready')->first() ?? Status::where('master_category_id', $componentMasterCat?->id)->first();
+            $validated['status_id'] = $defaultStatus?->id;
+        }
+
+        $statusModel = Status::find($validated['status_id']);
+        $validated['status'] = $statusModel?->name ?? 'Ready';
 
         $product = Product::with(['brand', 'category'])->findOrFail($validated['product_id']);
         $validated['name'] = $product->name;
@@ -120,7 +140,6 @@ class ComponentController extends Controller
             $unitData = $validated;
             $unitData['qty'] = 1;
             $unitData['purchase_cost'] = $singleCost;
-            $unitData['status'] = 'Ready';
             if ($i > 0) {
                 // Let booted hook generate unique component_tag per item
                 unset($unitData['component_tag']);
@@ -177,13 +196,16 @@ class ComponentController extends Controller
             'text' => $p->name.($p->brand ? ' ('.$p->brand->name.')' : '').($p->category ? ' - '.$p->category->name : ''),
         ])->values()->all();
 
+        $statuses = Status::where('master_category_id', $componentMasterCat?->id)->orderBy('name')->get();
+        $statusOpts = $statuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
+
         $locations = Location::orderBy('name')->get();
         $locationOpts = $locations->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->values()->all();
 
         $vendors = Vendor::orderBy('name')->get();
         $vendorOpts = $vendors->map(fn ($v) => ['id' => $v->id, 'text' => $v->name])->values()->all();
 
-        return view('pages.components.edit', compact('component', 'productOpts', 'locationOpts', 'vendorOpts'));
+        return view('pages.components.edit', compact('component', 'productOpts', 'statusOpts', 'locationOpts', 'vendorOpts'));
     }
 
     public function update(Request $request, Component $component)
@@ -191,6 +213,7 @@ class ComponentController extends Controller
         $validated = $request->validate([
             'component_tag' => 'nullable|string|max:255|unique:components,component_tag,'.$component->id,
             'product_id' => 'required|exists:products,id',
+            'status_id' => 'nullable|exists:statuses,id',
             'model_number' => 'nullable|string|max:255',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
@@ -203,6 +226,11 @@ class ComponentController extends Controller
             'location_id' => 'nullable|exists:locations,id',
             'notes' => 'nullable|string',
         ]);
+
+        if (! empty($validated['status_id'])) {
+            $statusModel = Status::find($validated['status_id']);
+            $validated['status'] = $statusModel?->name ?? 'Ready';
+        }
 
         $product = Product::with(['brand', 'category'])->findOrFail($validated['product_id']);
         $validated['name'] = $product->name;
@@ -251,8 +279,12 @@ class ComponentController extends Controller
         $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($request->asset_id);
         $checkoutDate = $request->filled('release_date') ? Carbon::parse($request->release_date) : now();
 
+        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
+        $installedStatus = Status::where('master_category_id', $componentMasterCat?->id)->where('name', 'Installed')->first();
+
         $component->update([
             'assigned_asset_id' => $asset->id,
+            'status_id' => $installedStatus?->id ?? $component->status_id,
             'status' => 'Installed',
             'release_date' => $checkoutDate,
         ]);
@@ -284,8 +316,12 @@ class ComponentController extends Controller
 
         $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($component->assigned_asset_id);
 
+        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
+        $readyStatus = Status::where('master_category_id', $componentMasterCat?->id)->where('name', 'Ready')->first();
+
         $component->update([
             'assigned_asset_id' => null,
+            'status_id' => $readyStatus?->id ?? $component->status_id,
             'status' => 'Ready',
         ]);
 

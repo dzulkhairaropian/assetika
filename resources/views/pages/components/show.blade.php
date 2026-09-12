@@ -33,23 +33,15 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 class="text-xl font-bold font-mono text-gray-900 dark:text-white">{{ $component->component_tag ?? $component->name }}</h2>
-                            @if($component->status === 'Installed')
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Installed
-                                </span>
-                            @elseif($component->status === 'Maintenance')
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Maintenance
-                                </span>
-                            @elseif($component->status === 'Retired')
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Retired
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Ready (In Stock)
-                                </span>
-                            @endif
+                            @php
+                                $statusObj = $component->status;
+                                $color = $statusObj->color ?? 'primary';
+                                $icon = $statusObj->icon ?? null;
+                                $name = $statusObj->name ?? $component->status ?? 'Ready';
+                            @endphp
+                            <x-ui.badge :color="$color" size="sm" :featherIcon="$icon">
+                                {{ $name }}
+                            </x-ui.badge>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $component->name }} • {{ $component->manufacturer ?? 'Dell' }} {{ $component->model_number ?? '' }} • S/N: {{ $component->serial ?? '-' }}</p>
                     </div>

@@ -14,6 +14,7 @@ class Component extends Model
         'name',
         'product_id',
         'assigned_asset_id',
+        'status_id',
         'status',
         'category_id',
         'manufacturer',
@@ -71,6 +72,11 @@ class Component extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(Status::class);
     }
 
     public function assignedAsset(): BelongsTo

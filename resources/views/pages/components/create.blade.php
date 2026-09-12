@@ -3,6 +3,7 @@
 @section('content')
     @php
         $selectedProductId = old('product_id');
+        $selectedStatusId = old('status_id', $readyStatus?->id);
         $selectedVendorId = old('vendor_id');
         $selectedLocationId = old('location_id');
     @endphp
@@ -30,44 +31,48 @@
                         </h3>
 
                         <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
-                            <div class="lg:col-span-2">
+                            <div>
                                 <x-form.searchable-select name="product_id" label="Product Model" :options="$productOpts" :selected="$selectedProductId" placeholder="Select Product" required="true" />
                                 @error('product_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                                <p class="mt-1 text-[11px] text-gray-400">Select a product model from catalog. Name, category, and brand will be automatically linked.</p>
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <x-form.searchable-select name="status_id" label="Status" :options="$statusOpts" :selected="$selectedStatusId" placeholder="Select Status" required="true" />
+                                @error('status_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Component Tag
                                 </label>
-                                <input type="text" name="component_tag" value="{{ old('component_tag') }}" placeholder="Auto-generated if empty (e.g. CMP/BATT/260912/001)"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white font-mono" />
-                                @error('component_tag') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                                <input type="text" name="component_tag" value="{{ old('component_tag') }}" placeholder="Auto-generated (e.g. DB/BATT/260912/001)"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 font-mono" />
+                                @error('component_tag') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Model Number / Spec
                                 </label>
                                 <input type="text" name="model_number" value="{{ old('model_number') }}" placeholder="e.g. Latitude 3410 Battery"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Serial Number / Batch No.
                                 </label>
                                 <input type="text" name="serial" value="{{ old('serial') }}" placeholder="e.g. SN-BAT-3410-001"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Total Qty <span class="text-red-500">*</span>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                    Quantity Purchased <span class="text-error-500">*</span>
                                 </label>
-                                <input type="number" name="qty" value="{{ old('qty', 1) }}" min="0" required
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
-                                @error('qty') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                                <input type="number" name="qty" value="{{ old('qty', 1) }}" min="1" required
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
+                                @error('qty') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>

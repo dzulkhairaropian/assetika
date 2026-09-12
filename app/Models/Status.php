@@ -31,6 +31,11 @@ class Status extends Model
         return $this->hasMany(Asset::class);
     }
 
+    public function components()
+    {
+        return $this->hasMany(Component::class);
+    }
+
     public function consumables()
     {
         return $this->hasMany(Consumable::class);

@@ -89,15 +89,14 @@
 	                            @endforeach
 	                        </select>
 
-	                        <select name="status" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-	                            <option value="">All Statuses</option>
-	                            <option value="Ready" {{ request('status') == 'Ready' ? 'selected' : '' }}>Ready (In Stock)</option>
-	                            <option value="Installed" {{ request('status') == 'Installed' ? 'selected' : '' }}>Installed</option>
-	                            <option value="Maintenance" {{ request('status') == 'Maintenance' ? 'selected' : '' }}>Maintenance</option>
-	                            <option value="Retired" {{ request('status') == 'Retired' ? 'selected' : '' }}>Retired</option>
-	                        </select>
+		                        <select name="status_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+		                            <option value="">All Statuses</option>
+		                            @foreach($statuses as $st)
+		                                <option value="{{ $st->id }}" {{ request('status_id') == $st->id ? 'selected' : '' }}>{{ $st->name }}</option>
+		                            @endforeach
+		                        </select>
 
-	                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id') || request()->filled('status'))
+		                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id') || request()->filled('status_id'))
 	                            <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Reset</a>
 	                        @endif
 	                    </form>
@@ -172,23 +171,15 @@
                                     <span class="block text-[11px] text-gray-400">{{ $component->model_number ?? $component->manufacturer }}</span>
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    @if($component->status === 'Installed')
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                                            Installed
-                                        </span>
-                                    @elseif($component->status === 'Maintenance')
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                                            Maintenance
-                                        </span>
-                                    @elseif($component->status === 'Retired')
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                                            Retired
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
-                                            Ready (In Stock)
-                                        </span>
-                                    @endif
+                                    @php
+                                        $statusObj = $component->status;
+                                        $color = $statusObj->color ?? 'primary';
+                                        $icon = $statusObj->icon ?? null;
+                                        $name = $statusObj->name ?? $component->status ?? 'Ready';
+                                    @endphp
+                                    <x-ui.badge :color="$color" size="xs" :featherIcon="$icon">
+                                        {{ $name }}
+                                    </x-ui.badge>
                                 </td>
                                 <td class="px-4 py-2.5">
                                     @if($component->assignedAsset)
