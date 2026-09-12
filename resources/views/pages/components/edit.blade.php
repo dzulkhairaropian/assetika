@@ -31,7 +31,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="product_id"
-                                    :options="$products->map(fn($p) => ['value' => $p->id, 'label' => $p->name . ($p->brand ? ' ('.$p->brand->name.')' : '')])->toArray()"
+                                    :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name . ($p->brand ? ' ('.$p->brand->name.')' : '')])->toArray()"
                                     :selected="old('product_id', $component->product_id)"
                                     placeholder="Select or search Master Product..."
                                 />
@@ -41,7 +41,7 @@
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Component Name <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="name" value="{{ old('name', $component->name) }}" placeholder="e.g., Baterai Latitude 3410" required
+                                <input type="text" name="name" value="{{ old('name', $component->name) }}" placeholder="e.g., Battery Lattitude 3410" required
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                 @error('name') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                             </div>
@@ -52,7 +52,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="category_id"
-                                    :options="$categories->map(fn($c) => ['value' => $c->id, 'label' => $c->name])->toArray()"
+                                    :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()"
                                     :selected="old('category_id', $component->category_id)"
                                     placeholder="Select Category..."
                                 />
@@ -64,7 +64,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="manufacturer"
-                                    :options="$brands->map(fn($b) => ['value' => $b->name, 'label' => $b->name])->toArray()"
+                                    :options="$brands->map(fn($b) => ['id' => $b->name, 'text' => $b->name])->toArray()"
                                     :selected="old('manufacturer', $component->manufacturer)"
                                     placeholder="Select Brand..."
                                 />
@@ -74,7 +74,7 @@
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Model Number
                                 </label>
-                                <input type="text" name="model_number" value="{{ old('model_number', $component->model_number) }}" placeholder="e.g., CMK16GX4M2B3200C16"
+                                <input type="text" name="model_number" value="{{ old('model_number', $component->model_number) }}" placeholder="e.g., Latitude 3410"
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                             </div>
 
@@ -133,7 +133,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="vendor_id"
-                                    :options="$vendors->map(fn($v) => ['value' => $v->id, 'label' => $v->name])->toArray()"
+                                    :options="$vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray()"
                                     :selected="old('vendor_id', $component->vendor_id)"
                                     placeholder="Select Vendor..."
                                 />
@@ -145,7 +145,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="location_id"
-                                    :options="$locations->map(fn($l) => ['value' => $l->id, 'label' => $l->name])->toArray()"
+                                    :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()"
                                     :selected="old('location_id', $component->location_id)"
                                     placeholder="Select Location..."
                                 />

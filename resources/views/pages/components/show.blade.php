@@ -129,7 +129,7 @@
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
                             <x-form.searchable-select
                                 name="asset_id"
-                                :options="$allAssets->map(fn($a) => ['value' => $a->id, 'label' => $a->name . ' ('.$a->asset_tag.')' . ($a->assignedTo ? ' - '.$a->assignedTo->name : '')])->toArray()"
+                                :options="$allAssets->map(fn($a) => ['id' => $a->id, 'text' => $a->name . ' ('.$a->asset_tag.')' . ($a->assignedToUser ? ' - '.$a->assignedToUser->name : '')])->toArray()"
                                 placeholder="Search & select Asset..."
                             />
                         </div>
