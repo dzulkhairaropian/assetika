@@ -177,21 +177,24 @@
                                         $icon = $statusObj->icon ?? null;
                                         $name = $statusObj->name ?? $component->status ?? 'Ready';
                                     @endphp
-                                    <x-ui.badge :color="$color" size="xs" :featherIcon="$icon">
+                                    <x-ui.badge :color="$color" size="sm" :featherIcon="$icon">
                                         {{ $name }}
                                     </x-ui.badge>
                                 </td>
                                 <td class="px-4 py-2.5">
                                     @if($component->assignedAsset)
-                                        <a href="{{ route('assets.show', $component->assignedAsset) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50/80 px-2 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-100 dark:border-brand-900/40 dark:bg-brand-500/10 dark:text-brand-300 transition">
-                                            <i data-lucide="laptop" class="w-3.5 h-3.5 text-brand-500"></i>
-                                            {{ $component->assignedAsset->asset_tag ?? $component->assignedAsset->device_name }}
+                                        <a href="{{ route('assets.show', $component->assignedAsset) }}" class="inline-flex items-center gap-1.5 font-semibold text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400 font-mono text-xs">
+                                            <i data-lucide="laptop" class="w-3.5 h-3.5 text-gray-400"></i>
+                                            {{ $component->assignedAsset->asset_tag }}
                                         </a>
+                                        <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-normal">
+                                            {{ $component->assignedAsset->product?->name ?? $component->assignedAsset->device_name }}
+                                        </span>
                                         @if($component->assignedAsset->assignedToUser)
-                                            <span class="block text-[10px] text-gray-400 mt-0.5">User: {{ $component->assignedAsset->assignedToUser->name }}</span>
+                                            <span class="block text-[10px] text-gray-400">User: {{ $component->assignedAsset->assignedToUser->name }}</span>
                                         @endif
                                     @else
-                                        <span class="text-gray-400 text-[11px] italic">Unassigned</span>
+                                        <span class="text-gray-400 text-[11px] italic">Unassigned (In Stock)</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
@@ -205,7 +208,7 @@
                                             this.open = !this.open;
                                             if (this.open) {
                                                 const rect = e.currentTarget.getBoundingClientRect();
-                                                const menuHeight = 120;
+                                                const menuHeight = 160;
                                                 const spaceBelow = window.innerHeight - rect.bottom;
                                                 const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
                                                 const left = Math.max(10, rect.right - 144);
@@ -220,13 +223,23 @@
                                         <div x-show="open"
                                             x-transition
                                             :style="dropdownStyle"
-                                            class="w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+                                            class="w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
                                             style="display: none;">
                                             
                                             <a href="{{ route('components.show', $component) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                                                 <i data-lucide="eye" class="w-3.5 h-3.5 text-gray-400"></i>
                                                 View Details
                                             </a>
+
+                                            @if($component->assigned_asset_id)
+                                                <form action="{{ route('components.checkin', $component) }}" method="POST" onsubmit="return confirm('Detach component unit from asset?')">
+                                                    @csrf
+                                                    <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-500/10 transition-colors">
+                                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                                        Check-in / Detach
+                                                    </button>
+                                                </form>
+                                            @endif
 
                                             <a href="{{ route('components.edit', $component) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                                                 <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>

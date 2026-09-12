@@ -1,39 +1,22 @@
-### Dynamic Master Status Integration for Component Module
+### Enhancement: Add Direct Checkin to Actions Dropdown & Refine Table Presentation
 
-#### 1. Schema & Relationships
-- **Migration**: Add `status_id` (foreign key `statuses.id`, nullable) to `components` table.
-- **`Component` Model**:
-  - Add `status_id` to `$fillable`.
-  - Add `public function status(): BelongsTo { return $this->belongsTo(Status::class); }`.
-- **`Status` Model**:
-  - Add `public function components(): HasMany { return $this->hasMany(Component::class); }`.
+#### 1. Add Direct Checkin in Table Actions Dropdown (`index.blade.php`)
+- In the actions dropdown for each component row:
+  - If the component is currently assigned (`assigned_asset_id` is present):
+    - Add **Check-in** action button with confirmation: `<form action="{{ route('components.checkin', $component) }}" method="POST">...` (orange text with rotate-ccw icon).
 
-#### 2. Controller Workflow (`ComponentController.php`)
-- **`create` & `edit`**:
-  - Load statuses under Master Category `IT Component` (`$statusOpts`).
-  - Pre-select `Ready` status by default.
-- **`store` & `update`**:
-  - Validate `'status_id' => 'required|exists:statuses,id'`.
-- **`checkout`**:
-  - Dynamically find and assign the `Installed` status for `IT Component`.
-- **`checkin`**:
-  - Dynamically find and revert to the `Ready` status for `IT Component`.
+#### 2. Refine Assigned Asset Column (No Bulky Badge, Clean Clickable Link)
+- Remove bulky button/badge container around assigned asset.
+- Replace with clean, minimal clickable link:
+  - Asset Tag in bold font-mono (`DB/NB/250217/008`).
+  - Device / Product model name in subtle gray (`Dell Latitude 3410`).
+  - Assigned user name (`User: Dzul Khair Aropian`).
 
-#### 3. View Modernization
-- **`create.blade.php` & `edit.blade.php`**:
-  - Add `Status` (`status_id`) searchable-select dropdown loaded from `statuses` table.
-- **`index.blade.php` & `show.blade.php`**:
-  - Render status dynamically using `<x-ui.badge>` component with database-backed status name, color, and icon (`optional($component->status)->name`, `optional($component->status)->color`, `optional($component->status)->icon`).
+#### 3. Refine Status Badge Sizing & Icons
+- Use `size="sm"` with subtle font size and proper Lucide icon rendering from status master definition.
 
 #### 4. Verification & Build
 - Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
 
-#### Files to Modify / Create
-- `database/migrations/YYYY_MM_DD_HHMMSS_add_status_id_to_components_table.php` (New)
-- `app/Models/Component.php`
-- `app/Models/Status.php`
-- `app/Http/Controllers/ComponentController.php`
+#### Files to Modify
 - `resources/views/pages/components/index.blade.php`
-- `resources/views/pages/components/show.blade.php`
-- `resources/views/pages/components/create.blade.php`
-- `resources/views/pages/components/edit.blade.php`
