@@ -26,17 +26,8 @@
 
                         <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
                             <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Product <span class="text-red-500">*</span>
-                                </label>
-                                <x-form.searchable-select
-                                    name="product_id"
-                                    :options="$productOpts"
-                                    :selected="old('product_id', $component->product_id)"
-                                    placeholder="Select Product"
-                                    :required="true"
-                                />
-                                @error('product_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                                <x-form.searchable-select name="product_id" label="Product Model" :options="$productOpts" :selected="old('product_id', $component->product_id)" placeholder="Select Product" required="true" />
+                                @error('product_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
@@ -114,27 +105,11 @@
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Vendor / Supplier
-                                </label>
-                                <x-form.searchable-select
-                                    name="vendor_id"
-                                    :options="$vendorOpts"
-                                    :selected="old('vendor_id', $component->vendor_id)"
-                                    placeholder="Select Vendor..."
-                                />
+                                <x-form.searchable-select name="vendor_id" label="Vendor / Supplier" :options="$vendorOpts" :selected="old('vendor_id', $component->vendor_id)" placeholder="Select Vendor" />
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Location
-                                </label>
-                                <x-form.searchable-select
-                                    name="location_id"
-                                    :options="$locationOpts"
-                                    :selected="old('location_id', $component->location_id)"
-                                    placeholder="Select Location..."
-                                />
+                                <x-form.searchable-select name="location_id" label="Location" :options="$locationOpts" :selected="old('location_id', $component->location_id)" placeholder="Select Location" />
                             </div>
 
                             <div class="lg:col-span-2">

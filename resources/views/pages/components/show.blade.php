@@ -213,13 +213,7 @@
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
-                                <x-form.searchable-select
-                                    name="asset_id"
-                                    :options="$assetOpts"
-                                    placeholder="Search & select Asset..."
-                                    :required="true"
-                                />
+                                <x-form.searchable-select name="asset_id" label="Target Asset" :options="$assetOpts" placeholder="Search & select Asset" required="true" />
                             </div>
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Date (Release Date)</label>
