@@ -89,7 +89,15 @@
 	                            @endforeach
 	                        </select>
 
-	                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id'))
+	                        <select name="status" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+	                            <option value="">All Statuses</option>
+	                            <option value="Ready" {{ request('status') == 'Ready' ? 'selected' : '' }}>Ready (In Stock)</option>
+	                            <option value="Installed" {{ request('status') == 'Installed' ? 'selected' : '' }}>Installed</option>
+	                            <option value="Maintenance" {{ request('status') == 'Maintenance' ? 'selected' : '' }}>Maintenance</option>
+	                            <option value="Retired" {{ request('status') == 'Retired' ? 'selected' : '' }}>Retired</option>
+	                        </select>
+
+	                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id') || request()->filled('status'))
 	                            <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Reset</a>
 	                        @endif
 	                    </form>
@@ -123,17 +131,16 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Tag / Name</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assigned To Asset</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Qty / Avail</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Tag / Component</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category & Model</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Asset</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Location</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($components as $component)
-                            @php $available = $component->availableQty(); @endphp
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
@@ -156,26 +163,44 @@
                                     <a href="{{ route('components.show', $component) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
                                         {{ $component->name }}
                                     </a>
+                                    @if($component->serial)
+                                        <span class="block text-[10px] text-gray-400 font-mono">SN: {{ $component->serial }}</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300">
                                     {{ $component->category?->name ?? '-' }}
-                                    @if($component->manufacturer)
-                                        <span class="block text-[11px] text-gray-400">{{ $component->manufacturer }}</span>
+                                    <span class="block text-[11px] text-gray-400">{{ $component->model_number ?? $component->manufacturer }}</span>
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    @if($component->status === 'Installed')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                            Installed
+                                        </span>
+                                    @elseif($component->status === 'Maintenance')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                            Maintenance
+                                        </span>
+                                    @elseif($component->status === 'Retired')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                            Retired
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                                            Ready (In Stock)
+                                        </span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    @if($component->assets->isNotEmpty())
-                                        <div class="flex flex-wrap gap-1 max-w-xs">
-                                            @foreach($component->assets as $assignedAsset)
-                                                <a href="{{ route('assets.show', $assignedAsset) }}" class="inline-flex items-center gap-1 rounded border border-brand-200 bg-brand-50/80 px-1.5 py-0.5 text-[11px] font-medium text-brand-700 hover:bg-brand-100 dark:border-brand-900/40 dark:bg-brand-500/10 dark:text-brand-300 transition">
-                                                    <i data-lucide="laptop" class="w-3 h-3"></i>
-                                                    {{ $assignedAsset->asset_tag ?? ($assignedAsset->product?->name ?? $assignedAsset->device_name) }}
-                                                    <span class="font-bold">({{ $assignedAsset->pivot->qty }}x)</span>
-                                                </a>
-                                            @endforeach
-                                        </div>
+                                    @if($component->assignedAsset)
+                                        <a href="{{ route('assets.show', $component->assignedAsset) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50/80 px-2 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-100 dark:border-brand-900/40 dark:bg-brand-500/10 dark:text-brand-300 transition">
+                                            <i data-lucide="laptop" class="w-3.5 h-3.5 text-brand-500"></i>
+                                            {{ $component->assignedAsset->asset_tag ?? $component->assignedAsset->device_name }}
+                                        </a>
+                                        @if($component->assignedAsset->assignedToUser)
+                                            <span class="block text-[10px] text-gray-400 mt-0.5">User: {{ $component->assignedAsset->assignedToUser->name }}</span>
+                                        @endif
                                     @else
-                                        <span class="text-gray-400 text-[11px] italic">In Stock (Unassigned)</span>
+                                        <span class="text-gray-400 text-[11px] italic">Unassigned</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2.5">

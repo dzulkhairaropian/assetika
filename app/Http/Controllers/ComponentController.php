@@ -25,7 +25,7 @@ class ComponentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assets.assignedToUser']);
+        $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -36,7 +36,7 @@ class ComponentController extends Controller
                     ->orWhere('model_number', 'like', "%$search%")
                     ->orWhereHas('product', fn ($p) => $p->where('name', 'like', "%$search%"))
                     ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%$search%"))
-                    ->orWhereHas('assets', fn ($a) => $a->where('asset_tag', 'like', "%$search%")->orWhere('name', 'like', "%$search%"));
+                    ->orWhereHas('assignedAsset', fn ($a) => $a->where('asset_tag', 'like', "%$search%")->orWhere('device_name', 'like', "%$search%"));
             });
         }
 
@@ -46,6 +46,10 @@ class ComponentController extends Controller
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         $components = $query->latest()->paginate(50)->withQueryString();
@@ -87,7 +91,7 @@ class ComponentController extends Controller
             'product_id' => 'required|exists:products,id',
             'model_number' => 'nullable|string|max:255',
             'serial' => 'nullable|string|max:255',
-            'qty' => 'required|integer|min:0',
+            'qty' => 'required|integer|min:1',
             'min_qty' => 'nullable|integer|min:0',
             'purchase_cost' => 'nullable|numeric|min:0',
             'purchase_date' => 'nullable|date',
@@ -106,27 +110,38 @@ class ComponentController extends Controller
             $validated['model_number'] = $product->product_type ?? $product->name;
         }
 
-        Component::create($validated);
+        $totalQty = (int) $validated['qty'];
+        $singleCost = $validated['purchase_cost'] ? ($validated['purchase_cost'] / max(1, $totalQty)) : null;
 
-        if ($request->has('create_another')) {
-            return redirect()->route('components.create')->with('success', 'Component created successfully. Add another one.');
+        // Batch creation for N individual component units
+        for ($i = 0; $i < $totalQty; $i++) {
+            $unitData = $validated;
+            $unitData['qty'] = 1;
+            $unitData['purchase_cost'] = $singleCost;
+            $unitData['status'] = 'Ready';
+            if ($i > 0) {
+                // Let booted hook generate unique component_tag per item
+                unset($unitData['component_tag']);
+                if (! empty($unitData['serial'])) {
+                    $unitData['serial'] = $unitData['serial'].'-'.($i + 1);
+                }
+            }
+            Component::create($unitData);
         }
 
-        return redirect()->route('components.index')->with('success', 'Component created successfully.');
+        if ($request->has('create_another')) {
+            return redirect()->route('components.create')->with('success', "{$totalQty} component unit(s) created successfully. Add another batch.");
+        }
+
+        return redirect()->route('components.index')->with('success', "{$totalQty} component unit(s) created successfully.");
     }
 
     public function show(Component $component)
     {
-        $component->load(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assets.assignedToUser']);
-        $available = $component->availableQty();
-        $checkouts = $component->assets()
-            ->withPivot(['qty', 'checked_out_at'])
-            ->orderBy('component_asset.created_at', 'desc')
-            ->get();
-
+        $component->load(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser']);
         $allAssets = Asset::with(['product', 'assignedToUser'])->orderBy('asset_tag')->get();
 
-        return view('pages.components.show', compact('component', 'available', 'checkouts', 'allAssets'));
+        return view('pages.components.show', compact('component', 'allAssets'));
     }
 
     public function edit(Component $component)
@@ -203,37 +218,28 @@ class ComponentController extends Controller
     {
         $request->validate([
             'asset_id' => 'required|exists:assets,id',
-            'qty' => 'required|integer|min:1',
             'release_date' => 'nullable|date',
             'notes' => 'nullable|string',
         ]);
 
-        $available = $component->availableQty();
-        if ($request->qty > $available) {
-            return back()->with('error', "Insufficient stock. Available: {$available}.");
+        if ($component->status === 'Installed' && $component->assigned_asset_id) {
+            return back()->with('error', 'This component unit is already installed on another asset.');
         }
 
         $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($request->asset_id);
         $checkoutDate = $request->filled('release_date') ? Carbon::parse($request->release_date) : now();
 
-        $existing = $component->assets()->where('asset_id', $asset->id)->first();
-        if ($existing) {
-            $component->assets()->updateExistingPivot($asset->id, [
-                'qty' => $existing->pivot->qty + $request->qty,
-                'checked_out_at' => $checkoutDate,
-            ]);
-        } else {
-            $component->assets()->attach($asset->id, [
-                'qty' => $request->qty,
-                'checked_out_at' => $checkoutDate,
-            ]);
-        }
+        $component->update([
+            'assigned_asset_id' => $asset->id,
+            'status' => 'Installed',
+            'release_date' => $checkoutDate,
+        ]);
 
         // Auto Generate Ticket for Component Installation
         $this->createAutomaticTicketForComponent(
             $asset,
             $component,
-            $request->qty,
+            1,
             'installed',
             $request->notes,
             $checkoutDate
@@ -241,42 +247,38 @@ class ComponentController extends Controller
 
         $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
 
-        return back()->with('success', "{$request->qty}x {$component->name} checked out & installed to {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
+        return back()->with('success', "Component {$component->component_tag} ({$component->name}) checked out & installed to {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
     }
 
-    public function checkin(Request $request, Component $component, Asset $asset)
+    public function checkin(Request $request, Component $component)
     {
-        $checkout = $component->assets()->where('asset_id', $asset->id)->first();
-
-        if (! $checkout) {
-            return back()->with('error', 'Asset does not have this component checked out.');
+        if (! $component->assigned_asset_id) {
+            return back()->with('error', 'Component unit is not currently installed on any asset.');
         }
 
         $request->validate([
-            'qty' => 'required|integer|min:1|max:'.$checkout->pivot->qty,
             'notes' => 'nullable|string',
         ]);
 
-        if ($request->qty < $checkout->pivot->qty) {
-            $component->assets()->updateExistingPivot($asset->id, [
-                'qty' => $checkout->pivot->qty - $request->qty,
-            ]);
-        } else {
-            $component->assets()->detach($asset->id);
-        }
+        $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($component->assigned_asset_id);
+
+        $component->update([
+            'assigned_asset_id' => null,
+            'status' => 'Ready',
+        ]);
 
         // Auto Generate Ticket for Component Removal
         $this->createAutomaticTicketForComponent(
             $asset,
             $component,
-            $request->qty,
+            1,
             'removed',
             $request->notes
         );
 
         $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
 
-        return back()->with('success', "{$request->qty}x {$component->name} checked in & removed from {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
+        return back()->with('success', "Component {$component->component_tag} ({$component->name}) checked in & removed from {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
     }
 
     private function createAutomaticTicketForComponent(Asset $asset, Component $component, int $qty, string $action, ?string $notes = null, ?Carbon $customDate = null): void

@@ -95,120 +95,113 @@
                 </div>
             </div>
 
-            {{-- Stock & Checkout --}}
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:col-span-2">
-                <div class="flex items-center justify-between mb-4">
+            {{-- Unit Status & Asset Assignment --}}
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i data-lucide="package" class="w-4 h-4 text-brand-500"></i>
-                        Stock & Assignments
+                        <i data-lucide="shield-check" class="w-4 h-4 text-brand-500"></i>
+                        Unit Status & Assignment
                     </h3>
-                    <div class="flex items-center gap-3">
-                        <div class="text-right">
-                            <span class="block text-xl font-bold text-gray-900 dark:text-white">{{ $component->qty }}</span>
-                            <span class="text-[11px] text-gray-400">Total Qty</span>
-                        </div>
-                        <div class="h-8 w-px bg-gray-200 dark:bg-gray-800"></div>
-                        <div class="text-right">
-                            <span class="block text-xl font-bold {{ $available <= $component->min_qty ? 'text-red-600 dark:text-red-400' : 'text-brand-600 dark:text-brand-400' }}">
-                                {{ $available }}
+                    <div>
+                        @if($component->status === 'Installed')
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Installed
                             </span>
-                            <span class="text-[11px] text-gray-400">Available</span>
-                        </div>
+                        @elseif($component->status === 'Maintenance')
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                <span class="w-2 h-2 rounded-full bg-amber-500"></span> Maintenance
+                            </span>
+                        @elseif($component->status === 'Retired')
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                <span class="w-2 h-2 rounded-full bg-gray-400"></span> Retired
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span> Ready (In Stock)
+                            </span>
+                        @endif
                     </div>
                 </div>
 
-                {{-- Checkout Form --}}
-                <form action="{{ route('components.checkout', $component) }}" method="POST" class="rounded-lg border border-gray-200 bg-gray-50 p-3.5 dark:border-gray-800 dark:bg-gray-950 mb-4 space-y-3">
-                    @csrf
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-xs font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                            <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-brand-500"></i>
-                            Checkout & Assign Component to Asset
-                        </h4>
-                        <span class="text-[11px] text-gray-400">Generates auto-ticket for maintenance</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
-                        <div class="sm:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
-                            <x-form.searchable-select
-                                name="asset_id"
-                                :options="$allAssets->map(fn($a) => ['id' => $a->id, 'text' => $a->name . ' ('.$a->asset_tag.')' . ($a->assignedToUser ? ' - '.$a->assignedToUser->name : '')])->toArray()"
-                                placeholder="Search & select Asset..."
-                            />
+                @if($component->assignedAsset)
+                    <div class="rounded-lg border border-emerald-200 bg-emerald-50/60 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/20 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
+                                <i data-lucide="laptop" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                                Installed on Asset: {{ $component->assignedAsset->asset_tag }}
+                            </h4>
+                            <span class="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
+                                Installed: {{ $component->release_date ? $component->release_date->format('d M Y') : '-' }}
+                            </span>
                         </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Quantity <span class="text-red-500">*</span></label>
-                            <input type="number" name="qty" value="1" min="1" max="{{ $available }}" required
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
+                            <div>
+                                <span class="text-gray-500 dark:text-gray-400 block text-[11px]">Asset Device Name:</span>
+                                <a href="{{ route('assets.show', $component->assignedAsset) }}" class="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                                    {{ $component->assignedAsset->product?->name ?? $component->assignedAsset->device_name ?? $component->assignedAsset->asset_tag }}
+                                </a>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 dark:text-gray-400 block text-[11px]">Assigned User:</span>
+                                <span class="font-medium text-gray-800 dark:text-gray-200">
+                                    {{ $component->assignedAsset->assignedToUser?->name ?? 'Unassigned' }}
+                                </span>
+                            </div>
                         </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Release / Installation Date</label>
-                            <input type="date" name="release_date" value="{{ date('Y-m-d') }}"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+
+                        <div class="pt-2 border-t border-emerald-200/80 dark:border-emerald-900/40 flex justify-end">
+                            <form action="{{ route('components.checkin', $component) }}" method="POST" onsubmit="return confirm('Detach component from asset?')">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-orange-600 transition shadow-sm">
+                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                    Detach / Checkin Component
+                                </button>
+                            </form>
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Notes (Optional)</label>
-                        <input type="text" name="notes" placeholder="e.g. Replaced swollen battery with new Latitude 3410 battery"
-                            class="h-8 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button type="submit" class="inline-flex items-center gap-1.5 h-8 rounded-lg bg-brand-500 px-4 text-xs font-semibold text-white hover:bg-brand-600 transition shadow-sm" {{ $available < 1 ? 'disabled' : '' }}>
-                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                            Checkout Component
-                        </button>
-                    </div>
-                </form>
-
-                {{-- Checked-out Assets --}}
-                <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Checked Out Assets</h4>
-                @if($checkouts->isNotEmpty())
-                    <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-                        <table class="w-full text-xs">
-                            <thead class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
-                                <tr>
-                                    <th class="px-3 py-2 text-start font-medium text-gray-500">Asset</th>
-                                    <th class="px-3 py-2 text-start font-medium text-gray-500">Qty</th>
-                                    <th class="px-3 py-2 text-start font-medium text-gray-500">Date</th>
-                                    <th class="px-3 py-2 text-end font-medium text-gray-500">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                                @foreach($checkouts as $checkout)
-                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
-                                        <td class="px-3 py-2">
-                                            <a href="{{ route('assets.show', $checkout) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 flex items-center gap-1.5">
-                                                <i data-lucide="laptop" class="w-3.5 h-3.5 text-brand-500"></i>
-                                                {{ $checkout->product?->name ?? $checkout->device_name ?? $checkout->asset_tag }}
-                                                <span class="font-mono text-[11px] text-gray-400">({{ $checkout->asset_tag }})</span>
-                                            </a>
-                                            @if($checkout->assignedToUser)
-                                                <span class="block text-[11px] text-gray-500">User: {{ $checkout->assignedToUser->name }}</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-3 py-2 font-semibold text-gray-900 dark:text-white">{{ $checkout->pivot->qty }}</td>
-                                        <td class="px-3 py-2 text-gray-500">{{ $checkout->pivot->checked_out_at ? \Carbon\Carbon::parse($checkout->pivot->checked_out_at)->format('d M Y') : '-' }}</td>
-                                        <td class="px-3 py-2 text-end">
-                                            <form action="{{ route('components.checkin', ['component' => $component->id, 'asset' => $checkout->id]) }}" method="POST" class="inline-flex items-center gap-1.5 justify-end">
-                                                @csrf
-                                                <input type="number" name="qty" value="{{ $checkout->pivot->qty }}" min="1" max="{{ $checkout->pivot->qty }}" class="h-7 w-14 rounded border border-gray-200 bg-white px-1.5 text-center text-xs dark:border-gray-800 dark:bg-gray-950">
-                                                <button type="submit" class="rounded bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-700 hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-400 transition">
-                                                    Checkin
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
                     </div>
                 @else
-                    <div class="rounded-lg border border-gray-200 bg-gray-50/50 p-4 text-center dark:border-gray-800 dark:bg-gray-950">
-                        <p class="text-xs text-gray-400">No assets have this component checked out yet.</p>
-                    </div>
+                    {{-- Checkout Form --}}
+                    <form action="{{ route('components.checkout', $component) }}" method="POST" class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950 space-y-3">
+                        @csrf
+                        <div class="flex items-center justify-between border-b border-gray-200/60 pb-2 dark:border-gray-800">
+                            <h4 class="text-xs font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                                <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-brand-500"></i>
+                                Attach Component Unit to Asset
+                            </h4>
+                            <span class="text-[11px] text-gray-400">Generates auto-ticket for maintenance</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
+                                <x-form.searchable-select
+                                    name="asset_id"
+                                    :options="$allAssets->map(fn($a) => ['id' => $a->id, 'text' => $a->asset_tag . ' - ' . ($a->product?->name ?? $a->device_name) . ($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : '')])->toArray()"
+                                    placeholder="Search & select Asset..."
+                                    required="true"
+                                />
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Date (Release Date)</label>
+                                <input type="date" name="release_date" value="{{ date('Y-m-d') }}"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Notes (Optional)</label>
+                            <input type="text" name="notes" placeholder="e.g. Replaced swollen battery with new Latitude 3410 battery"
+                                class="h-8 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+                        </div>
+
+                        <div class="flex justify-end pt-1">
+                            <button type="submit" class="inline-flex items-center gap-1.5 h-8 rounded-lg bg-brand-500 px-4 text-xs font-semibold text-white hover:bg-brand-600 transition shadow-sm">
+                                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                                Install / Attach Component
+                            </button>
+                        </div>
+                    </form>
                 @endif
             </div>
         </div>

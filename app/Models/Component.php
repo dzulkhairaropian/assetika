@@ -13,6 +13,8 @@ class Component extends Model
         'component_tag',
         'name',
         'product_id',
+        'assigned_asset_id',
+        'status',
         'category_id',
         'manufacturer',
         'model_number',
@@ -39,7 +41,7 @@ class Component extends Model
                 $date = $component->release_date ? Carbon::parse($component->release_date) : ($component->purchase_date ? Carbon::parse($component->purchase_date) : now());
                 $dateCode = $date->format('ymd');
 
-                $next = static::query()->whereDate('created_at', now()->toDateString())->count() + 1;
+                $next = static::query()->count() + 1;
                 do {
                     $candidate = sprintf('%s/%s/%s/%s', $companyCode, $categoryCode, $dateCode, str_pad((string) $next, 3, '0', STR_PAD_LEFT));
                     $exists = static::query()->where('component_tag', $candidate)->where('id', '!=', $component->id)->exists();
@@ -69,6 +71,11 @@ class Component extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function assignedAsset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class, 'assigned_asset_id');
     }
 
     public function vendor(): BelongsTo

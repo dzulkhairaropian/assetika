@@ -44,20 +44,14 @@ test('checkout component to asset automatically generates completed maintenance 
 
     $response = $this->post(route('components.checkout', $component), [
         'asset_id' => $asset->id,
-        'qty' => 1,
         'notes' => 'Pemasangan baterai pengganti',
     ]);
 
     $response->assertSessionHasNoErrors();
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('component_asset', [
-        'component_id' => $component->id,
-        'asset_id' => $asset->id,
-        'qty' => 1,
-    ]);
-
-    $this->assertEquals(5, $component->fresh()->availableQty());
+    $this->assertEquals($asset->id, $component->fresh()->assigned_asset_id);
+    $this->assertEquals('Installed', $component->fresh()->status);
 
     $this->assertDatabaseHas('tickets', [
         'asset_id' => $asset->id,
