@@ -28,9 +28,13 @@ test('checkout component to asset automatically generates completed maintenance 
         'product_id' => $product->id,
         'name' => 'Baterai Dell Latitude 3410',
         'category_id' => $category->id,
+        'release_date' => '2026-09-15',
         'qty' => 6,
         'min_qty' => 1,
     ]);
+
+    $this->assertNotNull($component->component_tag);
+    $this->assertStringContainsString('260915', $component->component_tag);
 
     $asset = Asset::create([
         'name' => 'Laptop Dell Latitude 3410',

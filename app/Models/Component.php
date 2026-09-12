@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -30,14 +31,28 @@ class Component extends Model
 
     protected static function booted()
     {
-        static::creating(function ($component) {
+        $generateTag = function ($component) {
             if (empty($component->component_tag)) {
                 $categoryCode = strtoupper(substr($component->category?->code ?? $component->category?->name ?? 'CMP', 0, 4));
-                $dateCode = now()->format('ymd');
-                $count = static::query()->whereDate('created_at', now()->toDateString())->count() + 1;
-                $component->component_tag = sprintf('CMP/%s/%s/%s', $categoryCode, $dateCode, str_pad((string) $count, 3, '0', STR_PAD_LEFT));
+                $date = $component->release_date ? Carbon::parse($component->release_date) : ($component->purchase_date ? Carbon::parse($component->purchase_date) : now());
+                $dateCode = $date->format('ymd');
+
+                $next = static::query()->whereDate('created_at', now()->toDateString())->count() + 1;
+                do {
+                    $candidate = sprintf('CMP/%s/%s/%s', $categoryCode, $dateCode, str_pad((string) $next, 3, '0', STR_PAD_LEFT));
+                    $exists = static::query()->where('component_tag', $candidate)->where('id', '!=', $component->id)->exists();
+                    if (! $exists) {
+                        $component->component_tag = $candidate;
+
+                        break;
+                    }
+                    $next++;
+                } while (true);
             }
-        });
+        };
+
+        static::creating($generateTag);
+        static::updating($generateTag);
     }
 
     protected $casts = [

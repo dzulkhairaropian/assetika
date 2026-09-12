@@ -1,28 +1,17 @@
-### Enhancement: Add Release Date & Model Number Input to Component Forms + Build Production Assets
+### Enhancement: Align `component_tag` Generation with `release_date`
 
-#### 1. Database & Model Updates
-- **Migration**: Add `release_date` (date, nullable) to `components` table.
-- **Component Model**: Add `release_date` to `$fillable` and `$casts` (`'release_date' => 'date'`).
+#### 1. Logic Alignment in `Component.php`
+- Modify the `creating` and `updating` boot hooks in `Component.php`:
+  - Determine date code from `release_date` (or `purchase_date` / `now()` as fallback).
+  - Format date code as `ymd` (e.g. `260912`).
+  - Calculate sequence count for the component's category within that date/year.
+  - Generate `component_tag = CMP/{CategoryCode}/{DateCode}/{Seq}` (e.g. `CMP/BATT/260912/001`).
 
-#### 2. Controller Updates (`ComponentController.php`)
-- `store` & `update`:
-  - Validate `model_number` (optional string) and `release_date` (optional date).
-  - Save `model_number` from request input (fallback to `product->product_type` if empty).
+#### 2. Test Verification
+- Update `ComponentCheckoutTicketTest.php` to verify `component_tag` generation using `release_date`.
+- Run `php artisan test` and `vendor/bin/pint`.
+- Re-run `npm run build`.
 
-#### 3. View Updates
-- **`create.blade.php` & `edit.blade.php`**:
-  - Add **Model Number** input field (`model_number`, e.g. `Latitude 3410`).
-  - Add **Release Date** datepicker input field (`release_date`).
-- **`show.blade.php` & `index.blade.php`**:
-  - Display `release_date` in Component details.
-
-#### 4. Asset Build
-- Run `npm run build` to compile production assets.
-
-#### Files to Modify / Create
-- `database/migrations/YYYY_MM_DD_HHMMSS_add_release_date_to_components_table.php` (New)
+#### Files to Modify
 - `app/Models/Component.php`
-- `app/Http/Controllers/ComponentController.php`
-- `resources/views/pages/components/create.blade.php`
-- `resources/views/pages/components/edit.blade.php`
-- `resources/views/pages/components/show.blade.php`
+- `tests/Feature/ComponentCheckoutTicketTest.php`
