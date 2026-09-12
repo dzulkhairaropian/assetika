@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedProductId = old('product_id', $component->product_id);
+        $selectedVendorId = old('vendor_id', $component->vendor_id);
+        $selectedLocationId = old('location_id', $component->location_id);
+    @endphp
+
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Edit Component" :items="[['label' => 'Components', 'url' => route('components.index')]]" />
 
@@ -26,7 +32,7 @@
 
                         <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
                             <div class="lg:col-span-2">
-                                <x-form.searchable-select name="product_id" label="Product Model" :options="$productOpts" :selected="old('product_id', $component->product_id)" placeholder="Select Product" required="true" />
+                                <x-form.searchable-select name="product_id" label="Product Model" :options="$productOpts" :selected="$selectedProductId" placeholder="Select Product" required="true" />
                                 @error('product_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
@@ -105,11 +111,11 @@
                             </div>
 
                             <div>
-                                <x-form.searchable-select name="vendor_id" label="Vendor / Supplier" :options="$vendorOpts" :selected="old('vendor_id', $component->vendor_id)" placeholder="Select Vendor" />
+                                <x-form.searchable-select name="vendor_id" label="Vendor / Supplier" :options="$vendorOpts" :selected="$selectedVendorId" placeholder="Select Vendor" />
                             </div>
 
                             <div>
-                                <x-form.searchable-select name="location_id" label="Location" :options="$locationOpts" :selected="old('location_id', $component->location_id)" placeholder="Select Location" />
+                                <x-form.searchable-select name="location_id" label="Location" :options="$locationOpts" :selected="$selectedLocationId" placeholder="Select Location" />
                             </div>
 
                             <div class="lg:col-span-2">
