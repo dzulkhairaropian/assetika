@@ -124,7 +124,7 @@ class ComponentController extends Controller
             ->orderBy('component_asset.created_at', 'desc')
             ->get();
 
-        $allAssets = Asset::with(['product', 'assignedToUser'])->orderBy('name')->get();
+        $allAssets = Asset::with(['product', 'assignedToUser'])->orderBy('asset_tag')->get();
 
         return view('pages.components.show', compact('component', 'available', 'checkouts', 'allAssets'));
     }
@@ -239,7 +239,9 @@ class ComponentController extends Controller
             $checkoutDate
         );
 
-        return back()->with('success', "{$request->qty}x {$component->name} checked out & installed to {$asset->name} ({$asset->asset_tag}). Maintenance ticket generated.");
+        $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
+
+        return back()->with('success', "{$request->qty}x {$component->name} checked out & installed to {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
     }
 
     public function checkin(Request $request, Component $component, Asset $asset)
@@ -272,7 +274,9 @@ class ComponentController extends Controller
             $request->notes
         );
 
-        return back()->with('success', "{$request->qty}x {$component->name} checked in & removed from {$asset->name} ({$asset->asset_tag}). Maintenance ticket generated.");
+        $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
+
+        return back()->with('success', "{$request->qty}x {$component->name} checked in & removed from {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
     }
 
     private function createAutomaticTicketForComponent(Asset $asset, Component $component, int $qty, string $action, ?string $notes = null, ?Carbon $customDate = null): void
@@ -309,7 +313,8 @@ class ComponentController extends Controller
         $toUser = $asset->assignedToUser;
         $actionText = $action === 'installed' ? 'Installed/Attached' : 'Removed/Detached';
 
-        $desc = "[Auto-Generated] Component {$actionText}: {$qty}x {$component->name} on Asset {$asset->asset_tag} - ".($asset->product->name ?? $asset->name);
+        $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
+        $desc = "[Auto-Generated] Component {$actionText}: {$qty}x {$component->name} on Asset {$asset->asset_tag} - ".$assetName;
         if ($notes) {
             $desc .= "\nNotes: ".$notes;
         }

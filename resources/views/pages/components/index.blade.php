@@ -169,7 +169,7 @@
                                             @foreach($component->assets as $assignedAsset)
                                                 <a href="{{ route('assets.show', $assignedAsset) }}" class="inline-flex items-center gap-1 rounded border border-brand-200 bg-brand-50/80 px-1.5 py-0.5 text-[11px] font-medium text-brand-700 hover:bg-brand-100 dark:border-brand-900/40 dark:bg-brand-500/10 dark:text-brand-300 transition">
                                                     <i data-lucide="laptop" class="w-3 h-3"></i>
-                                                    {{ $assignedAsset->asset_tag ?? $assignedAsset->name }}
+                                                    {{ $assignedAsset->asset_tag ?? ($assignedAsset->product?->name ?? $assignedAsset->device_name) }}
                                                     <span class="font-bold">({{ $assignedAsset->pivot->qty }}x)</span>
                                                 </a>
                                             @endforeach

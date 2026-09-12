@@ -182,7 +182,7 @@
                                         <td class="px-3 py-2">
                                             <a href="{{ route('assets.show', $checkout) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 flex items-center gap-1.5">
                                                 <i data-lucide="laptop" class="w-3.5 h-3.5 text-brand-500"></i>
-                                                {{ $checkout->name }}
+                                                {{ $checkout->product?->name ?? $checkout->device_name ?? $checkout->asset_tag }}
                                                 <span class="font-mono text-[11px] text-gray-400">({{ $checkout->asset_tag }})</span>
                                             </a>
                                             @if($checkout->assignedToUser)
