@@ -148,7 +148,19 @@ class ComponentController extends Controller
             'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
         ])->values()->all();
 
-        return view('pages.components.show', compact('component', 'assetOpts'));
+        $tickets = Ticket::with(['status', 'priority', 'ticketCategory', 'assignedTo'])
+            ->where(function ($q) use ($component) {
+                $q->where('problem_description', 'like', "%{$component->name}%")
+                    ->orWhere('problem_description', 'like', "%{$component->component_tag}%");
+                if ($component->assigned_asset_id) {
+                    $q->orWhere('asset_id', $component->assigned_asset_id);
+                }
+            })
+            ->latest()
+            ->take(15)
+            ->get();
+
+        return view('pages.components.show', compact('component', 'assetOpts', 'tickets'));
     }
 
     public function edit(Component $component)

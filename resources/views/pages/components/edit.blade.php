@@ -1,27 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="space-y-4">
+    <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Edit Component" :items="[['label' => 'Components', 'url' => route('components.index')]]" />
 
-        <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Update component details for {{ $component->name }}.
+        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Update component unit details for {{ $component->component_tag ?? $component->name }}.
         </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
 
-        <form action="{{ route('components.update', $component) }}" method="POST" class="grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_340px]">
+        <form action="{{ route('components.update', $component) }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
             @csrf
             @method('PUT')
 
-            <div class="space-y-4">
-                <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-8">
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                            <i data-lucide="cpu" class="w-4 h-4 text-brand-500"></i>
-                            Component Information
+                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                            <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
+                            General Information
                         </h3>
 
                         <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
@@ -138,37 +138,30 @@
                             </div>
 
                             <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Notes
                                 </label>
                                 <textarea name="notes" rows="3" placeholder="Additional notes..."
-                                    class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('notes', $component->notes) }}</textarea>
-                            </div>
-                        </div>
-
-                            <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Notes
-                                </label>
-                                <textarea name="notes" rows="3" placeholder="Additional notes..."
-                                    class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('notes', $component->notes) }}</textarea>
+                                    class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">{{ old('notes', $component->notes) }}</textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                    <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+            <!-- Actions Card -->
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <h3 class="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 pb-3 dark:border-gray-800">
                         <i data-lucide="save" class="w-4 h-4 text-brand-500"></i>
                         Actions
                     </h3>
-                    <div class="space-y-2.5">
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                    <div class="space-y-3">
+                        <button type="submit" class="inline-flex w-full justify-center items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
                             Update Component
                         </button>
-                        <a href="{{ route('components.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                        <a href="{{ route('components.index') }}" class="inline-flex w-full justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                             Cancel
                         </a>
                     </div>
