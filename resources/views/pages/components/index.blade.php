@@ -203,20 +203,6 @@
                                         <span class="text-gray-400 text-[11px] italic">Unassigned</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2.5">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-gray-900 dark:text-white">{{ $component->qty }}</span>
-                                        <span class="text-gray-400">/</span>
-                                        <span class="{{ $available <= $component->min_qty ? 'text-red-600 font-semibold dark:text-red-400' : 'text-gray-500' }}">
-                                            {{ $available }} avail
-                                        </span>
-                                    </div>
-                                    @if($available <= $component->min_qty && $component->qty > 0)
-                                        <span class="mt-0.5 inline-flex w-fit items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
-                                            Low stock
-                                        </span>
-                                    @endif
-                                </td>
                                 <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
                                     {{ $component->location?->name ?? '-' }}
                                 </td>
