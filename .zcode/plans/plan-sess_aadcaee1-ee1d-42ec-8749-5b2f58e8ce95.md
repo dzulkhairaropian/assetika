@@ -1,16 +1,22 @@
-### Fix: Isolate Inline String Evaluation in `x-form.searchable-select` Attributes
+### Fix: Blade Compiler Misparse on `page-breadcrumb` `:items` Attribute
 
 #### Root Cause
-In Laravel 13's Blade Compiler, passing inline function calls with single-quoted string parameters (e.g. `:selected="old('product_id', ...)"`) inside component attribute values causes the tag compiler regex to misinterpret `'product_id'` as a component variable property `$product_id`.
+In Laravel 13 Blade Compiler, passing inline array expressions with nested null-coalescing property accesses (e.g., `:items="[..., ['label' => $component->component_tag ?? $component->name]]"`) inside component attribute values causes Blade regex attribute parsing to misinterpret `$component->name` as an undefined component property `$name`.
 
 #### Solution Plan
-1. In `edit.blade.php`, `create.blade.php`, and `show.blade.php`, extract selected values to clean `@php` variables at the top of the file/block:
-   - `@php $selectedProduct = old('product_id', $component->product_id); @endphp`
-   - Pass `:selected="$selectedProduct"` directly.
-2. Verify GET `/components/2/edit` loads successfully without any Blade compiler errors.
-3. Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
+1. In `resources/views/pages/components/show.blade.php`, extract breadcrumb items array to a clean `@php` block at the top of the file:
+   ```php
+   @php
+       $breadcrumbLabel = $component->component_tag ?? $component->name;
+       $breadcrumbItems = [
+           ['label' => 'Components', 'url' => route('components.index')],
+           ['label' => $breadcrumbLabel],
+       ];
+   @endphp
+   ```
+2. Pass `:items="$breadcrumbItems"` cleanly to `<x-common.page-breadcrumb>`.
+3. Verify GET `/components/2` loads 100% successfully.
+4. Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
 
 #### Files to Modify
-- `resources/views/pages/components/edit.blade.php`
-- `resources/views/pages/components/create.blade.php`
 - `resources/views/pages/components/show.blade.php`

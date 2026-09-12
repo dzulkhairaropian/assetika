@@ -1,8 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $breadcrumbLabel = $component->component_tag ?? $component->name;
+        $breadcrumbItems = [
+            ['label' => 'Components', 'url' => route('components.index')],
+            ['label' => $breadcrumbLabel],
+        ];
+    @endphp
+
     <div class="space-y-4" x-data="{ activeTab: 'details' }">
-        <x-common.page-breadcrumb pageTitle="Component Details" :items="[['label' => 'Components', 'url' => route('components.index')], ['label' => $component->component_tag ?? $component->name]]" />
+        <x-common.page-breadcrumb pageTitle="Component Details" :items="$breadcrumbItems" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
             Detailed specification, assignment status, and maintenance tickets for component unit {{ $component->component_tag ?? $component->name }}.
