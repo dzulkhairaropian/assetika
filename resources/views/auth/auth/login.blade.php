@@ -49,11 +49,19 @@
                                     <input :type="showPassword ? 'text' : 'password'" name="password" required
                                            placeholder="Enter your password"
                                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                    <span @click="showPassword = !showPassword"
+                                    <button type="button" @click="showPassword = !showPassword"
                                           class="absolute z-30 text-gray-500 -translate-y-1/2 cursor-pointer right-4 top-1/2 dark:text-gray-400">
-                                        <i x-show="!showPassword" data-lucide="eye" class="size-5"></i>
-                                        <i x-show="showPassword" data-lucide="eye-off" class="size-5"></i>
-                                    </span>
+                                        <svg x-show="!showPassword" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        <svg x-show="showPassword" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                            <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/>
+                                            <path d="M14.084 14.158a10.745 10.745 0 0 1-12.022-1.81 1 1 0 0 1 0-.696 10.747 10.747 0 0 1 4.225-4.225"/>
+                                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                                            <line x1="2" y1="2" x2="22" y2="22"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                             <!-- Remember me / Forgot password -->
@@ -110,10 +118,17 @@
             
             <!-- Dark Mode Toggler -->
             <div class="fixed z-50 bottom-6 right-6">
-                <button class="flex items-center justify-center text-white rounded-full size-14 bg-brand-500 hover:bg-brand-600"
-                        @click="darkMode = !darkMode">
-                    <i data-lucide="sun" class="hidden dark:block size-5"></i>
-                    <i data-lucide="moon" class="dark:hidden size-5"></i>
+                <button class="flex items-center justify-center text-white rounded-full size-14 bg-brand-500 hover:bg-brand-600 active:scale-95 shadow-lg"
+                        @click="$store.theme.toggle()"
+                        aria-label="Toggle dark mode">
+                    <svg class="size-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                    </svg>
+                    <svg class="size-5 hidden dark:block text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+                        <path d="M2 12h2"/><path d="M22 12h-2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                    </svg>
                 </button>
             </div>
         </div>
