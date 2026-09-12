@@ -105,10 +105,3 @@
         </span>
     @endif
 </span>
-
-    @if($endIcon)
-        <span class="flex shrink-0">
-            {!! $endIcon !!}
-        </span>
-    @endif
-</span>

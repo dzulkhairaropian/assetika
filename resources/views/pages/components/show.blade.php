@@ -39,9 +39,7 @@
                                 $icon = $statusObj->icon ?? null;
                                 $name = $statusObj->name ?? $component->status ?? 'Ready';
                             @endphp
-                            <x-ui.badge :color="$color" size="sm" :featherIcon="$icon">
-                                {{ $name }}
-                            </x-ui.badge>
+                            <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $name }}</x-ui.badge>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $component->name }} • {{ $component->manufacturer ?? 'Dell' }} {{ $component->model_number ?? '' }} • S/N: {{ $component->serial ?? '-' }}</p>
                     </div>

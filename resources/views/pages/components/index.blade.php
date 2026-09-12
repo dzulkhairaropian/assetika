@@ -177,9 +177,7 @@
                                         $icon = $statusObj->icon ?? null;
                                         $name = $statusObj->name ?? $component->status ?? 'Ready';
                                     @endphp
-                                    <x-ui.badge :color="$color" size="sm" :featherIcon="$icon">
-                                        {{ $name }}
-                                    </x-ui.badge>
+                                    <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $name }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-2.5">
                                     @if($component->assignedAsset)
