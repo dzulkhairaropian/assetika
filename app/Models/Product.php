@@ -47,6 +47,11 @@ class Product extends Model
         return $this->hasMany(Consumable::class);
     }
 
+    public function components()
+    {
+        return $this->hasMany(Component::class);
+    }
+
     public function getModelAttribute()
     {
         return $this->name;

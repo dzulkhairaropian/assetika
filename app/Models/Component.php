@@ -10,6 +10,7 @@ class Component extends Model
 {
     protected $fillable = [
         'name',
+        'product_id',
         'category_id',
         'manufacturer',
         'model_number',
@@ -17,6 +18,9 @@ class Component extends Model
         'qty',
         'min_qty',
         'purchase_cost',
+        'purchase_date',
+        'warranty_months',
+        'vendor_id',
         'location_id',
         'notes',
         'image',
@@ -26,7 +30,19 @@ class Component extends Model
         'qty' => 'integer',
         'min_qty' => 'integer',
         'purchase_cost' => 'decimal:2',
+        'purchase_date' => 'date',
+        'warranty_months' => 'integer',
     ];
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
+    }
 
     public function category(): BelongsTo
     {

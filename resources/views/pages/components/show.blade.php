@@ -28,12 +28,21 @@
                         <dt class="text-[11px] font-medium text-gray-400">Name</dt>
                         <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $component->name }}</dd>
                     </div>
+                    @if($component->product)
+                    <div>
+                        <dt class="text-[11px] font-medium text-gray-400">Master Product Catalog</dt>
+                        <dd class="text-xs font-medium text-brand-600 dark:text-brand-400 flex items-center gap-1">
+                            <i data-lucide="package" class="w-3.5 h-3.5 text-brand-500"></i>
+                            {{ $component->product->name }}
+                        </dd>
+                    </div>
+                    @endif
                     <div>
                         <dt class="text-[11px] font-medium text-gray-400">Category</dt>
                         <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->category?->name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-[11px] font-medium text-gray-400">Manufacturer</dt>
+                        <dt class="text-[11px] font-medium text-gray-400">Manufacturer / Brand</dt>
                         <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->manufacturer ?? '-' }}</dd>
                     </div>
                     <div>
@@ -41,16 +50,28 @@
                         <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->model_number ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-[11px] font-medium text-gray-400">Serial</dt>
+                        <dt class="text-[11px] font-medium text-gray-400">Serial Number / Batch No.</dt>
                         <dd class="text-xs font-mono font-medium text-gray-800 dark:text-gray-200">{{ $component->serial ?? '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-medium text-gray-400">Vendor / Supplier</dt>
+                        <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->vendor?->name ?? '-' }}</dd>
                     </div>
                     <div>
                         <dt class="text-[11px] font-medium text-gray-400">Location</dt>
                         <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->location?->name ?? '-' }}</dd>
                     </div>
                     <div>
+                        <dt class="text-[11px] font-medium text-gray-400">Purchase Date</dt>
+                        <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->purchase_date ? $component->purchase_date->format('d M Y') : '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-medium text-gray-400">Warranty</dt>
+                        <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $component->warranty_months ? $component->warranty_months . ' Months' : '-' }}</dd>
+                    </div>
+                    <div>
                         <dt class="text-[11px] font-medium text-gray-400">Purchase Cost</dt>
-                        <dd class="text-xs font-semibold text-gray-900 dark:text-white">Rp {{ number_format($component->purchase_cost, 0, ',', '.') ?? '0' }}</dd>
+                        <dd class="text-xs font-semibold text-gray-900 dark:text-white">Rp {{ number_format($component->purchase_cost, 0, ',', '.') }}</dd>
                     </div>
                     @if($component->notes)
                     <div>
@@ -93,28 +114,43 @@
                 </div>
 
                 {{-- Checkout Form --}}
-                <form action="{{ route('components.checkout', $component) }}" method="POST" class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950 mb-4">
+                <form action="{{ route('components.checkout', $component) }}" method="POST" class="rounded-lg border border-gray-200 bg-gray-50 p-3.5 dark:border-gray-800 dark:bg-gray-950 mb-4 space-y-3">
                     @csrf
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                            <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-brand-500"></i>
+                            Checkout & Assign Component to Asset
+                        </h4>
+                        <span class="text-[11px] text-gray-400">Generates auto-ticket for maintenance</span>
+                    </div>
+
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Asset</label>
-                            <select name="asset_id" required class="h-8 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
-                                <option value="">-- Select Asset --</option>
-                                @foreach(\App\Models\Asset::orderBy('device_name')->get() as $asset)
-                                    <option value="{{ $asset->id }}">{{ $asset->name }} ({{ $asset->asset_tag }})</option>
-                                @endforeach
-                            </select>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
+                            <x-form.searchable-select
+                                name="asset_id"
+                                :options="$allAssets->map(fn($a) => ['value' => $a->id, 'label' => $a->name . ' ('.$a->asset_tag.')' . ($a->assignedTo ? ' - '.$a->assignedTo->name : '')])->toArray()"
+                                placeholder="Search & select Asset..."
+                            />
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Quantity</label>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Quantity <span class="text-red-500">*</span></label>
                             <input type="number" name="qty" value="1" min="1" max="{{ $available }}" required
-                                class="h-8 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
                         </div>
-                        <div class="flex items-end">
-                            <button type="submit" class="h-8 w-full rounded-lg bg-brand-500 px-3 text-xs font-semibold text-white hover:bg-brand-600 transition">
-                                Checkout to Asset
-                            </button>
-                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Notes (Optional)</label>
+                        <input type="text" name="notes" placeholder="e.g. Replaced swollen battery with new Latitude 3410 battery"
+                            class="h-8 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs dark:border-gray-800 dark:bg-gray-900">
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="inline-flex items-center gap-1.5 h-8 rounded-lg bg-brand-500 px-4 text-xs font-semibold text-white hover:bg-brand-600 transition shadow-sm" {{ $available < 1 ? 'disabled' : '' }}>
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                            Checkout Component
+                        </button>
                     </div>
                 </form>
 

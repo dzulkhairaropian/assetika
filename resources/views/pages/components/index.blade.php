@@ -63,21 +63,36 @@
         </div>
 
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            {{-- Card Header: Toolbar --}}
-            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <form action="{{ route('components.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
-                        <div class="relative flex items-center">
-                            <span class="absolute left-2.5 text-gray-400">
-                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                            </span>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components..."
-                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                        </div>
-                        @if(request()->filled('search'))
-                            <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear</a>
-                        @endif
-                    </form>
+	            {{-- Card Header: Toolbar --}}
+	            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
+	                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+	                    <form action="{{ route('components.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+	                        <div class="relative flex items-center">
+	                            <span class="absolute left-2.5 text-gray-400">
+	                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
+	                            </span>
+	                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components..."
+	                                class="h-9 w-48 sm:w-56 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+	                        </div>
+
+	                        <select name="product_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+	                            <option value="">All Master Products</option>
+	                            @foreach($products as $p)
+	                                <option value="{{ $p->id }}" {{ request('product_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+	                            @endforeach
+	                        </select>
+
+	                        <select name="category_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+	                            <option value="">All Categories</option>
+	                            @foreach($categories as $c)
+	                                <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+	                            @endforeach
+	                        </select>
+
+	                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id'))
+	                            <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Reset</a>
+	                        @endif
+	                    </form>
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('components.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
@@ -140,6 +155,12 @@
                                     <a href="{{ route('components.show', $component) }}" class="block font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
                                         {{ $component->name }}
                                     </a>
+                                    @if($component->product)
+                                        <span class="inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                            <i data-lucide="package" class="w-3 h-3 text-gray-400"></i>
+                                            {{ $component->product->name }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300">
                                     {{ $component->category?->name ?? '-' }}

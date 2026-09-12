@@ -24,42 +24,50 @@
                         </h3>
 
                         <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
+                            <div class="lg:col-span-2">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Master Product
+                                </label>
+                                <x-form.searchable-select
+                                    name="product_id"
+                                    :options="$products->map(fn($p) => ['value' => $p->id, 'label' => $p->name . ($p->brand ? ' ('.$p->brand->name.')' : '')])->toArray()"
+                                    :selected="old('product_id')"
+                                    placeholder="Select or search Master Product..."
+                                />
+                                <p class="mt-1 text-[11px] text-gray-400">Selecting a product automatically links the component to the Master Catalog.</p>
+                            </div>
+
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Name <span class="text-red-500">*</span>
+                                    Component Name <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g., Corsair Vengeance 16GB DDR4" required
+                                <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g., Baterai Latitude 3410" required
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                 @error('name') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Category <span class="text-red-500">*</span>
+                                    Category
                                 </label>
-                                <div class="relative z-20 bg-transparent">
-                                    <select name="category_id" required
-                                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                                        <option value="">-- Select Category --</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @error('category_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                                <x-form.searchable-select
+                                    name="category_id"
+                                    :options="$categories->map(fn($c) => ['value' => $c->id, 'label' => $c->name])->toArray()"
+                                    :selected="old('category_id')"
+                                    placeholder="Select Category..."
+                                />
                             </div>
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Manufacturer / Brand
                                 </label>
-                                <select name="manufacturer"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                                    <option value="">-- Select Brand --</option>
-                                    @foreach($brands as $brand)
-                                        <option value="{{ $brand->name }}" {{ old('manufacturer') == $brand->name ? 'selected' : '' }}>{{ $brand->name }}</option>
-                                    @endforeach
-                                </select>
+                                <x-form.searchable-select
+                                    name="manufacturer"
+                                    :options="$brands->map(fn($b) => ['value' => $b->name, 'label' => $b->name])->toArray()"
+                                    :selected="old('manufacturer')"
+                                    placeholder="Select Brand..."
+                                />
                             </div>
 
                             <div>
@@ -72,9 +80,9 @@
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Serial
+                                    Serial Number / Batch No.
                                 </label>
-                                <input type="text" name="serial" value="{{ old('serial') }}" placeholder="Serial number"
+                                <input type="text" name="serial" value="{{ old('serial') }}" placeholder="Serial / Batch number"
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                             </div>
 
@@ -82,7 +90,7 @@
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Total Qty <span class="text-red-500">*</span>
                                 </label>
-                                <input type="number" name="qty" value="{{ old('qty', 0) }}" min="0" required
+                                <input type="number" name="qty" value="{{ old('qty', 1) }}" min="0" required
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                 @error('qty') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                             </div>
@@ -105,15 +113,42 @@
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Purchase Date
+                                </label>
+                                <input type="date" name="purchase_date" value="{{ old('purchase_date') }}"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Warranty (Months)
+                                </label>
+                                <input type="number" name="warranty_months" value="{{ old('warranty_months') }}" min="0" placeholder="e.g. 12"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Vendor / Supplier
+                                </label>
+                                <x-form.searchable-select
+                                    name="vendor_id"
+                                    :options="$vendors->map(fn($v) => ['value' => $v->id, 'label' => $v->name])->toArray()"
+                                    :selected="old('vendor_id')"
+                                    placeholder="Select Vendor..."
+                                />
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Location
                                 </label>
-                                <select name="location_id"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                                    <option value="">-- Select Location --</option>
-                                    @foreach($locations as $location)
-                                        <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
-                                    @endforeach
-                                </select>
+                                <x-form.searchable-select
+                                    name="location_id"
+                                    :options="$locations->map(fn($l) => ['value' => $l->id, 'label' => $l->name])->toArray()"
+                                    :selected="old('location_id')"
+                                    placeholder="Select Location..."
+                                />
                             </div>
 
                             <div class="lg:col-span-2">
