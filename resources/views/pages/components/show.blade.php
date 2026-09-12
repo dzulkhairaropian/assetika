@@ -177,9 +177,9 @@
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Asset <span class="text-red-500">*</span></label>
                                 <x-form.searchable-select
                                     name="asset_id"
-                                    :options="$allAssets->map(fn($a) => ['id' => $a->id, 'text' => $a->asset_tag . ' - ' . ($a->product?->name ?? $a->device_name) . ($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : '')])->toArray()"
+                                    :options="$assetOpts"
                                     placeholder="Search & select Asset..."
-                                    required="true"
+                                    :required="true"
                                 />
                             </div>
                             <div>

@@ -30,10 +30,10 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="product_id"
-                                    :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name . ($p->brand ? ' ('.$p->brand->name.')' : '') . ($p->category ? ' - '.$p->category->name : '')])->toArray()"
+                                    :options="$productOpts"
                                     :selected="old('product_id')"
                                     placeholder="Select Product"
-                                    required="true"
+                                    :required="true"
                                 />
                                 @error('product_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                                 <p class="mt-1 text-[11px] text-gray-400">Select a product model from catalog. Name, category, and brand will be automatically linked.</p>
@@ -119,7 +119,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="vendor_id"
-                                    :options="$vendors->map(fn($v) => ['id' => $v->id, 'text' => $v->name])->toArray()"
+                                    :options="$vendorOpts"
                                     :selected="old('vendor_id')"
                                     placeholder="Select Vendor..."
                                 />
@@ -131,7 +131,7 @@
                                 </label>
                                 <x-form.searchable-select
                                     name="location_id"
-                                    :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()"
+                                    :options="$locationOpts"
                                     :selected="old('location_id')"
                                     placeholder="Select Location..."
                                 />

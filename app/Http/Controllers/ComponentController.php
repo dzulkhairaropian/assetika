@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Component;
 use App\Models\Location;
@@ -73,15 +72,18 @@ class ComponentController extends Controller
             ->orderBy('name')
             ->get();
 
-        $categories = Category::where('master_category_id', $componentMasterCat?->id)
-            ->orderBy('name')
-            ->get();
+        $productOpts = $products->map(fn ($p) => [
+            'id' => $p->id,
+            'text' => $p->name.($p->brand ? ' ('.$p->brand->name.')' : '').($p->category ? ' - '.$p->category->name : ''),
+        ])->values()->all();
 
-        $brands = Brand::orderBy('name')->get();
         $locations = Location::orderBy('name')->get();
-        $vendors = Vendor::orderBy('name')->get();
+        $locationOpts = $locations->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->values()->all();
 
-        return view('pages.components.create', compact('products', 'categories', 'brands', 'locations', 'vendors'));
+        $vendors = Vendor::orderBy('name')->get();
+        $vendorOpts = $vendors->map(fn ($v) => ['id' => $v->id, 'text' => $v->name])->values()->all();
+
+        return view('pages.components.create', compact('productOpts', 'locationOpts', 'vendorOpts'));
     }
 
     public function store(Request $request)
@@ -141,7 +143,12 @@ class ComponentController extends Controller
         $component->load(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser']);
         $allAssets = Asset::with(['product', 'assignedToUser'])->orderBy('asset_tag')->get();
 
-        return view('pages.components.show', compact('component', 'allAssets'));
+        $assetOpts = $allAssets->map(fn ($a) => [
+            'id' => $a->id,
+            'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
+        ])->values()->all();
+
+        return view('pages.components.show', compact('component', 'assetOpts'));
     }
 
     public function edit(Component $component)
@@ -153,15 +160,18 @@ class ComponentController extends Controller
             ->orderBy('name')
             ->get();
 
-        $categories = Category::where('master_category_id', $componentMasterCat?->id)
-            ->orderBy('name')
-            ->get();
+        $productOpts = $products->map(fn ($p) => [
+            'id' => $p->id,
+            'text' => $p->name.($p->brand ? ' ('.$p->brand->name.')' : '').($p->category ? ' - '.$p->category->name : ''),
+        ])->values()->all();
 
-        $brands = Brand::orderBy('name')->get();
         $locations = Location::orderBy('name')->get();
-        $vendors = Vendor::orderBy('name')->get();
+        $locationOpts = $locations->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->values()->all();
 
-        return view('pages.components.edit', compact('component', 'products', 'categories', 'brands', 'locations', 'vendors'));
+        $vendors = Vendor::orderBy('name')->get();
+        $vendorOpts = $vendors->map(fn ($v) => ['id' => $v->id, 'text' => $v->name])->values()->all();
+
+        return view('pages.components.edit', compact('component', 'productOpts', 'locationOpts', 'vendorOpts'));
     }
 
     public function update(Request $request, Component $component)
