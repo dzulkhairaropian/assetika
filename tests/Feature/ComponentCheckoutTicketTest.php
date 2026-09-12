@@ -34,7 +34,7 @@ test('checkout component to asset automatically generates completed maintenance 
     ]);
 
     $this->assertNotNull($component->component_tag);
-    $this->assertStringContainsString('260915', $component->component_tag);
+    $this->assertStringContainsString('/BATT/260915/', $component->component_tag);
 
     $asset = Asset::create([
         'name' => 'Laptop Dell Latitude 3410',

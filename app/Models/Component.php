@@ -33,13 +33,15 @@ class Component extends Model
     {
         $generateTag = function ($component) {
             if (empty($component->component_tag)) {
-                $categoryCode = strtoupper(substr($component->category?->code ?? $component->category?->name ?? 'CMP', 0, 4));
+                $userCompanyCode = auth()->user()?->company?->code ?? Company::first()?->code ?? 'DB';
+                $companyCode = strtoupper(trim($userCompanyCode));
+                $categoryCode = strtoupper(substr($component->category?->code ?? $component->category?->name ?? 'COMP', 0, 4));
                 $date = $component->release_date ? Carbon::parse($component->release_date) : ($component->purchase_date ? Carbon::parse($component->purchase_date) : now());
                 $dateCode = $date->format('ymd');
 
                 $next = static::query()->whereDate('created_at', now()->toDateString())->count() + 1;
                 do {
-                    $candidate = sprintf('CMP/%s/%s/%s', $categoryCode, $dateCode, str_pad((string) $next, 3, '0', STR_PAD_LEFT));
+                    $candidate = sprintf('%s/%s/%s/%s', $companyCode, $categoryCode, $dateCode, str_pad((string) $next, 3, '0', STR_PAD_LEFT));
                     $exists = static::query()->where('component_tag', $candidate)->where('id', '!=', $component->id)->exists();
                     if (! $exists) {
                         $component->component_tag = $candidate;
