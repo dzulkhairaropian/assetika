@@ -181,16 +181,17 @@
                                 </td>
                                 <td class="px-4 py-2.5">
                                     @if($component->assignedAsset)
-                                        <a href="{{ route('assets.show', $component->assignedAsset) }}" class="inline-flex items-center gap-1.5 font-semibold text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400 font-mono text-xs">
-                                            <i data-lucide="laptop" class="w-3.5 h-3.5 text-gray-400"></i>
-                                            {{ $component->assignedAsset->asset_tag }}
-                                        </a>
-                                        <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-normal">
-                                            {{ $component->assignedAsset->product?->name ?? $component->assignedAsset->device_name }}
-                                        </span>
-                                        @if($component->assignedAsset->assignedToUser)
-                                            <span class="block text-[10px] text-gray-400">User: {{ $component->assignedAsset->assignedToUser->name }}</span>
-                                        @endif
+                                        <div>
+                                            <a href="{{ route('assets.show', $component->assignedAsset) }}" class="font-bold font-mono text-xs text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400">
+                                                {{ $component->assignedAsset->asset_tag }}
+                                            </a>
+                                            <div class="text-[11px] text-gray-700 dark:text-gray-300 font-medium leading-tight">
+                                                {{ $component->assignedAsset->product?->name ?? $component->assignedAsset->device_name }}
+                                            </div>
+                                            @if($component->assignedAsset->assignedToUser)
+                                                <div class="text-[10px] text-gray-400 leading-tight">User: {{ $component->assignedAsset->assignedToUser->name }}</div>
+                                            @endif
+                                        </div>
                                     @else
                                         <span class="text-gray-400 text-[11px] italic">Unassigned (In Stock)</span>
                                     @endif
