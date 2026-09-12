@@ -172,7 +172,7 @@ Route::middleware('auth')->group(function () {
     // Component Management
     Route::resource('components', ComponentController::class);
     Route::post('components/{component}/checkout', [ComponentController::class, 'checkout'])->name('components.checkout');
-    Route::post('components/{component}/checkin/{asset}', [ComponentController::class, 'checkin'])->name('components.checkin');
+    Route::post('components/{component}/checkin', [ComponentController::class, 'checkin'])->name('components.checkin');
 
     // License Management
     Route::resource('licenses', LicenseController::class);
