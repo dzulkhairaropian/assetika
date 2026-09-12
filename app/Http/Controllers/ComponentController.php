@@ -80,11 +80,7 @@ class ComponentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'product_id' => 'nullable|exists:products,id',
-            'name' => 'required|string|max:255',
-            'category_id' => 'nullable|exists:categories,id',
-            'manufacturer' => 'nullable|string|max:255',
-            'model_number' => 'nullable|string|max:255',
+            'product_id' => 'required|exists:products,id',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
             'min_qty' => 'nullable|integer|min:0',
@@ -96,17 +92,11 @@ class ComponentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if (! empty($validated['product_id'])) {
-            $product = Product::find($validated['product_id']);
-            if ($product) {
-                if (empty($validated['category_id'])) {
-                    $validated['category_id'] = $product->category_id;
-                }
-                if (empty($validated['manufacturer']) && $product->brand) {
-                    $validated['manufacturer'] = $product->brand->name;
-                }
-            }
-        }
+        $product = Product::with(['brand', 'category'])->findOrFail($validated['product_id']);
+        $validated['name'] = $product->name;
+        $validated['category_id'] = $product->category_id;
+        $validated['manufacturer'] = $product->brand?->name;
+        $validated['model_number'] = $product->product_type ?? $product->name;
 
         Component::create($validated);
 
@@ -154,11 +144,7 @@ class ComponentController extends Controller
     public function update(Request $request, Component $component)
     {
         $validated = $request->validate([
-            'product_id' => 'nullable|exists:products,id',
-            'name' => 'required|string|max:255',
-            'category_id' => 'nullable|exists:categories,id',
-            'manufacturer' => 'nullable|string|max:255',
-            'model_number' => 'nullable|string|max:255',
+            'product_id' => 'required|exists:products,id',
             'serial' => 'nullable|string|max:255',
             'qty' => 'required|integer|min:0',
             'min_qty' => 'nullable|integer|min:0',
@@ -170,17 +156,11 @@ class ComponentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if (! empty($validated['product_id'])) {
-            $product = Product::find($validated['product_id']);
-            if ($product) {
-                if (empty($validated['category_id'])) {
-                    $validated['category_id'] = $product->category_id;
-                }
-                if (empty($validated['manufacturer']) && $product->brand) {
-                    $validated['manufacturer'] = $product->brand->name;
-                }
-            }
-        }
+        $product = Product::with(['brand', 'category'])->findOrFail($validated['product_id']);
+        $validated['name'] = $product->name;
+        $validated['category_id'] = $product->category_id;
+        $validated['manufacturer'] = $product->brand?->name;
+        $validated['model_number'] = $product->product_type ?? $product->name;
 
         $component->update($validated);
 

@@ -26,63 +26,24 @@
                         <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
                             <div class="lg:col-span-2">
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Master Product
+                                    Product <span class="text-red-500">*</span>
                                 </label>
                                 <x-form.searchable-select
                                     name="product_id"
-                                    :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name . ($p->brand ? ' ('.$p->brand->name.')' : '')])->toArray()"
+                                    :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name . ($p->brand ? ' ('.$p->brand->name.')' : '') . ($p->category ? ' - '.$p->category->name : '')])->toArray()"
                                     :selected="old('product_id')"
-                                    placeholder="Select or search Master Product..."
+                                    placeholder="Select Product"
+                                    required="true"
                                 />
-                                <p class="mt-1 text-[11px] text-gray-400">Selecting a product automatically links the component to the Master Catalog.</p>
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Component Name <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g., Battery Lattitude 3410" required
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
-                                @error('name') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Category
-                                </label>
-                                <x-form.searchable-select
-                                    name="category_id"
-                                    :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()"
-                                    :selected="old('category_id')"
-                                    placeholder="Select Category..."
-                                />
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Manufacturer / Brand
-                                </label>
-                                <x-form.searchable-select
-                                    name="manufacturer"
-                                    :options="$brands->map(fn($b) => ['id' => $b->name, 'text' => $b->name])->toArray()"
-                                    :selected="old('manufacturer')"
-                                    placeholder="Select Brand..."
-                                />
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    Model Number
-                                </label>
-                                <input type="text" name="model_number" value="{{ old('model_number') }}" placeholder="e.g., Latitude 3410"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                @error('product_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                                <p class="mt-1 text-[11px] text-gray-400">Select a product model from catalog. Name, category, and brand will be automatically linked.</p>
                             </div>
 
                             <div>
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                     Serial Number / Batch No.
                                 </label>
-                                <input type="text" name="serial" value="{{ old('serial') }}" placeholder="Serial / Batch number"
+                                <input type="text" name="serial" value="{{ old('serial') }}" placeholder="e.g. SN-BAT-3410-001"
                                     class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                             </div>
 
@@ -150,6 +111,15 @@
                                     placeholder="Select Location..."
                                 />
                             </div>
+
+                            <div class="lg:col-span-2">
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Notes
+                                </label>
+                                <textarea name="notes" rows="3" placeholder="Additional notes..."
+                                    class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('notes') }}</textarea>
+                            </div>
+                        </div>
 
                             <div class="lg:col-span-2">
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
