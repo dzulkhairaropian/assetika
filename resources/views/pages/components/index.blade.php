@@ -63,43 +63,72 @@
         </div>
 
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-	            {{-- Card Header: Toolbar --}}
-	            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
-	                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-	                    <form action="{{ route('components.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
-	                        <div class="relative flex items-center">
-	                            <span class="absolute left-2.5 text-gray-400">
-	                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
-	                            </span>
-	                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components..."
-	                                class="h-9 w-48 sm:w-56 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-	                        </div>
+            {{-- Card Header: Tabs + Toolbar --}}
+            <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
+                @php
+                    $currentTab = request('tab');
+                    $tabFilters = array_filter(request()->except(['page', 'tab']));
+                    $tabs = [
+                        ['key' => null,        'label' => 'All Components',  'count' => $summary['total'],     'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'ready',     'label' => 'Ready (In Stock)','count' => $summary['ready'],     'icon' => 'circle-check',  'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'installed', 'label' => 'Installed',       'count' => $summary['installed'], 'icon' => 'cpu',           'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
+                        ['key' => 'service',   'label' => 'In Repair',       'count' => $summary['service'],   'icon' => 'tool',          'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
+                        ['key' => 'scrapped',  'label' => 'Scrapped / Broken','count' => $summary['scrapped'],  'icon' => 'trash-2',       'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                    ];
+                @endphp
+                <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+                    @foreach($tabs as $tab)
+                        @php
+                            $isActive = $currentTab === $tab['key'];
+                            $tabUrl = route('components.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+                        @endphp
+                        <a href="{{ $tabUrl }}"
+                           class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                            <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                            {{ $tab['label'] }}
+                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+                        </a>
+                    @endforeach
+                </div>
 
-	                        <select name="product_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-	                            <option value="">All Master Products</option>
-	                            @foreach($products as $p)
-	                                <option value="{{ $p->id }}" {{ request('product_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
-	                            @endforeach
-	                        </select>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <form action="{{ route('components.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                        @if(request('tab'))
+                            <input type="hidden" name="tab" value="{{ request('tab') }}">
+                        @endif
+                        <div class="relative flex items-center">
+                            <span class="absolute left-2.5 text-gray-400">
+                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components..."
+                                class="h-9 w-48 sm:w-56 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                        </div>
 
-	                        <select name="category_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-	                            <option value="">All Categories</option>
-	                            @foreach($categories as $c)
-	                                <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
-	                            @endforeach
-	                        </select>
+                        <select name="product_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                            <option value="">All Master Products</option>
+                            @foreach($products as $p)
+                                <option value="{{ $p->id }}" {{ request('product_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                            @endforeach
+                        </select>
 
-		                        <select name="status_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-		                            <option value="">All Statuses</option>
-		                            @foreach($statuses as $st)
-		                                <option value="{{ $st->id }}" {{ request('status_id') == $st->id ? 'selected' : '' }}>{{ $st->name }}</option>
-		                            @endforeach
-		                        </select>
+                        <select name="category_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $c)
+                                <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                            @endforeach
+                        </select>
 
-		                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id') || request()->filled('status_id'))
-	                            <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Reset</a>
-	                        @endif
-	                    </form>
+                        <select name="status_id" onchange="this.form.submit()" class="h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                            <option value="">All Statuses</option>
+                            @foreach($statuses as $st)
+                                <option value="{{ $st->id }}" {{ request('status_id') == $st->id ? 'selected' : '' }}>{{ $st->name }}</option>
+                            @endforeach
+                        </select>
+
+                        @if(request()->filled('search') || request()->filled('product_id') || request()->filled('category_id') || request()->filled('status_id') || request()->filled('tab'))
+                            <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Reset</a>
+                        @endif
+                    </form>
 
                     <div class="flex items-center gap-2">
                         <a href="{{ route('components.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">

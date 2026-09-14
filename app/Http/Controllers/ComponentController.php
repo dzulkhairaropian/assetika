@@ -27,6 +27,24 @@ class ComponentController extends Controller
     {
         $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser', 'status']);
 
+        // Tab filter handling
+        $tab = $request->input('tab');
+        if ($tab === 'ready') {
+            $query->where(function ($q) {
+                $q->whereNull('assigned_asset_id')
+                    ->whereHas('status', fn ($s) => $s->where('name', 'Ready'));
+            });
+        } elseif ($tab === 'installed') {
+            $query->where(function ($q) {
+                $q->whereNotNull('assigned_asset_id')
+                    ->orWhereHas('status', fn ($s) => $s->where('name', 'Installed'));
+            });
+        } elseif ($tab === 'service') {
+            $query->whereHas('status', fn ($s) => $s->whereIn('name', ['In Repair', 'Service', 'Maintenance']));
+        } elseif ($tab === 'scrapped') {
+            $query->whereHas('status', fn ($s) => $s->whereIn('name', ['Scrapped', 'Broken', 'Retired']));
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -66,7 +84,16 @@ class ComponentController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses'));
+        // Summary counts for Tab Bar
+        $summary = [
+            'total' => Component::count(),
+            'ready' => Component::whereNull('assigned_asset_id')->whereHas('status', fn ($s) => $s->where('name', 'Ready'))->count(),
+            'installed' => Component::whereNotNull('assigned_asset_id')->orWhereHas('status', fn ($s) => $s->where('name', 'Installed'))->count(),
+            'service' => Component::whereHas('status', fn ($s) => $s->whereIn('name', ['In Repair', 'Service', 'Maintenance']))->count(),
+            'scrapped' => Component::whereHas('status', fn ($s) => $s->whereIn('name', ['Scrapped', 'Broken', 'Retired']))->count(),
+        ];
+
+        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses', 'summary'));
     }
 
     public function create()
