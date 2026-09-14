@@ -384,9 +384,15 @@ class ComponentController extends Controller
     private function createAutomaticTicketForComponent(Asset $asset, Component $component, int $qty, string $action, ?string $notes = null, ?Carbon $customDate = null): void
     {
         $ticketDate = $customDate ?? now();
-        $prefix = 'TCK-'.date('Ym').'-';
+        $maintType = TicketType::where('code', 'MTN')->first()
+            ?? TicketType::where('name', 'like', '%Maintenance%')->first()
+            ?? TicketType::first();
+
+        $requestCode = strtoupper($maintType?->code ?: 'MTN');
+        $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
+
         $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-            ->orderBy('id', 'desc')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
             ->first();
 
         $nextSeq = 1;

@@ -36,6 +36,7 @@ class TicketLookupSeeder extends Seeder
             ['name' => 'Service Request', 'code' => 'SERVICE_REQUEST', 'color' => 'info', 'sort_order' => 2, 'is_active' => 1],
             ['name' => 'Change Request', 'code' => 'CHANGE', 'color' => 'warning', 'sort_order' => 3, 'is_active' => 1],
             ['name' => 'Problem', 'code' => 'PROBLEM', 'color' => 'gray', 'sort_order' => 4, 'is_active' => 1],
+            ['name' => 'Maintenance', 'code' => 'MTN', 'color' => 'warning', 'sort_order' => 5, 'is_active' => 1],
         ], ['code'], ['name', 'color', 'sort_order', 'is_active']);
 
         DB::table('sources')->upsert([
