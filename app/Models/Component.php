@@ -49,7 +49,13 @@ class Component extends Model
                 $date = $component->purchase_date ? Carbon::parse($component->purchase_date) : ($component->release_date ? Carbon::parse($component->release_date) : now());
                 $dateCode = $date->format('ymd');
 
-                $next = static::query()->count() + 1;
+                // Sequence calculation identical to Asset Tag (per company, category, and year)
+                $yearPattern = substr($dateCode, 0, 2).'%';
+                $count = static::query()
+                    ->where('component_tag', 'like', sprintf('%s/%s/%s%%', $companyCode, $categoryCode, $yearPattern))
+                    ->count();
+
+                $next = $count + 1;
                 do {
                     $candidate = sprintf('%s/%s/%s/%s', $companyCode, $categoryCode, $dateCode, str_pad((string) $next, 3, '0', STR_PAD_LEFT));
                     $exists = static::query()->where('component_tag', $candidate)->where('id', '!=', $component->id)->exists();
