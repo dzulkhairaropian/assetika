@@ -233,12 +233,16 @@ class ImportController extends Controller
                 $imported++;
             }
         } elseif ($type === 'users') {
-            foreach ($validRows as $data) {
-                if (empty($data['email'])) {
+            foreach ($validRows as $rawRow) {
+                $data = $this->normalizeRowData($rawRow);
+                $email = ! empty($data['email']) ? trim($data['email']) : (! empty($data['email_address']) ? trim($data['email_address']) : null);
+                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['full_name']) ? trim($data['full_name']) : 'User');
+
+                if (empty($email)) {
                     continue;
                 }
 
-                if (User::where('email', trim($data['email']))->exists()) {
+                if (User::where('email', $email)->exists()) {
                     $skipped++;
 
                     continue;
@@ -264,13 +268,13 @@ class ImportController extends Controller
                     : null;
 
                 $isActive = isset($data['is_active'])
-                    ? (in_array(strtolower(trim($data['is_active'])), ['1', 'true', 'active', 'yes']))
+                    ? (in_array(strtolower(trim((string) $data['is_active'])), ['1', 'true', 'active', 'yes']))
                     : true;
 
                 User::create([
-                    'name' => ! empty($data['name']) ? trim($data['name']) : 'User',
-                    'email' => trim($data['email']),
-                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : null,
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : (! empty($data['phone_number']) ? trim($data['phone_number']) : null),
                     'password' => Hash::make('password123'),
                     'department_id' => $departmentId,
                     'company_id' => $companyId,
@@ -283,8 +287,10 @@ class ImportController extends Controller
         } elseif ($type === 'consumables') {
             $consumableMasterCat = MasterCategory::where('name', 'IT Consumable')->first();
 
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
+            foreach ($validRows as $rawRow) {
+                $data = $this->normalizeRowData($rawRow);
+                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['consumable_name']) ? trim($data['consumable_name']) : null);
+                if (empty($name)) {
                     continue;
                 }
 
@@ -300,7 +306,7 @@ class ImportController extends Controller
                     : null;
 
                 $product = Product::firstOrCreate(
-                    ['name' => trim($data['name'])],
+                    ['name' => $name],
                     [
                         'brand_id' => $brandId,
                         'category_id' => $categoryId,
@@ -316,7 +322,7 @@ class ImportController extends Controller
                     'product_id' => $product->id,
                     'status_id' => $statusId,
                     'quantity' => (int) ($data['quantity'] ?? $data['qty'] ?? 10),
-                    'low_threshold' => (int) ($data['min_qty'] ?? 5),
+                    'low_threshold' => (int) ($data['min_qty'] ?? $data['min_qty_alert'] ?? 5),
                     'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
                     'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
                 ]);
@@ -497,12 +503,14 @@ class ImportController extends Controller
                 $imported++;
             }
         } elseif ($type === 'products') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
+            foreach ($validRows as $rawRow) {
+                $data = $this->normalizeRowData($rawRow);
+                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['product_name']) ? trim($data['product_name']) : null);
+                if (empty($name)) {
                     continue;
                 }
 
-                if (Product::where('name', trim($data['name']))->exists()) {
+                if (Product::where('name', $name)->exists()) {
                     $skipped++;
 
                     continue;
@@ -524,7 +532,7 @@ class ImportController extends Controller
                     : null;
 
                 Product::create([
-                    'name' => trim($data['name']),
+                    'name' => $name,
                     'brand_id' => $brandId,
                     'category_id' => $categoryId,
                     'master_category_id' => $masterCat?->id,
@@ -534,8 +542,10 @@ class ImportController extends Controller
                 $imported++;
             }
         } elseif ($type === 'components') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
+            foreach ($validRows as $rawRow) {
+                $data = $this->normalizeRowData($rawRow);
+                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['component_name']) ? trim($data['component_name']) : null);
+                if (empty($name)) {
                     continue;
                 }
 
@@ -548,12 +558,12 @@ class ImportController extends Controller
                     : null;
 
                 Component::create([
-                    'name' => trim($data['name']),
+                    'name' => $name,
                     'category_id' => $categoryId,
                     'manufacturer' => ! empty($data['brand_name']) ? trim($data['brand_name']) : null,
                     'serial' => ! empty($data['serial_number']) ? trim($data['serial_number']) : null,
                     'qty' => (int) ($data['quantity'] ?? 1),
-                    'min_qty' => (int) ($data['min_qty'] ?? 1),
+                    'min_qty' => (int) ($data['min_qty'] ?? $data['min_qty_alert'] ?? 1),
                     'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
                     'location_id' => $locationId,
                     'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
@@ -561,16 +571,23 @@ class ImportController extends Controller
                 $imported++;
             }
         } elseif ($type === 'licenses') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
+            foreach ($validRows as $rawRow) {
+                $data = $this->normalizeRowData($rawRow);
+                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['license_name']) ? trim($data['license_name']) : null);
+                if (empty($name)) {
                     continue;
                 }
 
+                $categoryId = ! empty($data['category_name'])
+                    ? Category::firstOrCreate(['name' => trim($data['category_name'])])->id
+                    : null;
+
                 License::create([
-                    'name' => trim($data['name']),
+                    'name' => $name,
+                    'category_id' => $categoryId,
                     'product_key' => ! empty($data['license_key']) ? trim($data['license_key']) : null,
                     'seats' => (int) ($data['seats'] ?? 1),
-                    'manufacturer' => ! empty($data['manufacturer_name']) ? trim($data['manufacturer_name']) : null,
+                    'manufacturer' => ! empty($data['manufacturer_name']) ? trim($data['manufacturer_name']) : (! empty($data['manufacturer']) ? trim($data['manufacturer']) : null),
                     'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
                     'purchase_date' => ! empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
                     'expiration_date' => ! empty($data['expiration_date']) ? trim($data['expiration_date']) : null,
@@ -585,54 +602,37 @@ class ImportController extends Controller
         return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped {$skipped}.");
     }
 
-    private function normalizeAssetData(array $rawRow): array
+    private function normalizeRowData(array $rawRow): array
     {
-        $map = [
-            'Asset Tag' => 'asset_tag',
-            'Device Name' => 'device_name',
-            'Serial Number' => 'serial_number',
-            'Product Number' => 'product_number',
-            'Brand' => 'brand_name',
-            'brand_name' => 'brand_name',
-            'Category' => 'category_name',
-            'category_name' => 'category_name',
-            'Product Model' => 'model_name',
-            'Model' => 'model_name',
-            'model_name' => 'model_name',
-            'Operating System' => 'operating_system',
-            'Status' => 'status_name',
-            'status_name' => 'status_name',
-            'Company' => 'company_name',
-            'company_name' => 'company_name',
-            'Department' => 'department_name',
-            'department_name' => 'department_name',
-            'Location' => 'location_name',
-            'location_name' => 'location_name',
-            'Holder' => 'assigned_user_email',
-            'Assigned User' => 'assigned_user_email',
-            'assigned_user_email' => 'assigned_user_email',
-            'Vendor' => 'vendor_name',
-            'vendor_name' => 'vendor_name',
-            'Purchase Date' => 'purchase_date',
-            'purchase_date' => 'purchase_date',
-            'Purchase Cost' => 'purchase_cost',
-            'purchase_cost' => 'purchase_cost',
-            'Invoice' => 'invoice_number',
-            'Invoice Number' => 'invoice_number',
-            'invoice_number' => 'invoice_number',
-            'Warranty Expiry' => 'warranty_expiry_date',
-            'warranty_expiry_date' => 'warranty_expiry_date',
-            'Specification' => 'specification',
-            'specification' => 'specification',
-            'Notes' => 'notes',
-            'notes' => 'notes',
+        $aliasMap = [
+            'brand' => 'brand_name',
+            'category' => 'category_name',
+            'model' => 'model_name',
+            'product_model' => 'model_name',
+            'status' => 'status_name',
+            'company' => 'company_name',
+            'department' => 'department_name',
+            'position' => 'position_name',
+            'location' => 'location_name',
+            'vendor' => 'vendor_name',
+            'holder' => 'assigned_user_email',
+            'assigned_user' => 'assigned_user_email',
+            'warranty_expiry' => 'warranty_expiry_date',
+            'master_category' => 'master_category_name',
+            'manufacturer' => 'manufacturer_name',
+            'license_key' => 'license_key',
+            'serial' => 'serial_number',
+            'serial_number' => 'serial_number',
+            'quantity' => 'quantity',
+            'qty' => 'quantity',
         ];
 
         $normalized = [];
         foreach ($rawRow as $key => $value) {
             $trimmedKey = trim($key);
-            $targetKey = $map[$trimmedKey] ?? strtolower(str_replace(' ', '_', $trimmedKey));
-            $normalized[$targetKey] = $value;
+            $clean = strtolower(str_replace([' ', '-'], '_', preg_replace('/[^A-Za-z0-9 _-]/', '', $trimmedKey)));
+            $targetKey = $aliasMap[$clean] ?? $clean;
+            $normalized[$targetKey] = is_string($value) ? trim($value) : $value;
         }
 
         return $normalized;
@@ -714,16 +714,16 @@ class ImportController extends Controller
 
             case 'consumables':
                 $headers = [
-                    'name',
-                    'category_name',
-                    'brand_name',
-                    'company_name',
-                    'location_name',
-                    'quantity',
-                    'min_qty',
-                    'purchase_cost',
-                    'status_name',
-                    'notes',
+                    'Consumable Name',
+                    'Category',
+                    'Brand',
+                    'Company',
+                    'Location',
+                    'Quantity',
+                    'Min Qty Alert',
+                    'Purchase Cost',
+                    'Status',
+                    'Notes',
                 ];
                 $rows = [
                     [
@@ -755,14 +755,14 @@ class ImportController extends Controller
 
             case 'users':
                 $headers = [
-                    'name',
-                    'email',
-                    'phone',
-                    'company_name',
-                    'department_name',
-                    'position_name',
-                    'location_name',
-                    'is_active',
+                    'Full Name',
+                    'Email Address',
+                    'Phone Number',
+                    'Company',
+                    'Department',
+                    'Position',
+                    'Location',
+                    'Is Active',
                 ];
                 $rows = [
                     [
@@ -789,7 +789,7 @@ class ImportController extends Controller
                 break;
 
             case 'companies':
-                $headers = ['name', 'code', 'email', 'phone', 'website', 'address', 'notes'];
+                $headers = ['Company Name', 'Company Code', 'Email', 'Phone', 'Website', 'Address', 'Notes'];
                 $rows = [
                     ['PT Diastika Biotekindo', 'DB', 'info@diastika.co.id', '021-1234567', 'https://diastika.co.id', 'Kabayoran Lama, Jakarta', 'Head Company'],
                     ['PT UBC Indonesia', 'UBC', 'contact@ubcindonesia.com', '021-7654321', 'https://ubcindonesia.com', 'Jakarta', 'Subsidiary Company'],
@@ -797,7 +797,7 @@ class ImportController extends Controller
                 break;
 
             case 'departments':
-                $headers = ['name', 'code', 'company_name', 'notes'];
+                $headers = ['Department Name', 'Department Code', 'Company', 'Notes'];
                 $rows = [
                     ['Information Technology', 'IT', 'PT Diastika Biotekindo', 'IT Department'],
                     ['Finance & Accounting', 'FIN', 'PT Diastika Biotekindo', 'Finance & Tax Department'],
@@ -806,7 +806,7 @@ class ImportController extends Controller
                 break;
 
             case 'locations':
-                $headers = ['name', 'code', 'company_name', 'address', 'city', 'state', 'zip', 'country', 'notes'];
+                $headers = ['Location Name', 'Location Code', 'Company', 'Address', 'City', 'State', 'Zip Code', 'Country', 'Notes'];
                 $rows = [
                     ['Head Office Jakarta', 'HO-JKT', 'PT Diastika Biotekindo', 'Jl. Kebayoran Lama No. 12', 'Jakarta Selatan', 'DKI Jakarta', '12210', 'Indonesia', 'Main Headquarter'],
                     ['Branch Surabaya', 'BR-SBY', 'PT Diastika Biotekindo', 'Jl. Raya Darmo', 'Surabaya', 'Jawa Timur', '60241', 'Indonesia', 'Surabaya Office'],
@@ -814,7 +814,7 @@ class ImportController extends Controller
                 break;
 
             case 'brands':
-                $headers = ['name', 'website', 'support_phone', 'support_email', 'notes'];
+                $headers = ['Brand Name', 'Website', 'Support Phone', 'Support Email', 'Notes'];
                 $rows = [
                     ['Apple', 'https://apple.com', '1-800-MY-APPLE', 'support@apple.com', 'Apple Hardware & Devices'],
                     ['Dell', 'https://dell.com', '1-800-DELL-CARE', 'support@dell.com', 'Dell Workstations & Servers'],
@@ -823,16 +823,16 @@ class ImportController extends Controller
                 break;
 
             case 'categories':
-                $headers = ['name', 'master_category_name', 'code', 'eula_name', 'notes'];
+                $headers = ['Category Name', 'Master Category', 'Category Code', 'EULA Name', 'Notes'];
                 $rows = [
-                    ['Laptops', 'IT Asset', 'LAP', 'Standard Hardware EULA', 'Laptop Computers'],
-                    ['Desktops', 'IT Asset', 'DESK', 'Standard Hardware EULA', 'Desktop PC & All-in-One'],
+                    ['Notebook', 'IT Asset', 'NB', 'Standard Hardware EULA', 'Laptop Computers'],
+                    ['Printer', 'IT Asset', 'PR', 'Standard Hardware EULA', 'Desktop Printers'],
                     ['Peripherals', 'IT Consumable', 'PERIPH', '', 'Mice, Keyboards, Audio'],
                 ];
                 break;
 
             case 'positions':
-                $headers = ['name', 'code', 'department_name', 'notes'];
+                $headers = ['Position Name', 'Position Code', 'Department', 'Notes'];
                 $rows = [
                     ['Senior Developer', 'SR-DEV', 'Information Technology', 'Lead Developer Position'],
                     ['IT Support Specialist', 'IT-SUPP', 'Information Technology', 'Helpdesk & Support'],
@@ -841,7 +841,7 @@ class ImportController extends Controller
                 break;
 
             case 'vendors':
-                $headers = ['name', 'contact_person', 'email', 'phone', 'website', 'address', 'npwp_number', 'npwp_name', 'nib', 'bank_name', 'bank_account_number', 'bank_account_name', 'notes'];
+                $headers = ['Vendor Name', 'Contact Person', 'Email', 'Phone', 'Website', 'Address', 'NPWP Number', 'NPWP Name', 'NIB', 'Bank Name', 'Bank Account Number', 'Bank Account Name', 'Notes'];
                 $rows = [
                     ['PT Jasanet Mitra Network', 'Erna', 'admin@jasanet.co.id', '085894711377', 'https://jasanet.co.id', 'Jakarta', '12.345.678.9-012.000', 'PT Jasanet', '1234567890', 'BCA', '1234567890', 'PT Jasanet Mitra Network', 'Network Vendor'],
                     ['Bhinneka Mentari Dimensi', 'Sales Team', 'sales@bhinneka.com', '021-29292828', 'https://bhinneka.com', 'Jakarta', '', '', '', 'BCA', '0987654321', 'Bhinneka Mentari Dimensi', 'IT Hardware Vendor'],
@@ -849,15 +849,15 @@ class ImportController extends Controller
                 break;
 
             case 'products':
-                $headers = ['name', 'brand_name', 'category_name', 'master_category_name', 'product_type', 'description'];
+                $headers = ['Product Name', 'Brand', 'Category', 'Master Category', 'Product Type', 'Description'];
                 $rows = [
-                    ['MacBook Pro 16 M3 Max', 'Apple', 'Laptops', 'IT Asset', 'Hardware', '16-inch Apple Laptop'],
-                    ['Dell XPS 15 9530', 'Dell', 'Laptops', 'IT Asset', 'Hardware', '15-inch Dell Laptop'],
+                    ['MacBook Pro 16 M3 Max', 'Apple', 'Notebook', 'IT Asset', 'Hardware', '16-inch Apple Laptop'],
+                    ['Dell XPS 15 9530', 'Dell', 'Notebook', 'IT Asset', 'Hardware', '15-inch Dell Laptop'],
                 ];
                 break;
 
             case 'components':
-                $headers = ['name', 'category_name', 'brand_name', 'serial_number', 'quantity', 'min_qty', 'purchase_cost', 'location_name', 'notes'];
+                $headers = ['Component Name', 'Category', 'Brand', 'Serial Number', 'Quantity', 'Min Qty Alert', 'Purchase Cost', 'Location', 'Notes'];
                 $rows = [
                     ['DDR5 32GB RAM SODIMM', 'Memory RAM', 'Corsair', 'SN-RAM-001', '20', '5', '1850000', 'Head Office Jakarta', 'DDR5 Laptop Memory'],
                     ['Samsung 990 PRO 2TB SSD', 'Storage SSD', 'Samsung', 'SN-SSD-002', '15', '3', '2450000', 'Head Office Jakarta', 'NVMe M.2 SSD'],
@@ -865,7 +865,7 @@ class ImportController extends Controller
                 break;
 
             case 'licenses':
-                $headers = ['name', 'license_key', 'category_name', 'manufacturer_name', 'seats', 'purchase_cost', 'purchase_date', 'expiration_date', 'notes'];
+                $headers = ['License Name', 'License Key', 'Category', 'Manufacturer', 'Seats', 'Purchase Cost', 'Purchase Date', 'Expiration Date', 'Notes'];
                 $rows = [
                     ['Microsoft 365 Business Premium', 'MS365-KEY-2026-XYZ', 'Software License', 'Microsoft', '100', '25000000', '2026-01-01', '2027-01-01', 'Annual License'],
                     ['Adobe Creative Cloud All Apps', 'ADOBE-CC-2026-ABC', 'Software License', 'Adobe', '15', '18000000', '2026-02-01', '2027-02-01', 'Design Team Licenses'],
@@ -873,7 +873,7 @@ class ImportController extends Controller
                 break;
 
             default:
-                $headers = ['name', 'email'];
+                $headers = ['Name', 'Email'];
                 $rows = [];
                 break;
         }
