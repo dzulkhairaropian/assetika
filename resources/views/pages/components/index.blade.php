@@ -24,7 +24,7 @@
         <x-common.page-breadcrumb pageTitle="Components" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Manage hardware components (RAM, SSD, GPU) and stock levels.
+            Manage individual hardware component units (RAM, SSD, GPU), serial tags, and asset installations.
         </p>
 
         @if(session('success'))
