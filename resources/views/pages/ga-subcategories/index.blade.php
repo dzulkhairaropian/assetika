@@ -87,7 +87,7 @@
             const spaceBelow = window.innerHeight - rect.bottom;
             const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
             const left = Math.max(10, rect.right - 144);
-            this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999;`;
+            this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999; display: block;`;
         }
     }
 }" @click.away="open = false" @scroll.window="open = false" class="inline-block text-left">
@@ -97,7 +97,7 @@
 
     <div x-show="open"
         x-transition
-        :style="dropdownStyle"
+        :style="open ? dropdownStyle : 'display: none;'"
         class="w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
                                             style="display: none;">
                                             
