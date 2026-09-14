@@ -108,12 +108,24 @@ class ImportController extends Controller
         if ($type === 'assets') {
             $itMasterCat = MasterCategory::where('name', 'IT Asset')->first();
 
-            foreach ($validRows as $data) {
-                if (empty($data['serial_number']) && empty($data['asset_tag'])) {
+            foreach ($validRows as $rawRow) {
+                // Map human-readable headers to standard array keys
+                $data = $this->normalizeAssetData($rawRow);
+
+                $assetTag = ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null;
+                $serialNumber = ! empty($data['serial_number']) ? trim($data['serial_number']) : null;
+
+                if (empty($serialNumber) && empty($assetTag)) {
                     continue;
                 }
 
-                if (! empty($data['serial_number']) && Asset::where('serial_number', $data['serial_number'])->exists()) {
+                if (! empty($serialNumber) && Asset::where('serial_number', $serialNumber)->exists()) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                if (! empty($assetTag) && Asset::where('asset_tag', $assetTag)->exists()) {
                     $skipped++;
 
                     continue;
@@ -573,90 +585,128 @@ class ImportController extends Controller
         return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped {$skipped}.");
     }
 
+    private function normalizeAssetData(array $rawRow): array
+    {
+        $map = [
+            'Asset Tag' => 'asset_tag',
+            'Device Name' => 'device_name',
+            'Serial Number' => 'serial_number',
+            'Product Number' => 'product_number',
+            'Brand' => 'brand_name',
+            'brand_name' => 'brand_name',
+            'Category' => 'category_name',
+            'category_name' => 'category_name',
+            'Product Model' => 'model_name',
+            'Model' => 'model_name',
+            'model_name' => 'model_name',
+            'Operating System' => 'operating_system',
+            'Status' => 'status_name',
+            'status_name' => 'status_name',
+            'Company' => 'company_name',
+            'company_name' => 'company_name',
+            'Department' => 'department_name',
+            'department_name' => 'department_name',
+            'Location' => 'location_name',
+            'location_name' => 'location_name',
+            'Holder' => 'assigned_user_email',
+            'Assigned User' => 'assigned_user_email',
+            'assigned_user_email' => 'assigned_user_email',
+            'Vendor' => 'vendor_name',
+            'vendor_name' => 'vendor_name',
+            'Purchase Date' => 'purchase_date',
+            'purchase_date' => 'purchase_date',
+            'Purchase Cost' => 'purchase_cost',
+            'purchase_cost' => 'purchase_cost',
+            'Invoice' => 'invoice_number',
+            'Invoice Number' => 'invoice_number',
+            'invoice_number' => 'invoice_number',
+            'Warranty Expiry' => 'warranty_expiry_date',
+            'warranty_expiry_date' => 'warranty_expiry_date',
+            'Specification' => 'specification',
+            'specification' => 'specification',
+            'Notes' => 'notes',
+            'notes' => 'notes',
+        ];
+
+        $normalized = [];
+        foreach ($rawRow as $key => $value) {
+            $trimmedKey = trim($key);
+            $targetKey = $map[$trimmedKey] ?? strtolower(str_replace(' ', '_', $trimmedKey));
+            $normalized[$targetKey] = $value;
+        }
+
+        return $normalized;
+    }
+
     public function downloadTemplate($type)
     {
         switch ($type) {
             case 'assets':
                 $headers = [
-                    'asset_tag',
-                    'device_name',
-                    'serial_number',
-                    'product_number',
-                    'brand_name',
-                    'category_name',
-                    'model_name',
-                    'operating_system',
-                    'status_name',
-                    'company_name',
-                    'department_name',
-                    'location_name',
-                    'assigned_user_email',
-                    'vendor_name',
-                    'purchase_date',
-                    'purchase_cost',
-                    'invoice_number',
-                    'warranty_expiry_date',
-                    'license_windows',
-                    'license_office',
-                    'mac_address_wireless',
-                    'mac_address_ethernet',
-                    'specification',
-                    'accessories',
-                    'notes',
+                    'Asset Tag',
+                    'Device Name',
+                    'Brand',
+                    'Product Model',
+                    'Category',
+                    'Serial Number',
+                    'Product Number',
+                    'Status',
+                    'Company',
+                    'Department',
+                    'Location',
+                    'Holder',
+                    'Vendor',
+                    'Operating System',
+                    'Purchase Date',
+                    'Warranty Expiry',
+                    'Purchase Cost',
+                    'Invoice Number',
+                    'Specification',
+                    'Notes',
                 ];
                 $rows = [
                     [
                         'AST-IT-2026-001',
                         'MacBook Pro M3 Max',
+                        'Apple',
+                        'MacBook Pro 16 Inch M3 Max',
+                        'Notebook',
                         'SN-MAC2026-001',
                         'PN-MBP16-01',
-                        'Apple',
-                        'Laptops',
-                        'MacBook Pro 16 Inch M3 Max',
-                        'macOS Sequoia',
                         'Ready to Deploy',
                         'PT Diastika Biotekindo',
                         'Information Technology',
                         'Head Office Jakarta',
-                        'dzul.khair@diastika.co.id',
+                        'Dzul Khair Aropian',
                         'Bhinneka Mentari Dimensi',
+                        'macOS Sequoia',
                         '2026-01-15',
+                        '2028-01-15',
                         '45000000',
                         'INV-2026-001',
-                        '2028-01-15',
-                        '',
-                        '',
-                        'A1:B2:C3:D4:E5:F6',
-                        'A1:B2:C3:D4:E5:F7',
                         'Apple M3 Max 36GB RAM 1TB SSD',
-                        '140W USB-C Power Adapter, MagSafe 3 Cable',
                         'Primary Developer Laptop',
                     ],
                     [
                         'AST-IT-2026-002',
                         'Dell XPS 15 Workstation',
+                        'Dell',
+                        'Dell XPS 15 9530',
+                        'Notebook',
                         'SN-DELL2026-002',
                         'PN-XPS15-9530',
-                        'Dell',
-                        'Laptops',
-                        'Dell XPS 15 9530',
-                        'Windows 11 Pro',
                         'Deployed',
                         'PT Diastika Biotekindo',
                         'Finance & Accounting',
                         'Head Office Jakarta',
-                        'admin.finance2@diastika.co.id',
+                        'Dian',
                         'Global IT Solution',
+                        'Windows 11 Pro',
                         '2026-02-01',
+                        '2029-02-01',
                         '32000000',
                         'INV-2026-088',
-                        '2029-02-01',
-                        'WIN11-PRO-KEY-XYZ',
-                        'OFFICE-2021-KEY-ABC',
-                        'B1:C2:D3:E4:F5:A6',
-                        'B1:C2:D3:E4:F5:A7',
                         'Intel Core i7 32GB RAM 1TB SSD RTX 4060',
-                        'Charger 130W USB-C, Dell Backpack',
                         'Finance Lead Laptop',
                     ],
                 ];
