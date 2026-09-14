@@ -121,18 +121,20 @@ class ImportController extends Controller
                     continue;
                 }
 
+                $categoryObj = Category::where('name', $categoryName)->first();
+                $categoryCode = $categoryObj?->code;
+                if (! $categoryCode) {
+                    $categoryId = Category::firstOrCreate(
+                        ['name' => $categoryName],
+                        ['master_category_id' => $itMasterCat?->id, 'code' => strtoupper(substr($categoryName, 0, 2))]
+                    )->id;
+                    $categoryCode = Category::find($categoryId)?->code ?? strtoupper(substr($categoryName, 0, 2));
+                } else {
+                    $categoryId = $categoryObj->id;
+                }
+
                 // Format Asset Tag & Device Name to 100% Assetika Standard
-                $assetTag = $this->formatAssetTagStandard($rawTag, $categoryName);
-
-                // Resolve Brand & Category & Product
-                $brandId = ! empty($data['brand_name'])
-                    ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
-                    : null;
-
-                $categoryId = Category::firstOrCreate(
-                    ['name' => $categoryName],
-                    ['master_category_id' => $itMasterCat?->id, 'code' => strtoupper(substr($categoryName, 0, 2))]
-                )->id;
+                $assetTag = $this->formatAssetTagStandard($rawTag, $categoryCode);
 
                 $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : 'General Model');
                 $product = Product::firstOrCreate(
@@ -607,11 +609,10 @@ class ImportController extends Controller
         return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped {$skipped}.");
     }
 
-    private function formatAssetTagStandard(?string $rawTag, string $categoryName): string
+    private function formatAssetTagStandard(?string $rawTag, string $categoryCode): string
     {
+        $catCode = strtoupper(trim($categoryCode));
         if (empty($rawTag)) {
-            $catCode = strtoupper(substr($categoryName, 0, 2));
-
             return "DB/{$catCode}/220101/099";
         }
 
@@ -631,7 +632,7 @@ class ImportController extends Controller
         // Pattern 2: DB/15050029 -> DB/NB/150501/029
         if (preg_match('/^([A-Z0-9]+)\/(\d{2})(\d{2})(\d{4,5})$/i', $cleanTag, $matches)) {
             $comp = strtoupper($matches[1]);
-            $cat = strtoupper(substr($categoryName, 0, 2));
+            $cat = $catCode;
             $year = $matches[2];
             $month = $matches[3];
             $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
@@ -639,7 +640,18 @@ class ImportController extends Controller
             return "{$comp}/{$cat}/{$year}{$month}01/{$seq}";
         }
 
-        // Pattern 3: DB/NB/21080114 -> DB/NB/210801/014
+        // Pattern 3: DB/NB/21080114 -> DB/NB/210801/014 (or DB/NO/201201/033 -> DB/NB/201201/033)
+        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{6})\/(\d+)$/i', $cleanTag, $matches)) {
+            $comp = strtoupper($matches[1]);
+            $cat = strtoupper($matches[2]);
+            if (in_array($cat, ['NO', 'NOT'])) {
+                $cat = $catCode;
+            }
+            $dateCode = $matches[3];
+            $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
+
+            return "{$comp}/{$cat}/{$dateCode}/{$seq}";
+        }
         if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{6})(\d{2,4})$/i', $cleanTag, $matches)) {
             $comp = strtoupper($matches[1]);
             $cat = strtoupper($matches[2]);
