@@ -30,14 +30,15 @@ class ComponentController extends Controller
         // Tab filter handling
         $tab = $request->input('tab');
         if ($tab === 'ready') {
-            $query->where(function ($q) {
-                $q->whereNull('assigned_asset_id')
-                    ->whereHas('status', fn ($s) => $s->where('name', 'Ready'));
-            });
+            $query->whereNull('assigned_asset_id')
+                ->where(function ($q) {
+                    $q->whereNull('status_id')
+                        ->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Ready', 'Ready to Deploy', 'Available', 'In Stock']));
+                });
         } elseif ($tab === 'installed') {
             $query->where(function ($q) {
                 $q->whereNotNull('assigned_asset_id')
-                    ->orWhereHas('status', fn ($s) => $s->where('name', 'Installed'));
+                    ->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Installed', 'Deployed']));
             });
         } elseif ($tab === 'service') {
             $query->whereHas('status', fn ($s) => $s->whereIn('name', ['In Repair', 'Service', 'Maintenance']));
@@ -87,8 +88,15 @@ class ComponentController extends Controller
         // Summary counts for Tab Bar
         $summary = [
             'total' => Component::count(),
-            'ready' => Component::whereNull('assigned_asset_id')->whereHas('status', fn ($s) => $s->where('name', 'Ready'))->count(),
-            'installed' => Component::whereNotNull('assigned_asset_id')->orWhereHas('status', fn ($s) => $s->where('name', 'Installed'))->count(),
+            'ready' => Component::whereNull('assigned_asset_id')
+                ->where(function ($q) {
+                    $q->whereNull('status_id')
+                        ->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Ready', 'Ready to Deploy', 'Available', 'In Stock']));
+                })->count(),
+            'installed' => Component::where(function ($q) {
+                $q->whereNotNull('assigned_asset_id')
+                    ->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Installed', 'Deployed']));
+            })->count(),
             'service' => Component::whereHas('status', fn ($s) => $s->whereIn('name', ['In Repair', 'Service', 'Maintenance']))->count(),
             'scrapped' => Component::whereHas('status', fn ($s) => $s->whereIn('name', ['Scrapped', 'Broken', 'Retired']))->count(),
         ];
