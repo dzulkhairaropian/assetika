@@ -38,8 +38,15 @@ class Component extends Model
             if (empty($component->component_tag)) {
                 $userCompanyCode = auth()->user()?->company?->code ?? Company::first()?->code ?? 'DB';
                 $companyCode = strtoupper(trim($userCompanyCode));
-                $categoryCode = strtoupper(substr($component->category?->code ?? $component->category?->name ?? 'COMP', 0, 4));
-                $date = $component->release_date ? Carbon::parse($component->release_date) : ($component->purchase_date ? Carbon::parse($component->purchase_date) : now());
+
+                $category = $component->category ?? ($component->category_id ? Category::find($component->category_id) : null);
+                $catRaw = $category?->code ?: ($category?->name ?: 'COMP');
+                $categoryCode = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $catRaw), 0, 4));
+                if (empty($categoryCode)) {
+                    $categoryCode = 'COMP';
+                }
+
+                $date = $component->purchase_date ? Carbon::parse($component->purchase_date) : ($component->release_date ? Carbon::parse($component->release_date) : now());
                 $dateCode = $date->format('ymd');
 
                 $next = static::query()->count() + 1;
