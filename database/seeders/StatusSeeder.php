@@ -11,6 +11,7 @@ class StatusSeeder extends Seeder
     public function run(): void
     {
         $itAsset = MasterCategory::where('name', 'IT Asset')->first();
+        $itComponent = MasterCategory::where('name', 'IT Component')->first();
         $itConsumable = MasterCategory::where('name', 'IT Consumable')->first();
         $itRequest = MasterCategory::where('name', 'IT Request')->first();
         $gaAsset = MasterCategory::where('name', 'GA Asset')->first();
@@ -28,6 +29,12 @@ class StatusSeeder extends Seeder
             ['name' => 'For Sale',        'master_category_id' => $itAsset?->id,      'color' => 'warning',   'icon' => 'tag'],
             ['name' => 'Sold',            'master_category_id' => $itAsset?->id,      'color' => 'dark',      'icon' => 'dollar-sign'],
             ['name' => 'Retired',         'master_category_id' => $itAsset?->id,      'color' => 'secondary', 'icon' => 'trash-2'],
+
+            // IT Component
+            ['name' => 'Ready',           'master_category_id' => $itComponent?->id,  'color' => 'success',   'icon' => 'check-circle'],
+            ['name' => 'Installed',       'master_category_id' => $itComponent?->id,  'color' => 'primary',   'icon' => 'cpu'],
+            ['name' => 'In Repair',       'master_category_id' => $itComponent?->id,  'color' => 'warning',   'icon' => 'tool'],
+            ['name' => 'Scrapped',        'master_category_id' => $itComponent?->id,  'color' => 'danger',    'icon' => 'trash-2'],
 
             // IT Consumable
             ['name' => 'In Stock',        'master_category_id' => $itConsumable?->id, 'color' => 'success',   'icon' => 'check-circle'],

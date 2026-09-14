@@ -202,9 +202,25 @@
                                 <td class="px-4 py-2.5">
                                     @php
                                         $statusObj = $component->status;
-                                        $color = $statusObj->color ?? 'primary';
-                                        $icon = $statusObj->icon ?? null;
-                                        $name = $statusObj->name ?? $component->status ?? 'Ready';
+                                        $stRaw = strtolower($statusObj->name ?? $component->status ?? '');
+                                        
+                                        if ($component->assigned_asset_id || str_contains($stRaw, 'installed') || str_contains($stRaw, 'deployed')) {
+                                            $name = 'Installed';
+                                            $color = 'brand';
+                                            $icon = 'cpu';
+                                        } elseif (str_contains($stRaw, 'repair') || str_contains($stRaw, 'service') || str_contains($stRaw, 'maint')) {
+                                            $name = 'In Repair';
+                                            $color = 'warning';
+                                            $icon = 'tool';
+                                        } elseif (str_contains($stRaw, 'scrap') || str_contains($stRaw, 'broken') || str_contains($stRaw, 'retired')) {
+                                            $name = 'Scrapped';
+                                            $color = 'danger';
+                                            $icon = 'trash-2';
+                                        } else {
+                                            $name = 'Ready';
+                                            $color = 'success';
+                                            $icon = 'circle-check';
+                                        }
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $name }}</x-ui.badge>
                                 </td>

@@ -11,6 +11,7 @@ class MasterCategorySeeder extends Seeder
     {
         $masters = [
             ['name' => 'IT Asset'],
+            ['name' => 'IT Component'],
             ['name' => 'IT Consumable'],
             ['name' => 'IT Request'],
             ['name' => 'GA Asset'],
