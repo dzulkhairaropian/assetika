@@ -78,7 +78,7 @@
                                 <td class="px-4 py-2.5 text-end">
                                     <div x-data="{
     open: false,
-    dropdownStyle: "",
+    dropdownStyle: '',
     toggle(e) {
         this.open = !this.open;
         if (this.open) {
