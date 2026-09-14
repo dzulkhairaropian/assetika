@@ -163,13 +163,29 @@ class ImportController extends Controller
                     ? Vendor::firstOrCreate(['name' => trim($data['vendor_name'])])->id
                     : null;
 
-                // Resolve Status
-                $statusId = ! empty($data['status_name'])
-                    ? Status::where('name', trim($data['status_name']))->first()?->id
-                    : null;
+                // Resolve Status with Asset Tag Compliance Validation
+                $draftStatusId = Status::where('name', 'Draft')->first()?->id;
 
-                if (! $statusId) {
-                    $statusId = Status::where('name', 'Ready to Deploy')->first()?->id ?? Status::first()?->id;
+                // Standard Assetika format check: COMPANY/CATEGORY/YYMMDD/SEQ (e.g. DB/NB/260914/001 or AST-IT-2026-001)
+                $isCompliantTag = ! empty($assetTag) && (
+                    preg_match('/^[A-Z0-9]+\/[A-Z0-9]+\/\d{6}\/\d+$/i', $assetTag) ||
+                    preg_match('/^[A-Z0-9]+-[A-Z0-9]+-\d{4}-\d+$/i', $assetTag)
+                );
+
+                $notes = ! empty($data['notes']) ? trim($data['notes']) : null;
+
+                if (! $isCompliantTag && $draftStatusId) {
+                    $statusId = $draftStatusId;
+                    $nonComplianceReason = empty($assetTag) ? 'missing Asset Tag' : "non-compliant Asset Tag format ('{$assetTag}')";
+                    $notes = trim(($notes ? $notes.' | ' : '')."Imported as Draft due to {$nonComplianceReason}.");
+                } else {
+                    $statusId = ! empty($data['status_name'])
+                        ? Status::where('name', trim($data['status_name']))->first()?->id
+                        : null;
+
+                    if (! $statusId) {
+                        $statusId = Status::where('name', 'Ready to Deploy')->first()?->id ?? Status::first()?->id;
+                    }
                 }
 
                 // Resolve Company, Department, Location
@@ -228,7 +244,7 @@ class ImportController extends Controller
                     'mac_address_ethernet' => ! empty($data['mac_address_ethernet']) ? trim($data['mac_address_ethernet']) : null,
                     'specification' => ! empty($data['specification']) ? trim($data['specification']) : null,
                     'accessories' => ! empty($data['accessories']) ? trim($data['accessories']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
+                    'notes' => $notes,
                 ]);
                 $imported++;
             }
