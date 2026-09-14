@@ -110,7 +110,7 @@ class ImportController extends Controller
 
             foreach ($validRows as $rawRow) {
                 // Map human-readable headers to standard array keys
-                $data = $this->normalizeAssetData($rawRow);
+                $data = $this->normalizeRowData($rawRow);
 
                 $assetTag = ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null;
                 $serialNumber = ! empty($data['serial_number']) ? trim($data['serial_number']) : null;
