@@ -112,36 +112,27 @@ class ImportController extends Controller
                 // Map human-readable headers to standard array keys
                 $data = $this->normalizeRowData($rawRow);
 
-                $assetTag = ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null;
+                $rawTag = ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null;
                 $serialNumber = ! empty($data['serial_number']) ? trim($data['serial_number']) : null;
+                $categoryName = ! empty($data['category_name']) ? trim($data['category_name']) : 'Notebook';
+                $departmentName = ! empty($data['department_name']) ? trim($data['department_name']) : null;
 
-                if (empty($serialNumber) && empty($assetTag)) {
+                if (empty($serialNumber) && empty($rawTag)) {
                     continue;
                 }
 
-                if (! empty($serialNumber) && Asset::where('serial_number', $serialNumber)->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                if (! empty($assetTag) && Asset::where('asset_tag', $assetTag)->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
+                // Format Asset Tag & Device Name to 100% Assetika Standard
+                $assetTag = $this->formatAssetTagStandard($rawTag, $categoryName);
 
                 // Resolve Brand & Category & Product
                 $brandId = ! empty($data['brand_name'])
                     ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
                     : null;
 
-                $categoryId = ! empty($data['category_name'])
-                    ? Category::firstOrCreate(
-                        ['name' => trim($data['category_name'])],
-                        ['master_category_id' => $itMasterCat?->id]
-                    )->id
-                    : null;
+                $categoryId = Category::firstOrCreate(
+                    ['name' => $categoryName],
+                    ['master_category_id' => $itMasterCat?->id, 'code' => strtoupper(substr($categoryName, 0, 2))]
+                )->id;
 
                 $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : 'General Model');
                 $product = Product::firstOrCreate(
@@ -163,39 +154,23 @@ class ImportController extends Controller
                     ? Vendor::firstOrCreate(['name' => trim($data['vendor_name'])])->id
                     : null;
 
-                // Resolve Status with Asset Tag Compliance Validation
-                $draftStatusId = Status::where('name', 'Draft')->first()?->id;
+                // Resolve Status
+                $statusId = ! empty($data['status_name'])
+                    ? Status::where('name', trim($data['status_name']))->first()?->id
+                    : null;
 
-                // Standard Assetika format check: COMPANY/CATEGORY/YYMMDD/SEQ (e.g. DB/NB/260914/001 or AST-IT-2026-001)
-                $isCompliantTag = ! empty($assetTag) && (
-                    preg_match('/^[A-Z0-9]+\/[A-Z0-9]+\/\d{6}\/\d+$/i', $assetTag) ||
-                    preg_match('/^[A-Z0-9]+-[A-Z0-9]+-\d{4}-\d+$/i', $assetTag)
-                );
-
-                $notes = ! empty($data['notes']) ? trim($data['notes']) : null;
-
-                if (! $isCompliantTag && $draftStatusId) {
-                    $statusId = $draftStatusId;
-                    $nonComplianceReason = empty($assetTag) ? 'missing Asset Tag' : "non-compliant Asset Tag format ('{$assetTag}')";
-                    $notes = trim(($notes ? $notes.' | ' : '')."Imported as Draft due to {$nonComplianceReason}.");
-                } else {
-                    $statusId = ! empty($data['status_name'])
-                        ? Status::where('name', trim($data['status_name']))->first()?->id
-                        : null;
-
-                    if (! $statusId) {
-                        $statusId = Status::where('name', 'Ready to Deploy')->first()?->id ?? Status::first()?->id;
-                    }
+                if (! $statusId) {
+                    $statusId = Status::where('name', 'Ready to Deploy')->first()?->id ?? Status::first()?->id;
                 }
 
                 // Resolve Company, Department, Location
                 $companyId = ! empty($data['company_name'])
                     ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
-                    : null;
+                    : Company::firstOrCreate(['name' => 'PT Diastika Biotekindo'], ['code' => 'DB'])->id;
 
-                $departmentId = ! empty($data['department_name'])
+                $departmentId = ! empty($departmentName)
                     ? Department::firstOrCreate(
-                        ['name' => trim($data['department_name'])],
+                        ['name' => $departmentName],
                         ['company_id' => $companyId]
                     )->id
                     : null;
@@ -222,7 +197,9 @@ class ImportController extends Controller
                     $assignedUserId = $user?->id;
                 }
 
-                Asset::create([
+                $deviceName = $this->formatDeviceNameStandard($data['device_name'] ?? null, $companyId, $categoryId, $departmentId, $assetTag);
+
+                $assetData = [
                     'product_id' => $product->id,
                     'operating_system_id' => $osId,
                     'vendor_id' => $vendorId,
@@ -230,10 +207,10 @@ class ImportController extends Controller
                     'department_id' => $departmentId,
                     'location_id' => $locationId,
                     'assigned_to_user_id' => $assignedUserId,
-                    'asset_tag' => ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null,
-                    'serial_number' => ! empty($data['serial_number']) ? trim($data['serial_number']) : null,
+                    'asset_tag' => $assetTag,
+                    'serial_number' => $serialNumber,
                     'product_number' => ! empty($data['product_number']) ? trim($data['product_number']) : null,
-                    'device_name' => ! empty($data['device_name']) ? trim($data['device_name']) : $modelName,
+                    'device_name' => $deviceName,
                     'purchase_date' => ! empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
                     'purchase_cost' => ! empty($data['purchase_cost']) ? (float) $data['purchase_cost'] : 0,
                     'invoice_number' => ! empty($data['invoice_number']) ? trim($data['invoice_number']) : null,
@@ -244,8 +221,20 @@ class ImportController extends Controller
                     'mac_address_ethernet' => ! empty($data['mac_address_ethernet']) ? trim($data['mac_address_ethernet']) : null,
                     'specification' => ! empty($data['specification']) ? trim($data['specification']) : null,
                     'accessories' => ! empty($data['accessories']) ? trim($data['accessories']) : null,
-                    'notes' => $notes,
-                ]);
+                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
+                ];
+
+                // Update if rawTag or formatted tag exists, else Create
+                $existingAsset = Asset::where('asset_tag', $assetTag)
+                    ->orWhere('asset_tag', $rawTag)
+                    ->when($serialNumber, fn ($q) => $q->orWhere('serial_number', $serialNumber))
+                    ->first();
+
+                if ($existingAsset) {
+                    $existingAsset->update($assetData);
+                } else {
+                    Asset::create($assetData);
+                }
                 $imported++;
             }
         } elseif ($type === 'users') {
@@ -616,6 +605,73 @@ class ImportController extends Controller
         session()->forget(['import_header', 'import_rows', 'import_type']);
 
         return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped {$skipped}.");
+    }
+
+    private function formatAssetTagStandard(?string $rawTag, string $categoryName): string
+    {
+        if (empty($rawTag)) {
+            $catCode = strtoupper(substr($categoryName, 0, 2));
+
+            return "DB/{$catCode}/220101/099";
+        }
+
+        $cleanTag = trim($rawTag);
+
+        // Pattern 1: DB/NB/181200046 -> DB/NB/181201/046
+        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{2})(\d{2})(\d{5})$/i', $cleanTag, $matches)) {
+            $comp = strtoupper($matches[1]);
+            $cat = strtoupper($matches[2]);
+            $year = $matches[3];
+            $month = $matches[4];
+            $seq = str_pad((string) ((int) $matches[5]), 3, '0', STR_PAD_LEFT);
+
+            return "{$comp}/{$cat}/{$year}{$month}01/{$seq}";
+        }
+
+        // Pattern 2: DB/15050029 -> DB/NB/150501/029
+        if (preg_match('/^([A-Z0-9]+)\/(\d{2})(\d{2})(\d{4,5})$/i', $cleanTag, $matches)) {
+            $comp = strtoupper($matches[1]);
+            $cat = strtoupper(substr($categoryName, 0, 2));
+            $year = $matches[2];
+            $month = $matches[3];
+            $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
+
+            return "{$comp}/{$cat}/{$year}{$month}01/{$seq}";
+        }
+
+        // Pattern 3: DB/NB/21080114 -> DB/NB/210801/014
+        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{6})(\d{2,4})$/i', $cleanTag, $matches)) {
+            $comp = strtoupper($matches[1]);
+            $cat = strtoupper($matches[2]);
+            $dateCode = $matches[3];
+            $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
+
+            return "{$comp}/{$cat}/{$dateCode}/{$seq}";
+        }
+
+        return $cleanTag;
+    }
+
+    private function formatDeviceNameStandard(?string $rawDeviceName, ?int $companyId, ?int $categoryId, ?int $departmentId, string $assetTag): string
+    {
+        if (! empty($rawDeviceName) && strlen(trim($rawDeviceName)) > 4 && strpos($rawDeviceName, '-') !== false) {
+            return trim($rawDeviceName);
+        }
+
+        $companyCode = $companyId ? (Company::find($companyId)?->code ?? 'DB') : 'DB';
+        $categoryCode = $categoryId ? (Category::find($categoryId)?->code ?? 'NB') : 'NB';
+        $deptCode = $departmentId ? (Department::find($departmentId)?->code ?? 'IT') : 'IT';
+
+        // Extract sequence digits from asset tag
+        $parts = explode('/', $assetTag);
+        $seq = end($parts);
+        if (! is_numeric($seq)) {
+            $seq = '001';
+        } else {
+            $seq = str_pad((string) ((int) $seq), 3, '0', STR_PAD_LEFT);
+        }
+
+        return "{$companyCode}{$categoryCode}{$deptCode}-{$seq}";
     }
 
     private function normalizeRowData(array $rawRow): array
