@@ -176,10 +176,23 @@ class ImportController extends Controller
                     ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
                     : null;
 
-                // Resolve Assigned User
-                $assignedUserId = ! empty($data['assigned_user_email'])
-                    ? User::where('email', trim($data['assigned_user_email']))->first()?->id
-                    : null;
+                // Resolve Assigned User (by email or name)
+                $assignedUserId = null;
+                if (! empty($data['assigned_user_email'])) {
+                    $userSearch = trim($data['assigned_user_email']);
+                    $user = User::where('email', $userSearch)->orWhere('name', 'like', "%{$userSearch}%")->first();
+                    if (! $user && strpos($userSearch, '@') === false) {
+                        // Auto-create user if name is provided
+                        $user = User::create([
+                            'name' => $userSearch,
+                            'email' => strtolower(str_replace(' ', '.', $userSearch)).'@diastika.co.id',
+                            'password' => Hash::make('password123'),
+                            'department_id' => $departmentId,
+                            'company_id' => $companyId,
+                        ]);
+                    }
+                    $assignedUserId = $user?->id;
+                }
 
                 Asset::create([
                     'product_id' => $product->id,
