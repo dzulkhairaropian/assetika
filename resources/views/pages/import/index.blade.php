@@ -14,6 +14,18 @@
     @if(session('error'))
         <x-ui.alert variant="error" message="{{ session('error') }}" />
     @endif
+    @if(session('import_failed_details'))
+        <div class="rounded-xl border border-red-200 bg-red-50/50 p-4 text-xs text-red-700 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400 space-y-2">
+            <h4 class="font-bold uppercase tracking-wider flex items-center gap-1.5 text-red-800 dark:text-red-300">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i> Skipped / Failed Import Rows Report
+            </h4>
+            <ul class="list-disc list-inside space-y-1 font-mono text-[11px]">
+                @foreach(session('import_failed_details') as $detail)
+                    <li>{{ $detail }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
         {{-- Main Form Card --}}

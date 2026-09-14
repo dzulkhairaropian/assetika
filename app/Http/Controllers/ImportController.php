@@ -20,7 +20,6 @@ use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class ImportController extends Controller
 {
@@ -57,19 +56,46 @@ class ImportController extends Controller
             if (count($row) < count($header)) {
                 continue;
             }
-            $data = array_combine(array_slice($header, 0, count($row)), $row);
+            $rawRow = array_combine(array_slice($header, 0, count($row)), $row);
             if ($i < $maxPreview) {
-                $preview[] = $data;
+                $preview[] = $rawRow;
             }
 
             if ($request->type === 'assets') {
-                $v = Validator::make($data, [
-                    'asset_tag' => 'nullable|string',
-                    'serial_number' => 'nullable|string',
-                    'device_name' => 'nullable|string',
-                ]);
-                if ($v->fails()) {
-                    $errors[] = 'Row '.($i + 2).': '.implode(', ', $v->errors()->all());
+                $data = $this->normalizeRowData($rawRow);
+                $rowNum = $i + 2;
+                $rowErrors = [];
+
+                // Check Product / Model
+                $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : null);
+                if ($modelName) {
+                    $productExists = Product::where('name', $modelName)->exists();
+                    if (! $productExists) {
+                        $rowErrors[] = "Product Model '{$modelName}' does not exist in master DB";
+                    }
+                } else {
+                    $rowErrors[] = 'Missing Product Model / Device Name';
+                }
+
+                // Check Brand if specified
+                if (! empty($data['brand_name'])) {
+                    $brandExists = Brand::where('name', trim($data['brand_name']))->exists();
+                    if (! $brandExists) {
+                        $rowErrors[] = "Brand '{$data['brand_name']}' does not exist in master DB";
+                    }
+                }
+
+                // Check Category if specified
+                if (! empty($data['category_name'])) {
+                    $catExists = Category::where('name', trim($data['category_name']))->exists();
+                    if (! $catExists) {
+                        $rowErrors[] = "Category '{$data['category_name']}' does not exist in master DB";
+                    }
+                }
+
+                if (! empty($rowErrors)) {
+                    $itemLabel = ! empty($data['asset_tag']) ? $data['asset_tag'] : ($modelName ?? "Row {$rowNum}");
+                    $errors[] = "Row {$rowNum} ({$itemLabel}): ".implode('; ', $rowErrors);
                 }
             }
         }
@@ -105,55 +131,68 @@ class ImportController extends Controller
         }
 
         $imported = 0;
+        $failedDetails = [];
+
         if ($type === 'assets') {
             $itMasterCat = MasterCategory::where('name', 'IT Asset')->first();
 
-            foreach ($validRows as $rawRow) {
+            foreach ($validRows as $idx => $rawRow) {
                 // Map human-readable headers to standard array keys
                 $data = $this->normalizeRowData($rawRow);
+                $rowNum = $idx + 2;
 
                 $rawTag = ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null;
                 $serialNumber = ! empty($data['serial_number']) ? trim($data['serial_number']) : null;
-                $categoryName = ! empty($data['category_name']) ? trim($data['category_name']) : 'Notebook';
+                $categoryName = ! empty($data['category_name']) ? trim($data['category_name']) : null;
+                $brandName = ! empty($data['brand_name']) ? trim($data['brand_name']) : null;
                 $departmentName = ! empty($data['department_name']) ? trim($data['department_name']) : null;
+                $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : null);
 
                 if (empty($serialNumber) && empty($rawTag)) {
+                    $skipped++;
+
                     continue;
                 }
 
-                $categoryObj = Category::where('name', $categoryName)->first();
-                $categoryCode = $categoryObj?->code;
-                if (! $categoryCode) {
-                    $categoryId = Category::firstOrCreate(
-                        ['name' => $categoryName],
-                        ['master_category_id' => $itMasterCat?->id, 'code' => strtoupper(substr($categoryName, 0, 2))]
-                    )->id;
-                    $categoryCode = Category::find($categoryId)?->code ?? strtoupper(substr($categoryName, 0, 2));
-                } else {
-                    $categoryId = $categoryObj->id;
+                // Strict DB Lookup Check
+                $product = $modelName ? Product::where('name', $modelName)->first() : null;
+                if (! $product) {
+                    $skipped++;
+                    $failedDetails[] = "Row {$rowNum} (".($rawTag ?? 'No Tag')."): Failed - Product Model '{$modelName}' does not exist in master DB.";
+
+                    continue;
                 }
+
+                $brand = $brandName ? Brand::where('name', $brandName)->first() : null;
+                if ($brandName && ! $brand) {
+                    $skipped++;
+                    $failedDetails[] = "Row {$rowNum} (".($rawTag ?? 'No Tag')."): Failed - Brand '{$brandName}' does not exist in master DB.";
+
+                    continue;
+                }
+
+                $category = $categoryName ? Category::where('name', $categoryName)->first() : $product->category;
+                if ($categoryName && ! $category) {
+                    $skipped++;
+                    $failedDetails[] = "Row {$rowNum} (".($rawTag ?? 'No Tag')."): Failed - Category '{$categoryName}' does not exist in master DB.";
+
+                    continue;
+                }
+
+                $categoryCode = $category?->code ?? 'NB';
+                $categoryId = $category?->id ?? $product->category_id;
 
                 // Format Asset Tag & Device Name to 100% Assetika Standard
                 $assetTag = $this->formatAssetTagStandard($rawTag, $categoryCode);
 
-                $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : 'General Model');
-                $product = Product::firstOrCreate(
-                    ['name' => $modelName],
-                    [
-                        'brand_id' => $brandId,
-                        'category_id' => $categoryId,
-                        'master_category_id' => $itMasterCat?->id,
-                    ]
-                );
-
                 // Resolve Operating System
                 $osId = ! empty($data['operating_system'])
-                    ? OperatingSystem::firstOrCreate(['name' => trim($data['operating_system'])])->id
+                    ? OperatingSystem::where('name', trim($data['operating_system']))->first()?->id
                     : null;
 
                 // Resolve Vendor
                 $vendorId = ! empty($data['vendor_name'])
-                    ? Vendor::firstOrCreate(['name' => trim($data['vendor_name'])])->id
+                    ? Vendor::where('name', trim($data['vendor_name']))->first()?->id
                     : null;
 
                 // Resolve Status
@@ -166,36 +205,22 @@ class ImportController extends Controller
                 }
 
                 // Resolve Company, Department, Location
-                $companyId = ! empty($data['company_name'])
-                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
-                    : Company::firstOrCreate(['name' => 'PT Diastika Biotekindo'], ['code' => 'DB'])->id;
+                $company = ! empty($data['company_name']) ? Company::where('name', trim($data['company_name']))->first() : Company::where('code', 'DB')->first();
+                $companyId = $company?->id ?? Company::first()?->id;
 
                 $departmentId = ! empty($departmentName)
-                    ? Department::firstOrCreate(
-                        ['name' => $departmentName],
-                        ['company_id' => $companyId]
-                    )->id
+                    ? Department::where('name', $departmentName)->first()?->id
                     : null;
 
                 $locationId = ! empty($data['location_name'])
-                    ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
+                    ? Location::where('name', trim($data['location_name']))->first()?->id
                     : null;
 
-                // Resolve Assigned User (by email or name)
+                // Resolve Assigned User
                 $assignedUserId = null;
                 if (! empty($data['assigned_user_email'])) {
                     $userSearch = trim($data['assigned_user_email']);
                     $user = User::where('email', $userSearch)->orWhere('name', 'like', "%{$userSearch}%")->first();
-                    if (! $user && strpos($userSearch, '@') === false) {
-                        // Auto-create user if name is provided
-                        $user = User::create([
-                            'name' => $userSearch,
-                            'email' => strtolower(str_replace(' ', '.', $userSearch)).'@diastika.co.id',
-                            'password' => Hash::make('password123'),
-                            'department_id' => $departmentId,
-                            'company_id' => $companyId,
-                        ]);
-                    }
                     $assignedUserId = $user?->id;
                 }
 
@@ -606,7 +631,11 @@ class ImportController extends Controller
 
         session()->forget(['import_header', 'import_rows', 'import_type']);
 
-        return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped {$skipped}.");
+        if (! empty($failedDetails)) {
+            session()->flash('import_failed_details', $failedDetails);
+        }
+
+        return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped/Failed {$skipped}.");
     }
 
     private function formatAssetTagStandard(?string $rawTag, string $categoryCode): string
