@@ -85,6 +85,13 @@ class ComponentController extends Controller
             ->orderBy('name')
             ->get();
 
+        $allAssets = Asset::with(['product', 'assignedToUser'])->orderBy('asset_tag')->get();
+
+        $assetOpts = $allAssets->map(fn ($a) => [
+            'id' => $a->id,
+            'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
+        ])->values()->all();
+
         // Summary counts for Tab Bar
         $summary = [
             'total' => Component::count(),
@@ -101,7 +108,7 @@ class ComponentController extends Controller
             'scrapped' => Component::whereHas('status', fn ($s) => $s->whereIn('name', ['Scrapped', 'Broken', 'Retired']))->count(),
         ];
 
-        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses', 'summary'));
+        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses', 'assetOpts', 'summary'));
     }
 
     public function create()

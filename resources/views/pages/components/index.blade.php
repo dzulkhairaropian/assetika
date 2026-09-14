@@ -4,6 +4,16 @@
     <div class="space-y-4" x-data="{
         selectedItems: [],
         selectAll: false,
+        checkoutModalOpen: false,
+        checkoutComponentId: null,
+        checkoutComponentTag: '',
+        checkoutActionUrl: '',
+        openCheckout(id, tag) {
+            this.checkoutComponentId = id;
+            this.checkoutComponentTag = tag;
+            this.checkoutActionUrl = '/components/' + id + '/checkout';
+            this.checkoutModalOpen = true;
+        },
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -283,6 +293,11 @@
                                                         Check-in / Detach
                                                     </button>
                                                 </form>
+                                            @else
+                                                <button type="button" @click="openCheckout({{ $component->id }}, '{{ $component->component_tag }}')" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
+                                                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                                                    Check-out / Install
+                                                </button>
                                             @endif
 
                                             <a href="{{ route('components.edit', $component) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
@@ -324,6 +339,51 @@
             {{-- Pagination Footer --}}
             <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
                 {{ $components->links() }}
+            </div>
+        </div>
+
+        <!-- Checkout / Install Modal -->
+        <div x-show="checkoutModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak style="display: none;">
+            <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-4 h-4 text-brand-500"></i>
+                        Checkout / Install Component
+                    </h3>
+                    <button type="button" @click="checkoutModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <form :action="checkoutActionUrl" method="POST" class="space-y-4 text-left">
+                    @csrf
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Component Unit</label>
+                        <input type="text" :value="checkoutComponentTag" readonly class="h-9 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 text-xs font-mono font-bold text-gray-700 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300" />
+                    </div>
+
+                    <div>
+                        <x-form.searchable-select name="asset_id" label="Target IT Asset (Laptop/Server)" :options="$assetOpts ?? []" placeholder="Select Target Asset" required="true" />
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Date</label>
+                        <input type="date" name="release_date" value="{{ date('Y-m-d') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Notes (Optional)</label>
+                        <textarea name="notes" rows="2" placeholder="e.g. Upgrade RAM for graphic design work" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                        <button type="button" @click="checkoutModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">Cancel</button>
+                        <button type="submit" class="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition flex items-center gap-1.5">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                            Confirm Checkout
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
