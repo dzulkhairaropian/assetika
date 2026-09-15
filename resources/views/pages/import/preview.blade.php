@@ -20,16 +20,17 @@
                 <i data-lucide="eye" class="w-5 h-5 text-brand-500"></i>
                 <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">Data Preview</h3>
                 <span class="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
-                    {{ min(count($preview), $maxPreview) }} rows shown
+                    Showing {{ count($preview) }} of {{ $totalRows ?? count($preview) }} total rows
                 </span>
             </div>
-            <span class="text-xs text-gray-400">Columns: {{ implode(', ', $header) }}</span>
+            <span class="text-xs text-gray-400">Columns: {{ count($header) }}</span>
         </div>
 
         <div class="max-w-full overflow-x-auto">
-            <table class="min-w-full">
-                <thead class="border-b border-gray-100 dark:border-gray-800">
+            <table class="min-w-full divide-y divide-gray-100 dark:divide-white/[0.05]">
+                <thead class="border-b border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-white/[0.02]">
                     <tr>
+                        <th class="w-12 px-4 py-3 text-left font-medium text-gray-500 text-theme-xs dark:text-gray-400 uppercase tracking-wider">#</th>
                         @foreach($header as $h)
                             <th class="px-5 py-3 sm:px-6">
                                 <div class="flex items-center">
@@ -40,10 +41,11 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                    @forelse($preview as $row)
+                    @forelse($preview as $index => $row)
                         <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                            <td class="px-4 py-3 text-xs font-mono text-gray-400 dark:text-gray-500 whitespace-nowrap">{{ $index + 1 }}</td>
                             @foreach($header as $h)
-                                <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                <td class="px-5 py-3 sm:px-6 text-theme-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                     {{ $row[$h] ?? '-' }}
                                 </td>
                             @endforeach

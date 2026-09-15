@@ -69,7 +69,8 @@ class ImportController extends Controller
 
         $errors = [];
         $preview = [];
-        $maxPreview = 10;
+        $maxPreview = 100;
+        $totalRows = count($rows);
         $headerCount = count($header);
 
         foreach ($rows as $i => $row) {
@@ -133,7 +134,7 @@ class ImportController extends Controller
         session()->flash('import_header', json_encode($header));
         session()->flash('import_type', $request->type);
 
-        return view('pages.import.preview', compact('header', 'preview', 'errors', 'maxPreview'));
+        return view('pages.import.preview', compact('header', 'preview', 'errors', 'maxPreview', 'totalRows'));
     }
 
     public function process(Request $request)
