@@ -108,7 +108,8 @@
 
                             <!-- Position -->
                             <div>
-                                <x-form.searchable-select name="position_id" label="Position" :options="$positions->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="old('position_id')" placeholder="Select Position" />
+                                @php
+                                    $posOpts = array_merge([['id' => '', 'text' => 'Select Position']], $positions->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray());
                                 @endphp
                                 <x-form.searchable-select name="position_id" label="Position" :options="$posOpts" :selected="old('position_id')" placeholder="Select Position" />
                             </div>
