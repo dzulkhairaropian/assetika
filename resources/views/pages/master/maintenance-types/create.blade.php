@@ -15,7 +15,7 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
                 <div>
                     <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                        <i data-lucide="tool" class="w-5 h-5 text-brand-500"></i> Maintenance Type Information
+                        <i data-lucide="wrench" class="w-5 h-5 text-brand-500"></i> Maintenance Type Information
                     </h3>
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <div>

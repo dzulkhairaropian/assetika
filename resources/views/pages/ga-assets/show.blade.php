@@ -60,7 +60,7 @@
                     @endif
 
                     <button type="button" @click="maintOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-amber-600">
-                        <i data-lucide="tool" class="h-3.5 w-3.5"></i>
+                        <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                         Maintenance
                     </button>
                 </div>

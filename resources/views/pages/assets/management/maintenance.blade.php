@@ -7,7 +7,7 @@
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div class="mb-5 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-800">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
-                    <i data-lucide="tool" class="h-5 w-5"></i>
+                    <i data-lucide="wrench" class="h-5 w-5"></i>
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Send to Maintenance</h2>

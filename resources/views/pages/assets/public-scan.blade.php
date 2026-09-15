@@ -157,7 +157,7 @@
                     @if($activeRepair)
                         <div class="space-y-4 py-6">
                             <h4 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-red-500">
-                                <i data-lucide="tool" class="h-4 w-4"></i>
+                                <i data-lucide="wrench" class="h-4 w-4"></i>
                                 Maintenance Information
                             </h4>
                             <div class="space-y-3 rounded-2xl border border-red-100 bg-red-50/30 p-4 text-sm dark:border-red-950/20 dark:bg-red-950/5">

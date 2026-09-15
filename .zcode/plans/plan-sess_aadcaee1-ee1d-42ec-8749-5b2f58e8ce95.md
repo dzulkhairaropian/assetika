@@ -1,25 +1,24 @@
-### Comprehensive Refinement Plan: Consumables Inventory Module
+### Fix: Replace Invalid Lucide Icon Name `tool` with `wrench`
 
-#### 1. Controller & Form Data Preparation (`ConsumableController.php`)
-- Prepare `$productOpts`, `$userOpts`, `$deptOpts`, `$locationOpts` as clean array format `[['id' => ..., 'text' => ...]]` in `create`, `edit`, `checkout`, `bulkCheckoutForm`, and `restock` methods.
+#### Root Cause
+In Lucide Icons library, the wrench/maintenance icon is named `wrench` (in legacy Feather icons it was `tool`). Having `data-lucide="tool"` results in a missing icon on the Maintenance button and cards.
 
-#### 2. View Modernization & Blade Parser Fixes
-- **`create.blade.php` & `edit.blade.php`**:
-  - Replace `<select>` with `<x-form.searchable-select>` for Product selection.
-  - Apply clean 2-column card layout matching Asset/Component standards.
-- **`checkout.blade.php` & `bulk-checkout.blade.php`**:
-  - Replace `<select>` with `<x-form.searchable-select>` for User, Department, and Location selection.
-- **`index.blade.php`**:
-  - Ensure KPI Metric Cards (Total, In Stock, Low Stock, Out of Stock) and Filter Tabs match TailAdmin specs.
-  - Standardize actions dropdown to fixed viewport positioning.
-
-#### 3. Verification & Build
-- Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
+#### Solution Plan
+1. Replace all occurrences of `data-lucide="tool"` with `data-lucide="wrench"` in:
+   - `resources/views/pages/assets/show.blade.php`
+   - `resources/views/pages/assets/management/maintenance.blade.php`
+   - `resources/views/pages/assets/public-scan.blade.php`
+   - `resources/views/pages/ga-assets/show.blade.php`
+   - `resources/views/pages/master/maintenance-types/create.blade.php`
+   - `resources/views/pages/master/maintenance-types/edit.blade.php`
+   - `resources/views/pages/master/maintenance-types/index.blade.php`
+2. Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
 
 #### Files to Modify
-- `app/Http/Controllers/ConsumableController.php`
-- `resources/views/pages/consumables/index.blade.php`
-- `resources/views/pages/consumables/create.blade.php`
-- `resources/views/pages/consumables/edit.blade.php`
-- `resources/views/pages/consumables/checkout.blade.php`
-- `resources/views/pages/consumables/bulk-checkout.blade.php`
+- `resources/views/pages/assets/show.blade.php`
+- `resources/views/pages/assets/management/maintenance.blade.php`
+- `resources/views/pages/assets/public-scan.blade.php`
+- `resources/views/pages/ga-assets/show.blade.php`
+- `resources/views/pages/master/maintenance-types/create.blade.php`
+- `resources/views/pages/master/maintenance-types/edit.blade.php`
+- `resources/views/pages/master/maintenance-types/index.blade.php`

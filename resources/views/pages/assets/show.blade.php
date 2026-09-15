@@ -81,7 +81,7 @@
                             Check-in
                         </a>
                         <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-600 transition">
-                            <i data-lucide="tool" class="h-3.5 w-3.5"></i>
+                            <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                             Maintenance
                         </a>
                     @else
@@ -102,7 +102,7 @@
                             @endif
                         @else
                             <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-600 transition">
-                                <i data-lucide="tool" class="h-3.5 w-3.5"></i>
+                                <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                                 Maintenance
                             </a>
                         @endif
@@ -294,7 +294,7 @@
                             <button @click="activeTab = 'maintenance'"
                                 :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
-                                <i data-lucide="tool" class="w-3.5 h-3.5"></i>
+                                <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
                                 Maintenance History
                             </button>
                             <button @click="activeTab = 'tickets'"
