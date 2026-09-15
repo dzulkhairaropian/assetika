@@ -66,6 +66,7 @@
                 $tabFilters = array_filter(request()->except(['page', 'tab']));
                 $tabs = [
                     ['key' => null,          'label' => 'All Tickets', 'count' => $ticketSummary['total'],       'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                    ['key' => 'created_today','label' => 'Created Today', 'count' => $ticketSummary['created_today'], 'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
                     ['key' => 'new',         'label' => 'New',         'count' => $ticketSummary['new'],         'icon' => 'alert-circle', 'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
                     ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $ticketSummary['in_progress'], 'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
                     ['key' => 'pending',     'label' => 'Pending',     'count' => $ticketSummary['pending'],     'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],

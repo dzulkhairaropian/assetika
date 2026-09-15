@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Ticket;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -36,6 +37,30 @@ class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
             'createdBy',
             'asset',
         ]);
+
+        if (! empty($this->filters['tab'])) {
+            switch ($this->filters['tab']) {
+                case 'created_today':
+                case 'today':
+                    $query->whereDate('created_at', Carbon::today());
+                    break;
+                case 'new':
+                    $query->whereHas('status', fn ($q) => $q->where('name', 'New'));
+                    break;
+                case 'in_progress':
+                    $query->whereHas('status', fn ($q) => $q->where('name', 'In Progress'));
+                    break;
+                case 'pending':
+                    $query->whereHas('status', fn ($q) => $q->where('name', 'Pending'));
+                    break;
+                case 'unassigned':
+                    $query->whereNull('assigned_to_id');
+                    break;
+                case 'closed':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true));
+                    break;
+            }
+        }
 
         if (! empty($this->filters['from_date'])) {
             $query->whereDate('request_date', '>=', $this->filters['from_date']);
@@ -81,6 +106,7 @@ class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         return [
             'Ticket Key',
             'Type',
+            'Created Date',
             'Request Date',
             'Requester Name',
             'Requester Email',
@@ -107,6 +133,7 @@ class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         return [
             $ticket->request_id,
             $ticket->ticketType?->name ?? 'REQ',
+            $ticket->created_at?->format('Y-m-d H:i'),
             $ticket->request_date?->format('Y-m-d'),
             $ticket->requester_name ?? $ticket->requesterUser?->name,
             $ticket->requester_email ?? $ticket->requesterUser?->email,

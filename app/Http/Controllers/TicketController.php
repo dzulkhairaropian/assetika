@@ -89,6 +89,7 @@ class TicketController extends Controller
 
         $ticketSummary = [
             'total' => (clone $query)->count(),
+            'created_today' => (clone $query)->whereDate('tickets.created_at', Carbon::today())->count(),
             'new' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'New'))->count(),
             'in_progress' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'In Progress'))->count(),
             'pending' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'Pending'))->count(),
@@ -97,6 +98,10 @@ class TicketController extends Controller
         ];
 
         switch ($request->input('tab')) {
+            case 'created_today':
+            case 'today':
+                $query->whereDate('tickets.created_at', Carbon::today());
+                break;
             case 'new':
                 $query->whereHas('status', fn ($q) => $q->where('name', 'New'));
                 break;
