@@ -62,11 +62,24 @@ class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
             }
         }
 
-        if (! empty($this->filters['from_date'])) {
-            $query->whereDate('request_date', '>=', $this->filters['from_date']);
+        $dateType = $this->filters['date_type'] ?? 'created_at';
+        $startDate = $this->filters['start_date'] ?? $this->filters['from_date'] ?? $this->filters['created_from'] ?? null;
+        $endDate = $this->filters['end_date'] ?? $this->filters['to_date'] ?? $this->filters['created_to'] ?? null;
+
+        if (! empty($startDate)) {
+            if ($dateType === 'request_date') {
+                $query->whereDate('request_date', '>=', $startDate);
+            } else {
+                $query->whereDate('created_at', '>=', $startDate);
+            }
         }
-        if (! empty($this->filters['to_date'])) {
-            $query->whereDate('request_date', '<=', $this->filters['to_date']);
+
+        if (! empty($endDate)) {
+            if ($dateType === 'request_date') {
+                $query->whereDate('request_date', '<=', $endDate);
+            } else {
+                $query->whereDate('created_at', '<=', $endDate);
+            }
         }
         if (! empty($this->filters['company_id'])) {
             $query->where('requester_company_id', $this->filters['company_id']);

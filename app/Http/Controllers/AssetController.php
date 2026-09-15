@@ -45,6 +45,13 @@ class AssetController extends Controller
             $query->where('depreciation_id', $request->depreciation_id);
         }
 
+        if ($request->filled('created_from')) {
+            $query->whereDate('assets.created_at', '>=', $request->created_from);
+        }
+        if ($request->filled('created_to')) {
+            $query->whereDate('assets.created_at', '<=', $request->created_to);
+        }
+
         if ($request->filled('year')) {
             $year = (int) $request->year;
             $query->where(function ($q) use ($year) {

@@ -167,6 +167,8 @@
                             if (request('location_id')) $activeCount++;
                             if (request('year')) $activeCount++;
                             if (request('aging')) $activeCount++;
+                            if (request('created_from')) $activeCount++;
+                            if (request('created_to')) $activeCount++;
                         @endphp
 
                         <div class="relative" @click.away="filterOpen = false">
@@ -223,6 +225,18 @@
                                             ['id' => '3-4', 'text' => '3 - 4 Years'],
                                             ['id' => '4+',  'text' => 'Aged (≥ 4 Years)']
                                         ]" :selected="request('aging')" placeholder="All Ages" />
+                                    </div>
+
+                                    <div class="col-span-2 sm:col-span-1">
+                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Created From (Input Date)</label>
+                                        <input type="date" name="created_from" value="{{ request('created_from') }}"
+                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                    </div>
+
+                                    <div class="col-span-2 sm:col-span-1">
+                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Created To (Input Date)</label>
+                                        <input type="date" name="created_to" value="{{ request('created_to') }}"
+                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                     </div>
                                 </div>
 

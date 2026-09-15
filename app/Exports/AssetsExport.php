@@ -112,6 +112,13 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
             $query->whereIn('id', $this->filters['ids']);
         }
 
+        if (! empty($this->filters['created_from'])) {
+            $query->whereDate('created_at', '>=', $this->filters['created_from']);
+        }
+        if (! empty($this->filters['created_to'])) {
+            $query->whereDate('created_at', '<=', $this->filters['created_to']);
+        }
+
         if (! empty($this->filters['purchase_from'])) {
             $query->whereDate('purchase_date', '>=', $this->filters['purchase_from']);
         }

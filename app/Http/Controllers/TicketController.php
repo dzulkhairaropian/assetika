@@ -43,24 +43,21 @@ class TicketController extends Controller
             });
         }
 
-        if ($startDate = ($request->input('start_date') ?: $request->input('from_date'))) {
-            $query->where(function ($q) use ($startDate) {
-                $q->whereDate('request_date', '>=', $startDate)
-                    ->orWhere(function ($sub) use ($startDate) {
-                        $sub->whereNull('request_date')
-                            ->whereDate('created_at', '>=', $startDate);
-                    });
-            });
+        $dateType = $request->input('date_type', 'created_at');
+        if ($startDate = ($request->input('start_date') ?: $request->input('from_date') ?: $request->input('created_from'))) {
+            if ($dateType === 'request_date') {
+                $query->whereDate('request_date', '>=', $startDate);
+            } else {
+                $query->whereDate('tickets.created_at', '>=', $startDate);
+            }
         }
 
-        if ($endDate = ($request->input('end_date') ?: $request->input('to_date'))) {
-            $query->where(function ($q) use ($endDate) {
-                $q->whereDate('request_date', '<=', $endDate)
-                    ->orWhere(function ($sub) use ($endDate) {
-                        $sub->whereNull('request_date')
-                            ->whereDate('created_at', '<=', $endDate);
-                    });
-            });
+        if ($endDate = ($request->input('end_date') ?: $request->input('to_date') ?: $request->input('created_to'))) {
+            if ($dateType === 'request_date') {
+                $query->whereDate('request_date', '<=', $endDate);
+            } else {
+                $query->whereDate('tickets.created_at', '<=', $endDate);
+            }
         }
 
         if ($status = $request->input('status_id')) {

@@ -106,8 +106,9 @@
                         if (request('ticket_category_id')) $activeCount++;
                         if (request('company_id')) $activeCount++;
                         if (request('department_id')) $activeCount++;
-                        if (request('start_date') || request('from_date')) $activeCount++;
-                        if (request('end_date') || request('to_date')) $activeCount++;
+                        if (request('start_date') || request('from_date') || request('created_from')) $activeCount++;
+                        if (request('end_date') || request('to_date') || request('created_to')) $activeCount++;
+                        if (request('date_type')) $activeCount++;
                     @endphp
 
                     <div class="relative" @click.away="filterOpen = false">
@@ -132,15 +133,25 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-2.5 text-left">
+                                <div class="col-span-2">
+                                    <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Date Filter Basis</label>
+                                    <div class="relative">
+                                        <select name="date_type" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                            <option value="created_at" {{ request('date_type', 'created_at') === 'created_at' ? 'selected' : '' }}>Created Date (System Input Date)</option>
+                                            <option value="request_date" {{ request('date_type') === 'request_date' ? 'selected' : '' }}>Request Date (Ticket Date)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="col-span-2 sm:col-span-1">
                                     <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Start Date</label>
-                                    <input type="date" name="start_date" value="{{ request('start_date', request('from_date')) }}"
+                                    <input type="date" name="start_date" value="{{ request('start_date', request('from_date', request('created_from'))) }}"
                                         class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                 </div>
 
                                 <div class="col-span-2 sm:col-span-1">
                                     <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">End Date</label>
-                                    <input type="date" name="end_date" value="{{ request('end_date', request('to_date')) }}"
+                                    <input type="date" name="end_date" value="{{ request('end_date', request('to_date', request('created_to'))) }}"
                                         class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                 </div>
 
