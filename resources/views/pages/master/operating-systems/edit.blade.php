@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedBrandId = old('brand_id', $operatingSystem->brand_id);
+    @endphp
+
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Edit Operating System" :items="[['label' => 'Operating Systems', 'url' => route('operating-systems.index')]]" />
 
@@ -35,18 +39,7 @@
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Brand <span class="text-error-500">*</span>
-                                </label>
-                                <select name="brand_id" required
-                                    class="dark:bg-gray-950 h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 shadow-sm focus:border-brand-500 focus:outline-none focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:placeholder:text-white/30 dark:focus:border-brand-800">
-                                    <option value="">Select Brand</option>
-                                    @foreach($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ old('brand_id', $operatingSystem->brand_id) == $brand->id ? 'selected' : '' }}>
-                                            {{ $brand->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <x-form.searchable-select name="brand_id" label="Brand" :options="$brandOpts" :selected="$selectedBrandId" placeholder="Select Brand" required="true" />
                                 @error('brand_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 

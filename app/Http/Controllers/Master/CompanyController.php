@@ -31,8 +31,9 @@ class CompanyController extends Controller
     public function create()
     {
         $groups = Group::orderBy('name')->get();
+        $groupOpts = $groups->map(fn ($g) => ['id' => $g->id, 'text' => $g->name])->values()->all();
 
-        return view('pages.master.companies.create', compact('groups'));
+        return view('pages.master.companies.create', compact('groupOpts'));
     }
 
     public function store(Request $request)
@@ -64,8 +65,9 @@ class CompanyController extends Controller
     public function edit(Company $company)
     {
         $groups = Group::orderBy('name')->get();
+        $groupOpts = $groups->map(fn ($g) => ['id' => $g->id, 'text' => $g->name])->values()->all();
 
-        return view('pages.master.companies.edit', compact('company', 'groups'));
+        return view('pages.master.companies.edit', compact('company', 'groupOpts'));
     }
 
     public function update(Request $request, Company $company)

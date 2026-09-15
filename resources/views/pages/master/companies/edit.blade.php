@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedGroupId = old('group_id', $company->group_id);
+    @endphp
+
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Edit Company" :items="[['label' => 'Companies', 'url' => route('companies.index')]]" />
 
@@ -26,17 +30,7 @@
 
                         <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                             <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Holding / Group (Optional)
-                                </label>
-                                <select name="group_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                    <option value="">-- No Group --</option>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}" {{ old('group_id', $company->group_id) == $group->id ? 'selected' : '' }}>
-                                            {{ $group->name }} ({{ $group->code }})
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <x-form.searchable-select name="group_id" label="Holding / Group (Optional)" :options="$groupOpts" :selected="$selectedGroupId" placeholder="No Group" />
                             </div>
 
                             <div>

@@ -1,25 +1,27 @@
-### Architectural Refactoring Plan: IT Projects Management Module
+### Master Data UI Harmonization Plan: Convert Raw `<select>` to `<x-form.searchable-select>`
 
-#### 1. Create `ProjectService` (`app/Services/ProjectService.php`)
-- `createProject(array $data): Project`
-- `updateProject(Project $project, array $data): Project`
-- `addTask(Project $project, array $data): ProjectTask`
-- `updateTaskStatus(ProjectTask $task, array $data): array`
+#### 1. Controller Option Preparation
+- Update Master Controllers (`ProductController`, `DepartmentController`, `LocationController`, `OperatingSystemController`, `CompanyController`):
+  - Prepare pre-formatted array options (`$brandOpts`, `$categoryOpts`, `$companyOpts`, `$groupOpts`) in `index`, `create`, and `edit` methods.
 
-#### 2. Option Preparation in `ProjectController.php`
-- In `index` and `show`, prepare `$userOpts`, `$statusOpts`, `$assetOpts`, and `$ticketOpts` as clean array format `[['id' => ..., 'text' => ...]]`.
-- Inject `ProjectService` into `ProjectController`.
+#### 2. View Upgrades to `<x-form.searchable-select>`
+- **`products/create.blade.php` & `edit.blade.php`**: Upgrade Brand and Category dropdowns.
+- **`departments/create.blade.php` & `edit.blade.php`**: Upgrade Company dropdown.
+- **`locations/create.blade.php` & `edit.blade.php`**: Upgrade Company dropdown.
+- **`operating-systems/create.blade.php` & `edit.blade.php`**: Upgrade Brand dropdown.
+- **`companies/create.blade.php` & `edit.blade.php`**: Upgrade Group dropdown.
+- **`index.blade.php` filters** across Master views: Convert raw filter select elements to `<x-form.searchable-select>`.
 
-#### 3. View Modernization & Blade Parser Protection
-- Update `pages/projects/index.blade.php` and `pages/projects/show.blade.php`:
-  - Isolate `:selected` variables into top `@php` blocks.
-  - Standardize searchable-select dropdowns to clean single-line syntax.
+#### 3. Layout Harmonization
+- Apply TailAdmin 2-column card layout + Actions Card across all Master Data create & edit pages.
 
 #### 4. Verification & Build
 - Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
 
-#### Files to Create / Modify
-- `app/Services/ProjectService.php` (New)
-- `app/Http/Controllers/ProjectController.php` (Refactored)
-- `resources/views/pages/projects/index.blade.php` (Updated)
-- `resources/views/pages/projects/show.blade.php` (Updated)
+#### Files to Modify
+- `app/Http/Controllers/Master/ProductController.php`
+- `app/Http/Controllers/Master/DepartmentController.php`
+- `app/Http/Controllers/Master/LocationController.php`
+- `app/Http/Controllers/Master/OperatingSystemController.php`
+- `app/Http/Controllers/Master/CompanyController.php`
+- Master Data views in `resources/views/pages/master/`

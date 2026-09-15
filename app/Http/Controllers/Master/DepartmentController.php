@@ -33,9 +33,10 @@ class DepartmentController extends Controller
 
     public function create()
     {
-        $companies = Company::all();
+        $companies = Company::orderBy('name')->get();
+        $companyOpts = $companies->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
 
-        return view('pages.master.departments.create', compact('companies'));
+        return view('pages.master.departments.create', compact('companyOpts'));
     }
 
     public function store(Request $request)
@@ -58,9 +59,10 @@ class DepartmentController extends Controller
 
     public function edit(Department $department)
     {
-        $companies = Company::all();
+        $companies = Company::orderBy('name')->get();
+        $companyOpts = $companies->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
 
-        return view('pages.master.departments.edit', compact('department', 'companies'));
+        return view('pages.master.departments.edit', compact('department', 'companyOpts'));
     }
 
     public function update(Request $request, Department $department)

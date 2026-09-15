@@ -30,8 +30,9 @@ class LocationController extends Controller
     public function create()
     {
         $companies = Company::orderBy('name')->get();
+        $companyOpts = $companies->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
 
-        return view('pages.master.locations.create', compact('companies'));
+        return view('pages.master.locations.create', compact('companyOpts'));
     }
 
     public function store(Request $request)
@@ -54,8 +55,9 @@ class LocationController extends Controller
     public function edit(Location $location)
     {
         $companies = Company::orderBy('name')->get();
+        $companyOpts = $companies->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
 
-        return view('pages.master.locations.edit', compact('location', 'companies'));
+        return view('pages.master.locations.edit', compact('location', 'companyOpts'));
     }
 
     public function update(Request $request, Location $location)

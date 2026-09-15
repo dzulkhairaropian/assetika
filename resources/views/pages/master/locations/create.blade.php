@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedCompanyId = old('company_id');
+    @endphp
+
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Create Location" :items="[['label' => 'Locations', 'url' => route('locations.index')]]" />
 
@@ -34,18 +38,7 @@
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Company <span class="text-error-500">*</span>
-                                </label>
-                                <select name="company_id" required
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                    <option value="">Select Company</option>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
-                                            {{ $company->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <x-form.searchable-select name="company_id" label="Company" :options="$companyOpts" :selected="$selectedCompanyId" placeholder="Select Company" required="true" />
                                 @error('company_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 

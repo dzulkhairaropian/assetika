@@ -25,8 +25,9 @@ class OperatingSystemController extends Controller
     public function create()
     {
         $brands = Brand::orderBy('name')->get();
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->id, 'text' => $b->name])->values()->all();
 
-        return view('pages.master.operating-systems.create', compact('brands'));
+        return view('pages.master.operating-systems.create', compact('brandOpts'));
     }
 
     public function store(Request $request)
@@ -49,8 +50,9 @@ class OperatingSystemController extends Controller
     public function edit(OperatingSystem $operatingSystem)
     {
         $brands = Brand::orderBy('name')->get();
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->id, 'text' => $b->name])->values()->all();
 
-        return view('pages.master.operating-systems.edit', compact('operatingSystem', 'brands'));
+        return view('pages.master.operating-systems.edit', compact('operatingSystem', 'brandOpts'));
     }
 
     public function update(Request $request, OperatingSystem $operatingSystem)

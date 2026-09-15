@@ -32,7 +32,10 @@ class ProductController extends Controller
         $brands = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
 
-        return view('pages.master.products.index', compact('products', 'brands', 'categories'));
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->id, 'text' => $b->name])->values()->all();
+        $categoryOpts = $categories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
+
+        return view('pages.master.products.index', compact('products', 'brands', 'categories', 'brandOpts', 'categoryOpts'));
     }
 
     public function create()
@@ -41,7 +44,11 @@ class ProductController extends Controller
         $categories = Category::orderBy('name')->get();
         $masterCategories = MasterCategory::orderBy('name')->get();
 
-        return view('pages.master.products.create', compact('brands', 'categories', 'masterCategories'));
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->id, 'text' => $b->name])->values()->all();
+        $categoryOpts = $categories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
+        $masterCatOpts = $masterCategories->map(fn ($mc) => ['id' => $mc->id, 'text' => $mc->name])->values()->all();
+
+        return view('pages.master.products.create', compact('brandOpts', 'categoryOpts', 'masterCatOpts'));
     }
 
     public function store(Request $request)
@@ -70,7 +77,11 @@ class ProductController extends Controller
         $categories = Category::orderBy('name')->get();
         $masterCategories = MasterCategory::orderBy('name')->get();
 
-        return view('pages.master.products.edit', compact('product', 'brands', 'categories', 'masterCategories'));
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->id, 'text' => $b->name])->values()->all();
+        $categoryOpts = $categories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
+        $masterCatOpts = $masterCategories->map(fn ($mc) => ['id' => $mc->id, 'text' => $mc->name])->values()->all();
+
+        return view('pages.master.products.edit', compact('product', 'brandOpts', 'categoryOpts', 'masterCatOpts'));
     }
 
     public function update(Request $request, Product $product)

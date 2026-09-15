@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedBrandId = old('brand_id', $product->brand_id);
+        $selectedCategoryId = old('category_id', $product->category_id);
+    @endphp
+
     <div class="space-y-6">
         <x-common.page-breadcrumb pageTitle="Edit Product" :items="[['label' => 'Products', 'url' => route('products.index')]]" />
 
@@ -44,49 +49,11 @@
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Brand
-                                </label>
-                                <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent">
-                                    <select name="brand_id"
-                                        class="dark:bg-gray-950 shadow-sm focus:border-brand-500 dark:focus:border-brand-800 h-9 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 bg-none px-3 py-1.5 pr-11 text-xs text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:placeholder:text-white/30"
-                                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                        <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Brand</option>
-                                        @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                {{ $brand->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                        <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </span>
-                                </div>
+                                <x-form.searchable-select name="brand_id" label="Brand" :options="$brandOpts" :selected="$selectedBrandId" placeholder="Select Brand" />
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Category
-                                </label>
-                                <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent">
-                                    <select name="category_id"
-                                        class="dark:bg-gray-950 shadow-sm focus:border-brand-500 dark:focus:border-brand-800 h-9 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 bg-none px-3 py-1.5 pr-11 text-xs text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:placeholder:text-white/30"
-                                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                                        <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">Select Category</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }} class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                {{ $category->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                        <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </span>
-                                </div>
+                                <x-form.searchable-select name="category_id" label="Category" :options="$categoryOpts" :selected="$selectedCategoryId" placeholder="Select Category" />
                             </div>
 
                             <div>
