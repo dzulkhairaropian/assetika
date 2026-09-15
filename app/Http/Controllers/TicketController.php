@@ -196,7 +196,7 @@ class TicketController extends Controller
         $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
 
         $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->orderBy('id', 'desc')
             ->first();
 
         $nextSeq = 1;

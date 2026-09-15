@@ -408,7 +408,7 @@ class AssetController extends Controller
             'product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location',
             'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType',
             'tickets.status', 'tickets.priority', 'tickets.assignedTo',
-            'activityLogs.user',
+            'activityLogs.user', 'installedComponents.product', 'installedComponents.vendor',
         ]);
 
         return view('pages.assets.show', compact('asset'));

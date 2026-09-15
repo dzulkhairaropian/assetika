@@ -81,39 +81,14 @@ class Asset extends Model
                     ->orWhere('specification', 'like', $like)
                     ->orWhereHas('product', function ($p) use ($like) {
                         $p->where('name', 'like', $like)
-                            ->orWhereHas('brand', function ($b) use ($like) {
-                                $b->where('name', 'like', $like);
-                            })
-                            ->orWhereHas('category', function ($c) use ($like) {
-                                $c->where('name', 'like', $like);
-                            });
+                            ->orWhereHas('brand', fn ($b) => $b->where('name', 'like', $like))
+                            ->orWhereHas('category', fn ($c) => $c->where('name', 'like', $like));
                     })
-                    ->orWhereHas('status', function ($s) use ($like) {
-                        $s->where('name', 'like', $like);
-                    })
-                    ->orWhereHas('department', function ($d) use ($like) {
-                        $d->where('name', 'like', $like)
-                            ->orWhereHas('company', function ($cmp) use ($like) {
-                                $cmp->where('name', 'like', $like);
-                            });
-                    })
-                    ->orWhereHas('location', function ($l) use ($like) {
-                        $l->where('name', 'like', $like);
-                    })
-                    ->orWhereHas('vendor', function ($v) use ($like) {
-                        $v->where('name', 'like', $like);
-                    })
-                    ->orWhereHas('depreciation', function ($d) use ($like) {
-                        $d->where('name', 'like', $like);
-                    })
-                    ->orWhereHas('assignedToUser', function ($u) use ($like) {
-                        $u->where('name', 'like', $like)
-                            ->orWhere('email', 'like', $like);
-                    })
-                    ->orWhereHas('currentCheckout.checkedOutToUser', function ($u) use ($like) {
-                        $u->where('name', 'like', $like)
-                            ->orWhere('email', 'like', $like);
-                    });
+                    ->orWhereHas('status', fn ($s) => $s->where('name', 'like', $like))
+                    ->orWhereHas('department', fn ($d) => $d->where('name', 'like', $like))
+                    ->orWhereHas('location', fn ($l) => $l->where('name', 'like', $like))
+                    ->orWhereHas('vendor', fn ($v) => $v->where('name', 'like', $like))
+                    ->orWhereHas('assignedToUser', fn ($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like));
             });
         }
 
@@ -417,5 +392,10 @@ class Asset extends Model
         $depreciated = $perMonth * min($elapsed, $months);
 
         return max(0, (float) $this->purchase_cost - $depreciated);
+    }
+
+    public function installedComponents(): HasMany
+    {
+        return $this->hasMany(Component::class, 'assigned_asset_id');
     }
 }

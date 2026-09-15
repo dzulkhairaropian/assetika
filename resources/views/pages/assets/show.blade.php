@@ -268,6 +268,17 @@
                                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                                 Details
                             </button>
+                            <button @click="activeTab = 'components'"
+                                :class="activeTab === 'components' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
+                                class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                                Installed Components
+                                @if($asset->installedComponents->count() > 0)
+                                    <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                                        {{ $asset->installedComponents->count() }}
+                                    </span>
+                                @endif
+                            </button>
                             <button @click="activeTab = 'history'"
                                 :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white'"
                                 class="flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all">
@@ -302,6 +313,67 @@
 
                     <!-- Tabs Content -->
                     <div class="p-4 sm:p-5">
+                        <!-- Installed Components Tab -->
+                        <div x-show="activeTab === 'components'" class="space-y-4" style="display: none;" x-transition>
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                                    Hardware Components Attached to This Asset
+                                </h4>
+                            </div>
+
+                            @if($asset->installedComponents->isNotEmpty())
+                                <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+                                    <table class="w-full text-xs">
+                                        <thead class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
+                                            <tr>
+                                                <th class="px-3.5 py-2.5 text-start font-medium text-gray-500">Component Tag / Name</th>
+                                                <th class="px-3.5 py-2.5 text-start font-medium text-gray-500">Model / Serial</th>
+                                                <th class="px-3.5 py-2.5 text-start font-medium text-gray-500">Installed Date</th>
+                                                <th class="px-3.5 py-2.5 text-end font-medium text-gray-500">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                            @foreach($asset->installedComponents as $installedComp)
+                                                <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                                    <td class="px-3.5 py-2.5">
+                                                        <span class="block font-mono text-[11px] font-bold text-gray-900 dark:text-white">{{ $installedComp->component_tag ?? '-' }}</span>
+                                                        <a href="{{ route('components.show', $installedComp) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                                                            {{ $installedComp->name }}
+                                                        </a>
+                                                    </td>
+                                                    <td class="px-3.5 py-2.5 text-gray-700 dark:text-gray-300">
+                                                        <span>{{ $installedComp->model_number ?? '-' }}</span>
+                                                        @if($installedComp->serial)
+                                                            <span class="block text-[10px] text-gray-400 font-mono">SN: {{ $installedComp->serial }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-3.5 py-2.5 text-gray-600 dark:text-gray-400">
+                                                        {{ $installedComp->release_date ? $installedComp->release_date->format('d M Y') : ($installedComp->created_at ? $installedComp->created_at->format('d M Y') : '-') }}
+                                                    </td>
+                                                    <td class="px-3.5 py-2.5 text-end">
+                                                        <form action="{{ route('components.checkin', $installedComp) }}" method="POST" onsubmit="return confirm('Detach component from asset?')">
+                                                            @csrf
+                                                            <button type="submit" class="inline-flex items-center gap-1 rounded bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-700 hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-400 transition">
+                                                                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Detach
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-6 text-center dark:border-gray-800 dark:bg-gray-950">
+                                    <div class="flex flex-col items-center justify-center space-y-1.5">
+                                        <i data-lucide="cpu" class="w-6 h-6 text-gray-400"></i>
+                                        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No components attached</p>
+                                        <p class="text-[11px] text-gray-400 dark:text-gray-500">You can attach RAM, SSD, Battery from Component Details page.</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
                         <!-- Details Tab -->
                         <div x-show="activeTab === 'details'" class="space-y-6" x-transition>
                             <!-- Product Info -->

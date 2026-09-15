@@ -92,7 +92,7 @@ class ComponentController extends Controller
             'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
         ])->values()->all();
 
-        // Summary counts for Tab Bar
+        // Summary counts for Tab Bar & KPI Cards
         $summary = [
             'total' => Component::count(),
             'ready' => Component::whereNull('assigned_asset_id')
@@ -392,7 +392,7 @@ class ComponentController extends Controller
         $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
 
         $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-            ->orderByRaw('CAST(SUBSTRING_INDEX(request_id, "-", -1) AS UNSIGNED) DESC')
+            ->orderBy('id', 'desc')
             ->first();
 
         $nextSeq = 1;
