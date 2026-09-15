@@ -122,6 +122,7 @@
                     $tabFilters = array_filter(request()->except(['page', 'tab']));
                     $tabs = [
                         ['key' => null,       'label' => 'All Assets',      'count' => $inventorySummary['total'],      'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'today',    'label' => 'Added Today',     'count' => $inventorySummary['today'],      'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
                         ['key' => 'draft',    'label' => 'Draft',           'count' => $inventorySummary['draft'],      'icon' => 'file-text',    'badge' => 'bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-400'],
                         ['key' => 'ready',    'label' => 'Ready to Deploy', 'count' => $inventorySummary['ready'],      'icon' => 'circle-check', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
                         ['key' => 'deployed', 'label' => 'Deployed',        'count' => $inventorySummary['deployed'],   'icon' => 'monitor',      'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],

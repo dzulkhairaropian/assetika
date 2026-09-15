@@ -187,6 +187,7 @@ class AssetController extends Controller
 
         $inventorySummary = [
             'total' => (clone $query)->count(),
+            'today' => (clone $query)->whereDate('assets.created_at', Carbon::today())->count(),
             'draft' => (clone $query)->whereHas('status', function ($q) {
                 $q->whereIn('name', ['Draft']);
             })->count(),
@@ -213,6 +214,9 @@ class AssetController extends Controller
 
         // Tab quick filter
         switch ($request->input('tab')) {
+            case 'today':
+                $query->whereDate('assets.created_at', Carbon::today());
+                break;
             case 'draft':
                 $query->whereHas('status', function ($q) {
                     $q->whereIn('name', ['Draft']);

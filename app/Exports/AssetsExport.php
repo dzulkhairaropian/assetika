@@ -41,6 +41,35 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
             'depreciation',
         ]);
 
+        if (! empty($this->filters['tab'])) {
+            switch ($this->filters['tab']) {
+                case 'today':
+                    $query->whereDate('created_at', Carbon::today());
+                    break;
+                case 'draft':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Draft']));
+                    break;
+                case 'ready':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Ready to Deploy']));
+                    break;
+                case 'deployed':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Deployed', 'Borrowed']));
+                    break;
+                case 'service':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']));
+                    break;
+                case 'broken':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Broken']));
+                    break;
+                case 'retired':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Retired', 'Disposal']));
+                    break;
+                case 'sold':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Sold', 'For Sale']));
+                    break;
+            }
+        }
+
         if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
