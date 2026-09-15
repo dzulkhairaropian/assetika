@@ -643,23 +643,33 @@ class ImportController extends Controller
     {
         $catCode = strtoupper(trim($categoryCode));
         if (empty($rawTag)) {
-            return "DB/{$catCode}/220101/099";
+            return "DB/{$catCode}/220101/001";
         }
 
         $cleanTag = trim($rawTag);
 
-        // Pattern 1: DB/NB/181200046 -> DB/NB/181201/046
-        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{2})(\d{2})(\d{5})$/i', $cleanTag, $matches)) {
+        // Pattern 1: DB/NB/210801/014 or DB/NB/210801/14
+        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{6})\/(\d+)$/i', $cleanTag, $matches)) {
             $comp = strtoupper($matches[1]);
-            $cat = strtoupper($matches[2]);
+            $cat = in_array(strtoupper($matches[2]), ['NO', 'NOT']) ? $catCode : strtoupper($matches[2]);
+            $dateCode = $matches[3];
+            $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
+
+            return "{$comp}/{$cat}/{$dateCode}/{$seq}";
+        }
+
+        // Pattern 2: DB/NB/181200046, DB/NB/21080114, DB/NB/201201006, DB/NB/23030017
+        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{2})(\d{2})(\d{2}|\d{3})(\d{1,5})$/i', $cleanTag, $matches)) {
+            $comp = strtoupper($matches[1]);
+            $cat = in_array(strtoupper($matches[2]), ['NO', 'NOT']) ? $catCode : strtoupper($matches[2]);
             $year = $matches[3];
             $month = $matches[4];
-            $seq = str_pad((string) ((int) $matches[5]), 3, '0', STR_PAD_LEFT);
+            $seq = str_pad((string) ((int) $matches[6]), 3, '0', STR_PAD_LEFT);
 
             return "{$comp}/{$cat}/{$year}{$month}01/{$seq}";
         }
 
-        // Pattern 2: DB/15050029 -> DB/NB/150501/029
+        // Pattern 3: DB/15050029 -> DB/NB/150501/029
         if (preg_match('/^([A-Z0-9]+)\/(\d{2})(\d{2})(\d{4,5})$/i', $cleanTag, $matches)) {
             $comp = strtoupper($matches[1]);
             $cat = $catCode;
@@ -668,27 +678,6 @@ class ImportController extends Controller
             $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
 
             return "{$comp}/{$cat}/{$year}{$month}01/{$seq}";
-        }
-
-        // Pattern 3: DB/NB/21080114 -> DB/NB/210801/014 (or DB/NO/201201/033 -> DB/NB/201201/033)
-        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{6})\/(\d+)$/i', $cleanTag, $matches)) {
-            $comp = strtoupper($matches[1]);
-            $cat = strtoupper($matches[2]);
-            if (in_array($cat, ['NO', 'NOT'])) {
-                $cat = $catCode;
-            }
-            $dateCode = $matches[3];
-            $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
-
-            return "{$comp}/{$cat}/{$dateCode}/{$seq}";
-        }
-        if (preg_match('/^([A-Z0-9]+)\/([A-Z0-9]+)\/(\d{6})(\d{2,4})$/i', $cleanTag, $matches)) {
-            $comp = strtoupper($matches[1]);
-            $cat = strtoupper($matches[2]);
-            $dateCode = $matches[3];
-            $seq = str_pad((string) ((int) $matches[4]), 3, '0', STR_PAD_LEFT);
-
-            return "{$comp}/{$cat}/{$dateCode}/{$seq}";
         }
 
         return $cleanTag;
