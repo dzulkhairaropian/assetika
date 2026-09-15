@@ -38,7 +38,21 @@ class ImportController extends Controller
         $path = $request->file('file')->getRealPath();
 
         if ($request->file('file')->getClientOriginalExtension() === 'csv' || $request->file('file')->getClientOriginalExtension() === 'txt') {
-            $rows = array_map('str_getcsv', file($path));
+            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (empty($lines)) {
+                return back()->with('error', 'Empty file.');
+            }
+
+            // Detect delimiter (, or ; or \t) from first line
+            $firstLine = $lines[0];
+            $delimiter = ',';
+            if (substr_count($firstLine, ';') > substr_count($firstLine, ',')) {
+                $delimiter = ';';
+            } elseif (substr_count($firstLine, "\t") > substr_count($firstLine, ',')) {
+                $delimiter = "\t";
+            }
+
+            $rows = array_map(fn ($line) => str_getcsv($line, $delimiter), $lines);
         } else {
             return back()->with('error', 'XLSX not supported yet. Use CSV.');
         }
@@ -48,15 +62,30 @@ class ImportController extends Controller
             return back()->with('error', 'Empty file.');
         }
 
+        // Clean UTF-8 BOM if present on first header item
+        if (isset($header[0])) {
+            $header[0] = preg_replace('/\x{EF}\x{BB}\x{BF}/', '', $header[0]);
+        }
+
         $errors = [];
         $preview = [];
         $maxPreview = 10;
+        $headerCount = count($header);
 
         foreach ($rows as $i => $row) {
-            if (count($row) < count($header)) {
+            if (empty($row) || (count($row) === 1 && $row[0] === null)) {
                 continue;
             }
-            $rawRow = array_combine(array_slice($header, 0, count($row)), $row);
+
+            $minCount = min($headerCount, count($row));
+            if ($minCount === 0) {
+                continue;
+            }
+
+            $keys = array_slice($header, 0, $minCount);
+            $values = array_slice($row, 0, $minCount);
+            $rawRow = array_combine($keys, $values);
+
             if ($i < $maxPreview) {
                 $preview[] = $rawRow;
             }
@@ -119,14 +148,25 @@ class ImportController extends Controller
 
         $validRows = [];
         $skipped = 0;
+        $headerCount = count($header);
 
         foreach ($rows as $row) {
-            if (count($row) < count($header)) {
+            if (empty($row) || (count($row) === 1 && $row[0] === null)) {
                 $skipped++;
 
                 continue;
             }
-            $data = array_combine(array_slice($header, 0, count($row)), $row);
+
+            $minCount = min($headerCount, count($row));
+            if ($minCount === 0) {
+                $skipped++;
+
+                continue;
+            }
+
+            $keys = array_slice($header, 0, $minCount);
+            $values = array_slice($row, 0, $minCount);
+            $data = array_combine($keys, $values);
             $validRows[] = $data;
         }
 
