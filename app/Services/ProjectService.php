@@ -98,6 +98,14 @@ class ProjectService
 
             $task->save();
 
+            // Auto sync linked ticket if task is done
+            if (($task->status === 'done' || str_contains(strtolower($task->statusRel?->name ?? ''), 'done')) && $task->ticket) {
+                $closedStatus = Status::where('name', 'Closed')->first() ?? Status::where('name', 'Resolved')->first();
+                if ($closedStatus) {
+                    $task->ticket->update(['status_id' => $closedStatus->id]);
+                }
+            }
+
             $project = $task->project;
             $project->syncAutoStatus();
             $stRel = $project->statusRel;
