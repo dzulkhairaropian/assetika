@@ -60,5 +60,5 @@ test('checkout component to asset automatically generates completed maintenance 
 
     $ticket = Ticket::where('asset_id', $asset->id)->first();
     $this->assertNotNull($ticket);
-    $this->assertStringContainsString('[Auto-Generated] Component Installed/Attached: 1x Baterai Dell Latitude 3410', $ticket->problem_description);
+    $this->assertStringContainsString('Installed component DB/BATT/260915/001 (Baterai Dell Latitude 3410)', $ticket->problem_description);
 });

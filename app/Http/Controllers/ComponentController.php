@@ -7,22 +7,22 @@ use App\Models\Category;
 use App\Models\Component;
 use App\Models\Location;
 use App\Models\MasterCategory;
-use App\Models\Priority;
 use App\Models\Product;
-use App\Models\SlaStatus;
-use App\Models\Source;
 use App\Models\Status;
 use App\Models\Ticket;
-use App\Models\TicketCategory;
-use App\Models\TicketStatus;
-use App\Models\TicketSubcategory;
-use App\Models\TicketType;
 use App\Models\Vendor;
-use Carbon\Carbon;
+use App\Services\ComponentService;
 use Illuminate\Http\Request;
 
 class ComponentController extends Controller
 {
+    protected ComponentService $componentService;
+
+    public function __construct(ComponentService $componentService)
+    {
+        $this->componentService = $componentService;
+    }
+
     public function index(Request $request)
     {
         $query = Component::query()->with(['product.brand', 'product.category', 'category', 'location', 'vendor', 'assignedAsset.assignedToUser', 'status']);
@@ -157,40 +157,7 @@ class ComponentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
-        if (empty($validated['status_id'])) {
-            $defaultStatus = Status::where('master_category_id', $componentMasterCat?->id)->where('name', 'Ready')->first() ?? Status::where('master_category_id', $componentMasterCat?->id)->first();
-            $validated['status_id'] = $defaultStatus?->id;
-        }
-
-        $statusModel = Status::find($validated['status_id']);
-        $validated['status'] = $statusModel?->name ?? 'Ready';
-
-        $product = Product::with(['brand', 'category'])->findOrFail($validated['product_id']);
-        $validated['name'] = $product->name;
-        $validated['category_id'] = $product->category_id;
-        $validated['manufacturer'] = $product->brand?->name;
-        if (empty($validated['model_number'])) {
-            $validated['model_number'] = $product->product_type ?? $product->name;
-        }
-
-        $totalQty = (int) $validated['qty'];
-        $singleCost = $validated['purchase_cost'] ? ($validated['purchase_cost'] / max(1, $totalQty)) : null;
-
-        // Batch creation for N individual component units
-        for ($i = 0; $i < $totalQty; $i++) {
-            $unitData = $validated;
-            $unitData['qty'] = 1;
-            $unitData['purchase_cost'] = $singleCost;
-            if ($i > 0) {
-                // Let booted hook generate unique component_tag per item
-                unset($unitData['component_tag']);
-                if (! empty($unitData['serial'])) {
-                    $unitData['serial'] = $unitData['serial'].'-'.($i + 1);
-                }
-            }
-            Component::create($unitData);
-        }
+        $totalQty = $this->componentService->createBatch($validated);
 
         if ($request->has('create_another')) {
             return redirect()->route('components.create')->with('success', "{$totalQty} component unit(s) created successfully. Add another batch.");
@@ -269,20 +236,7 @@ class ComponentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if (! empty($validated['status_id'])) {
-            $statusModel = Status::find($validated['status_id']);
-            $validated['status'] = $statusModel?->name ?? 'Ready';
-        }
-
-        $product = Product::with(['brand', 'category'])->findOrFail($validated['product_id']);
-        $validated['name'] = $product->name;
-        $validated['category_id'] = $product->category_id;
-        $validated['manufacturer'] = $product->brand?->name;
-        if (empty($validated['model_number'])) {
-            $validated['model_number'] = $product->product_type ?? $product->name;
-        }
-
-        $component->update($validated);
+        $this->componentService->updateComponent($component, $validated);
 
         return redirect()->route('components.index')->with('success', 'Component updated successfully.');
     }
@@ -319,27 +273,7 @@ class ComponentController extends Controller
         }
 
         $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($request->asset_id);
-        $checkoutDate = $request->filled('release_date') ? Carbon::parse($request->release_date) : now();
-
-        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
-        $installedStatus = Status::where('master_category_id', $componentMasterCat?->id)->where('name', 'Installed')->first();
-
-        $component->update([
-            'assigned_asset_id' => $asset->id,
-            'status_id' => $installedStatus?->id ?? $component->status_id,
-            'status' => 'Installed',
-            'release_date' => $checkoutDate,
-        ]);
-
-        // Auto Generate Ticket for Component Installation
-        $this->createAutomaticTicketForComponent(
-            $asset,
-            $component,
-            1,
-            'installed',
-            $request->notes,
-            $checkoutDate
-        );
+        $this->componentService->checkout($component, $asset, $request->release_date, $request->notes);
 
         $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
 
@@ -356,101 +290,11 @@ class ComponentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $asset = Asset::with(['assignedToUser', 'product.category'])->findOrFail($component->assigned_asset_id);
+        $asset = $component->assignedAsset;
+        $this->componentService->checkin($component, $request->notes);
 
-        $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
-        $readyStatus = Status::where('master_category_id', $componentMasterCat?->id)->where('name', 'Ready')->first();
+        $assetName = $asset?->product?->name ?? $asset?->device_name ?? $asset?->asset_tag ?? 'Asset';
 
-        $component->update([
-            'assigned_asset_id' => null,
-            'status_id' => $readyStatus?->id ?? $component->status_id,
-            'status' => 'Ready',
-        ]);
-
-        // Auto Generate Ticket for Component Removal
-        $this->createAutomaticTicketForComponent(
-            $asset,
-            $component,
-            1,
-            'removed',
-            $request->notes
-        );
-
-        $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
-
-        return back()->with('success', "Component {$component->component_tag} ({$component->name}) checked in & removed from {$assetName} ({$asset->asset_tag}). Maintenance ticket generated.");
-    }
-
-    private function createAutomaticTicketForComponent(Asset $asset, Component $component, int $qty, string $action, ?string $notes = null, ?Carbon $customDate = null): void
-    {
-        $ticketDate = $customDate ?? now();
-        $maintType = TicketType::where('code', 'MTN')->first()
-            ?? TicketType::where('name', 'like', '%Maintenance%')->first()
-            ?? TicketType::first();
-
-        $requestCode = strtoupper($maintType?->code ?: 'MTN');
-        $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
-
-        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-            ->orderBy('id', 'desc')
-            ->first();
-
-        $nextSeq = 1;
-        if ($latestTicket) {
-            $parts = explode('-', $latestTicket->request_id);
-            $nextSeq = ((int) end($parts)) + 1;
-        }
-
-        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
-        $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
-        $mediumPriority = Priority::where('name', 'Medium')->first();
-        $portalSource = Source::first();
-        $maintType = TicketType::where('name', 'like', '%Maintenance%')->first() ?? TicketType::first();
-
-        // Resolve category
-        $hardwareCat = TicketCategory::where('name', 'Hardware')->orWhere('code', 'HARDWARE')->first();
-        $catId = $hardwareCat?->id ?? TicketCategory::first()?->id;
-        $subCatId = null;
-        if ($hardwareCat) {
-            $sub = TicketSubcategory::where('ticket_category_id', $hardwareCat->id)
-                ->where('name', 'like', '%Peripherals%')
-                ->first();
-            $subCatId = $sub?->id;
-        }
-
-        $toUser = $asset->assignedToUser;
-        $actionText = $action === 'installed' ? 'Installed/Attached' : 'Removed/Detached';
-
-        $assetName = $asset->product?->name ?? $asset->device_name ?? $asset->asset_tag;
-        $desc = "[Auto-Generated] Component {$actionText}: {$qty}x {$component->name} on Asset {$asset->asset_tag} - ".$assetName;
-        if ($notes) {
-            $desc .= "\nNotes: ".$notes;
-        }
-
-        Ticket::create([
-            'request_id' => $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT),
-            'ticket_type_id' => $maintType?->id,
-            'ticket_category_id' => $catId,
-            'ticket_subcategory_id' => $subCatId,
-            'requester_user_id' => $toUser?->id ?? auth()->id(),
-            'requester_name' => $toUser?->name ?? auth()->user()?->name,
-            'requester_email' => $toUser?->email ?? auth()->user()?->email,
-            'requester_company_id' => $toUser?->company_id ?? auth()->user()?->company_id,
-            'requester_department_id' => $toUser?->department_id,
-            'assigned_to_id' => auth()->id(),
-            'created_by_id' => auth()->id(),
-            'asset_id' => $asset->id,
-            'priority_id' => $mediumPriority?->id,
-            'source_id' => $portalSource?->id,
-            'status_id' => $completedStatus?->id,
-            'sla_status_id' => $fulfilledSla?->id,
-            'problem_description' => $desc,
-            'resolution_notes' => "Component {$actionText} successfully by ".(auth()->user()?->name ?? 'System').'.',
-            'request_date' => $ticketDate->toDateString(),
-            'request_time' => $ticketDate,
-            'completed_date' => $ticketDate->toDateString(),
-            'completed_time' => $ticketDate,
-            'created_at' => $ticketDate,
-        ]);
+        return back()->with('success', "Component {$component->component_tag} ({$component->name}) checked in & removed from {$assetName}. Maintenance ticket generated.");
     }
 }

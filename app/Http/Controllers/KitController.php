@@ -8,10 +8,18 @@ use App\Models\Consumable;
 use App\Models\Kit;
 use App\Models\License;
 use App\Models\User;
+use App\Services\KitService;
 use Illuminate\Http\Request;
 
 class KitController extends Controller
 {
+    protected KitService $kitService;
+
+    public function __construct(KitService $kitService)
+    {
+        $this->kitService = $kitService;
+    }
+
     public function index(Request $request)
     {
         $query = Kit::query();
@@ -41,9 +49,6 @@ class KitController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'assets' => 'nullable|array',
-            'assets.*.id' => 'exists:assets,id',
-            'assets.*.qty' => 'nullable|integer|min:1',
             'licenses' => 'nullable|array',
             'licenses.*.id' => 'exists:licenses,id',
             'licenses.*.qty' => 'nullable|integer|min:1',
@@ -55,44 +60,10 @@ class KitController extends Controller
             'consumables.*.qty' => 'nullable|integer|min:1',
         ]);
 
-        $kit = Kit::create(['name' => $validated['name'], 'description' => $request->description]);
-
-        if ($request->has('assets')) {
-            $sync = [];
-            foreach ($request->assets as $item) {
-                if (! empty($item['id'])) {
-                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
-                }
-            }
-            $kit->assets()->sync($sync);
-        }
-        if ($request->has('licenses')) {
-            $sync = [];
-            foreach ($request->licenses as $item) {
-                if (! empty($item['id'])) {
-                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
-                }
-            }
-            $kit->licenses()->sync($sync);
-        }
-        if ($request->has('components')) {
-            $sync = [];
-            foreach ($request->components as $item) {
-                if (! empty($item['id'])) {
-                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
-                }
-            }
-            $kit->components()->sync($sync);
-        }
-        if ($request->has('consumables')) {
-            $sync = [];
-            foreach ($request->consumables as $item) {
-                if (! empty($item['id'])) {
-                    $sync[$item['id']] = ['qty' => $item['qty'] ?? 1];
-                }
-            }
-            $kit->consumables()->sync($sync);
-        }
+        $kit = $this->kitService->createKit(
+            ['name' => $validated['name'], 'description' => $request->description],
+            $request->only(['licenses', 'components', 'consumables'])
+        );
 
         if ($request->has('create_another')) {
             return redirect()->route('kits.create')->with('success', 'Kit created successfully. Add another one.');

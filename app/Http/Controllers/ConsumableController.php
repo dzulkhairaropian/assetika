@@ -5,15 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Consumable;
-use App\Models\ConsumableTransaction;
 use App\Models\Product;
 use App\Models\User;
-use App\Notifications\SystemNotification;
+use App\Services\ConsumableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ConsumableController extends Controller
 {
+    protected ConsumableService $consumableService;
+
+    public function __construct(ConsumableService $consumableService)
+    {
+        $this->consumableService = $consumableService;
+    }
+
     public function index(Request $request)
     {
         $query = Consumable::with(['product.brand', 'product.category', 'status']);
@@ -160,49 +166,7 @@ class ConsumableController extends Controller
             'transaction_date' => 'required|date',
         ]);
 
-        DB::transaction(function () use ($request, $consumable) {
-            $qty = $request->quantity;
-            $unitCost = $request->unit_cost ?? $consumable->purchase_cost ?? 0;
-            $totalCost = $qty * $unitCost;
-
-            $evidencePath = null;
-            if ($request->hasFile('evidence')) {
-                $evidencePath = $request->file('evidence')->store('consumables/transactions', 'public');
-            }
-
-            $before = $consumable->quantity;
-            $after = $before + $qty;
-
-            ConsumableTransaction::create([
-                'consumable_id' => $consumable->id,
-                'user_id' => auth()->id(),
-                'type' => 'restock',
-                'quantity' => $qty,
-                'quantity_before' => $before,
-                'quantity_after' => $after,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalCost,
-                'evidence_file_path' => $evidencePath,
-                'notes' => $request->notes,
-                'transaction_date' => $request->transaction_date,
-            ]);
-
-            $consumable->update([
-                'quantity' => $after,
-                'purchase_cost' => $unitCost, // Update default purchase cost to latest restock cost
-            ]);
-        });
-
-        $auth = auth()->user();
-        if ($auth) {
-            $auth->notify(new SystemNotification(
-                'Consumable Restocked',
-                "{$request->quantity} units of '".($consumable->product->name ?? 'Consumable')."' have been restocked.",
-                route('consumables.index'),
-                'plus-circle',
-                'Consumable'
-            ));
-        }
+        $this->consumableService->processRestock($consumable, (int) $request->quantity, $request->all(), $request->file('evidence'));
 
         return redirect()->route('consumables.index')->with('success', 'Consumable restocked successfully.');
     }
@@ -229,49 +193,8 @@ class ConsumableController extends Controller
             'transaction_date' => 'required|date',
         ]);
 
-        DB::transaction(function () use ($request, $consumable) {
-            $qty = $request->quantity;
-            $unitCost = $consumable->purchase_cost ?? 0;
-            $totalCost = $qty * $unitCost;
-
-            $evidencePath = null;
-            if ($request->hasFile('evidence')) {
-                $evidencePath = $request->file('evidence')->store('consumables/transactions', 'public');
-            }
-
-            $before = $consumable->quantity;
-            $after = $before - $qty;
-
-            ConsumableTransaction::create([
-                'consumable_id' => $consumable->id,
-                'user_id' => auth()->id(),
-                'checked_out_to_user_id' => $request->checked_out_to_user_id,
-                'type' => 'checkout',
-                'quantity' => $qty,
-                'quantity_before' => $before,
-                'quantity_after' => $after,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalCost,
-                'evidence_file_path' => $evidencePath,
-                'notes' => $request->notes,
-                'transaction_date' => $request->transaction_date,
-            ]);
-
-            $consumable->update([
-                'quantity' => $after,
-            ]);
-        });
-
-        $toUser = User::find($request->checked_out_to_user_id);
-        if ($toUser) {
-            $toUser->notify(new SystemNotification(
-                'Consumable Checked Out',
-                "{$request->quantity} units of '".($consumable->product->name ?? 'Consumable')."' have been checked out to you.",
-                route('consumables.index'),
-                'shopping-bag',
-                'Consumable'
-            ));
-        }
+        $toUser = User::findOrFail($request->checked_out_to_user_id);
+        $this->consumableService->processCheckout($consumable, $toUser, (int) $request->quantity, $request->all(), $request->file('evidence'));
 
         return redirect()->route('consumables.index')->with('success', 'Consumable checked out successfully.');
     }
@@ -312,73 +235,22 @@ class ConsumableController extends Controller
             'evidence' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $quantities = $request->input('quantities');
+        $quantities = $request->input('quantities', []);
         $consumableIds = array_keys($quantities);
-
         $consumables = Consumable::whereIn('id', $consumableIds)->get();
 
-        // Validate quantities against stock
         foreach ($consumables as $consumable) {
-            $qty = $quantities[$consumable->id] ?? 0;
+            $qty = (int) ($quantities[$consumable->id] ?? 0);
             if ($qty > $consumable->quantity) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Quantity for '.($consumable->product->name ?? 'Consumable')." cannot exceed available stock ({$consumable->quantity}).");
+                    ->with('error', 'Quantity for '.($consumable->product?->name ?? 'Consumable')." cannot exceed available stock ({$consumable->quantity}).");
             }
         }
 
-        DB::transaction(function () use ($request, $consumables, $quantities) {
-            $evidencePath = null;
-            if ($request->hasFile('evidence')) {
-                $evidencePath = $request->file('evidence')->store('consumables/transactions', 'public');
-            }
+        $toUser = User::findOrFail($request->checked_out_to_user_id);
+        $this->consumableService->processBulkCheckout($quantities, $toUser, $request->all(), $request->file('evidence'));
 
-            foreach ($consumables as $consumable) {
-                $qty = $quantities[$consumable->id];
-                $unitCost = $consumable->purchase_cost ?? 0;
-                $totalCost = $qty * $unitCost;
-                $before = $consumable->quantity;
-                $after = $before - $qty;
-
-                ConsumableTransaction::create([
-                    'consumable_id' => $consumable->id,
-                    'user_id' => auth()->id(),
-                    'checked_out_to_user_id' => $request->checked_out_to_user_id,
-                    'type' => 'checkout',
-                    'quantity' => $qty,
-                    'quantity_before' => $before,
-                    'quantity_after' => $after,
-                    'unit_cost' => $unitCost,
-                    'total_cost' => $totalCost,
-                    'evidence_file_path' => $evidencePath,
-                    'notes' => $request->notes,
-                    'transaction_date' => now(),
-                ]);
-
-                $consumable->update([
-                    'quantity' => $after,
-                ]);
-            }
-        });
-
-        $toUser = User::find($request->checked_out_to_user_id);
-        if ($toUser) {
-            $details = [];
-            foreach ($consumables as $consumable) {
-                $qty = $quantities[$consumable->id];
-                $details[] = "{$qty}x ".($consumable->product->name ?? 'Consumable');
-            }
-            $message = 'Consumables checked out to you: '.implode(', ', $details);
-
-            $toUser->notify(new SystemNotification(
-                'Consumables Checked Out',
-                $message,
-                route('consumables.index'),
-                'shopping-bag',
-                'Consumable'
-            ));
-        }
-
-        return redirect()->route('consumables.index')->with('success', 'Selected consumables checked out successfully.');
+        return redirect()->route('consumables.index')->with('success', 'Bulk checkout completed successfully.');
     }
 }

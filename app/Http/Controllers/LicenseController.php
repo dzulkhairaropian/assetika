@@ -6,10 +6,18 @@ use App\Models\Asset;
 use App\Models\Brand;
 use App\Models\License;
 use App\Models\User;
+use App\Services\LicenseService;
 use Illuminate\Http\Request;
 
 class LicenseController extends Controller
 {
+    protected LicenseService $licenseService;
+
+    public function __construct(LicenseService $licenseService)
+    {
+        $this->licenseService = $licenseService;
+    }
+
     public function index(Request $request)
     {
         $query = License::query();
