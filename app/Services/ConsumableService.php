@@ -44,6 +44,20 @@ class ConsumableService
                 'quantity' => $after,
             ]);
 
+            // Alert IT Admins when stock drops to or below low threshold
+            if ($after <= ($consumable->low_threshold ?? 5)) {
+                $admins = User::whereHas('roles', fn ($q) => $q->whereIn('name', ['Admin', 'Super Admin', 'IT Admin']))->get();
+                foreach ($admins as $admin) {
+                    $admin->notify(new SystemNotification(
+                        'Consumable Low Stock Alert',
+                        "Low Stock Warning: '".($consumable->product?->name ?? 'Consumable')."' remaining count is {$after} (threshold: {$consumable->low_threshold}).",
+                        route('consumables.show', $consumable),
+                        'alert-triangle',
+                        'Consumable'
+                    ));
+                }
+            }
+
             $toUser->notify(new SystemNotification(
                 'Consumable Checked Out',
                 "{$quantity} units of '".($consumable->product?->name ?? 'Consumable')."' have been checked out to you.",
