@@ -209,34 +209,24 @@
                 </div>
 
                 <div>
-                    <x-form.searchable-select name="assigned_to_id" label="Assigned To" 
-                        :options="$users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])" 
-                        :selected="old('assigned_to_id')" placeholder="Unassigned" />
+                    <x-form.searchable-select name="assigned_to_id" label="Assigned To" :options="$userOpts" :selected="old('assigned_to_id')" placeholder="Unassigned" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <x-form.searchable-select name="status_id" label="Initial Status" 
-                            :options="$columns->filter(fn($st) => isset($st->id))->map(fn($st) => ['id' => $st->id, 'text' => $st->name])->values()" 
-                            :selected="old('status_id')" placeholder="Select Status" />
+                        <x-form.searchable-select name="status_id" label="Initial Status" :options="$statusOpts" :selected="old('status_id')" placeholder="Select Status" />
                     </div>
                     <div>
-                        <x-form.searchable-select name="priority" label="Priority" 
-                            :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" 
-                            :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
+                        <x-form.searchable-select name="priority" label="Priority" :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <x-form.searchable-select name="asset_id" label="Link Asset (Optional)" 
-                            :options="$assets->map(fn($a) => ['id' => $a->id, 'text' => $a->asset_tag . ' - ' . $a->name])" 
-                            :selected="old('asset_id')" placeholder="None" />
+                        <x-form.searchable-select name="asset_id" label="Link Asset (Optional)" :options="$assetOpts" :selected="old('asset_id')" placeholder="None" />
                     </div>
                     <div>
-                        <x-form.searchable-select name="ticket_id" label="Link Ticket (Optional)" 
-                            :options="$tickets->map(fn($t) => ['id' => $t->id, 'text' => '#' . $t->request_id . ' - ' . $t->title])" 
-                            :selected="old('ticket_id')" placeholder="None" />
+                        <x-form.searchable-select name="ticket_id" label="Link Ticket (Optional)" :options="$ticketOpts" :selected="old('ticket_id')" placeholder="None" />
                     </div>
                 </div>
 

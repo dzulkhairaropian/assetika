@@ -303,21 +303,15 @@
                 </div>
 
                 <div>
-                    <x-form.searchable-select name="owner_id" label="Project Manager / Owner" 
-                        :options="$users->map(fn($u) => ['id' => $u->id, 'text' => $u->name])" 
-                        :selected="old('owner_id')" placeholder="Select Owner" />
+                    <x-form.searchable-select name="owner_id" label="Project Manager / Owner" :options="$userOpts" :selected="old('owner_id')" placeholder="Select Owner" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <x-form.searchable-select name="status_id" label="Status" 
-                            :options="$projectStatuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])" 
-                            :selected="old('status_id')" placeholder="Select Status" />
+                        <x-form.searchable-select name="status_id" label="Status" :options="$statusOpts" :selected="old('status_id')" placeholder="Select Status" />
                     </div>
                     <div>
-                        <x-form.searchable-select name="priority" label="Priority" 
-                            :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" 
-                            :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
+                        <x-form.searchable-select name="priority" label="Priority" :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
                     </div>
                 </div>
 

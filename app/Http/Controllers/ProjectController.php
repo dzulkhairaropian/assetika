@@ -9,12 +9,20 @@ use App\Models\ProjectTask;
 use App\Models\Status;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Services\ProjectService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
+    protected ProjectService $projectService;
+
+    public function __construct(ProjectService $projectService)
+    {
+        $this->projectService = $projectService;
+    }
+
     public function index(Request $request): View
     {
         $query = Project::with(['owner.department', 'statusRel', 'tasks.statusRel', 'tasks.assignedTo']);
@@ -34,12 +42,14 @@ class ProjectController extends Controller
         }
 
         $projects = $query->latest()->paginate(12)->withQueryString();
-        $users = User::all();
+        $users = User::orderBy('name')->get();
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name])->values()->all();
 
         $projectMC = MasterCategory::where('name', 'Project')->first();
         $projectStatuses = $projectMC ? Status::where('master_category_id', $projectMC->id)->get() : collect();
+        $statusOpts = $projectStatuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
 
-        return view('pages.projects.index', compact('projects', 'search', 'users', 'projectStatuses'));
+        return view('pages.projects.index', compact('projects', 'search', 'users', 'projectStatuses', 'userOpts', 'statusOpts'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -56,18 +66,7 @@ class ProjectController extends Controller
             'budget' => ['nullable', 'numeric'],
         ]);
 
-        if (empty($data['status_id']) && ! empty($data['status'])) {
-            $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project'))
-                ->where('name', 'like', $data['status'])
-                ->first();
-            if ($st) {
-                $data['status_id'] = $st->id;
-            }
-        }
-
-        $data['code'] = 'PRJ-'.date('Ym').'-'.strtoupper(substr(uniqid(), -4));
-
-        Project::create($data);
+        $this->projectService->createProject($data);
 
         return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
@@ -75,14 +74,19 @@ class ProjectController extends Controller
     public function show(Project $project): View
     {
         $project->load(['owner', 'statusRel', 'tasks.assignedTo', 'tasks.ticket', 'tasks.asset', 'tasks.statusRel']);
-        $users = User::all();
+        $users = User::orderBy('name')->get();
         $tickets = Ticket::latest()->limit(50)->get();
         $assets = Asset::latest()->limit(50)->get();
 
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name])->values()->all();
+        $ticketOpts = $tickets->map(fn ($t) => ['id' => $t->id, 'text' => '#'.$t->request_id.' - '.substr($t->problem_description, 0, 40)])->values()->all();
+        $assetOpts = $assets->map(fn ($a) => ['id' => $a->id, 'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name)])->values()->all();
+
         $taskMC = MasterCategory::where('name', 'Project Task')->first();
         $taskStatuses = $taskMC ? Status::where('master_category_id', $taskMC->id)->get() : collect();
+        $statusOpts = $taskStatuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
 
-        return view('pages.projects.show', compact('project', 'users', 'tickets', 'assets', 'taskStatuses'));
+        return view('pages.projects.show', compact('project', 'users', 'tickets', 'assets', 'taskStatuses', 'userOpts', 'ticketOpts', 'assetOpts', 'statusOpts'));
     }
 
     public function update(Request $request, Project $project): RedirectResponse
@@ -99,14 +103,7 @@ class ProjectController extends Controller
             'budget' => ['nullable', 'numeric'],
         ]);
 
-        if (! empty($data['status_id'])) {
-            $st = Status::find($data['status_id']);
-            if ($st) {
-                $data['status'] = strtolower(str_replace(' ', '_', $st->name));
-            }
-        }
-
-        $project->update($data);
+        $this->projectService->updateProject($project, $data);
 
         return redirect()->back()->with('success', 'Project updated successfully.');
     }
@@ -132,28 +129,7 @@ class ProjectController extends Controller
             'asset_id' => ['nullable', 'exists:assets,id'],
         ]);
 
-        if (! empty($data['status_id'])) {
-            $st = Status::find($data['status_id']);
-            if ($st) {
-                $data['status'] = match (strtolower($st->name)) {
-                    'to do' => 'todo',
-                    'in progress' => 'in_progress',
-                    'review' => 'review',
-                    'done' => 'done',
-                    default => strtolower(str_replace(' ', '_', $st->name))
-                };
-            }
-        } elseif (empty($data['status_id']) && ! empty($data['status'])) {
-            $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project Task'))
-                ->where('name', 'like', $data['status'])
-                ->first();
-            if ($st) {
-                $data['status_id'] = $st->id;
-            }
-        }
-
-        $project->tasks()->create($data);
-        $project->syncAutoStatus();
+        $this->projectService->addTask($project, $data);
 
         return redirect()->back()->with('success', 'Task added to project.');
     }
@@ -165,40 +141,10 @@ class ProjectController extends Controller
             'status' => ['nullable', 'string'],
         ]);
 
-        if (! empty($validated['status_id'])) {
-            $st = Status::find($validated['status_id']);
-            $task->status_id = $st->id;
-            $task->status = match (strtolower($st->name)) {
-                'to do' => 'todo',
-                'in progress' => 'in_progress',
-                'review' => 'review',
-                'done' => 'done',
-                default => strtolower(str_replace(' ', '_', $st->name))
-            };
-        } elseif (! empty($validated['status'])) {
-            $task->status = $validated['status'];
-            $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project Task'))
-                ->where('name', 'like', str_replace('_', ' ', $validated['status']))
-                ->first();
-            if ($st) {
-                $task->status_id = $st->id;
-            }
-        }
-
-        $task->save();
-
-        $project = $task->project;
-        $project->syncAutoStatus();
+        $res = $this->projectService->updateTaskStatus($task, $validated);
 
         if ($request->wantsJson()) {
-            $stRel = $project->statusRel;
-
-            return response()->json([
-                'success' => true,
-                'progress' => $project->progress_percentage,
-                'status_name' => $stRel ? $stRel->name : ucfirst(str_replace('_', ' ', $project->status)),
-                'status_color' => $stRel ? $stRel->color : 'info',
-            ]);
+            return response()->json($res);
         }
 
         return redirect()->back()->with('success', 'Task status updated.');
