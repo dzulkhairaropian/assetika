@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asset;
 use App\Models\Component;
 use App\Models\Consumable;
 use App\Models\Kit;
@@ -36,12 +35,15 @@ class KitController extends Controller
 
     public function create()
     {
-        $assets = Asset::orderBy('device_name')->get();
         $licenses = License::orderBy('name')->get();
         $components = Component::orderBy('name')->get();
         $consumables = Consumable::with('product')->get();
 
-        return view('pages.kits.create', compact('assets', 'licenses', 'components', 'consumables'));
+        $licenseOpts = $licenses->map(fn ($l) => ['id' => $l->id, 'text' => $l->name.' ('.$l->seats.' seats)'])->values()->all();
+        $componentOpts = $components->map(fn ($c) => ['id' => $c->id, 'text' => ($c->component_tag ? '['.$c->component_tag.'] ' : '').$c->name])->values()->all();
+        $consumableOpts = $consumables->map(fn ($con) => ['id' => $con->id, 'text' => $con->product?->name ?? 'Consumable'])->values()->all();
+
+        return view('pages.kits.create', compact('licenseOpts', 'componentOpts', 'consumableOpts'));
     }
 
     public function store(Request $request)
@@ -81,13 +83,16 @@ class KitController extends Controller
 
     public function edit(Kit $kit)
     {
-        $kit->load(['assets', 'licenses', 'components', 'consumables']);
-        $assets = Asset::orderBy('device_name')->get();
+        $kit->load(['licenses', 'components', 'consumables']);
         $licenses = License::orderBy('name')->get();
         $components = Component::orderBy('name')->get();
         $consumables = Consumable::with('product')->get();
 
-        return view('pages.kits.edit', compact('kit', 'assets', 'licenses', 'components', 'consumables'));
+        $licenseOpts = $licenses->map(fn ($l) => ['id' => $l->id, 'text' => $l->name.' ('.$l->seats.' seats)'])->values()->all();
+        $componentOpts = $components->map(fn ($c) => ['id' => $c->id, 'text' => ($c->component_tag ? '['.$c->component_tag.'] ' : '').$c->name])->values()->all();
+        $consumableOpts = $consumables->map(fn ($con) => ['id' => $con->id, 'text' => $con->product?->name ?? 'Consumable'])->values()->all();
+
+        return view('pages.kits.edit', compact('kit', 'licenseOpts', 'componentOpts', 'consumableOpts'));
     }
 
     public function update(Request $request, Kit $kit)

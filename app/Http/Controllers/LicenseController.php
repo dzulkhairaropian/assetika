@@ -41,7 +41,10 @@ class LicenseController extends Controller
         $brands = Brand::orderBy('name')->get();
         $assets = Asset::with('product.brand')->orderBy('asset_tag')->get();
 
-        return view('pages.licenses.create', compact('brands', 'assets'));
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->name, 'text' => $b->name])->values()->all();
+        $assetOpts = $assets->map(fn ($a) => ['id' => $a->id, 'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name)])->values()->all();
+
+        return view('pages.licenses.create', compact('brandOpts', 'assetOpts'));
     }
 
     public function store(Request $request)
@@ -83,15 +86,21 @@ class LicenseController extends Controller
     public function show(License $license)
     {
         $license->load('seats.assignedTo');
+        $users = User::orderBy('name')->get();
+        $assets = Asset::with('product.brand')->orderBy('asset_tag')->get();
 
-        return view('pages.licenses.show', compact('license'));
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.$u->email.')'])->values()->all();
+        $assetOpts = $assets->map(fn ($a) => ['id' => $a->id, 'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name)])->values()->all();
+
+        return view('pages.licenses.show', compact('license', 'userOpts', 'assetOpts'));
     }
 
     public function edit(License $license)
     {
         $brands = Brand::orderBy('name')->get();
+        $brandOpts = $brands->map(fn ($b) => ['id' => $b->name, 'text' => $b->name])->values()->all();
 
-        return view('pages.licenses.edit', compact('license', 'brands'));
+        return view('pages.licenses.edit', compact('license', 'brandOpts'));
     }
 
     public function update(Request $request, License $license)
