@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedUserId = old('checked_out_to_user_id');
+    @endphp
+
     <div class="space-y-4">
         <x-common.page-breadcrumb pageTitle="Bulk Checkout Consumables" :items="[['label' => 'Consumables', 'url' => route('consumables.index')]]" />
 
@@ -26,19 +30,8 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2">
                         <div class="lg:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                Checkout to User <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative z-20 bg-transparent">
-                                <select name="checked_out_to_user_id" required
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                                    <option value="">Select User</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ old('checked_out_to_user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->email }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('checked_out_to_user_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                            <x-form.searchable-select name="checked_out_to_user_id" label="Checkout to User" :options="$userOpts" :selected="$selectedUserId" placeholder="Select User" required="true" />
+                            @error('checked_out_to_user_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>

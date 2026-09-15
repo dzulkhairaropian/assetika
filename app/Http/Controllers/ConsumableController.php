@@ -81,7 +81,12 @@ class ConsumableController extends Controller
                 $q->where('name', 'IT Consumable');
             })->get();
 
-        return view('pages.consumables.create', compact('products'));
+        $productOpts = $products->map(fn ($p) => [
+            'id' => $p->id,
+            'text' => ($p->brand->name ?? '').' - '.$p->name.' ('.($p->category->name ?? '').')',
+        ])->values()->all();
+
+        return view('pages.consumables.create', compact('productOpts'));
     }
 
     public function store(Request $request)
@@ -110,7 +115,12 @@ class ConsumableController extends Controller
                 $q->where('name', 'IT Consumable');
             })->get();
 
-        return view('pages.consumables.edit', compact('consumable', 'products'));
+        $productOpts = $products->map(fn ($p) => [
+            'id' => $p->id,
+            'text' => ($p->brand->name ?? '').' - '.$p->name.' ('.($p->category->name ?? '').')',
+        ])->values()->all();
+
+        return view('pages.consumables.edit', compact('consumable', 'productOpts'));
     }
 
     public function update(Request $request, Consumable $consumable)
@@ -203,9 +213,10 @@ class ConsumableController extends Controller
             return redirect()->route('consumables.index')->with('error', 'Consumable is out of stock.');
         }
 
-        $users = User::all();
+        $users = User::orderBy('name')->get();
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.$u->email.')'])->values()->all();
 
-        return view('pages.consumables.checkout', compact('consumable', 'users'));
+        return view('pages.consumables.checkout', compact('consumable', 'userOpts'));
     }
 
     public function processCheckout(Request $request, Consumable $consumable)
@@ -285,9 +296,10 @@ class ConsumableController extends Controller
             }
         }
 
-        $users = User::all();
+        $users = User::orderBy('name')->get();
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.$u->email.')'])->values()->all();
 
-        return view('pages.consumables.bulk-checkout', compact('consumables', 'users'));
+        return view('pages.consumables.bulk-checkout', compact('consumables', 'userOpts'));
     }
 
     public function processBulkCheckout(Request $request)

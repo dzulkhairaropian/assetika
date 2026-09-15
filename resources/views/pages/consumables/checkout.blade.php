@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $selectedUserId = old('checked_out_to_user_id');
+    @endphp
+
     <div class="space-y-4">
         <x-common.page-breadcrumb pageTitle="Checkout Consumable" :items="[['label' => 'Consumables', 'url' => route('consumables.index')]]" />
 
@@ -42,21 +46,8 @@
                         </div>
 
                         <div>
-                            @php
-                                $userOptions = array_merge(
-                                    [['id' => '', 'text' => 'Select User']],
-                                    $users->map(fn($u) => ['id' => $u->id, 'text' => $u->name . ' (' . $u->email . ')'])->toArray()
-                                );
-                            @endphp
-                            <x-form.searchable-select
-                                name="checked_out_to_user_id"
-                                label="Checkout to User"
-                                :options="$userOptions"
-                                :selected="old('checked_out_to_user_id')"
-                                placeholder="Select User"
-                                required="true"
-                            />
-                            @error('checked_out_to_user_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                            <x-form.searchable-select name="checked_out_to_user_id" label="Checkout to User" :options="$userOpts" :selected="$selectedUserId" placeholder="Select User" required="true" />
+                            @error('checked_out_to_user_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
