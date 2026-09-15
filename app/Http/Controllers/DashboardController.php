@@ -17,13 +17,14 @@ use App\Models\Product;
 use App\Models\Status;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
     private function calculateTrend($current, $previous)
     {
         if ($previous === 0) {
-            return $current > 0 ? 100 : 0; // If previous is 0 and current is >0, assume 100% growth. Otherwise, 0.
+            return $current > 0 ? 100 : 0;
         }
 
         return round((($current - $previous) / $previous) * 100, 1);
@@ -32,67 +33,55 @@ class DashboardController extends Controller
     public function index()
     {
         $startOfMonth = now()->startOfMonth();
+        $cacheTtl = 60; // Cache heavy aggregation for 60 seconds
 
-        $totalAssets = Asset::count();
-        $totalAssetsPrev = Asset::where('created_at', '<', $startOfMonth)->count();
-        $totalAssetsTrend = $this->calculateTrend($totalAssets, $totalAssetsPrev);
+        $metrics = Cache::remember('dashboard_metrics_summary', $cacheTtl, function () use ($startOfMonth) {
+            $totalAssets = Asset::count();
+            $totalAssetsPrev = Asset::where('created_at', '<', $startOfMonth)->count();
+
+            $readyToDeploy = Asset::whereHas('status', fn ($q) => $q->where('name', 'Ready to Deploy'))->count();
+            $readyToDeployPrev = Asset::whereHas('status', fn ($q) => $q->where('name', 'Ready to Deploy'))->where('created_at', '<', $startOfMonth)->count();
+
+            $deployed = Asset::whereHas('status', fn ($q) => $q->where('name', 'Deployed'))->count();
+            $deployedPrev = Asset::whereHas('status', fn ($q) => $q->where('name', 'Deployed'))->where('created_at', '<', $startOfMonth)->count();
+
+            $broken = Asset::whereHas('status', fn ($q) => $q->where('name', 'Broken'))->count();
+            $brokenPrev = Asset::whereHas('status', fn ($q) => $q->where('name', 'Broken'))->where('created_at', '<', $startOfMonth)->count();
+
+            $brokenDisposal = Asset::whereHas('status', fn ($q) => $q->whereIn('name', ['Broken', 'Retired']))->count();
+            $brokenDisposalPrev = Asset::whereHas('status', fn ($q) => $q->whereIn('name', ['Broken', 'Retired']))->where('created_at', '<', $startOfMonth)->count();
+
+            $service = Asset::whereHas('status', fn ($q) => $q->where('name', 'Service'))->count();
+            $servicePrev = Asset::whereHas('status', fn ($q) => $q->where('name', 'Service'))->where('created_at', '<', $startOfMonth)->count();
+
+            $readyForSale = Asset::whereHas('status', fn ($q) => $q->whereIn('name', ['Ready for Sale', 'For Sale', 'Available for Sale']))->count();
+            $readyForSalePrev = Asset::whereHas('status', fn ($q) => $q->whereIn('name', ['Ready for Sale', 'For Sale', 'Available for Sale']))->where('created_at', '<', $startOfMonth)->count();
+
+            return [
+                'totalAssets' => $totalAssets,
+                'totalAssetsTrend' => $this->calculateTrend($totalAssets, $totalAssetsPrev),
+                'readyToDeploy' => $readyToDeploy,
+                'readyToDeployTrend' => $this->calculateTrend($readyToDeploy, $readyToDeployPrev),
+                'deployed' => $deployed,
+                'deployedTrend' => $this->calculateTrend($deployed, $deployedPrev),
+                'broken' => $broken,
+                'brokenTrend' => $this->calculateTrend($broken, $brokenPrev),
+                'brokenDisposal' => $brokenDisposal,
+                'brokenDisposalTrend' => $this->calculateTrend($brokenDisposal, $brokenDisposalPrev),
+                'service' => $service,
+                'serviceTrend' => $this->calculateTrend($service, $servicePrev),
+                'readyForSale' => $readyForSale,
+                'readyForSaleTrend' => $this->calculateTrend($readyForSale, $readyForSalePrev),
+            ];
+        });
+
+        extract($metrics);
 
         $totalConsumables = Consumable::sum('quantity');
         $consumablesBreakdown = Consumable::with(['product.brand', 'product.category'])
             ->orderBy('quantity', 'desc')
             ->limit(5)
             ->get();
-
-        // Status counts for Widgets
-        $readyToDeploy = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Ready to Deploy');
-        })->count();
-        $readyToDeployPrev = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Ready to Deploy');
-        })->where('created_at', '<', $startOfMonth)->count();
-        $readyToDeployTrend = $this->calculateTrend($readyToDeploy, $readyToDeployPrev);
-
-        $deployed = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Deployed');
-        })->count();
-        $deployedPrev = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Deployed');
-        })->where('created_at', '<', $startOfMonth)->count();
-        $deployedTrend = $this->calculateTrend($deployed, $deployedPrev);
-
-        $broken = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Broken');
-        })->count();
-        $brokenPrev = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Broken');
-        })->where('created_at', '<', $startOfMonth)->count();
-        $brokenTrend = $this->calculateTrend($broken, $brokenPrev);
-
-        $brokenDisposal = Asset::whereHas('status', function ($q) {
-            $q->whereIn('name', ['Broken', 'Retired']);
-        })->count();
-        $brokenDisposalPrev = Asset::whereHas('status', function ($q) {
-            $q->whereIn('name', ['Broken', 'Retired']);
-        })->where('created_at', '<', $startOfMonth)->count();
-        $brokenDisposalTrend = $this->calculateTrend($brokenDisposal, $brokenDisposalPrev);
-
-        // Reintroduce Service metric
-        $service = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Service');
-        })->count();
-        $servicePrev = Asset::whereHas('status', function ($q) {
-            $q->where('name', 'Service');
-        })->where('created_at', '<', $startOfMonth)->count();
-        $serviceTrend = $this->calculateTrend($service, $servicePrev);
-
-        // Ready for Sale metric
-        $readyForSale = Asset::whereHas('status', function ($q) {
-            $q->whereIn('name', ['Ready for Sale', 'For Sale', 'Available for Sale']);
-        })->count();
-        $readyForSalePrev = Asset::whereHas('status', function ($q) {
-            $q->whereIn('name', ['Ready for Sale', 'For Sale', 'Available for Sale']);
-        })->where('created_at', '<', $startOfMonth)->count();
-        $readyForSaleTrend = $this->calculateTrend($readyForSale, $readyForSalePrev);
 
         $recentCheckouts = AssetCheckout::with(['asset.product.brand', 'asset.department', 'asset.status', 'checkedOutToUser.department'])
             ->latest('checked_out_at')
