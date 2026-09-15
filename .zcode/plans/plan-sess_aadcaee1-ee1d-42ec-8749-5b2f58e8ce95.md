@@ -1,24 +1,19 @@
-### Fix: Replace Invalid Lucide Icon Name `tool` with `wrench`
+### Fix: Replace All Remaining Invalid Icon Names `'tool'` with `'wrench'` across Inventory Tabs & Dashboards
 
 #### Root Cause
-In Lucide Icons library, the wrench/maintenance icon is named `wrench` (in legacy Feather icons it was `tool`). Having `data-lucide="tool"` results in a missing icon on the Maintenance button and cards.
+In `resources/views/pages/assets/index.blade.php` (Service & Repair quick tab), `components/index.blade.php`, `dashboard/it-assets.blade.php`, and `ga-assets/index.blade.php`, the tab icon was set to `'icon' => 'tool'`. Because Lucide uses `wrench` as the valid icon name, the icon failed to render on the Service & Repair metric tab.
 
 #### Solution Plan
-1. Replace all occurrences of `data-lucide="tool"` with `data-lucide="wrench"` in:
-   - `resources/views/pages/assets/show.blade.php`
-   - `resources/views/pages/assets/management/maintenance.blade.php`
-   - `resources/views/pages/assets/public-scan.blade.php`
-   - `resources/views/pages/ga-assets/show.blade.php`
-   - `resources/views/pages/master/maintenance-types/create.blade.php`
-   - `resources/views/pages/master/maintenance-types/edit.blade.php`
-   - `resources/views/pages/master/maintenance-types/index.blade.php`
-2. Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
+1. Update icon definition in `resources/views/pages/assets/index.blade.php` line 129:
+   - `'icon' => 'tool'` ➔ `'icon' => 'wrench'`
+2. Update icon definition in `resources/views/pages/components/index.blade.php`:
+   - `'icon' => 'tool'` ➔ `'icon' => 'wrench'`
+3. Update `dashboard/it-assets.blade.php` and `ga-assets/index.blade.php`:
+   - `icon="tool"` ➔ `icon="wrench"`
+4. Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
 
 #### Files to Modify
-- `resources/views/pages/assets/show.blade.php`
-- `resources/views/pages/assets/management/maintenance.blade.php`
-- `resources/views/pages/assets/public-scan.blade.php`
-- `resources/views/pages/ga-assets/show.blade.php`
-- `resources/views/pages/master/maintenance-types/create.blade.php`
-- `resources/views/pages/master/maintenance-types/edit.blade.php`
-- `resources/views/pages/master/maintenance-types/index.blade.php`
+- `resources/views/pages/assets/index.blade.php`
+- `resources/views/pages/components/index.blade.php`
+- `resources/views/pages/dashboard/it-assets.blade.php`
+- `resources/views/pages/ga-assets/index.blade.php`

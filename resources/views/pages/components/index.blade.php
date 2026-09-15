@@ -152,7 +152,7 @@
                         ['key' => null,        'label' => 'All Components',  'count' => $summary['total'],     'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
                         ['key' => 'ready',     'label' => 'Ready (In Stock)','count' => $summary['ready'],     'icon' => 'circle-check',  'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
                         ['key' => 'installed', 'label' => 'Installed',       'count' => $summary['installed'], 'icon' => 'cpu',           'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
-                        ['key' => 'service',   'label' => 'In Repair',       'count' => $summary['service'],   'icon' => 'tool',          'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
+                        ['key' => 'service',   'label' => 'In Repair',       'count' => $summary['service'],   'icon' => 'wrench',        'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
                         ['key' => 'scrapped',  'label' => 'Scrapped / Broken','count' => $summary['scrapped'],  'icon' => 'trash-2',       'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
                     ];
                 @endphp
@@ -291,7 +291,7 @@
                                         } elseif (str_contains($stRaw, 'repair') || str_contains($stRaw, 'service') || str_contains($stRaw, 'maint')) {
                                             $name = 'In Repair';
                                             $color = 'warning';
-                                            $icon = 'tool';
+                                            $icon = 'wrench';
                                         } elseif (str_contains($stRaw, 'scrap') || str_contains($stRaw, 'broken') || str_contains($stRaw, 'retired')) {
                                             $name = 'Scrapped';
                                             $color = 'danger';

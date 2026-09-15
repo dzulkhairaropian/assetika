@@ -63,7 +63,7 @@
         @php $serviceTrendColor = $serviceTrend >= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="In Repair / Service"
-            icon="tool"
+            icon="wrench"
             :value="$service"
             :trend="$serviceTrend"
             :trendColor="$serviceTrendColor"
