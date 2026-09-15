@@ -20,6 +20,15 @@
             'text' => '[' . $asset->asset_tag . '] ' . $deviceName . ' — ' . ($holder ? 'User: ' . $holder : 'Unassigned') . ($dept ? ' ('.$dept.')' : '') . ($statusName ? ' [' . $statusName . ']' : '')
         ];
     })->values()->toArray();
+
+    $selTypeId = old('ticket_type_id', $ticket?->ticket_type_id ?? ($ticketTypes->where('name', 'Incident')->first()?->id ?? ''));
+    $selRequesterId = old('requester_user_id', $ticket?->requester_user_id);
+    $selAssignedId = old('assigned_to_id', $ticket?->assigned_to_id);
+    $selCatId = old('ticket_category_id', $ticket?->ticket_category_id);
+    $selPriorityId = old('priority_id', $ticket?->priority_id ?? ($priorities->where('name', 'Medium')->first()?->id ?? ''));
+    $selStatusId = old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? ''));
+    $selLabelId = old('label_id', $ticket?->label_id);
+    $selSourceId = old('source_id', $ticket?->source_id ?? ($sources->first()?->id ?? ''));
 @endphp
 <div class="space-y-4" x-data="{
     selectedCategory: '{{ old('ticket_category_id', $ticket?->ticket_category_id) }}',
@@ -131,98 +140,42 @@
 
                 <!-- Ticket Type -->
                 <div>
-                    <x-form.searchable-select
-                        name="ticket_type_id"
-                        label="Ticket Type"
-                        :options="$ticketTypes->map(fn($t) => ['id' => $t->id, 'text' => $t->name])->toArray()"
-                        :selected="old('ticket_type_id', $ticket?->ticket_type_id ?? ($ticketTypes->where('name', 'Incident')->first()?->id ?? ''))"
-                        placeholder="Select Type"
-                    />
+                    <x-form.searchable-select name="ticket_type_id" label="Ticket Type" :options="$typeOpts" :selected="$selTypeId" placeholder="Select Type" />
                 </div>
 
                 <!-- Requester -->
-                @php
-                    $userOptions = $users->map(fn($u) => ['id' => $u->id, 'text' => $u->name . ' (' . $u->email . ')'])->toArray();
-                @endphp
-                <x-form.searchable-select
-                    name="requester_user_id"
-                    label="Requester User"
-                    :options="$userOptions"
-                    :selected="old('requester_user_id', $ticket?->requester_user_id)"
-                    placeholder="Select User"
-                    required="true"
-                />
+                <div>
+                    <x-form.searchable-select name="requester_user_id" label="Requester User" :options="$userOpts" :selected="$selRequesterId" placeholder="Select User" required="true" />
+                </div>
 
                 <!-- Assigned To -->
-                @php
-                    $staffList = $staffUsers ?? $users->filter(fn($u) => $u->hasAnyRole(['it_admin', 'super_admin']));
-                    if ($staffList->isEmpty()) $staffList = $users;
-                    $staffOptions = $staffList->map(fn($u) => [
-                        'id' => $u->id, 
-                        'text' => $u->name . ($u->department ? ' (' . $u->department->name . ')' : '')
-                    ])->toArray();
-                @endphp
-                <x-form.searchable-select
-                    name="assigned_to_id"
-                    label="Assigned Staff"
-                    :options="$staffOptions"
-                    :selected="old('assigned_to_id', $ticket?->assigned_to_id)"
-                    placeholder="Unassigned"
-                />
+                <div>
+                    <x-form.searchable-select name="assigned_to_id" label="Assigned Staff" :options="$staffOpts" :selected="$selAssignedId" placeholder="Unassigned" />
+                </div>
 
                 <!-- ITSM Ticket Category -->
                 <div>
-                    <x-form.searchable-select
-                        name="ticket_category_id"
-                        label="ITSM Category"
-                        :options="$ticketCategories->map(fn($cat) => ['id' => $cat->id, 'text' => $cat->name])->toArray()"
-                        :selected="old('ticket_category_id', $ticket?->ticket_category_id)"
-                        placeholder="Select Category"
-                    />
+                    <x-form.searchable-select name="ticket_category_id" label="ITSM Category" :options="$catOpts" :selected="$selCatId" placeholder="Select Category (Auto-mapped if Asset selected)" />
                 </div>
 
                 <!-- Priority -->
                 <div>
-                    <x-form.searchable-select
-                        name="priority_id"
-                        label="Priority"
-                        :options="$priorities->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()"
-                        :selected="old('priority_id', $ticket?->priority_id ?? ($priorities->where('name', 'Medium')->first()?->id ?? ''))"
-                        placeholder="Select Priority"
-                    />
+                    <x-form.searchable-select name="priority_id" label="Priority" :options="$priorityOpts" :selected="$selPriorityId" placeholder="Select Priority" />
                 </div>
 
                 <!-- Status -->
                 <div>
-                    <x-form.searchable-select
-                        name="status_id"
-                        label="Status"
-                        :options="$ticketStatuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()"
-                        :selected="old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? ''))"
-                        placeholder="Select Status"
-                    />
+                    <x-form.searchable-select name="status_id" label="Status" :options="$statusOpts" :selected="$selStatusId" placeholder="Select Status" />
                 </div>
 
                 <!-- Label -->
                 <div>
-                    <x-form.searchable-select
-                        name="label_id"
-                        label="Label"
-                        :options="$labels->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()"
-                        :selected="old('label_id', $ticket?->label_id)"
-                        placeholder="Select Label"
-                    />
+                    <x-form.searchable-select name="label_id" label="Label" :options="$labelOpts" :selected="$selLabelId" placeholder="Select Label" />
                 </div>
 
                 <!-- Source -->
                 <div>
-                    <x-form.searchable-select
-                        name="source_id"
-                        label="Source"
-                        :options="$sources->map(fn($src) => ['id' => $src->id, 'text' => $src->name])->toArray()"
-                        :selected="old('source_id', $ticket?->source_id ?? ($sources->where('name', 'Portal')->first()?->id ?? ''))"
-                        placeholder="Select Source"
-                    />
+                    <x-form.searchable-select name="source_id" label="Source" :options="$sourceOpts" :selected="$selSourceId" placeholder="Select Source" />
                 </div>
 
                 <!-- SLA Status -->
@@ -257,14 +210,9 @@
                         })->toArray()
                     );
                 @endphp
-                <x-form.searchable-select
-                    name="asset_id"
-                    label="Linked Asset (ITAM)"
-                    :options="$assetOptions"
-                    :selected="old('asset_id', $ticket?->asset_id)"
-                    placeholder="No Asset Linked"
-                    class="sm:col-span-2"
-                />
+                <div class="sm:col-span-2">
+                    <x-form.searchable-select name="asset_id" label="Linked Asset (ITAM)" :options="[['id' => '', 'text' => 'No Asset Linked'], ...$allAssetItems]" :selected="old('asset_id', $ticket?->asset_id)" placeholder="No Asset Linked" />
+                </div>
             </div>
         </div>
 

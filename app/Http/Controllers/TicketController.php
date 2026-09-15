@@ -19,6 +19,7 @@ use App\Models\TicketStatus;
 use App\Models\TicketType;
 use App\Models\User;
 use App\Notifications\SystemNotification;
+use App\Services\AssetTicketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -150,6 +151,19 @@ class TicketController extends Controller
             'status',
         ])->latest('id')->get();
 
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
+        $staffOpts = $staffUsers->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
+        $typeOpts = $ticketTypes->map(fn ($t) => ['id' => $t->id, 'text' => $t->name])->values()->all();
+        $catOpts = $ticketCategories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
+        $priorityOpts = $priorities->map(fn ($p) => ['id' => $p->id, 'text' => $p->name])->values()->all();
+        $labelOpts = $labels->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->values()->all();
+        $sourceOpts = $sources->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
+        $statusOpts = $ticketStatuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
+        $assetOpts = $assets->map(fn ($a) => [
+            'id' => $a->id,
+            'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
+        ])->values()->all();
+
         return view('pages.tickets.create', compact(
             'users',
             'staffUsers',
@@ -160,7 +174,16 @@ class TicketController extends Controller
             'sources',
             'ticketStatuses',
             'slaStatuses',
-            'assets'
+            'assets',
+            'userOpts',
+            'staffOpts',
+            'typeOpts',
+            'catOpts',
+            'priorityOpts',
+            'labelOpts',
+            'sourceOpts',
+            'statusOpts',
+            'assetOpts'
         ))->with('ticket', null);
     }
 
@@ -189,6 +212,16 @@ class TicketController extends Controller
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
+
+        // Auto-map category and subcategory from asset if asset_id is provided
+        if (! empty($data['asset_id']) && empty($data['ticket_category_id'])) {
+            $assetObj = Asset::with('product.category')->find($data['asset_id']);
+            if ($assetObj) {
+                $mapped = AssetTicketService::resolveTicketCategoryForAsset($assetObj);
+                $data['ticket_category_id'] = $mapped['category_id'];
+                $data['ticket_subcategory_id'] = $mapped['subcategory_id'];
+            }
+        }
 
         $ticketDate = ! empty($data['created_at']) ? Carbon::parse($data['created_at']) : now();
         $ticketType = ! empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
@@ -322,6 +355,19 @@ class TicketController extends Controller
             'status',
         ])->latest('id')->get();
 
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
+        $staffOpts = $staffUsers->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
+        $typeOpts = $ticketTypes->map(fn ($t) => ['id' => $t->id, 'text' => $t->name])->values()->all();
+        $catOpts = $ticketCategories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
+        $priorityOpts = $priorities->map(fn ($p) => ['id' => $p->id, 'text' => $p->name])->values()->all();
+        $labelOpts = $labels->map(fn ($l) => ['id' => $l->id, 'text' => $l->name])->values()->all();
+        $sourceOpts = $sources->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
+        $statusOpts = $ticketStatuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
+        $assetOpts = $assets->map(fn ($a) => [
+            'id' => $a->id,
+            'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
+        ])->values()->all();
+
         return view('pages.tickets.edit', compact(
             'ticket',
             'users',
@@ -333,7 +379,16 @@ class TicketController extends Controller
             'sources',
             'ticketStatuses',
             'slaStatuses',
-            'assets'
+            'assets',
+            'userOpts',
+            'staffOpts',
+            'typeOpts',
+            'catOpts',
+            'priorityOpts',
+            'labelOpts',
+            'sourceOpts',
+            'statusOpts',
+            'assetOpts'
         ));
     }
 
