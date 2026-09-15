@@ -342,7 +342,7 @@
                                 </td>
                                 <td class="px-4 py-2.5">
                                     <div class="flex flex-col">
-                                        <a href="{{ route('assets.show', $asset) }}" class="block font-medium text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
+                                        <a href="{{ route('assets.show', $asset) }}" class="block font-mono font-medium tracking-tight text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
                                         <span class="text-[11px] text-gray-400 dark:text-gray-500">{{ $asset->device_name }}</span>
                                     </div>
                                 </td>
@@ -351,7 +351,7 @@
                                         <span class="font-medium text-gray-800 dark:text-gray-200">
                                             {{ $asset->product?->brand?->name ?? '-' }} {{ $asset->product?->model ?? '' }}
                                         </span>
-                                        <span class="text-[11px] text-gray-400">S/N: {{ $asset->serial_number ?? '-' }}</span>
+                                        <span class="font-mono text-[11px] tracking-tight text-gray-400">S/N: {{ $asset->serial_number ?? '-' }}</span>
                                         @if($asset->warranty_expiry_date)
                                             @if($asset->warranty_expiry_date->isPast())
                                                 <span class="mt-0.5 inline-flex w-fit items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">

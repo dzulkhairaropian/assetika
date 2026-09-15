@@ -376,7 +376,7 @@
                             </td>
                             <td class="px-4 py-2.5">
                                 <div class="flex flex-col">
-                                    <a href="{{ route('tickets.show', $ticket) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
+                                    <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
                                     <span class="text-[11px] text-gray-400">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 60) }}</span>
                                 </div>
                             </td>
