@@ -24,7 +24,7 @@ class ImportPreviewProcessTest extends TestCase
             'file' => $file,
         ]);
 
-        $controller = new ImportController;
+        $controller = app(ImportController::class);
         $response = $controller->preview($request);
 
         $this->assertInstanceOf(View::class, $response);

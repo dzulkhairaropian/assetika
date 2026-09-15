@@ -9,7 +9,7 @@ class ImportTemplateTest extends TestCase
 {
     public function test_assets_import_template_contains_release_date_and_extended_headers()
     {
-        $controller = new ImportController;
+        $controller = app(ImportController::class);
         $response = $controller->downloadTemplate('assets');
 
         $this->assertEquals(200, $response->getStatusCode());

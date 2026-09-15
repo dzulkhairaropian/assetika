@@ -2,142 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asset;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Company;
-use App\Models\Component;
-use App\Models\Consumable;
-use App\Models\Department;
-use App\Models\License;
-use App\Models\Location;
-use App\Models\MasterCategory;
-use App\Models\OperatingSystem;
-use App\Models\Position;
-use App\Models\Product;
-use App\Models\Status;
-use App\Models\User;
-use App\Models\Vendor;
+use App\Services\ImportService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class ImportController extends Controller
 {
-    public function index()
+    public function __construct(protected ImportService $importService) {}
+
+    public function index(): View
     {
         return view('pages.import.index');
     }
 
-    public function preview(Request $request)
+    public function preview(Request $request): View|RedirectResponse
     {
         $request->validate([
             'file' => 'required|file|mimes:csv,txt,xlsx|max:10240',
             'type' => 'required|in:assets,users,consumables,companies,departments,locations,brands,categories,positions,vendors,products,components,licenses',
         ]);
 
-        $path = $request->file('file')->getRealPath();
+        $file = $request->file('file');
+        $ext = $file->getClientOriginalExtension();
 
-        if ($request->file('file')->getClientOriginalExtension() === 'csv' || $request->file('file')->getClientOriginalExtension() === 'txt') {
-            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            if (empty($lines)) {
-                return back()->with('error', 'Empty file.');
-            }
-
-            // Detect delimiter (, or ; or \t) from first line
-            $firstLine = $lines[0];
-            $delimiter = ',';
-            if (substr_count($firstLine, ';') > substr_count($firstLine, ',')) {
-                $delimiter = ';';
-            } elseif (substr_count($firstLine, "\t") > substr_count($firstLine, ',')) {
-                $delimiter = "\t";
-            }
-
-            $rows = array_map(fn ($line) => str_getcsv($line, $delimiter), $lines);
-        } else {
+        if ($ext !== 'csv' && $ext !== 'txt') {
             return back()->with('error', 'XLSX not supported yet. Use CSV.');
         }
 
-        $header = array_shift($rows);
-        if (! $header) {
+        $parsed = $this->importService->parseCsvFile($file);
+        $header = $parsed['header'];
+        $rows = $parsed['rows'];
+
+        if (empty($header) && empty($rows)) {
             return back()->with('error', 'Empty file.');
         }
 
-        // Clean UTF-8 BOM if present on first header item
         if (isset($header[0])) {
             $header[0] = preg_replace('/\x{EF}\x{BB}\x{BF}/', '', $header[0]);
         }
 
-        $errors = [];
-        $preview = [];
-        $maxPreview = 100;
+        $preview = array_slice($rows, 0, 100);
         $totalRows = count($rows);
-        $headerCount = count($header);
-
-        foreach ($rows as $i => $row) {
-            if (empty($row) || (count($row) === 1 && $row[0] === null)) {
-                continue;
-            }
-
-            $minCount = min($headerCount, count($row));
-            if ($minCount === 0) {
-                continue;
-            }
-
-            $keys = array_slice($header, 0, $minCount);
-            $values = array_slice($row, 0, $minCount);
-            $rawRow = array_combine($keys, $values);
-
-            if ($i < $maxPreview) {
-                $preview[] = $rawRow;
-            }
-
-            if ($request->type === 'assets') {
-                $data = $this->normalizeRowData($rawRow);
-                $rowNum = $i + 2;
-                $rowErrors = [];
-
-                // Check Product / Model
-                $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : null);
-                if ($modelName) {
-                    $productExists = Product::where('name', $modelName)->exists();
-                    if (! $productExists) {
-                        $rowErrors[] = "Product Model '{$modelName}' does not exist in master DB";
-                    }
-                } else {
-                    $rowErrors[] = 'Missing Product Model / Device Name';
-                }
-
-                // Check Brand if specified
-                if (! empty($data['brand_name'])) {
-                    $brandExists = Brand::where('name', trim($data['brand_name']))->exists();
-                    if (! $brandExists) {
-                        $rowErrors[] = "Brand '{$data['brand_name']}' does not exist in master DB";
-                    }
-                }
-
-                // Check Category if specified
-                if (! empty($data['category_name'])) {
-                    $catExists = Category::where('name', trim($data['category_name']))->exists();
-                    if (! $catExists) {
-                        $rowErrors[] = "Category '{$data['category_name']}' does not exist in master DB";
-                    }
-                }
-
-                if (! empty($rowErrors)) {
-                    $itemLabel = ! empty($data['asset_tag']) ? $data['asset_tag'] : ($modelName ?? "Row {$rowNum}");
-                    $errors[] = "Row {$rowNum} ({$itemLabel}): ".implode('; ', $rowErrors);
-                }
-            }
-        }
 
         session()->flash('import_rows', json_encode($rows));
         session()->flash('import_header', json_encode($header));
         session()->flash('import_type', $request->type);
 
-        return view('pages.import.preview', compact('header', 'preview', 'errors', 'maxPreview', 'totalRows'));
+        return view('pages.import.preview', [
+            'header' => $header,
+            'preview' => $preview,
+            'errors' => [],
+            'maxPreview' => 100,
+            'totalRows' => $totalRows,
+        ]);
     }
 
-    public function process(Request $request)
+    public function process(Request $request): RedirectResponse
     {
         $header = json_decode(session('import_header'), true);
         $rows = json_decode(session('import_rows'), true);
@@ -147,537 +68,29 @@ class ImportController extends Controller
             return redirect()->route('import.index')->with('error', 'No data to import.');
         }
 
-        $validRows = [];
-        $skipped = 0;
+        $formattedData = [];
         $headerCount = count($header);
 
         foreach ($rows as $row) {
             if (empty($row) || (count($row) === 1 && $row[0] === null)) {
-                $skipped++;
-
                 continue;
             }
 
             $minCount = min($headerCount, count($row));
             if ($minCount === 0) {
-                $skipped++;
-
                 continue;
             }
 
             $keys = array_slice($header, 0, $minCount);
             $values = array_slice($row, 0, $minCount);
-            $data = array_combine($keys, $values);
-            $validRows[] = $data;
+            $formattedData[] = array_combine($keys, $values);
         }
 
-        $imported = 0;
-        $failedDetails = [];
-
-        if ($type === 'assets') {
-            $itMasterCat = MasterCategory::where('name', 'IT Asset')->first();
-
-            foreach ($validRows as $idx => $rawRow) {
-                // Map human-readable headers to standard array keys
-                $data = $this->normalizeRowData($rawRow);
-                $rowNum = $idx + 2;
-
-                $rawTag = ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null;
-                $serialNumber = ! empty($data['serial_number']) ? trim($data['serial_number']) : null;
-                $categoryName = ! empty($data['category_name']) ? trim($data['category_name']) : null;
-                $brandName = ! empty($data['brand_name']) ? trim($data['brand_name']) : null;
-                $departmentName = ! empty($data['department_name']) ? trim($data['department_name']) : null;
-                $modelName = ! empty($data['model_name']) ? trim($data['model_name']) : (! empty($data['device_name']) ? trim($data['device_name']) : null);
-
-                if (empty($serialNumber) && empty($rawTag)) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                // Strict DB Lookup Check
-                $product = $modelName ? Product::where('name', $modelName)->first() : null;
-                if (! $product) {
-                    $skipped++;
-                    $failedDetails[] = "Row {$rowNum} (".($rawTag ?? 'No Tag')."): Failed - Product Model '{$modelName}' does not exist in master DB.";
-
-                    continue;
-                }
-
-                $brand = $brandName ? Brand::where('name', $brandName)->first() : null;
-                if ($brandName && ! $brand) {
-                    $skipped++;
-                    $failedDetails[] = "Row {$rowNum} (".($rawTag ?? 'No Tag')."): Failed - Brand '{$brandName}' does not exist in master DB.";
-
-                    continue;
-                }
-
-                $category = $categoryName ? Category::where('name', $categoryName)->first() : $product->category;
-                if ($categoryName && ! $category) {
-                    $skipped++;
-                    $failedDetails[] = "Row {$rowNum} (".($rawTag ?? 'No Tag')."): Failed - Category '{$categoryName}' does not exist in master DB.";
-
-                    continue;
-                }
-
-                $categoryCode = $category?->code ?? 'NB';
-                $categoryId = $category?->id ?? $product->category_id;
-
-                // Format Asset Tag & Device Name to 100% Assetika Standard
-                $assetTag = $this->formatAssetTagStandard($rawTag, $categoryCode);
-
-                // Resolve Operating System
-                $osId = ! empty($data['operating_system'])
-                    ? OperatingSystem::where('name', trim($data['operating_system']))->first()?->id
-                    : null;
-
-                // Resolve Vendor
-                $vendorId = ! empty($data['vendor_name'])
-                    ? Vendor::where('name', trim($data['vendor_name']))->first()?->id
-                    : null;
-
-                // Resolve Status
-                $statusId = ! empty($data['status_name'])
-                    ? Status::where('name', trim($data['status_name']))->first()?->id
-                    : null;
-
-                if (! $statusId) {
-                    $statusId = Status::where('name', 'Ready to Deploy')->first()?->id ?? Status::first()?->id;
-                }
-
-                // Resolve Company, Department, Location
-                $company = ! empty($data['company_name']) ? Company::where('name', trim($data['company_name']))->first() : Company::where('code', 'DB')->first();
-                $companyId = $company?->id ?? Company::first()?->id;
-
-                $departmentId = ! empty($departmentName)
-                    ? Department::where('name', $departmentName)->first()?->id
-                    : null;
-
-                $locationId = ! empty($data['location_name'])
-                    ? Location::where('name', trim($data['location_name']))->first()?->id
-                    : null;
-
-                // Resolve Assigned User
-                $assignedUserId = null;
-                if (! empty($data['assigned_user_email'])) {
-                    $userSearch = trim($data['assigned_user_email']);
-                    $user = User::where('email', $userSearch)->orWhere('name', 'like', "%{$userSearch}%")->first();
-                    $assignedUserId = $user?->id;
-                }
-
-                $deviceName = $this->formatDeviceNameStandard($data['device_name'] ?? null, $companyId, $categoryId, $departmentId, $assetTag);
-
-                $assetData = [
-                    'product_id' => $product->id,
-                    'operating_system_id' => $osId,
-                    'vendor_id' => $vendorId,
-                    'status_id' => $statusId,
-                    'department_id' => $departmentId,
-                    'location_id' => $locationId,
-                    'assigned_to_user_id' => $assignedUserId,
-                    'asset_tag' => $assetTag,
-                    'serial_number' => $serialNumber,
-                    'product_number' => ! empty($data['product_number']) ? trim($data['product_number']) : null,
-                    'device_name' => $deviceName,
-                    'release_date' => ! empty($data['release_date']) ? trim($data['release_date']) : null,
-                    'purchase_date' => ! empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
-                    'purchase_cost' => ! empty($data['purchase_cost']) ? (float) $data['purchase_cost'] : 0,
-                    'invoice_number' => ! empty($data['invoice_number']) ? trim($data['invoice_number']) : null,
-                    'warranty_expiry_date' => ! empty($data['warranty_expiry_date']) ? trim($data['warranty_expiry_date']) : null,
-                    'license_windows' => ! empty($data['license_windows']) ? trim($data['license_windows']) : null,
-                    'license_office' => ! empty($data['license_office']) ? trim($data['license_office']) : null,
-                    'mac_address_wireless' => ! empty($data['mac_address_wireless']) ? trim($data['mac_address_wireless']) : null,
-                    'mac_address_ethernet' => ! empty($data['mac_address_ethernet']) ? trim($data['mac_address_ethernet']) : null,
-                    'specification' => ! empty($data['specification']) ? trim($data['specification']) : null,
-                    'accessories' => ! empty($data['accessories']) ? trim($data['accessories']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ];
-
-                // Update if rawTag or formatted tag exists, else Create
-                $existingAsset = Asset::where('asset_tag', $assetTag)
-                    ->orWhere('asset_tag', $rawTag)
-                    ->when($serialNumber, fn ($q) => $q->orWhere('serial_number', $serialNumber))
-                    ->first();
-
-                if ($existingAsset) {
-                    $existingAsset->update($assetData);
-                } else {
-                    Asset::create($assetData);
-                }
-                $imported++;
-            }
-        } elseif ($type === 'users') {
-            foreach ($validRows as $rawRow) {
-                $data = $this->normalizeRowData($rawRow);
-                $email = ! empty($data['email']) ? trim($data['email']) : (! empty($data['email_address']) ? trim($data['email_address']) : null);
-                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['full_name']) ? trim($data['full_name']) : 'User');
-
-                if (empty($email)) {
-                    continue;
-                }
-
-                if (User::where('email', $email)->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $companyId = ! empty($data['company_name'])
-                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
-                    : null;
-
-                $departmentId = ! empty($data['department_name'])
-                    ? Department::firstOrCreate(
-                        ['name' => trim($data['department_name'])],
-                        ['company_id' => $companyId]
-                    )->id
-                    : null;
-
-                $positionId = ! empty($data['position_name'])
-                    ? Position::firstOrCreate(['name' => trim($data['position_name'])])->id
-                    : null;
-
-                $locationId = ! empty($data['location_name'])
-                    ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
-                    : null;
-
-                $isActive = isset($data['is_active'])
-                    ? (in_array(strtolower(trim((string) $data['is_active'])), ['1', 'true', 'active', 'yes']))
-                    : true;
-
-                User::create([
-                    'name' => $name,
-                    'email' => $email,
-                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : (! empty($data['phone_number']) ? trim($data['phone_number']) : null),
-                    'password' => Hash::make('password123'),
-                    'department_id' => $departmentId,
-                    'company_id' => $companyId,
-                    'position_id' => $positionId,
-                    'location_id' => $locationId,
-                    'is_active' => $isActive,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'consumables') {
-            $consumableMasterCat = MasterCategory::where('name', 'IT Consumable')->first();
-
-            foreach ($validRows as $rawRow) {
-                $data = $this->normalizeRowData($rawRow);
-                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['consumable_name']) ? trim($data['consumable_name']) : null);
-                if (empty($name)) {
-                    continue;
-                }
-
-                $brandId = ! empty($data['brand_name'])
-                    ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
-                    : null;
-
-                $categoryId = ! empty($data['category_name'])
-                    ? Category::firstOrCreate(
-                        ['name' => trim($data['category_name'])],
-                        ['master_category_id' => $consumableMasterCat?->id]
-                    )->id
-                    : null;
-
-                $product = Product::firstOrCreate(
-                    ['name' => $name],
-                    [
-                        'brand_id' => $brandId,
-                        'category_id' => $categoryId,
-                        'master_category_id' => $consumableMasterCat?->id,
-                    ]
-                );
-
-                $statusId = ! empty($data['status_name'])
-                    ? Status::where('name', trim($data['status_name']))->first()?->id
-                    : (Status::where('name', 'In Stock')->first()?->id ?? Status::first()?->id);
-
-                Consumable::create([
-                    'product_id' => $product->id,
-                    'status_id' => $statusId,
-                    'quantity' => (int) ($data['quantity'] ?? $data['qty'] ?? 10),
-                    'low_threshold' => (int) ($data['min_qty'] ?? $data['min_qty_alert'] ?? 5),
-                    'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'companies') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Company::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                Company::create([
-                    'name' => trim($data['name']),
-                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
-                    'email' => ! empty($data['email']) ? trim($data['email']) : null,
-                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : null,
-                    'website' => ! empty($data['website']) ? trim($data['website']) : null,
-                    'address' => ! empty($data['address']) ? trim($data['address']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'departments') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Department::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $companyId = ! empty($data['company_name'])
-                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
-                    : null;
-
-                Department::create([
-                    'name' => trim($data['name']),
-                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
-                    'company_id' => $companyId,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'locations') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Location::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $companyId = ! empty($data['company_name'])
-                    ? Company::firstOrCreate(['name' => trim($data['company_name'])])->id
-                    : null;
-
-                Location::create([
-                    'name' => trim($data['name']),
-                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
-                    'company_id' => $companyId,
-                    'address' => ! empty($data['address']) ? trim($data['address']) : null,
-                    'city' => ! empty($data['city']) ? trim($data['city']) : null,
-                    'state' => ! empty($data['state']) ? trim($data['state']) : null,
-                    'zip' => ! empty($data['zip']) ? trim($data['zip']) : null,
-                    'country' => ! empty($data['country']) ? trim($data['country']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'brands') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Brand::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                Brand::create([
-                    'name' => trim($data['name']),
-                    'website' => ! empty($data['website']) ? trim($data['website']) : null,
-                    'support_phone' => ! empty($data['support_phone']) ? trim($data['support_phone']) : null,
-                    'support_email' => ! empty($data['support_email']) ? trim($data['support_email']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'categories') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Category::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $masterCategory = ! empty($data['master_category_name'])
-                    ? MasterCategory::where('name', trim($data['master_category_name']))->first()
-                    : MasterCategory::first();
-
-                Category::create([
-                    'name' => trim($data['name']),
-                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
-                    'master_category_id' => $masterCategory?->id,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'positions') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Position::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $departmentId = ! empty($data['department_name'])
-                    ? Department::firstOrCreate(['name' => trim($data['department_name'])])->id
-                    : null;
-
-                Position::create([
-                    'name' => trim($data['name']),
-                    'code' => ! empty($data['code']) ? trim($data['code']) : null,
-                    'department_id' => $departmentId,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'vendors') {
-            foreach ($validRows as $data) {
-                if (empty($data['name'])) {
-                    continue;
-                }
-
-                if (Vendor::where('name', trim($data['name']))->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                Vendor::create([
-                    'name' => trim($data['name']),
-                    'contact_person' => ! empty($data['contact_person']) ? trim($data['contact_person']) : null,
-                    'email' => ! empty($data['email']) ? trim($data['email']) : null,
-                    'phone' => ! empty($data['phone']) ? trim($data['phone']) : null,
-                    'website' => ! empty($data['website']) ? trim($data['website']) : null,
-                    'address' => ! empty($data['address']) ? trim($data['address']) : null,
-                    'npwp_number' => ! empty($data['npwp_number']) ? trim($data['npwp_number']) : null,
-                    'npwp_name' => ! empty($data['npwp_name']) ? trim($data['npwp_name']) : null,
-                    'nib' => ! empty($data['nib']) ? trim($data['nib']) : null,
-                    'bank_name' => ! empty($data['bank_name']) ? trim($data['bank_name']) : null,
-                    'bank_account_number' => ! empty($data['bank_account_number']) ? trim($data['bank_account_number']) : null,
-                    'bank_account_name' => ! empty($data['bank_account_name']) ? trim($data['bank_account_name']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'products') {
-            foreach ($validRows as $rawRow) {
-                $data = $this->normalizeRowData($rawRow);
-                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['product_name']) ? trim($data['product_name']) : null);
-                if (empty($name)) {
-                    continue;
-                }
-
-                if (Product::where('name', $name)->exists()) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $brandId = ! empty($data['brand_name'])
-                    ? Brand::firstOrCreate(['name' => trim($data['brand_name'])])->id
-                    : null;
-
-                $masterCat = ! empty($data['master_category_name'])
-                    ? MasterCategory::where('name', trim($data['master_category_name']))->first()
-                    : MasterCategory::first();
-
-                $categoryId = ! empty($data['category_name'])
-                    ? Category::firstOrCreate(
-                        ['name' => trim($data['category_name'])],
-                        ['master_category_id' => $masterCat?->id]
-                    )->id
-                    : null;
-
-                Product::create([
-                    'name' => $name,
-                    'brand_id' => $brandId,
-                    'category_id' => $categoryId,
-                    'master_category_id' => $masterCat?->id,
-                    'product_type' => ! empty($data['product_type']) ? trim($data['product_type']) : 'Hardware',
-                    'description' => ! empty($data['description']) ? trim($data['description']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'components') {
-            foreach ($validRows as $rawRow) {
-                $data = $this->normalizeRowData($rawRow);
-                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['component_name']) ? trim($data['component_name']) : null);
-                if (empty($name)) {
-                    continue;
-                }
-
-                $categoryId = ! empty($data['category_name'])
-                    ? Category::firstOrCreate(['name' => trim($data['category_name'])])->id
-                    : null;
-
-                $locationId = ! empty($data['location_name'])
-                    ? Location::firstOrCreate(['name' => trim($data['location_name'])])->id
-                    : null;
-
-                Component::create([
-                    'name' => $name,
-                    'category_id' => $categoryId,
-                    'manufacturer' => ! empty($data['brand_name']) ? trim($data['brand_name']) : null,
-                    'serial' => ! empty($data['serial_number']) ? trim($data['serial_number']) : null,
-                    'qty' => (int) ($data['quantity'] ?? 1),
-                    'min_qty' => (int) ($data['min_qty'] ?? $data['min_qty_alert'] ?? 1),
-                    'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
-                    'location_id' => $locationId,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        } elseif ($type === 'licenses') {
-            foreach ($validRows as $rawRow) {
-                $data = $this->normalizeRowData($rawRow);
-                $name = ! empty($data['name']) ? trim($data['name']) : (! empty($data['license_name']) ? trim($data['license_name']) : null);
-                if (empty($name)) {
-                    continue;
-                }
-
-                $categoryId = ! empty($data['category_name'])
-                    ? Category::firstOrCreate(['name' => trim($data['category_name'])])->id
-                    : null;
-
-                License::create([
-                    'name' => $name,
-                    'category_id' => $categoryId,
-                    'product_key' => ! empty($data['license_key']) ? trim($data['license_key']) : null,
-                    'seats' => (int) ($data['seats'] ?? 1),
-                    'manufacturer' => ! empty($data['manufacturer_name']) ? trim($data['manufacturer_name']) : (! empty($data['manufacturer']) ? trim($data['manufacturer']) : null),
-                    'purchase_cost' => (float) ($data['purchase_cost'] ?? 0),
-                    'purchase_date' => ! empty($data['purchase_date']) ? trim($data['purchase_date']) : null,
-                    'expiration_date' => ! empty($data['expiration_date']) ? trim($data['expiration_date']) : null,
-                    'notes' => ! empty($data['notes']) ? trim($data['notes']) : null,
-                ]);
-                $imported++;
-            }
-        }
+        $imported = $this->importService->processImport($type, $formattedData);
 
         session()->forget(['import_header', 'import_rows', 'import_type']);
 
-        if (! empty($failedDetails)) {
-            session()->flash('import_failed_details', $failedDetails);
-        }
-
-        return redirect()->route('import.index')->with('success', "Imported {$imported} records. Skipped/Failed {$skipped}.");
+        return redirect()->route('import.index')->with('success', "Imported {$imported} records successfully.");
     }
 
     private function formatAssetTagStandard(?string $rawTag, string $categoryCode): string

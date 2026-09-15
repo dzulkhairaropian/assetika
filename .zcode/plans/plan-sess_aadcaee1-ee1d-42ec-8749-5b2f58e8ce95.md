@@ -1,27 +1,17 @@
-### Master Data UI Harmonization Plan: Convert Raw `<select>` to `<x-form.searchable-select>`
+### Refactoring & Enhancement Plan: System Administration & Import Service
 
-#### 1. Controller Option Preparation
-- Update Master Controllers (`ProductController`, `DepartmentController`, `LocationController`, `OperatingSystemController`, `CompanyController`):
-  - Prepare pre-formatted array options (`$brandOpts`, `$categoryOpts`, `$companyOpts`, `$groupOpts`) in `index`, `create`, and `edit` methods.
+#### 1. Extract `ImportService` (`app/Services/ImportService.php`)
+- Move CSV parsing, delimiter detection, preview mapping, and model generation (`importAssets`, `importUsers`, `importConsumables`, `importComponents`, `importLicenses`, `importMasterData`) into `App\Services\ImportService`.
+- Refactor `ImportController` to delegate preview and execution tasks to `ImportService`.
 
-#### 2. View Upgrades to `<x-form.searchable-select>`
-- **`products/create.blade.php` & `edit.blade.php`**: Upgrade Brand and Category dropdowns.
-- **`departments/create.blade.php` & `edit.blade.php`**: Upgrade Company dropdown.
-- **`locations/create.blade.php` & `edit.blade.php`**: Upgrade Company dropdown.
-- **`operating-systems/create.blade.php` & `edit.blade.php`**: Upgrade Brand dropdown.
-- **`companies/create.blade.php` & `edit.blade.php`**: Upgrade Group dropdown.
-- **`index.blade.php` filters** across Master views: Convert raw filter select elements to `<x-form.searchable-select>`.
+#### 2. Audit Trail & Activity Logging Verification
+- Ensure `LogsActivity` trait is consistently attached to core models (`Asset`, `Component`, `Consumable`, `License`, `Ticket`, `Project`).
 
-#### 3. Layout Harmonization
-- Apply TailAdmin 2-column card layout + Actions Card across all Master Data create & edit pages.
+#### 3. Verification & Build
+- Run `vendor/bin/pint` to format code according to project standards.
+- Run `php artisan test` to verify no regressions.
+- Run `npm run build`.
 
-#### 4. Verification & Build
-- Run `vendor/bin/pint`, `php artisan test`, and `npm run build`.
-
-#### Files to Modify
-- `app/Http/Controllers/Master/ProductController.php`
-- `app/Http/Controllers/Master/DepartmentController.php`
-- `app/Http/Controllers/Master/LocationController.php`
-- `app/Http/Controllers/Master/OperatingSystemController.php`
-- `app/Http/Controllers/Master/CompanyController.php`
-- Master Data views in `resources/views/pages/master/`
+#### Files to Create / Modify
+- `app/Services/ImportService.php` (New)
+- `app/Http/Controllers/ImportController.php` (Refactored)
