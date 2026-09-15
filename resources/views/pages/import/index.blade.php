@@ -15,10 +15,17 @@
         <x-ui.alert variant="error" message="{{ session('error') }}" />
     @endif
     @if(session('import_failed_details'))
-        <div class="rounded-xl border border-red-200 bg-red-50/50 p-4 text-xs text-red-700 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400 space-y-2">
-            <h4 class="font-bold uppercase tracking-wider flex items-center gap-1.5 text-red-800 dark:text-red-300">
-                <i data-lucide="alert-triangle" class="w-4 h-4"></i> Skipped / Failed Import Rows Report
-            </h4>
+        <div x-data="{ show: true }" x-show="show" class="relative rounded-xl border border-red-200 bg-red-50/50 p-4 text-xs text-red-700 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400 space-y-2">
+            <div class="flex items-center justify-between">
+                <h4 class="font-bold uppercase tracking-wider flex items-center gap-1.5 text-red-800 dark:text-red-300">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i> Skipped / Failed Import Rows Report
+                </h4>
+                <button @click="show = false" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
             <ul class="list-disc list-inside space-y-1 font-mono text-[11px]">
                 @foreach(session('import_failed_details') as $detail)
                     <li>{{ $detail }}</li>

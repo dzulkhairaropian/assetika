@@ -10,7 +10,7 @@
 
     @if($errors)
         @foreach($errors as $e)
-            <x-ui.alert variant="error" message="{{ $e }}" />
+            <x-ui.alert variant="error" message="{{ $e }}" :autoClose="false" />
         @endforeach
     @endif
 

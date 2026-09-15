@@ -6,7 +6,8 @@
     'message' => '',
     'showLink' => false,
     'linkHref' => '#',
-    'linkText' => 'Learn more'
+    'linkText' => 'Learn more',
+    'autoClose' => true,
 ])
 
 @php
@@ -51,7 +52,7 @@
 
 <div x-data="{ show: true }"
      x-show="show"
-     x-init="setTimeout(() => show = false, 5000)"
+     @if($autoClose) x-init="setTimeout(() => show = false, 8000)" @endif
      {{ $attributes->merge(['class' => 'relative rounded-xl border p-4 transition-all duration-300 ' . $containerClass]) }}>
     <div class="flex items-start gap-3 pr-8">
         <div class="-mt-0.5 {{ $iconClass }}">
