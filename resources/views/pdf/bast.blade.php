@@ -202,11 +202,11 @@
             <!-- Placeholder for additional signature if needed -->
             @php
                 $supervisorPosition = '';
-                if ($receiver_supervisor->position) {
+                if (isset($receiver_supervisor) && $receiver_supervisor && $receiver_supervisor->position) {
                     $supervisorPosition = $receiver_supervisor->position->name;
                 }
             @endphp
-            <div style="margin-top:30px; font-weight:bold;">({{ $receiver_supervisor->name }} @if ($supervisorPosition)
+            <div style="margin-top:30px; font-weight:bold;">({{ isset($receiver_supervisor) && $receiver_supervisor ? $receiver_supervisor->name : '' }} @if ($supervisorPosition)
                     - {{ $supervisorPosition }}
                 @endif)</div>
         </div>
