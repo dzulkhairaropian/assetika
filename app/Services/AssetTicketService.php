@@ -173,6 +173,26 @@ class AssetTicketService
         ]);
     }
 
+    public static function completeOpenTicketsForRetiredAsset(Asset $asset, string $reason, ?string $notes = null): void
+    {
+        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
+
+        $openTickets = Ticket::where('asset_id', $asset->id)
+            ->whereHas('status', fn ($q) => $q->where('is_closed', false))
+            ->get();
+
+        foreach ($openTickets as $ticket) {
+            $ticket->update([
+                'status_id' => $completedStatus?->id ?? $ticket->status_id,
+                'sla_status_id' => $fulfilledSla?->id ?? $ticket->sla_status_id,
+                'resolution_notes' => "Ticket closed automatically because linked asset {$asset->asset_tag} was retired. Reason: {$reason}".($notes ? " ({$notes})" : ''),
+                'completed_date' => now()->toDateString(),
+                'completed_time' => now(),
+            ]);
+        }
+    }
+
     private static function buildAndSaveTicket(array $data): Ticket
     {
         $ticketDate = now();

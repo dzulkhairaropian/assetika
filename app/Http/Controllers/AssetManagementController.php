@@ -11,6 +11,7 @@ use App\Models\Status;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Services\AssetService;
+use App\Services\AssetTicketService;
 use App\Services\BastService;
 use Illuminate\Http\Request;
 
@@ -188,6 +189,8 @@ class AssetManagementController extends Controller
             'current_checkout_id' => null,
         ]);
 
-        return redirect()->route('assets.show', $asset)->with('success', 'Asset retired successfully.');
+        AssetTicketService::completeOpenTicketsForRetiredAsset($asset, $request->retirement_reason, $request->retirement_notes);
+
+        return redirect()->route('assets.show', $asset)->with('success', 'Asset retired successfully. All open tickets closed.');
     }
 }
