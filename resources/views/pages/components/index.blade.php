@@ -73,40 +73,6 @@
             />
         </div>
 
-        <!-- Quick Filter Tabs -->
-        @php
-            $currentTab = request('tab');
-        @endphp
-        <div class="border-b border-gray-200 dark:border-gray-800">
-            <nav class="-mb-px flex space-x-6 overflow-x-auto">
-                <a href="{{ route('components.index') }}"
-                    class="inline-flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition {{ empty($currentTab) ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
-                    <i data-lucide="layers" class="w-4 h-4"></i>
-                    All Units ({{ $summary['total'] ?? 0 }})
-                </a>
-                <a href="{{ route('components.index', ['tab' => 'ready']) }}"
-                    class="inline-flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition {{ $currentTab === 'ready' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
-                    <i data-lucide="circle-check" class="w-4 h-4 text-emerald-500"></i>
-                    Ready in Stock ({{ $summary['ready'] ?? 0 }})
-                </a>
-                <a href="{{ route('components.index', ['tab' => 'installed']) }}"
-                    class="inline-flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition {{ $currentTab === 'installed' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
-                    <i data-lucide="user-check" class="w-4 h-4 text-brand-500"></i>
-                    Installed on Asset ({{ $summary['installed'] ?? 0 }})
-                </a>
-                <a href="{{ route('components.index', ['tab' => 'service']) }}"
-                    class="inline-flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition {{ $currentTab === 'service' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
-                    <i data-lucide="wrench" class="w-4 h-4 text-amber-500"></i>
-                    Under Maintenance ({{ $summary['service'] ?? 0 }})
-                </a>
-                <a href="{{ route('components.index', ['tab' => 'scrapped']) }}"
-                    class="inline-flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition {{ $currentTab === 'scrapped' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
-                    <i data-lucide="archive" class="w-4 h-4 text-gray-400"></i>
-                    Retired / Scrapped ({{ $summary['scrapped'] ?? 0 }})
-                </a>
-            </nav>
-        </div>
-
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
