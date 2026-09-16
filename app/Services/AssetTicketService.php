@@ -135,6 +135,22 @@ class AssetTicketService
         $assetName = $asset->product?->name ?? $asset->device_name ?? 'Asset';
         $user = $asset->assignedToUser ?? auth()->user();
 
+        // Close any existing open "Send to Service" tickets for this asset
+        $openServiceTickets = Ticket::where('asset_id', $asset->id)
+            ->where('problem_description', 'like', '%[Auto-Generated] Send to Service%')
+            ->whereHas('status', fn ($q) => $q->where('is_closed', false))
+            ->get();
+
+        foreach ($openServiceTickets as $openTicket) {
+            $openTicket->update([
+                'status_id' => $completedStatus?->id ?? $openTicket->status_id,
+                'sla_status_id' => $fulfilledSla?->id ?? $openTicket->sla_status_id,
+                'resolution_notes' => "Service completed: {$maintenance->notes}. Provider: {$maintenance->service_provider}. Cost: Rp ".number_format($maintenance->cost, 0, ',', '.'),
+                'completed_date' => now()->toDateString(),
+                'completed_time' => now(),
+            ]);
+        }
+
         return static::buildAndSaveTicket([
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
