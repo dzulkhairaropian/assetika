@@ -335,6 +335,7 @@
                                 </div>
                             </label>
                         </th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Created Date</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Ticket Key / Problem</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Requester</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
@@ -384,14 +385,14 @@
                                     </div>
                                 </label>
                             </td>
+                            <td class="px-4 py-2.5 whitespace-nowrap">
+                                <span class="font-mono text-xs text-gray-600 dark:text-gray-300">
+                                    {{ $ticket->created_at?->format('d/m/Y') ?? '-' }}
+                                </span>
+                            </td>
                             <td class="px-4 py-2.5">
                                 <div class="flex flex-col">
-                                    <div class="flex items-center gap-2">
-                                        <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
-                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">
-                                            (Created: {{ $ticket->created_at?->format('d/m/Y') }})
-                                        </span>
-                                    </div>
+                                    <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
                                     <span class="text-[11px] text-gray-400">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 60) }}</span>
                                 </div>
                             </td>
@@ -517,7 +518,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-4 py-8 text-center">
+                            <td colspan="10" class="px-4 py-8 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-1.5">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                         <i data-lucide="file-text" class="w-5 h-5"></i>
