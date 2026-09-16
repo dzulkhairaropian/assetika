@@ -47,11 +47,11 @@ class AssetService
             $checkout = AssetCheckout::create([
                 'asset_id' => $asset->id,
                 'checked_out_to_user_id' => $toUser->id,
+                'checked_out_by_user_id' => auth()->id() ?? $toUser->id,
                 'department_id' => $toUser->department_id,
                 'location_id' => $params['location_id'] ?? $toUser->location_id,
-                'checked_out_by_id' => auth()->id(),
                 'checked_out_at' => $params['checkout_date'] ?? now(),
-                'notes' => $params['notes'] ?? null,
+                'checkout_notes' => $params['notes'] ?? $params['checkout_notes'] ?? null,
             ]);
 
             $asset->update([
@@ -78,9 +78,10 @@ class AssetService
 
             if ($checkout) {
                 $checkout->update([
-                    'checked_in_by_id' => auth()->id(),
+                    'checked_in_by_user_id' => auth()->id() ?? $checkout->checked_out_to_user_id,
                     'checked_in_at' => $params['checkin_date'] ?? now(),
-                    'notes' => $params['notes'] ?? $checkout->notes,
+                    'checkin_notes' => $params['notes'] ?? $params['checkin_notes'] ?? null,
+                    'condition_report' => $params['condition_report'] ?? null,
                 ]);
             }
 
