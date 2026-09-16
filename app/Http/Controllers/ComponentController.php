@@ -13,6 +13,7 @@ use App\Models\Ticket;
 use App\Models\Vendor;
 use App\Services\ComponentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ComponentController extends Controller
 {
@@ -29,7 +30,9 @@ class ComponentController extends Controller
 
         // Tab filter handling
         $tab = $request->input('tab');
-        if ($tab === 'ready') {
+        if ($tab === 'today') {
+            $query->whereDate('components.created_at', Carbon::today());
+        } elseif ($tab === 'ready') {
             $query->whereNull('assigned_asset_id')
                 ->where(function ($q) {
                     $q->whereNull('status_id')
@@ -71,6 +74,18 @@ class ComponentController extends Controller
             $query->where('status_id', $request->status_id);
         }
 
+        if ($request->filled('location_id')) {
+            $query->where('location_id', $request->location_id);
+        }
+
+        if ($request->filled('created_from')) {
+            $query->whereDate('components.created_at', '>=', $request->created_from);
+        }
+
+        if ($request->filled('created_to')) {
+            $query->whereDate('components.created_at', '<=', $request->created_to);
+        }
+
         $components = $query->latest()->paginate(50)->withQueryString();
 
         $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
@@ -84,6 +99,7 @@ class ComponentController extends Controller
         $statuses = Status::where('master_category_id', $componentMasterCat?->id)
             ->orderBy('name')
             ->get();
+        $locations = Location::orderBy('name')->get();
 
         $allAssets = Asset::with(['product', 'assignedToUser'])->orderBy('asset_tag')->get();
 
@@ -92,9 +108,10 @@ class ComponentController extends Controller
             'text' => $a->asset_tag.' - '.($a->product?->name ?? $a->device_name).($a->assignedToUser ? ' ('.$a->assignedToUser->name.')' : ''),
         ])->values()->all();
 
-        // Summary counts for Tab Bar & KPI Cards
+        // Summary counts for Tab Bar
         $summary = [
             'total' => Component::count(),
+            'today' => Component::whereDate('created_at', Carbon::today())->count(),
             'ready' => Component::whereNull('assigned_asset_id')
                 ->where(function ($q) {
                     $q->whereNull('status_id')
@@ -108,7 +125,7 @@ class ComponentController extends Controller
             'scrapped' => Component::whereHas('status', fn ($s) => $s->whereIn('name', ['Scrapped', 'Broken', 'Retired']))->count(),
         ];
 
-        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses', 'assetOpts', 'summary'));
+        return view('pages.components.index', compact('components', 'products', 'categories', 'statuses', 'locations', 'assetOpts', 'summary'));
     }
 
     public function create()
