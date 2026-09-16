@@ -93,19 +93,29 @@
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <label for="purchase_date" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Purchase Date
                                 </label>
-                                <input type="date" name="purchase_date" value="{{ old('purchase_date', optional($component->purchase_date)->format('Y-m-d')) }}"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                <x-form.date-picker
+                                    id="purchase_date"
+                                    name="purchase_date"
+                                    placeholder="Select purchase date"
+                                    defaultDate="{{ old('purchase_date', optional($component->purchase_date)->format('Y-m-d')) }}"
+                                />
+                                @error('purchase_date') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <label for="release_date" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Release Date (Pemasangan)
                                 </label>
-                                <input type="date" name="release_date" value="{{ old('release_date', optional($component->release_date)->format('Y-m-d')) }}"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                <x-form.date-picker
+                                    id="release_date"
+                                    name="release_date"
+                                    placeholder="Select release date"
+                                    defaultDate="{{ old('release_date', optional($component->release_date)->format('Y-m-d')) }}"
+                                />
+                                @error('release_date') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
