@@ -21,15 +21,15 @@
                         </h3>
                         <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Kit Name <span class="text-error-500">*</span></label>
+                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Kit Name <span class="text-error-500">*</span></label>
                                 <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Developer Onboarding Kit" required
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
-                                @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                @error('name') <p class="mt-1 text-xs text-error-500 font-medium">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Description</label>
+                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Description</label>
                                 <input type="text" name="description" value="{{ old('description') }}" placeholder="Brief kit bundle description"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
+                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                             </div>
                         </div>
                     </div>

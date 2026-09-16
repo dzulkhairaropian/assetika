@@ -76,7 +76,7 @@
                 @endif
 
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Current Active Assignments</h4>
-                @if($license->seats->isNotEmpty())
+                @if($license->seats()->exists())
                     <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
                         <table class="w-full text-xs">
                             <thead class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">

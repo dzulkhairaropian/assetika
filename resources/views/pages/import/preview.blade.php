@@ -68,12 +68,12 @@
         </div>
 
         <div class="border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6 flex items-center justify-end gap-3">
-            <a href="{{ route('import.index') }}" class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+            <a href="{{ route('import.index') }}" class="inline-flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
                 Cancel
             </a>
             <form action="{{ route('import.process') }}" method="POST" class="inline-flex">
                 @csrf
-                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600 shadow-theme-xs">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-xs font-semibold text-white hover:bg-brand-600 active:scale-[0.98] transition-all duration-150 ease-out shadow-sm focus:outline-none focus:ring-4 focus:ring-brand-500/20">
                     <i data-lucide="circle-check" class="w-4 h-4"></i> Confirm & Execute Import
                 </button>
             </form>

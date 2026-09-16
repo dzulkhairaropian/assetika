@@ -26,49 +26,49 @@
                         <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
                             <i data-lucide="key" class="w-5 h-5 text-brand-500"></i> License Information
                         </h3>
-                    <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Name <span class="text-red-500">*</span></label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Name <span class="text-error-500">*</span></label>
                             <input type="text" name="name" value="{{ old('name', $license->name) }}" required
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Product Key</label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Product Key</label>
                             <input type="text" name="product_key" value="{{ old('product_key', $license->product_key) }}"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-mono text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Seats <span class="text-red-500">*</span></label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Seats <span class="text-error-500">*</span></label>
                             <input type="number" name="seats" value="{{ old('seats', $license->seats) }}" min="1" required
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">License Email</label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">License Email</label>
                             <input type="email" name="license_email" value="{{ old('license_email', $license->license_email) }}"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
-                            <div>
-                                <x-form.searchable-select name="manufacturer" label="Manufacturer / Brand" :options="$brandOpts" :selected="$selectedBrand" placeholder="Select Brand" />
-                            </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Purchase Date</label>
+                            <x-form.searchable-select name="manufacturer" label="Manufacturer / Brand" :options="$brandOpts" :selected="$selectedBrand" placeholder="Select Brand" />
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Purchase Date</label>
                             <input type="date" name="purchase_date" value="{{ old('purchase_date', $license->purchase_date?->format('Y-m-d')) }}"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Expiration Date</label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Expiration Date</label>
                             <input type="date" name="expiration_date" value="{{ old('expiration_date', $license->expiration_date?->format('Y-m-d')) }}"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Purchase Cost (Rp)</label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Purchase Cost (Rp)</label>
                             <input type="number" name="purchase_cost" value="{{ old('purchase_cost', $license->purchase_cost) }}" step="0.01"
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
                         </div>
                         <div class="lg:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Notes</label>
                             <textarea name="notes" rows="3"
-                                class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('notes', $license->notes) }}</textarea>
+                                class="w-full rounded-lg border border-gray-300 bg-white p-3 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500">{{ old('notes', $license->notes) }}</textarea>
                         </div>
                     </div>
                 </div>

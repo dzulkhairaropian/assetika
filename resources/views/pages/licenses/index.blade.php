@@ -91,9 +91,9 @@
             {{-- Table --}}
             <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full text-xs">
-                    <thead>
-                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
+                    <thead class="border-b border-gray-100 dark:border-gray-800">
+                        <tr>
+                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -108,18 +108,18 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Software Name</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Product Key</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Seats</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Expiration</th>
-                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Software Name</th>
+                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Product Key</th>
+                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Seats</th>
+                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Expiration</th>
+                            <th class="px-5 py-3 sm:px-6 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($licenses as $license)
                             @php $avail = $license->availableSeats(); @endphp
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
-                                <td class="px-4 py-2.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
                                             <input type="checkbox" value="{{ $license->id }}" class="row-checkbox sr-only"
@@ -135,15 +135,15 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <a href="{{ route('licenses.show', $license) }}" class="block font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
                                         {{ $license->name }}
                                     </a>
                                 </td>
-                                <td class="px-4 py-2.5 font-mono text-xs text-gray-600 dark:text-gray-400">
+                                <td class="px-5 py-4 sm:px-6 font-mono font-medium text-xs text-gray-700 dark:text-gray-300">
                                     {{ $license->product_key ?? '-' }}
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-5 py-4 sm:px-6">
                                     <div class="flex items-center gap-1">
                                         <span class="font-bold text-gray-900 dark:text-white">{{ $license->seats }}</span>
                                         <span class="text-gray-400">/ {{ $avail }} free</span>
@@ -152,7 +152,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                <td class="px-5 py-4 sm:px-6 whitespace-nowrap">
                                     @if($license->expiration_date)
                                         @if($license->expiration_date->isPast())
                                             <span class="font-semibold text-red-600 dark:text-red-400">{{ $license->expiration_date->format('d M Y') }}</span>
@@ -165,7 +165,7 @@
                                         <span class="text-gray-400 italic">-</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2.5 text-end">
+                                <td class="px-5 py-4 sm:px-6 text-end">
                                     <div x-data="{
                                         open: false,
                                         dropdownStyle: '',
@@ -173,10 +173,10 @@
                                             this.open = !this.open;
                                             if (this.open) {
                                                 const rect = e.currentTarget.getBoundingClientRect();
-                                                const menuHeight = 120;
+                                                const menuHeight = 160;
                                                 const spaceBelow = window.innerHeight - rect.bottom;
                                                 const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
-                                                const left = Math.max(10, rect.right - 144);
+                                                const left = Math.max(10, rect.right - 160);
                                                 this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999; display: block;`;
                                             }
                                         }
@@ -188,7 +188,7 @@
                                         <div x-show="open"
                                             x-transition
                                             :style="open ? dropdownStyle : 'display: none;'"
-                                            class="w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+                                            class="w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
                                             style="display: none;">
                                             
                                             <a href="{{ route('licenses.show', $license) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
@@ -203,12 +203,12 @@
 
                                             <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
 
-                                            <form action="{{ route('licenses.destroy', $license) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                            <form action="{{ route('licenses.destroy', $license) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this license?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
                                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                                    Delete
+                                                    Delete License
                                                 </button>
                                             </form>
                                         </div>

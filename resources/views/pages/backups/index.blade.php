@@ -33,7 +33,7 @@
                         <form action="{{ route('backups.create') }}" method="POST" class="inline">
                             @csrf
                             <input type="hidden" name="type" value="db">
-                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/[0.03]">
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
                                 <i data-lucide="database" class="w-4 h-4 text-brand-500"></i>
                                 Backup Database Only
                             </button>
@@ -42,7 +42,7 @@
                         <form action="{{ route('backups.create') }}" method="POST" class="inline">
                             @csrf
                             <input type="hidden" name="type" value="full">
-                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition-all duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-brand-500/20">
                                 <i data-lucide="archive" class="w-4 h-4"></i>
                                 Backup Application & Database
                             </button>
@@ -65,59 +65,39 @@
 
                     {{-- Table --}}
                     <div class="max-w-full overflow-x-auto">
-                        <table class="min-w-full">
+                        <table class="min-w-full text-xs">
                             <thead class="border-b border-gray-100 dark:border-gray-800">
                                 <tr>
-                                    <th class="px-5 py-3 sm:px-6">
-                                        <div class="flex items-center">
-                                            <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">File Name</p>
-                                        </div>
-                                    </th>
-                                    <th class="px-5 py-3 sm:px-6">
-                                        <div class="flex items-center">
-                                            <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Size</p>
-                                        </div>
-                                    </th>
-                                    <th class="px-5 py-3 sm:px-6">
-                                        <div class="flex items-center">
-                                            <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Created At</p>
-                                        </div>
-                                    </th>
-                                    <th class="px-5 py-3 sm:px-6">
-                                        <div class="flex items-center justify-end">
-                                            <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
-                                        </div>
-                                    </th>
+                                    <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">File Name</th>
+                                    <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Size</th>
+                                    <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Created At</th>
+                                    <th class="px-5 py-3 sm:px-6 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                                 @forelse($backups as $backup)
-                                    <tr class="border-b border-gray-100 dark:border-white/[0.05] hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
                                         <td class="px-5 py-4 sm:px-6">
-                                            <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-300">
+                                            <span class="block font-mono font-medium text-gray-900 dark:text-white">
                                                 {{ $backup['name'] }}
                                             </span>
                                         </td>
-                                        <td class="px-5 py-4 sm:px-6">
-                                            <span class="text-theme-sm text-gray-600 dark:text-gray-400">
-                                                {{ $backup['size'] }}
-                                            </span>
+                                        <td class="px-5 py-4 sm:px-6 text-gray-600 dark:text-gray-400">
+                                            {{ $backup['size'] }}
                                         </td>
-                                        <td class="px-5 py-4 sm:px-6">
-                                            <span class="text-theme-sm text-gray-600 dark:text-gray-400">
-                                                {{ $backup['date'] }}
-                                            </span>
+                                        <td class="px-5 py-4 sm:px-6 text-gray-600 dark:text-gray-400">
+                                            {{ $backup['date'] }}
                                         </td>
-                                        <td class="px-5 py-4 sm:px-6">
+                                        <td class="px-5 py-4 sm:px-6 text-end">
                                             <div class="flex items-center justify-end gap-3 text-gray-500">
                                                 <a href="{{ route('backups.download', $backup['name']) }}" class="transition-colors hover:text-brand-500" title="Download">
-                                                    <i data-lucide="download" class="w-5 h-5"></i>
+                                                    <i data-lucide="download" class="w-4 h-4"></i>
                                                 </a>
                                                 <form action="{{ route('backups.destroy', $backup['name']) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this backup file?')" class="inline-flex">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="transition-colors hover:text-error-500" title="Delete">
-                                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -216,7 +196,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition-all duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-brand-500/20">
                                 <i data-lucide="save" class="w-4 h-4"></i>
                                 Save Schedule
                             </button>

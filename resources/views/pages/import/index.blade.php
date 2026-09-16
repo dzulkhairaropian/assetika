@@ -49,11 +49,11 @@
                     <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
                         <!-- Import Type -->
                         <div class="lg:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
                                 Data Type to Import <span class="text-error-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="type" required class="dark:bg-gray-950 h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 pr-11 text-xs text-gray-800 shadow-sm outline-none focus:border-brand-500 focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
+                                <select name="type" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 pr-11 text-sm text-gray-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.75rem_center] bg-[size:1.5em_1.5em] bg-no-repeat transition-all duration-150 ease-out">
                                     <optgroup label="Core Modules">
                                         <option value="assets">IT Assets Hardware</option>
                                         <option value="consumables">Consumables Inventory</option>
@@ -76,26 +76,35 @@
                         </div>
 
                         <!-- CSV File Upload Dropzone -->
-                        <div class="lg:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                        <div class="lg:col-span-2" x-data="{ isDragging: false, fileName: '' }">
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
                                 Select CSV File <span class="text-error-500">*</span>
                             </label>
                             <div class="relative flex items-center justify-center w-full">
-                                <label class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50/50 hover:bg-gray-100/50 dark:bg-white/[0.02] dark:border-gray-700 dark:hover:border-gray-600 transition">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <i data-lucide="file-text" class="w-8 h-8 mb-2 text-brand-500"></i>
-                                        <p class="mb-1 text-sm text-gray-700 dark:text-gray-300"><span class="font-semibold text-brand-500">Click to upload</span> or drag and drop</p>
-                                        <p class="text-xs text-gray-400">CSV or TXT files (MAX. 10MB)</p>
+                                <label @dragover.prevent="isDragging = true"
+                                       @dragleave.prevent="isDragging = false"
+                                       @drop.prevent="isDragging = false"
+                                       :class="isDragging ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-500/10 dark:border-brand-500' : 'border-gray-300 bg-gray-50/50 hover:bg-gray-100/50 dark:bg-gray-950 dark:border-gray-800 dark:hover:border-gray-700'"
+                                       class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-150 ease-out">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/15 mb-3 transition-transform group-hover:scale-105">
+                                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                                        </div>
+                                        <p class="mb-1 text-sm text-gray-700 dark:text-gray-300">
+                                            <span class="font-semibold text-brand-500">Click to upload</span> or drag and drop
+                                        </p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500">CSV or TXT files (MAX. 10MB)</p>
+                                        <p x-show="fileName" x-text="'Selected file: ' + fileName" class="mt-2 text-xs font-semibold text-brand-600 dark:text-brand-400"></p>
                                     </div>
-                                    <input type="file" name="file" accept=".csv,.txt" required class="hidden" />
+                                    <input type="file" name="file" accept=".csv,.txt" required class="hidden" @change="fileName = $event.target.files[0]?.name || ''" />
                                 </label>
                             </div>
-                            @error('file') <p class="mt-1.5 text-xs text-error-500">{{ $message }}</p> @enderror
+                            @error('file') <p class="mt-1.5 text-xs text-error-500 font-medium">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     <div class="pt-2 flex justify-end">
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600 shadow-theme-xs">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition-all duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-brand-500/20">
                             <i data-lucide="eye" class="w-4 h-4"></i> Preview & Validate Import
                         </button>
                     </div>
