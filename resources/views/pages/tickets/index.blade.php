@@ -303,7 +303,7 @@
                                     <button type="button" @click="exportModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
                                         Cancel
                                     </button>
-                                    <button type="submit" @click="exportModalOpen = false" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
+                                    <button type="submit" @click="setTimeout(() => exportModalOpen = false, 500)" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
                                         <i data-lucide="download" class="w-3.5 h-3.5"></i>
                                         Export Excel
                                     </button>

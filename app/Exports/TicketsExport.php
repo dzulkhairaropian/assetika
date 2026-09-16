@@ -69,6 +69,11 @@ class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         if (! empty($startDate)) {
             if ($dateType === 'request_date') {
                 $query->whereDate('request_date', '>=', $startDate);
+            } elseif ($dateType === 'both') {
+                $query->where(function ($q) use ($startDate) {
+                    $q->whereDate('created_at', '>=', $startDate)
+                        ->orWhereDate('request_date', '>=', $startDate);
+                });
             } else {
                 $query->whereDate('created_at', '>=', $startDate);
             }
@@ -77,6 +82,11 @@ class TicketsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         if (! empty($endDate)) {
             if ($dateType === 'request_date') {
                 $query->whereDate('request_date', '<=', $endDate);
+            } elseif ($dateType === 'both') {
+                $query->where(function ($q) use ($endDate) {
+                    $q->whereDate('created_at', '<=', $endDate)
+                        ->orWhereDate('request_date', '<=', $endDate);
+                });
             } else {
                 $query->whereDate('created_at', '<=', $endDate);
             }
