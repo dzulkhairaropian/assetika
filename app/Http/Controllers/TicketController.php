@@ -48,6 +48,11 @@ class TicketController extends Controller
         if ($startDate = ($request->input('start_date') ?: $request->input('from_date') ?: $request->input('created_from'))) {
             if ($dateType === 'request_date') {
                 $query->whereDate('request_date', '>=', $startDate);
+            } elseif ($dateType === 'both') {
+                $query->where(function ($q) use ($startDate) {
+                    $q->whereDate('tickets.created_at', '>=', $startDate)
+                        ->orWhereDate('request_date', '>=', $startDate);
+                });
             } else {
                 $query->whereDate('tickets.created_at', '>=', $startDate);
             }
@@ -56,6 +61,11 @@ class TicketController extends Controller
         if ($endDate = ($request->input('end_date') ?: $request->input('to_date') ?: $request->input('created_to'))) {
             if ($dateType === 'request_date') {
                 $query->whereDate('request_date', '<=', $endDate);
+            } elseif ($dateType === 'both') {
+                $query->where(function ($q) use ($endDate) {
+                    $q->whereDate('tickets.created_at', '<=', $endDate)
+                        ->orWhereDate('request_date', '<=', $endDate);
+                });
             } else {
                 $query->whereDate('tickets.created_at', '<=', $endDate);
             }

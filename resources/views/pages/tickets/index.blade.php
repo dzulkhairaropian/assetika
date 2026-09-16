@@ -139,6 +139,7 @@
                                         <select name="date_type" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
                                             <option value="created_at" {{ request('date_type', 'created_at') === 'created_at' ? 'selected' : '' }}>Created Date (System Input Date)</option>
                                             <option value="request_date" {{ request('date_type') === 'request_date' ? 'selected' : '' }}>Request Date (Ticket Date)</option>
+                                            <option value="both" {{ request('date_type') === 'both' ? 'selected' : '' }}>Both (Either Created or Request Date)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -376,7 +377,12 @@
                             </td>
                             <td class="px-4 py-2.5">
                                 <div class="flex flex-col">
-                                    <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
+                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">
+                                            (Created: {{ $ticket->created_at?->format('d/m/Y') }})
+                                        </span>
+                                    </div>
                                     <span class="text-[11px] text-gray-400">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 60) }}</span>
                                 </div>
                             </td>
