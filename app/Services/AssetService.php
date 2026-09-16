@@ -127,10 +127,13 @@ class AssetService
         return DB::transaction(function () use ($asset, $maintenance, $params) {
             $readyStatus = Status::where('name', 'Ready to Deploy')->first();
 
+            $cost = isset($params['cost']) && $params['cost'] !== '' && $params['cost'] !== null ? (float) $params['cost'] : ($maintenance->cost ?? 0);
+            $notes = ! empty($params['notes']) ? $params['notes'] : (! empty($params['resolution_notes']) ? $params['resolution_notes'] : $maintenance->notes);
+
             $maintenance->update([
                 'completion_date' => $params['completion_date'] ?? now(),
-                'cost' => $params['cost'] ?? $maintenance->cost,
-                'notes' => $params['resolution_notes'] ?? $maintenance->notes,
+                'cost' => $cost,
+                'notes' => $notes,
             ]);
 
             $asset->update([

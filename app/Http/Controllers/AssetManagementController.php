@@ -155,8 +155,9 @@ class AssetManagementController extends Controller
 
         $request->validate([
             'completion_date' => 'required|date',
-            'cost' => 'required|numeric|min:0',
-            'resolution_notes' => 'required|string',
+            'cost' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string',
+            'resolution_notes' => 'nullable|string',
         ]);
 
         $this->assetService->processCompleteMaintenance($asset, $maintenance, $request->all());
