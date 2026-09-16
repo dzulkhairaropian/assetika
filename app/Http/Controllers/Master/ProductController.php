@@ -48,7 +48,7 @@ class ProductController extends Controller
         $categoryOpts = $categories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
         $masterCatOpts = $masterCategories->map(fn ($mc) => ['id' => $mc->id, 'text' => $mc->name])->values()->all();
 
-        return view('pages.master.products.create', compact('brandOpts', 'categoryOpts', 'masterCatOpts'));
+        return view('pages.master.products.create', compact('brandOpts', 'categoryOpts', 'masterCatOpts', 'masterCategories'));
     }
 
     public function store(Request $request)
@@ -81,7 +81,7 @@ class ProductController extends Controller
         $categoryOpts = $categories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
         $masterCatOpts = $masterCategories->map(fn ($mc) => ['id' => $mc->id, 'text' => $mc->name])->values()->all();
 
-        return view('pages.master.products.edit', compact('product', 'brandOpts', 'categoryOpts', 'masterCatOpts'));
+        return view('pages.master.products.edit', compact('product', 'brandOpts', 'categoryOpts', 'masterCatOpts', 'masterCategories'));
     }
 
     public function update(Request $request, Product $product)
