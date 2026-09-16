@@ -220,13 +220,22 @@
 
                             <form action="{{ route('tickets.export') }}" method="GET" class="space-y-3">
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
+                                    <div class="col-span-2">
+                                        <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Date Filter Basis</label>
+                                        <select name="date_type" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                                            <option value="created_at" {{ request('date_type', 'created_at') === 'created_at' ? 'selected' : '' }}>Created Date (System Input Date)</option>
+                                            <option value="request_date" {{ request('date_type') === 'request_date' ? 'selected' : '' }}>Request Date (Ticket Date)</option>
+                                            <option value="both" {{ request('date_type') === 'both' ? 'selected' : '' }}>Both (Either Created or Request Date)</option>
+                                        </select>
+                                    </div>
+
                                     <div>
                                         <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">From Date</label>
-                                        <input type="date" name="from_date" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                        <input type="date" name="from_date" value="{{ request('start_date', request('from_date', request('created_from'))) }}" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">To Date</label>
-                                        <input type="date" name="to_date" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                                        <input type="date" name="to_date" value="{{ request('end_date', request('to_date', request('created_to'))) }}" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
                                     </div>
 
                                     <div>
@@ -234,7 +243,7 @@
                                         <select name="company_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Companies</option>
                                             @foreach($companies as $c)
-                                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                <option value="{{ $c->id }}" {{ request('company_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -244,7 +253,7 @@
                                         <select name="department_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Departments</option>
                                             @foreach($departments as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                                <option value="{{ $d->id }}" {{ request('department_id') == $d->id ? 'selected' : '' }}>{{ $d->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -254,7 +263,7 @@
                                         <select name="ticket_category_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Categories</option>
                                             @foreach($categories as $cat)
-                                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                <option value="{{ $cat->id }}" {{ request('ticket_category_id', request('category_id')) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -264,7 +273,7 @@
                                         <select name="priority_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Priorities</option>
                                             @foreach($priorities as $p)
-                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                <option value="{{ $p->id }}" {{ request('priority_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -274,7 +283,7 @@
                                         <select name="status_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Statuses</option>
                                             @foreach($statuses as $st)
-                                                <option value="{{ $st->id }}">{{ $st->name }}</option>
+                                                <option value="{{ $st->id }}" {{ request('status_id') == $st->id ? 'selected' : '' }}>{{ $st->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -284,7 +293,7 @@
                                         <select name="created_by_id" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                             <option value="">All Users</option>
                                             @foreach($users as $u)
-                                                <option value="{{ $u->id }}">{{ $u->name }}</option>
+                                                <option value="{{ $u->id }}" {{ request('created_by_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
