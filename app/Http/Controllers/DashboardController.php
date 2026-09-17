@@ -532,6 +532,15 @@ class DashboardController extends Controller
         $totalComponentUnits = Component::count();
         $readyComponents = Component::whereNull('assigned_asset_id')->count();
         $installedComponents = Component::whereNotNull('assigned_asset_id')->count();
+        $serviceComponents = Component::whereHas('status', fn ($s) => $s->whereIn('name', ['In Repair', 'Service', 'Maintenance']))->count();
+        $scrappedComponents = Component::whereHas('status', fn ($s) => $s->whereIn('name', ['Scrapped', 'Broken', 'Retired']))->count();
+
+        $componentChartData = [
+            'labels' => ['Ready in Stock', 'Installed on Asset', 'Under Repair', 'Retired / Scrapped'],
+            'data' => [$readyComponents, $installedComponents, $serviceComponents, $scrappedComponents],
+            'colors' => ['#12b76a', '#465fff', '#f79009', '#ef4444'],
+        ];
+
         $recentComponentInstallations = Component::with(['assignedAsset', 'category', 'product'])
             ->whereNotNull('assigned_asset_id')
             ->latest('updated_at')
@@ -552,6 +561,7 @@ class DashboardController extends Controller
             'totalComponentUnits',
             'readyComponents',
             'installedComponents',
+            'componentChartData',
             'recentComponentInstallations',
             'readyToDeploy',
             'readyToDeployTrend',

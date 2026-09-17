@@ -199,39 +199,19 @@
             @endif
         </div>
 
-        <!-- Chart 3: Most Used Products -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
-             x-data="{ activeCategory: 'all', categoryLabel: 'All Categories', updateProductChart(catId, label) { this.activeCategory = catId; this.categoryLabel = label; if (window.updateProductChartJS) { window.updateProductChartJS(catId); } } }">
+        <!-- Chart 3: Component Allocation Pie Chart -->
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Most Used Hardware</h3>
-                    <p class="text-xs text-gray-400">Top 5 hardware models</p>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Component Units Allocation</h3>
+                    <p class="text-xs text-gray-400">Stock & installation status pie ratio</p>
                 </div>
-                <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                    <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-all duration-150 ease-out">
-                        <span x-text="categoryLabel">All Categories</span>
-                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
-                    </button>
-                    <div x-show="dropdownOpen"
-                         x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 mt-1.5 origin-top-right rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50 flex flex-col gap-0.5 max-h-60 overflow-y-auto w-max"
-                         style="display: none;">
-                        <button @click="updateProductChart('all', 'All Categories'); dropdownOpen = false;" class="px-3 py-1.5 text-xs text-left font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-900 transition-colors">All Categories</button>
-                        @foreach($categories as $category)
-                            <button @click="updateProductChart('{{ $category->id }}', '{{ $category->name }}'); dropdownOpen = false;" class="px-3 py-1.5 text-xs text-left font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-900 transition-colors">{{ $category->name }}</button>
-                        @endforeach
-                    </div>
-                </div>
+                <a href="{{ route('components.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
-            @if(count($productDataByCategory['all']['data']) > 0)
-                <div id="productAssetChart" class="h-64 flex items-center justify-center"></div>
+            @if(($totalComponentUnits ?? 0) > 0)
+                <div id="componentPieChart" class="h-64 flex items-center justify-center"></div>
             @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No product usage data available</div>
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No component units available</div>
             @endif
         </div>
 
@@ -447,8 +427,10 @@
 @if($totalAssets > 0)
 <script>
 	    window.chartData = {
-	        totalAssets: {{ $totalAssets }},
-	        chartData: @json($chartData),
+		        totalAssets: {{ $totalAssets }},
+		        totalComponentUnits: {{ $totalComponentUnits ?? 0 }},
+		        componentChartData: @json($componentChartData ?? []),
+		        chartData: @json($chartData),
 	        chartDataByCategory: @json($chartDataByCategory),
 	        deptChartData: @json($deptChartData),
 	        deptDataByCategory: @json($deptDataByCategory),
