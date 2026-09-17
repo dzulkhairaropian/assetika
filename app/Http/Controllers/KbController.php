@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\KbArticle;
 use App\Models\KbCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class KbController extends Controller
 {
@@ -24,10 +25,16 @@ class KbController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $articles = $query->latest()->paginate(12);
+        $summary = [
+            'total' => KbArticle::where('is_published', true)->count(),
+            'today' => KbArticle::where('is_published', true)->whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $articles = $query->latest()->paginate($perPage)->withQueryString();
         $categories = KbCategory::where('is_active', true)->withCount('articles')->get();
 
-        return view('pages.kb.index', compact('articles', 'categories'));
+        return view('pages.kb.index', compact('articles', 'categories', 'summary'));
     }
 
     public function show(KbArticle $article)

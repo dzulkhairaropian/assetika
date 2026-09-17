@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\ProjectService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
@@ -41,7 +42,19 @@ class ProjectController extends Controller
             });
         }
 
-        $projects = $query->latest()->paginate(12)->withQueryString();
+        $summary = [
+            'total' => Project::count(),
+            'today' => Project::whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        if ($tab = $request->input('tab')) {
+            if ($tab === 'today') {
+                $query->whereDate('projects.created_at', Carbon::today());
+            }
+        }
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $projects = $query->latest()->paginate($perPage)->withQueryString();
         $users = User::orderBy('name')->get();
         $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name])->values()->all();
 
@@ -49,7 +62,7 @@ class ProjectController extends Controller
         $projectStatuses = $projectMC ? Status::where('master_category_id', $projectMC->id)->get() : collect();
         $statusOpts = $projectStatuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
 
-        return view('pages.projects.index', compact('projects', 'search', 'users', 'projectStatuses', 'userOpts', 'statusOpts'));
+        return view('pages.projects.index', compact('projects', 'search', 'users', 'projectStatuses', 'userOpts', 'statusOpts', 'summary'));
     }
 
     public function store(Request $request): RedirectResponse

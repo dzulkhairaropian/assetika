@@ -64,8 +64,34 @@
     <div class="overflow-hidden xl:overflow-visible rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <!-- Card Header Toolbar -->
         <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
+            @php
+                $currentTab = request('tab');
+                $tabFilters = array_filter(request()->except(['page', 'tab']));
+                $tabs = [
+                    ['key' => null,     'label' => 'All Projects', 'count' => $summary['total'] ?? 0, 'icon' => 'layers',   'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                    ['key' => 'today',  'label' => 'Added Today',  'count' => $summary['today'] ?? 0, 'icon' => 'calendar', 'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                ];
+            @endphp
+            <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+                @foreach($tabs as $tab)
+                    @php
+                        $isActive = $currentTab === $tab['key'];
+                        $tabUrl = route('projects.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+                    @endphp
+                    <a href="{{ $tabUrl }}"
+                       class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                        <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                        {{ $tab['label'] }}
+                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+                    </a>
+                @endforeach
+            </div>
+
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <form action="{{ route('projects.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                    @if(request('tab'))
+                        <input type="hidden" name="tab" value="{{ request('tab') }}">
+                    @endif
                     <div class="relative flex items-center">
                         <span class="absolute left-2.5 text-gray-400">
                             <i data-lucide="search" class="w-3.5 h-3.5"></i>
@@ -277,11 +303,23 @@
             </table>
         </div>
 
-        @if($projects->hasPages())
-            <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
+        <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Per page:</span>
+                <select onchange="const url = new URL(window.location.href); url.searchParams.set('per_page', this.value); url.searchParams.set('page', 1); window.location.href = url.toString();"
+                    class="h-8 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                    <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                    <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
+                    <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
+                </select>
+            </div>
+            <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
                 {{ $projects->links() }}
             </div>
-        @endif
+        </div>
     </div>
 
     <!-- Modal Create Project -->

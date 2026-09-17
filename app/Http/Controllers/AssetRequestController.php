@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Consumable;
 use App\Models\License;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class AssetRequestController extends Controller
 {
@@ -29,6 +30,7 @@ class AssetRequestController extends Controller
 
         $requestSummary = [
             'total' => (clone $query)->count(),
+            'today' => (clone $query)->whereDate('created_at', Carbon::today())->count(),
             'hardware' => (clone $query)->where('requestable_type', Category::class)->count(),
             'consumable' => (clone $query)->where('requestable_type', Consumable::class)->count(),
             'license' => (clone $query)->where('requestable_type', License::class)->count(),
@@ -36,6 +38,7 @@ class AssetRequestController extends Controller
 
         if ($tab = $request->input('tab')) {
             match ($tab) {
+                'today' => $query->whereDate('created_at', Carbon::today()),
                 'hardware' => $query->where('requestable_type', Category::class),
                 'consumable' => $query->where('requestable_type', Consumable::class),
                 'license' => $query->where('requestable_type', License::class),
@@ -43,7 +46,8 @@ class AssetRequestController extends Controller
             };
         }
 
-        $requests = $query->latest()->paginate(50)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $requests = $query->latest()->paginate($perPage)->withQueryString();
 
         return view('pages.requests.index', compact('requests', 'requestSummary'));
     }
