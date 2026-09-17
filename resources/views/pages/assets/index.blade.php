@@ -4,6 +4,7 @@
     <div class="space-y-4" x-data="{
         selectedAssets: [],
         selectAll: false,
+        bulkStatusModalOpen: false,
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -96,6 +97,11 @@
                     <input type="number" id="labelCopies" min="1" max="10" value="1"
                         class="w-14 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1 text-center text-xs font-semibold text-gray-800 dark:text-white">
                 </div>
+                <button type="button" @click="bulkStatusModalOpen = true"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-indigo-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-600">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    Change Status
+                </button>
                 <button type="button" @click="submitBulkLabels()"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
@@ -111,6 +117,55 @@
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
+            </div>
+        </div>
+
+        <!-- Bulk Change Status Modal -->
+        <div x-show="bulkStatusModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4" style="display: none;">
+            <div @click.away="bulkStatusModalOpen = false" class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10">
+                            <i data-lucide="edit-3" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Bulk Change Status & Location</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Update <strong x-text="selectedAssets.length"></strong> selected assets</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="bulkStatusModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('assets.bulk-edit') }}" method="POST" class="mt-4 space-y-4 text-left">
+                    @csrf
+                    <template x-for="asset in selectedAssets" :key="asset.id">
+                        <input type="hidden" name="ids[]" :value="asset.id">
+                    </template>
+
+                    <div>
+                        <x-form.searchable-select name="status_id" label="New Status (Optional)" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" placeholder="-- Keep Current Status --" />
+                    </div>
+
+                    <div>
+                        <x-form.searchable-select name="department_id" label="New Department (Optional)" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" placeholder="-- Keep Current Department --" />
+                    </div>
+
+                    <div>
+                        <x-form.searchable-select name="location_id" label="New Location (Optional)" :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()" placeholder="-- Keep Current Location --" />
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <button type="button" @click="bulkStatusModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition">
+                            Apply Update
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
