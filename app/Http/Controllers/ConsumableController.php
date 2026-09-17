@@ -254,4 +254,16 @@ class ConsumableController extends Controller
 
         return redirect()->route('consumables.index')->with('success', 'Bulk checkout completed successfully.');
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:consumables,id',
+        ]);
+
+        Consumable::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('consumables.index')->with('success', 'Selected consumables deleted successfully.');
+    }
 }

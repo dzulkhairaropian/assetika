@@ -35,6 +35,14 @@
             <x-ui.alert variant="error" message="{{ session('error') }}" />
         @endif
 
+        <!-- Bulk Delete Form -->
+        <form id="bulkDeleteForm" action="{{ route('consumables.bulk-delete') }}" method="POST" class="hidden">
+            @csrf
+            <template x-for="c in selectedConsumables" :key="c.id">
+                <input type="hidden" name="ids[]" :value="c.id">
+            </template>
+        </form>
+
         <!-- Bulk Action Bar -->
         <div x-show="selectedConsumables.length > 0"
             x-transition
@@ -46,11 +54,16 @@
                     <span x-text="selectedConsumables.length"></span> items selected.
                 </span>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
                 <button type="button" @click="const ids = selectedConsumables.map(c => c.id).join(','); window.location.href = `{{ route('consumables.bulk-checkout') }}?ids=${ids}`;"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     Checkout Selected
+                </button>
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    Delete Selected
                 </button>
             </div>
         </div>

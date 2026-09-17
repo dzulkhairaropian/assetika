@@ -138,4 +138,16 @@ class StockCountController extends Controller
 
         return back()->with('success', 'Stock count marked as completed.');
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:stock_counts,id',
+        ]);
+
+        StockCount::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('stock-counts.index')->with('success', 'Selected stock count sessions deleted successfully.');
+    }
 }

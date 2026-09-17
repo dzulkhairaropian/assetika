@@ -71,4 +71,16 @@ class KbController extends Controller
 
         return response()->json($suggestions);
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:kb_articles,id',
+        ]);
+
+        KbArticle::whereIn('id', $request->ids)->delete();
+
+        return redirect()->route('kb.index')->with('success', 'Selected articles deleted successfully.');
+    }
 }
