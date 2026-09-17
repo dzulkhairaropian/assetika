@@ -188,11 +188,13 @@
                                 </span>
                                 @if($asset->warranty_expiry_date)
                                     @if($asset->warranty_expiry_date->isPast())
-                                        <span class="block text-[10px] font-semibold text-red-600 dark:text-red-400">
+                                        <span class="flex items-center justify-end gap-1 text-[10px] font-semibold text-red-600 dark:text-red-400">
+                                            <i data-lucide="shield-alert" class="w-3 h-3"></i>
                                             Warranty Expired
                                         </span>
                                     @elseif(($daysLeft = (int) ceil(now()->diffInDays($asset->warranty_expiry_date, false))) <= 30)
-                                        <span class="block text-[10px] font-semibold text-orange-600 dark:text-orange-400">
+                                        <span class="flex items-center justify-end gap-1 text-[10px] font-semibold text-orange-600 dark:text-orange-400">
+                                            <i data-lucide="shield-off" class="w-3 h-3"></i>
                                             Warranty Expiring in {{ max(0, $daysLeft) }} days
                                         </span>
                                     @endif
