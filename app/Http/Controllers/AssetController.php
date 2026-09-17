@@ -545,7 +545,10 @@ class AssetController extends Controller
             'ids.*' => 'exists:assets,id',
         ]);
 
-        Asset::whereIn('id', $request->ids)->delete();
+        $assets = Asset::whereIn('id', $request->ids)->get();
+        foreach ($assets as $asset) {
+            $asset->delete();
+        }
 
         return redirect()->route('assets.index')->with('success', 'Selected assets deleted successfully.');
     }
@@ -567,9 +570,12 @@ class AssetController extends Controller
             return back()->with('error', 'No changes selected.');
         }
 
-        Asset::whereIn('id', $request->ids)->update($data);
+        $assets = Asset::whereIn('id', $request->ids)->get();
+        foreach ($assets as $asset) {
+            $asset->update($data);
+        }
 
-        return redirect()->route('assets.index')->with('success', count($request->ids).' assets updated successfully.');
+        return redirect()->route('assets.index')->with('success', count($assets).' assets updated successfully.');
     }
 
     public function bulkCheckoutForm(Request $request)

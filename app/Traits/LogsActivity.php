@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\ActivityLog;
+use App\Models\Status;
 
 trait LogsActivity
 {
@@ -33,10 +34,16 @@ trait LogsActivity
     protected static function recordActivity($model, string $event, ?array $oldValues, ?array $newValues): void
     {
         $classBasename = class_basename($model);
-        $desc = "{$classBasename} #{$model->id} was {$event}.";
+        $tag = $model->asset_tag ?? $model->component_tag ?? $model->name ?? "#{$model->id}";
+        $desc = "{$classBasename} {$tag} was {$event}.";
 
         if ($event === 'updated' && isset($newValues['status_id'])) {
-            $desc = "{$classBasename} #{$model->id} status changed.";
+            $oldStatus = isset($oldValues['status_id']) ? Status::find($oldValues['status_id'])?->name : null;
+            $newStatus = Status::find($newValues['status_id'])?->name ?? 'New Status';
+            $desc = "{$classBasename} {$tag} status changed to {$newStatus}".($oldStatus ? " (was {$oldStatus})" : '').'.';
+        } elseif ($event === 'updated' && ! empty($newValues)) {
+            $changedKeys = array_keys($newValues);
+            $desc = "{$classBasename} {$tag} updated fields: ".implode(', ', $changedKeys).'.';
         }
 
         ActivityLog::create([
