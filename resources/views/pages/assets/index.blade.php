@@ -291,6 +291,7 @@
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Depreciation / Value</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Holder</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Age</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Warranty</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
@@ -352,17 +353,6 @@
                                             {{ $asset->product?->brand?->name ?? '-' }} {{ $asset->product?->model ?? '' }}
                                         </span>
                                         <span class="font-mono text-[11px] tracking-tight text-gray-400">S/N: {{ $asset->serial_number ?? '-' }}</span>
-                                        @if($asset->warranty_expiry_date)
-                                            @if($asset->warranty_expiry_date->isPast())
-                                                <span class="mt-0.5 inline-flex w-fit items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
-                                                    Warranty Expired
-                                                </span>
-                                            @elseif(($daysLeft = (int) ceil(now()->diffInDays($asset->warranty_expiry_date, false))) <= 30)
-                                                <span class="mt-0.5 inline-flex w-fit items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
-                                                    Warranty Expiring in {{ max(0, $daysLeft) }}d
-                                                </span>
-                                            @endif
-                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-4 py-2.5">
@@ -440,6 +430,25 @@
                                         <span class="text-gray-400 italic">-</span>
                                     @endif
                                 </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    @if($asset->warranty_expiry_date)
+                                        @if($asset->warranty_expiry_date->isPast())
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
+                                                Warranty Expired
+                                            </span>
+                                        @elseif(($daysLeft = (int) ceil(now()->diffInDays($asset->warranty_expiry_date, false))) <= 30)
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+                                                Warranty Expiring in {{ max(0, $daysLeft) }}d
+                                            </span>
+                                        @else
+                                            <span class="text-[11px] text-gray-600 dark:text-gray-300 font-mono">
+                                                {{ $asset->warranty_expiry_date->format('d/m/Y') }}
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="text-gray-400 italic text-[11px]">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-2.5 text-end">
                                     <div x-data="{
                                         open: false,
@@ -505,7 +514,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center">
+                                <td colspan="9" class="px-4 py-8 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-1.5">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                             <i data-lucide="monitor" class="w-5 h-5"></i>
