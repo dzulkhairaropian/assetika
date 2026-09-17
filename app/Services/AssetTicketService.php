@@ -196,7 +196,10 @@ class AssetTicketService
     private static function buildAndSaveTicket(array $data): Ticket
     {
         $ticketDate = now();
-        $prefix = 'TCK-'.date('Ym').'-';
+        $ticketType = ! empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
+        $requestCode = strtoupper($ticketType?->code ?: 'REQ');
+        $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
+
         $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
             ->orderBy('id', 'desc')
             ->first();
