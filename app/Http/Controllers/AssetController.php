@@ -289,7 +289,9 @@ class AssetController extends Controller
             ->sortDesc()
             ->values();
 
-        return view('pages.assets.index', compact('assets', 'statuses', 'departments', 'locations', 'products', 'categories', 'depreciations', 'inventorySummary', 'availableYears'));
+        $companies = Company::orderBy('name')->get();
+
+        return view('pages.assets.index', compact('assets', 'statuses', 'departments', 'companies', 'locations', 'products', 'categories', 'depreciations', 'inventorySummary', 'availableYears'));
     }
 
     public function create()

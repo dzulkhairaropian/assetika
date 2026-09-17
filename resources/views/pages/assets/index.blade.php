@@ -160,6 +160,7 @@
 
                         @php
                             $activeCount = 0;
+                            if (request('company_id')) $activeCount++;
                             if (request('status_id')) $activeCount++;
                             if (request('category_id')) $activeCount++;
                             if (request('product_id')) $activeCount++;
@@ -193,6 +194,10 @@
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
+                                    <div class="col-span-2">
+                                        <x-form.searchable-select name="company_id" label="Company" :options="isset($companies) ? $companies->map(fn($cmp) => ['id' => $cmp->id, 'text' => $cmp->name])->toArray() : []" :selected="request('company_id')" placeholder="All Companies" />
+                                    </div>
+
                                     <div>
                                         <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" />
                                     </div>
