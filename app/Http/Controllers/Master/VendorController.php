@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class VendorController extends Controller
@@ -28,9 +29,15 @@ class VendorController extends Controller
             });
         }
 
-        $vendors = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Vendor::count(),
+            'today' => Vendor::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.master.vendors.index', compact('vendors'));
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $vendors = $query->latest()->paginate($perPage)->withQueryString();
+
+        return view('pages.master.vendors.index', compact('vendors', 'summary'));
     }
 
     public function create()

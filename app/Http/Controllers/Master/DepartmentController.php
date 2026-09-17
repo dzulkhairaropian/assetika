@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class DepartmentController extends Controller
 {
@@ -25,10 +26,16 @@ class DepartmentController extends Controller
             $query->where('company_id', $request->company_id);
         }
 
-        $departments = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Department::count(),
+            'today' => Department::whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $departments = $query->latest()->paginate($perPage)->withQueryString();
         $companies = Company::all();
 
-        return view('pages.master.departments.index', compact('departments', 'companies'));
+        return view('pages.master.departments.index', compact('departments', 'companies', 'summary'));
     }
 
     public function create()

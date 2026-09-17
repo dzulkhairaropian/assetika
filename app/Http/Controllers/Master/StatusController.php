@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterCategory;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class StatusController extends Controller
 {
@@ -22,10 +23,16 @@ class StatusController extends Controller
             $query->where('master_category_id', $request->master_category_id);
         }
 
-        $statuses = $query->orderBy('master_category_id')->orderBy('name')->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Status::count(),
+            'today' => Status::whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $statuses = $query->orderBy('master_category_id')->orderBy('name')->paginate($perPage)->withQueryString();
         $masterCategories = MasterCategory::withCount('statuses')->orderBy('name')->get();
 
-        return view('pages.master.statuses.index', compact('statuses', 'masterCategories'));
+        return view('pages.master.statuses.index', compact('statuses', 'masterCategories', 'summary'));
     }
 
     public function create()

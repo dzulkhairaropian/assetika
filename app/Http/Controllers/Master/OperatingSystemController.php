@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\OperatingSystem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class OperatingSystemController extends Controller
 {
@@ -17,9 +18,15 @@ class OperatingSystemController extends Controller
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        $operatingSystems = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => OperatingSystem::count(),
+            'today' => OperatingSystem::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.master.operating-systems.index', compact('operatingSystems'));
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $operatingSystems = $query->latest()->paginate($perPage)->withQueryString();
+
+        return view('pages.master.operating-systems.index', compact('operatingSystems', 'summary'));
     }
 
     public function create()

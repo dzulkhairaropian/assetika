@@ -249,8 +249,22 @@
             </div>
 
             {{-- Pagination Footer --}}
-            <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
-                {{ $locations->links() }}
+            <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Per page:</span>
+                    <select onchange="const url = new URL(window.location.href); url.searchParams.set('per_page', this.value); url.searchParams.set('page', 1); window.location.href = url.toString();"
+                        class="h-8 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                        <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
+                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
+                    </select>
+                </div>
+                <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
+                    {{ $locations->links() }}
+                </div>
             </div>
         </div>
     </div>

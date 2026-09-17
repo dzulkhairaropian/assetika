@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class LocationController extends Controller
 {
@@ -21,10 +22,16 @@ class LocationController extends Controller
             $query->where('company_id', $request->company_id);
         }
 
-        $locations = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Location::count(),
+            'today' => Location::whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $locations = $query->latest()->paginate($perPage)->withQueryString();
         $companies = Company::all();
 
-        return view('pages.master.locations.index', compact('locations', 'companies'));
+        return view('pages.master.locations.index', compact('locations', 'companies', 'summary'));
     }
 
     public function create()

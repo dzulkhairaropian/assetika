@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class GroupController extends Controller
@@ -23,9 +24,15 @@ class GroupController extends Controller
             });
         }
 
-        $groups = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Group::count(),
+            'today' => Group::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.master.groups.index', compact('groups'));
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $groups = $query->latest()->paginate($perPage)->withQueryString();
+
+        return view('pages.master.groups.index', compact('groups', 'summary'));
     }
 
     public function create()

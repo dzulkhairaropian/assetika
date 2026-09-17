@@ -44,7 +44,8 @@ abstract class LookupController extends Controller
         $activeCount = $model::where('is_active', true)->count();
         $inactiveCount = $model::where('is_active', false)->count();
 
-        $items = $this->query($request)->paginate(50)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $items = $this->query($request)->paginate($perPage)->withQueryString();
 
         return view('admin.lookups.index', [
             'title' => $this->title(),

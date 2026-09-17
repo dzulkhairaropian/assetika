@@ -20,7 +20,8 @@ class TicketCategoryController extends Controller
                 ->orWhere('code', 'like', "%{$search}%");
         }
 
-        $categories = $query->latest()->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $categories = $query->latest()->paginate($perPage)->withQueryString();
 
         return view('pages.admin.ticket-categories.index', compact('categories', 'search'));
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\MasterCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class CategoryController extends Controller
 {
@@ -25,10 +26,16 @@ class CategoryController extends Controller
             $query->where('master_category_id', $request->master_category_id);
         }
 
-        $categories = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Category::count(),
+            'today' => Category::whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $categories = $query->latest()->paginate($perPage)->withQueryString();
         $masterCategories = MasterCategory::all();
 
-        return view('pages.master.categories.index', compact('categories', 'masterCategories'));
+        return view('pages.master.categories.index', compact('categories', 'masterCategories', 'summary'));
     }
 
     public function create()

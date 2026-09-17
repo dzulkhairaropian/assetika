@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class BrandController extends Controller
 {
@@ -17,9 +18,15 @@ class BrandController extends Controller
                 ->orWhere('code', 'like', '%'.$request->search.'%');
         }
 
-        $brands = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Brand::count(),
+            'today' => Brand::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.master.brands.index', compact('brands'));
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $brands = $query->latest()->paginate($perPage)->withQueryString();
+
+        return view('pages.master.brands.index', compact('brands', 'summary'));
     }
 
     public function create()
