@@ -26,44 +26,54 @@
                         </h3>
                         <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Name <span class="text-error-500">*</span></label>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Name <span class="text-error-500">*</span></label>
                                 <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Microsoft 365 Business Premium" required
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                                 @error('name') <p class="mt-1 text-xs text-error-500 font-medium">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Product Key / Serial</label>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Product Key / Serial</label>
                                 <input type="text" name="product_key" value="{{ old('product_key') }}" placeholder="XXXXX-XXXXX-XXXXX"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-mono text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-mono text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Seats <span class="text-error-500">*</span></label>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Seats <span class="text-error-500">*</span></label>
                                 <input type="number" name="seats" value="{{ old('seats', 1) }}" min="1" required
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                                 @error('seats') <p class="mt-1 text-xs text-error-500 font-medium">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">License Email</label>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">License Email</label>
                                 <input type="email" name="license_email" value="{{ old('license_email') }}" placeholder="licenses@company.com"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             </div>
                             <div>
                                 <x-form.searchable-select name="manufacturer" label="Manufacturer / Brand" :options="$brandOpts" :selected="$selectedBrand" placeholder="Select Brand" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Purchase Date</label>
-                                <input type="date" name="purchase_date" value="{{ old('purchase_date') }}"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                <label for="purchase_date" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Purchase Date</label>
+                                <x-form.date-picker
+                                    id="purchase_date"
+                                    name="purchase_date"
+                                    placeholder="Select purchase date"
+                                    defaultDate="{{ old('purchase_date') }}"
+                                />
+                                @error('purchase_date') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Expiration Date</label>
-                                <input type="date" name="expiration_date" value="{{ old('expiration_date') }}"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                <label for="expiration_date" class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Expiration Date</label>
+                                <x-form.date-picker
+                                    id="expiration_date"
+                                    name="expiration_date"
+                                    placeholder="Select expiration date"
+                                    defaultDate="{{ old('expiration_date') }}"
+                                />
+                                @error('expiration_date') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Purchase Cost (Rp)</label>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Purchase Cost (Rp)</label>
                                 <input type="number" name="purchase_cost" value="{{ old('purchase_cost') }}" step="0.01" placeholder="0.00"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 ease-out focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:placeholder:text-gray-500" />
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             </div>
                             <div>
                                 <x-form.searchable-select name="asset_id" label="Link to Asset / Hardware" :options="$assetOpts" :selected="$selectedAssetId" placeholder="Select Hardware" />

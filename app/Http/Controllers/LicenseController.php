@@ -8,6 +8,7 @@ use App\Models\License;
 use App\Models\User;
 use App\Services\LicenseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class LicenseController extends Controller
 {
@@ -22,6 +23,29 @@ class LicenseController extends Controller
     {
         $query = License::query();
 
+        $tab = $request->input('tab');
+        $now = Carbon::now();
+
+        if ($tab === 'expiring') {
+            $query->whereNotNull('expiration_date')
+                ->whereBetween('expiration_date', [$now->format('Y-m-d'), $now->copy()->addDays(30)->format('Y-m-d')]);
+        } elseif ($tab === 'expired') {
+            $query->whereNotNull('expiration_date')
+                ->where('expiration_date', '<', $now->format('Y-m-d'));
+        } elseif ($tab === 'today') {
+            $query->whereDate('created_at', Carbon::today());
+        }
+
+        if ($request->filled('created_from')) {
+            $query->whereDate('created_at', '>=', $request->created_from);
+        }
+        if ($request->filled('created_to')) {
+            $query->whereDate('created_at', '<=', $request->created_to);
+        }
+        if ($request->filled('manufacturer')) {
+            $query->where('manufacturer', $request->manufacturer);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -31,10 +55,22 @@ class LicenseController extends Controller
             });
         }
 
+        $summary = [
+            'total' => License::count(),
+            'today' => License::whereDate('created_at', Carbon::today())->count(),
+            'expiring' => License::whereNotNull('expiration_date')
+                ->whereBetween('expiration_date', [$now->format('Y-m-d'), $now->copy()->addDays(30)->format('Y-m-d')])
+                ->count(),
+            'expired' => License::whereNotNull('expiration_date')
+                ->where('expiration_date', '<', $now->format('Y-m-d'))
+                ->count(),
+        ];
+
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
         $licenses = $query->latest()->paginate($perPage)->withQueryString();
+        $manufacturers = License::whereNotNull('manufacturer')->select('manufacturer')->distinct()->pluck('manufacturer');
 
-        return view('pages.licenses.index', compact('licenses'));
+        return view('pages.licenses.index', compact('licenses', 'summary', 'manufacturers'));
     }
 
     public function create()
