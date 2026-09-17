@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Depreciation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class DepreciationController extends Controller
 {
@@ -16,9 +17,15 @@ class DepreciationController extends Controller
             $query->where('name', 'like', "%{$request->search}%");
         }
 
-        $depreciations = $query->latest()->paginate(50)->withQueryString();
+        $summary = [
+            'total' => Depreciation::count(),
+            'today' => Depreciation::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.master.depreciations.index', compact('depreciations'));
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $depreciations = $query->latest()->paginate($perPage)->withQueryString();
+
+        return view('pages.master.depreciations.index', compact('depreciations', 'summary'));
     }
 
     public function create()

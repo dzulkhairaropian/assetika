@@ -7,6 +7,7 @@ use App\Models\Location;
 use App\Models\StockCount;
 use App\Models\StockCountItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class StockCountController extends Controller
 {
@@ -18,9 +19,15 @@ class StockCountController extends Controller
             $query->where('name', 'like', "%{$request->search}%");
         }
 
-        $stockCounts = $query->paginate(50)->withQueryString();
+        $summary = [
+            'total' => StockCount::count(),
+            'today' => StockCount::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.stock-counts.index', compact('stockCounts'));
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $stockCounts = $query->paginate($perPage)->withQueryString();
+
+        return view('pages.stock-counts.index', compact('stockCounts', 'summary'));
     }
 
     public function create()

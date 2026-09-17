@@ -24,7 +24,7 @@
         <x-common.page-breadcrumb pageTitle="Pre-defined Kits" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Bundle assets and components into deployable equipment kits.
+            Bundle hardware assets, software licenses, and components into deployable equipment kits.
         </p>
 
         @if(session('success'))
@@ -63,10 +63,36 @@
         </div>
 
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            {{-- Card Header: Toolbar --}}
-            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
+            {{-- Card Header: Quick Filter Tabs + Search & Filters Toolbar --}}
+            <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
+                @php
+                    $currentTab = request('tab');
+                    $tabFilters = array_filter(request()->except(['page', 'tab']));
+                    $tabs = [
+                        ['key' => null,     'label' => 'All Kits',    'count' => $summary['total'] ?? 0, 'icon' => 'layers',   'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'today',  'label' => 'Added Today', 'count' => $summary['today'] ?? 0, 'icon' => 'calendar', 'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                    ];
+                @endphp
+                <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+                    @foreach($tabs as $tab)
+                        @php
+                            $isActive = $currentTab === $tab['key'];
+                            $tabUrl = route('kits.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+                        @endphp
+                        <a href="{{ $tabUrl }}"
+                           class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                            <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                            {{ $tab['label'] }}
+                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('kits.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                        @if(request('tab'))
+                            <input type="hidden" name="tab" value="{{ request('tab') }}">
+                        @endif
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
@@ -75,7 +101,7 @@
                                 class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
                         </div>
                         @if(request()->filled('search'))
-                            <a href="{{ route('kits.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear</a>
+                            <a href="{{ route('kits.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">Clear</a>
                         @endif
                     </form>
 
@@ -91,9 +117,9 @@
             {{-- Table --}}
             <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full text-xs">
-                    <thead class="border-b border-gray-100 dark:border-gray-800">
-                        <tr>
-                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">
+                    <thead>
+                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -108,15 +134,16 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Kit Name</th>
-                            <th class="px-5 py-3 sm:px-6 text-start font-medium text-gray-500 dark:text-gray-400">Description</th>
-                            <th class="px-5 py-3 sm:px-6 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Kit Name</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Bundled Items</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Description</th>
+                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($kits as $kit)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
                                             <input type="checkbox" value="{{ $kit->id }}" class="row-checkbox sr-only"
@@ -132,13 +159,20 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <a href="{{ route('kits.show', $kit) }}" class="block font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                                <td class="px-4 py-2.5">
+                                    <a href="{{ route('kits.show', $kit) }}" class="font-bold text-brand-600 hover:text-brand-700 dark:text-brand-400">
                                         {{ $kit->name }}
                                     </a>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6 text-gray-600 dark:text-gray-400">
-                                    {{ Str::limit($kit->description, 80) }}
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex items-center gap-1.5">
+                                        <x-ui.badge color="brand" variant="light" size="sm" featherIcon="hard-drive">{{ $kit->assets_count ?? $kit->assets()->count() }} Assets</x-ui.badge>
+                                        <x-ui.badge color="primary" variant="light" size="sm" featherIcon="cpu">{{ $kit->components_count ?? $kit->components()->count() }} Parts</x-ui.badge>
+                                        <x-ui.badge color="success" variant="light" size="sm" featherIcon="key">{{ $kit->licenses_count ?? $kit->licenses()->count() }} Licenses</x-ui.badge>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
+                                    {{ Str::limit($kit->description, 80) ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2.5 text-end">
                                     <div x-data="{
@@ -151,7 +185,7 @@
                                                 const menuHeight = 160;
                                                 const spaceBelow = window.innerHeight - rect.bottom;
                                                 const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
-                                                const left = Math.max(10, rect.right - 160);
+                                                const left = Math.max(10, rect.right - 144);
                                                 this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999; display: block;`;
                                             }
                                         }
@@ -197,7 +231,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-4 py-8 text-center">
+                                <td colspan="5" class="px-4 py-8 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-1.5">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
                                             <i data-lucide="box" class="w-5 h-5"></i>
@@ -213,8 +247,22 @@
             </div>
 
             {{-- Pagination Footer --}}
-            <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4">
-                {{ $kits->links() }}
+            <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Per page:</span>
+                    <select onchange="const url = new URL(window.location.href); url.searchParams.set('per_page', this.value); url.searchParams.set('page', 1); window.location.href = url.toString();"
+                        class="h-8 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                        <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
+                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
+                    </select>
+                </div>
+                <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
+                    {{ $kits->links() }}
+                </div>
             </div>
         </div>
     </div>
