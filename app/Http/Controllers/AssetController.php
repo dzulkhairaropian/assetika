@@ -634,15 +634,48 @@ class AssetController extends Controller
     public function myAssets(Request $request)
     {
         $userId = auth()->id();
-        $assets = Asset::with(['product.category', 'product.brand', 'status', 'location'])
-            ->where('assigned_to_user_id', $userId)
-            ->orWhereHas('currentCheckout', function ($q) use ($userId) {
-                $q->where('checked_out_to_user_id', $userId)
-                    ->whereNull('checked_in_at');
-            })
-            ->latest()
-            ->get();
+        $query = Asset::with([
+            'product.category',
+            'product.brand',
+            'status',
+            'location',
+            'department',
+            'currentCheckout',
+        ])
+            ->where(function ($q) use ($userId) {
+                $q->where('assigned_to_user_id', $userId)
+                    ->orWhereHas('currentCheckout', function ($cq) use ($userId) {
+                        $cq->where('checked_out_to_user_id', $userId)
+                            ->whereNull('checked_in_at');
+                    });
+            });
 
-        return view('pages.assets.my-assets', compact('assets'));
+        if ($search = $request->string('search')->trim()->toString()) {
+            $query->where(function ($q) use ($search) {
+                $q->where('asset_tag', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%")
+                    ->orWhere('device_name', 'like', "%{$search}%")
+                    ->orWhereHas('product', function ($pq) use ($search) {
+                        $pq->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('brand', function ($bq) use ($search) {
+                                $bq->where('name', 'like', "%{$search}%");
+                            });
+                    });
+            });
+        }
+
+        $allMyAssets = (clone $query)->get();
+
+        $summary = [
+            'total' => $allMyAssets->count(),
+            'laptops' => $allMyAssets->filter(fn ($a) => in_array(strtolower(optional(optional($a->product)->category)->name), ['notebook', 'laptop', 'desktop', 'pc', 'workstation']))->count(),
+            'other' => $allMyAssets->filter(fn ($a) => ! in_array(strtolower(optional(optional($a->product)->category)->name), ['notebook', 'laptop', 'desktop', 'pc', 'workstation']))->count(),
+            'bast_count' => $allMyAssets->filter(fn ($a) => $a->currentCheckout !== null)->count(),
+        ];
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $assets = $query->latest()->paginate($perPage)->withQueryString();
+
+        return view('pages.assets.my-assets', compact('assets', 'summary'));
     }
 }
