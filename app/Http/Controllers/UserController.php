@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -25,8 +26,14 @@ class UserController extends Controller
 
         $roles = Role::all();
         $departments = Department::all();
+        $summary = [
+            'total' => User::count(),
+            'active' => User::where('is_active', true)->count(),
+            'inactive' => User::where('is_active', false)->count(),
+            'today' => User::whereDate('created_at', Carbon::today())->count(),
+        ];
 
-        return view('pages.users.index', compact('users', 'roles', 'departments'));
+        return view('pages.users.index', compact('users', 'roles', 'departments', 'summary'));
     }
 
     public function show(User $user)
