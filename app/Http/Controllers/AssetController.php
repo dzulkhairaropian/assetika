@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AssetsExport;
 use App\Models\Asset;
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Depreciation;
 use App\Models\Location;
