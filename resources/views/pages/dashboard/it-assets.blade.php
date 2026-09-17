@@ -203,15 +203,14 @@
         <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Component Units Allocation</h3>
-                    <p class="text-xs text-gray-400">Stock & installation status pie ratio</p>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Components Allocation</h3>
+                    <p class="text-xs text-gray-400">Stock & installation status ratio</p>
                 </div>
-                <a href="{{ route('components.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
             @if(($totalComponentUnits ?? 0) > 0)
                 <div id="componentPieChart" class="h-64 flex items-center justify-center"></div>
             @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No component units available</div>
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No component unit data available</div>
             @endif
         </div>
 
