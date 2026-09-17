@@ -75,6 +75,17 @@
 
     <!-- Secondary Alert & Operational KPI Row -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <x-common.small-box
+            title="Hardware Components"
+            icon="cpu"
+            :value="$totalComponentUnits"
+            :trend="0"
+            trendColor="emerald"
+            description="{{ $installedComponents }} installed • {{ $readyComponents }} in stock"
+            color="brand"
+            :url="route('components.index')"
+        />
+
         @php
             $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
             $lowStockTrendColor = $lowStockTrend <= 0 ? 'emerald' : 'red';
@@ -385,6 +396,45 @@
                     </tr>
                 @empty
                     <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No assets older than 4 years</td></tr>
+                @endforelse
+            </x-common.dashboard-table>
+        </div>
+
+        <!-- Recent Component Installations Table -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900 md:col-span-2 xl:col-span-1">
+            <x-common.dashboard-table
+                title="Installed Component Units"
+                description="Hardware parts (RAM, SSD, GPU) attached to assets"
+                :headers="['Component', 'Installed Asset', 'Category']"
+                :footerLink="route('components.index', ['tab' => 'installed'])"
+                footerText="View All Components"
+            >
+                @forelse($recentComponentInstallations as $comp)
+                    <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
+                        <td class="px-4 py-2.5">
+                            <span class="block font-semibold font-mono text-gray-900 dark:text-white">{{ $comp->component_tag ?? '-' }}</span>
+                            <a href="{{ route('components.show', $comp) }}" class="font-medium text-brand-600 hover:underline dark:text-brand-400">
+                                {{ $comp->name }}
+                            </a>
+                        </td>
+                        <td class="px-4 py-2.5">
+                            @if($comp->assignedAsset)
+                                <a href="{{ route('assets.show', $comp->assignedAsset) }}" class="font-bold font-mono text-xs text-brand-600 hover:underline dark:text-brand-400">
+                                    {{ $comp->assignedAsset->asset_tag }}
+                                </a>
+                                <span class="block text-[10px] text-gray-400">{{ $comp->assignedAsset->product?->name ?? $comp->assignedAsset->device_name }}</span>
+                            @else
+                                <span class="text-gray-400 italic text-[11px]">Unassigned</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-2.5 whitespace-nowrap">
+                            <x-ui.badge color="brand" variant="light" size="sm" featherIcon="cpu">
+                                {{ $comp->category?->name ?? 'Part' }}
+                            </x-ui.badge>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3" class="px-4 py-6 text-center text-xs text-gray-400">No components installed yet</td></tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>

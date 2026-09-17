@@ -527,7 +527,17 @@ class DashboardController extends Controller
         $brokenStatusId = $statusMap['Broken'] ?? null;
         $readyForSaleStatusId = $statusMap['Ready for Sale'] ?? ($statusMap['For Sale'] ?? null);
 
-        // Alert Metrics
+        // Alert & Component Metrics
+        $totalComponents = Component::sum('qty');
+        $totalComponentUnits = Component::count();
+        $readyComponents = Component::whereNull('assigned_asset_id')->count();
+        $installedComponents = Component::whereNotNull('assigned_asset_id')->count();
+        $recentComponentInstallations = Component::with(['assignedAsset', 'category', 'product'])
+            ->whereNotNull('assigned_asset_id')
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+
         $lowStockComponents = Component::whereRaw('qty <= min_qty')->get();
         $expiringLicenses = License::whereNotNull('expiration_date')
             ->where('expiration_date', '<=', now()->addDays(30))
@@ -538,6 +548,11 @@ class DashboardController extends Controller
             'totalAssetsTrend',
             'totalConsumables',
             'consumablesBreakdown',
+            'totalComponents',
+            'totalComponentUnits',
+            'readyComponents',
+            'installedComponents',
+            'recentComponentInstallations',
             'readyToDeploy',
             'readyToDeployTrend',
             'deployed',
