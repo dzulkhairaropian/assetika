@@ -443,9 +443,9 @@
                                                 Warranty Expiring in {{ max(0, $daysLeft) }}d
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 text-[11px] text-gray-600 dark:text-gray-300 font-mono">
-                                                <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i>
-                                                {{ $asset->warranty_expiry_date->format('d/m/Y') }}
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                                <i data-lucide="shield-check" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i>
+                                                Active ({{ $asset->warranty_expiry_date->format('d/m/Y') }})
                                             </span>
                                         @endif
                                     @else
