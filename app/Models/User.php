@@ -79,11 +79,28 @@ class User extends Authenticatable
         }
 
         if (! empty($filters['role'])) {
-            $query->role($filters['role']);
+            $roles = is_array($filters['role']) ? $filters['role'] : explode(',', $filters['role']);
+            $query->whereHas('roles', fn ($r) => $r->whereIn('name', array_filter($roles)));
         }
 
         if (! empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
+            $ids = is_array($filters['department_id']) ? $filters['department_id'] : explode(',', $filters['department_id']);
+            $query->whereIn('department_id', array_filter($ids));
+        }
+
+        if (! empty($filters['company_id'])) {
+            $ids = is_array($filters['company_id']) ? $filters['company_id'] : explode(',', $filters['company_id']);
+            $query->whereIn('company_id', array_filter($ids));
+        }
+
+        if (! empty($filters['position_id'])) {
+            $ids = is_array($filters['position_id']) ? $filters['position_id'] : explode(',', $filters['position_id']);
+            $query->whereIn('position_id', array_filter($ids));
+        }
+
+        if (! empty($filters['location_id'])) {
+            $ids = is_array($filters['location_id']) ? $filters['location_id'] : explode(',', $filters['location_id']);
+            $query->whereIn('location_id', array_filter($ids));
         }
 
         if (array_key_exists('is_active', $filters) && $filters['is_active'] !== null && $filters['is_active'] !== '') {

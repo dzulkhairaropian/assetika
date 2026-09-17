@@ -137,46 +137,27 @@
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Product</label>
-                                        <select name="product_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Products</option>
-                                            @foreach($products as $prod)
-                                                <option value="{{ $prod->id }}" {{ request('product_id') == $prod->id ? 'selected' : '' }}>{{ $prod->brand->name ?? '' }} - {{ $prod->model }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="product_id" label="Product" :options="$products->map(fn($prod) => ['id' => $prod->id, 'text' => ($prod->brand->name ?? '') . ' - ' . $prod->name])->toArray()" :selected="request('product_id')" placeholder="All Products" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Category</label>
-                                        <select name="category_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Categories</option>
-                                            @foreach($categories as $cat)
-                                                <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($cat) => ['id' => $cat->id, 'text' => $cat->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Brand</label>
-                                        <select name="brand_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Brands</option>
-                                            @foreach($brands as $br)
-                                                <option value="{{ $br->id }}" {{ request('brand_id') == $br->id ? 'selected' : '' }}>{{ $br->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="brand_id" label="Brand" :options="$brands->map(fn($br) => ['id' => $br->id, 'text' => $br->name])->toArray()" :selected="request('brand_id')" placeholder="All Brands" :multiple="true" />
                                     </div>
 
                                     <div>
                                         <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Status</label>
                                         <select name="status"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                             <option value="">All Statuses</option>
                                             <option value="in_stock" {{ (request('status') === 'in_stock' || request('tab') === 'in_stock') ? 'selected' : '' }}>In Stock</option>
                                             <option value="low_stock" {{ (request('status') === 'low_stock' || request('tab') === 'low_stock') ? 'selected' : '' }}>Low Stock</option>
                                             <option value="out_of_stock" {{ (request('status') === 'out_of_stock' || request('tab') === 'out_of_stock') ? 'selected' : '' }}>Out of Stock</option>
+                                        </select>
+                                    </div>
                                         </select>
                                     </div>
                                 </div>

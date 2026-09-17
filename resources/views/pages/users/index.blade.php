@@ -128,31 +128,17 @@
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Role</label>
-                                        <select name="role"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Roles</option>
-                                            @foreach($roles as $role)
-                                                <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>{{ $role->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="role" label="Role" :options="$roles->map(fn($r) => ['id' => $r->name, 'text' => $r->name])->toArray()" :selected="request('role')" placeholder="All Roles" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Department</label>
-                                        <select name="department_id"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                            <option value="">All Departments</option>
-                                            @foreach($departments as $dept)
-                                                <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>{{ $dept->name }}{{ $dept->company ? ' - ' . $dept->company->name : '' }}</option>
-                                            @endforeach
-                                        </select>
+                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($dept) => ['id' => $dept->id, 'text' => $dept->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" :multiple="true" />
                                     </div>
 
                                     <div class="col-span-2">
                                         <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Status</label>
                                         <select name="is_active"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                             <option value="">All Statuses</option>
                                             <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Active</option>
                                             <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Inactive</option>

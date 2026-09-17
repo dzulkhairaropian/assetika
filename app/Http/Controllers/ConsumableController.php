@@ -33,18 +33,21 @@ class ConsumableController extends Controller
         }
 
         if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
+            $ids = is_array($request->product_id) ? $request->product_id : explode(',', $request->product_id);
+            $query->whereIn('product_id', array_filter($ids));
         }
 
         if ($request->filled('category_id')) {
-            $query->whereHas('product', function ($q) use ($request) {
-                $q->where('category_id', $request->category_id);
+            $ids = is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id);
+            $query->whereHas('product', function ($q) use ($ids) {
+                $q->whereIn('category_id', array_filter($ids));
             });
         }
 
         if ($request->filled('brand_id')) {
-            $query->whereHas('product', function ($q) use ($request) {
-                $q->where('brand_id', $request->brand_id);
+            $ids = is_array($request->brand_id) ? $request->brand_id : explode(',', $request->brand_id);
+            $query->whereHas('product', function ($q) use ($ids) {
+                $q->whereIn('brand_id', array_filter($ids));
             });
         }
 
