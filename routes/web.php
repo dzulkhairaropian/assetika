@@ -51,6 +51,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RenewalController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SlaPolicyController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\TicketController;
@@ -238,6 +239,10 @@ Route::middleware('auth')->group(function () {
     Route::get('backups/download/{fileName}', [BackupController::class, 'download'])->name('backups.download');
     Route::delete('backups/{fileName}', [BackupController::class, 'destroy'])->name('backups.destroy');
     Route::post('backups/settings', [BackupController::class, 'updateSettings'])->name('backups.settings');
+
+    // System Settings Routes
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
 
     // Admin Bulk Delete Routes (must be before resource routes)
     Route::post('admin/priorities/bulk-delete', [PriorityController::class, 'bulkDestroy'])->name('admin.priorities.bulk-delete');

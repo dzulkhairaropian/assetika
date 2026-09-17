@@ -224,6 +224,7 @@ class MenuHelper
                 ['name' => 'Import Data', 'icon' => 'upload', 'path' => '/import'],
                 ['name' => 'Backups', 'icon' => 'backup', 'path' => '/backups'],
                 ['name' => 'Renewals Expiry', 'icon' => 'support', 'path' => '/renewals'],
+                ['name' => 'System Settings', 'icon' => 'support', 'path' => '/settings'],
             ];
 
             $groups[] = [

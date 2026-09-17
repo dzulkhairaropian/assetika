@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Dashboard' }} | Assetika</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon_assetika.png') }}">
+    <title>{{ $title ?? 'Dashboard' }} | {{ \App\Helpers\AppSetting::get('app_name', 'Assetika') }}</title>
+    <link rel="icon" type="image/png" href="{{ \App\Helpers\AppSetting::get('favicon', asset('images/favicon_assetika.png')) }}">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

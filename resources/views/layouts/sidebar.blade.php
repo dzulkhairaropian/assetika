@@ -65,11 +65,11 @@
         'justify-between'">
         <a href="/">
             <span class="logo" :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:hidden' : ''">
-                <img class="dark:hidden" src="/images/assetika.png" alt="Logo" width="150" height="40" />
-                <img class="hidden dark:block" src="/images/assetika.png" alt="Logo" width="150" height="40" />
+                <img class="dark:hidden max-h-10 w-auto object-contain" src="{{ \App\Helpers\AppSetting::get('logo_light', '/images/assetika.png') }}" alt="{{ \App\Helpers\AppSetting::get('app_name', 'Assetika') }}" width="150" height="40" />
+                <img class="hidden dark:block max-h-10 w-auto object-contain" src="{{ \App\Helpers\AppSetting::get('logo_dark', '/images/assetika.png') }}" alt="{{ \App\Helpers\AppSetting::get('app_name', 'Assetika') }}" width="150" height="40" />
             </span>
 
-            <img class="logo-icon" :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:block' : 'hidden'" src="/images/favicon_assetika.png" alt="Logo" width="32" height="32" />
+            <img class="logo-icon max-h-8 w-8 object-contain" :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:block' : 'hidden'" src="{{ \App\Helpers\AppSetting::get('favicon', '/images/favicon_assetika.png') }}" alt="{{ \App\Helpers\AppSetting::get('app_name', 'Assetika') }}" width="32" height="32" />
         </a>
     </div>
 
