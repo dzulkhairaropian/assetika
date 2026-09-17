@@ -107,7 +107,8 @@ class AssetTransactionController extends Controller
             })->count(),
         ];
 
-        $transactions = $query->latest('checked_out_at')->paginate(25)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $transactions = $query->latest('checked_out_at')->paginate($perPage)->withQueryString();
         $departments = Department::orderBy('name')->get();
 
         return view('pages.assets.transactions', compact('transactions', 'summary', 'departments'));

@@ -86,7 +86,8 @@ class ComponentController extends Controller
             $query->whereDate('components.created_at', '<=', $request->created_to);
         }
 
-        $components = $query->latest()->paginate(50)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $components = $query->latest()->paginate($perPage)->withQueryString();
 
         $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
 

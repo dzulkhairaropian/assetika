@@ -127,7 +127,8 @@ class TicketController extends Controller
                 break;
         }
 
-        $tickets = $query->latest()->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $tickets = $query->latest()->paginate($perPage)->withQueryString();
         $statuses = TicketStatus::all();
         $priorities = Priority::all();
 

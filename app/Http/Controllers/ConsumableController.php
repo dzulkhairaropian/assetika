@@ -64,7 +64,8 @@ class ConsumableController extends Controller
             $query->where('quantity', '<=', 0);
         }
 
-        $consumables = $query->latest()->paginate(50)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $consumables = $query->latest()->paginate($perPage)->withQueryString();
 
         $products = Product::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Consumable');

@@ -16,10 +16,11 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
         $users = User::with(['roles', 'department', 'company', 'position', 'location'])
             ->filter($request->all())
             ->latest()
-            ->paginate(50)
+            ->paginate($perPage)
             ->withQueryString();
 
         $roles = Role::all();

@@ -31,7 +31,8 @@ class LicenseController extends Controller
             });
         }
 
-        $licenses = $query->latest()->paginate(50)->withQueryString();
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
+        $licenses = $query->latest()->paginate($perPage)->withQueryString();
 
         return view('pages.licenses.index', compact('licenses'));
     }
