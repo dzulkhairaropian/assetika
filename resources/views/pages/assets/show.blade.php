@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     @php
@@ -182,9 +182,22 @@
                         </div>
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-gray-500">Warranty Expiry</span>
-                            <span class="font-medium {{ $asset->warranty_expiry_date?->isPast() ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
-                                {{ $asset->warranty_expiry_date?->format('d M Y') ?? '-' }}
-                            </span>
+                            <div class="text-end">
+                                <span class="font-medium {{ $asset->warranty_expiry_date?->isPast() ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
+                                    {{ $asset->warranty_expiry_date?->format('d M Y') ?? '-' }}
+                                </span>
+                                @if($asset->warranty_expiry_date)
+                                    @if($asset->warranty_expiry_date->isPast())
+                                        <span class="block text-[10px] font-semibold text-red-600 dark:text-red-400">
+                                            Warranty Expired
+                                        </span>
+                                    @elseif(($daysLeft = (int) ceil(now()->diffInDays($asset->warranty_expiry_date, false))) <= 30)
+                                        <span class="block text-[10px] font-semibold text-orange-600 dark:text-orange-400">
+                                            Warranty Expiring in {{ max(0, $daysLeft) }} days
+                                        </span>
+                                    @endif
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
