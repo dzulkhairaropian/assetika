@@ -63,19 +63,23 @@ class ComponentController extends Controller
         }
 
         if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
+            $ids = is_array($request->product_id) ? $request->product_id : explode(',', $request->product_id);
+            $query->whereIn('product_id', array_filter($ids));
         }
 
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $ids = is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id);
+            $query->whereIn('category_id', array_filter($ids));
         }
 
         if ($request->filled('status_id')) {
-            $query->where('status_id', $request->status_id);
+            $ids = is_array($request->status_id) ? $request->status_id : explode(',', $request->status_id);
+            $query->whereIn('status_id', array_filter($ids));
         }
 
         if ($request->filled('location_id')) {
-            $query->where('location_id', $request->location_id);
+            $ids = is_array($request->location_id) ? $request->location_id : explode(',', $request->location_id);
+            $query->whereIn('location_id', array_filter($ids));
         }
 
         if ($request->filled('created_from')) {

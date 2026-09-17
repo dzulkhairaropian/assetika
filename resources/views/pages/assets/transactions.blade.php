@@ -118,7 +118,7 @@
                                     </div>
 
                                     <div class="col-span-2">
-                                        <x-form.searchable-select name="department_id" label="Department" :options="isset($departments) ? $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray() : []" :selected="request('department_id')" placeholder="All Departments" />
+                                        <x-form.searchable-select name="department_id" label="Department" :options="isset($departments) ? $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray() : []" :selected="request('department_id')" placeholder="All Departments" :multiple="true" />
                                     </div>
                                 </div>
 

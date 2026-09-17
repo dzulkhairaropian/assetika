@@ -133,7 +133,7 @@
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div class="col-span-2">
-                                        <x-form.searchable-select name="manufacturer" label="Manufacturer / Vendor" :options="isset($manufacturers) ? $manufacturers->map(fn($m) => ['id' => $m, 'text' => $m])->toArray() : []" :selected="request('manufacturer')" placeholder="All Manufacturers" />
+                                        <x-form.searchable-select name="manufacturer" label="Manufacturer / Vendor" :options="isset($manufacturers) ? $manufacturers->map(fn($m) => ['id' => $m, 'text' => $m])->toArray() : []" :selected="request('manufacturer')" placeholder="All Manufacturers" :multiple="true" />
                                     </div>
 
                                     <div class="col-span-2 sm:col-span-1">

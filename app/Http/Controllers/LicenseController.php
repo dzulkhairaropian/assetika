@@ -43,7 +43,8 @@ class LicenseController extends Controller
             $query->whereDate('created_at', '<=', $request->created_to);
         }
         if ($request->filled('manufacturer')) {
-            $query->where('manufacturer', $request->manufacturer);
+            $mfs = is_array($request->manufacturer) ? $request->manufacturer : explode(',', $request->manufacturer);
+            $query->whereIn('manufacturer', array_filter($mfs));
         }
 
         if ($request->filled('search')) {

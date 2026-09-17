@@ -148,19 +148,19 @@
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div>
-                                        <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" />
+                                        <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" />
+                                        <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="product_id" label="Product Model" :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="request('product_id')" placeholder="All Models" />
+                                        <x-form.searchable-select name="product_id" label="Product Model" :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="request('product_id')" placeholder="All Models" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="location_id" label="Location" :options="isset($locations) ? $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray() : []" :selected="request('location_id')" placeholder="All Locations" />
+                                        <x-form.searchable-select name="location_id" label="Location" :options="isset($locations) ? $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray() : []" :selected="request('location_id')" placeholder="All Locations" :multiple="true" />
                                     </div>
 
                                     <div class="col-span-2 sm:col-span-1">

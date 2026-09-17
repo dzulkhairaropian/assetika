@@ -76,7 +76,8 @@ class AssetTransactionController extends Controller
         }
 
         if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
+            $ids = is_array($request->department_id) ? $request->department_id : explode(',', $request->department_id);
+            $query->whereIn('department_id', array_filter($ids));
         }
 
         if ($request->filled('search')) {

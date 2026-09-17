@@ -195,31 +195,31 @@
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
                                     <div class="col-span-2">
-                                        <x-form.searchable-select name="company_id" label="Company" :options="isset($companies) ? $companies->map(fn($cmp) => ['id' => $cmp->id, 'text' => $cmp->name])->toArray() : []" :selected="request('company_id')" placeholder="All Companies" />
+                                        <x-form.searchable-select name="company_id" label="Company" :options="isset($companies) ? $companies->map(fn($cmp) => ['id' => $cmp->id, 'text' => $cmp->name])->toArray() : []" :selected="request('company_id')" placeholder="All Companies" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" />
+                                        <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" />
+                                        <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="product_id" label="Product Model" :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="request('product_id')" placeholder="All Models" />
+                                        <x-form.searchable-select name="product_id" label="Product Model" :options="$products->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray()" :selected="request('product_id')" placeholder="All Models" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" />
+                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="location_id" label="Location" :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()" :selected="request('location_id')" placeholder="All Locations" />
+                                        <x-form.searchable-select name="location_id" label="Location" :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()" :selected="request('location_id')" placeholder="All Locations" :multiple="true" />
                                     </div>
 
                                     <div>
-                                        <x-form.searchable-select name="year" label="Release / Purchase Year" :options="isset($availableYears) ? $availableYears->map(fn($yr) => ['id' => $yr, 'text' => (string)$yr])->toArray() : []" :selected="request('year')" placeholder="All Years" />
+                                        <x-form.searchable-select name="year" label="Release / Purchase Year" :options="isset($availableYears) ? $availableYears->map(fn($yr) => ['id' => $yr, 'text' => (string)$yr])->toArray() : []" :selected="request('year')" placeholder="All Years" :multiple="true" />
                                     </div>
 
                                     <div class="col-span-2">
@@ -229,7 +229,7 @@
                                             ['id' => '2-3', 'text' => '2 - 3 Years'],
                                             ['id' => '3-4', 'text' => '3 - 4 Years'],
                                             ['id' => '4+',  'text' => 'Aged (≥ 4 Years)']
-                                        ]" :selected="request('aging')" placeholder="All Ages" />
+                                        ]" :selected="request('aging')" placeholder="All Ages" :multiple="true" />
                                     </div>
 
                                     <div class="col-span-2 sm:col-span-1">
