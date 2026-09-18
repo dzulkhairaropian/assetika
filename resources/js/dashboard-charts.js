@@ -378,49 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 9. Component Status Pie Chart
+    // 9. Component Status Doughnut Chart with Center Number
     const componentCanvas = mountCanvas('#componentPieChart');
     if (componentCanvas && componentChartData && componentChartData.data?.length) {
-        new Chart(componentCanvas, {
-            type: 'pie',
-            data: {
-                labels: componentChartData.labels,
-                datasets: [{
-                    data: componentChartData.data,
-                    backgroundColor: componentChartData.colors || ['#12b76a', '#465fff', '#f79009', '#ef4444'],
-                    borderWidth: 2,
-                    borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 14,
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            font: { family: 'Outfit, sans-serif', size: 11, weight: '500' },
-                            color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#e2e8f0',
-                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
-                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: (ctx) => ' ' + ctx.label + ': ' + ctx.raw + ' units'
-                        }
-                    }
-                }
-            }
-        });
+        const compTotal = totalComponentUnits !== undefined ? totalComponentUnits : componentChartData.data.reduce((a, b) => Number(a) + Number(b), 0);
+        const compColors = componentChartData.colors || ['#12b76a', '#465fff', '#f79009', '#ef4444'];
+        new Chart(componentCanvas, createDoughnutConfig(componentChartData.labels, componentChartData.data, compColors, 'Total Units', compTotal));
     }
 });
 
