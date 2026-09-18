@@ -78,7 +78,9 @@ class AssetManagementController extends Controller
             return redirect()->back()->with('error', 'Asset is not checked out.');
         }
 
-        return view('pages.assets.management.checkin', compact('asset'));
+        $statuses = Status::all();
+
+        return view('pages.assets.management.checkin', compact('asset', 'statuses'));
     }
 
     public function processCheckin(Request $request, $asset)
