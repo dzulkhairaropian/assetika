@@ -74,15 +74,15 @@
                     ['key' => 'closed',      'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],      'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
                 ];
             @endphp
-            <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+            <div class="inline-flex max-w-full overflow-x-auto rounded-xl bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
                 @foreach($tabs as $tab)
                     @php
                         $isActive = $currentTab === $tab['key'];
                         $tabUrl = route('tickets.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
                     @endphp
                     <a href="{{ $tabUrl }}"
-                       class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
-                        <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                       class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 {{ $isActive ? 'bg-white text-gray-900 shadow-xs dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50' }}">
+                        <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5 opacity-80"></i>
                         {{ $tab['label'] }}
                         <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
                     </a>
