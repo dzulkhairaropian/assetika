@@ -303,9 +303,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Asset Count',
                     data: assetAgeDistribution.data,
-                    backgroundColor: ['#12b76a', '#3b82f6', '#06b6d4', '#f79009', '#f04438'],
-                    borderRadius: 6,
-                    borderSkipped: false
+                    backgroundColor: '#465fff',
+                    borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                    borderSkipped: false,
+                    barThickness: 24,
+                    maxBarThickness: 32
                 }]
             },
             options: {
@@ -324,11 +326,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8' }
+                    },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                        grid: { color: 'rgba(226, 232, 240, 0.4)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8', precision: 0 }
                     }
                 }
             }
@@ -347,8 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     label: 'Units Registered',
                     data: vendorChartData.data,
                     backgroundColor: '#465fff',
-                    borderRadius: 6,
-                    borderSkipped: false
+                    borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                    borderSkipped: false,
+                    barThickness: 24,
+                    maxBarThickness: 32
                 }]
             },
             options: {
@@ -367,11 +375,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8' }
+                    },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                        grid: { color: 'rgba(226, 232, 240, 0.4)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8', precision: 0 }
                     }
                 }
             }
