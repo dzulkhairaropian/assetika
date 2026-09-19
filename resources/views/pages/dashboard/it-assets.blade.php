@@ -253,11 +253,18 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         
         <!-- Timeline Chart: Consumable Usage -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Consumable Usage Timeline</h3>
-                    <p class="text-xs text-gray-400">Distribution trend by month</p>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Consumable Usage Timeline</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Visitor analytics of last 30 days</span>
+                </div>
+
+                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
+                    <button @click="timeframe = '12months'" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
+                    <button @click="timeframe = '30days'" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
+                    <button @click="timeframe = '7days'" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
+                    <button @click="timeframe = '24hours'" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
                 </div>
             </div>
             @if(count($consumableTimelineChartData['data']) > 0)
@@ -268,11 +275,18 @@
         </div>
 
         <!-- Timeline Chart: Asset Purchases -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Asset Acquisition Timeline</h3>
-                    <p class="text-xs text-gray-400">Historical acquisition volume</p>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Acquisition Timeline</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Visitor analytics of last 30 days</span>
+                </div>
+
+                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
+                    <button @click="timeframe = '12months'" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
+                    <button @click="timeframe = '30days'" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
+                    <button @click="timeframe = '7days'" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
+                    <button @click="timeframe = '24hours'" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
                 </div>
             </div>
             @if(count($purchaseChartData['data']) > 0)
