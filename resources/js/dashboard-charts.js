@@ -81,16 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     value: centerValue !== undefined ? centerValue : data.reduce((a, b) => Number(a) + Number(b), 0)
                 },
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 16,
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        boxWidth: 8,
-                        boxHeight: 8,
-                        font: { family: 'Outfit, sans-serif', size: 12, weight: '500' },
-                        color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569'
-                    }
+                    display: false
                 },
                 tooltip: {
                     backgroundColor: '#0f172a',
