@@ -34,8 +34,13 @@ class BastService
             $admin = $checkout->checkedInByUser ?? auth()->user() ?? new User(['name' => 'IT Admin']);
 
             $knowingUser = $checkout->supervisor;
-            $knowingName = $knowingUser?->name ?? 'Afrizal Rajab';
-            $knowingPosition = $knowingUser?->position?->name ?? 'IT Manager';
+            if (! $knowingUser || $knowingUser->id === $admin->id || $knowingUser->id === $user->id) {
+                $knowingName = 'Afrizal Rajab';
+                $knowingPosition = 'IT Manager';
+            } else {
+                $knowingName = $knowingUser->name;
+                $knowingPosition = $knowingUser->position?->name ?? 'Department Head';
+            }
 
             $pdf = Pdf::loadView('pdf.bast_checkin', [
                 'asset' => $asset,
@@ -74,8 +79,14 @@ class BastService
         $giver = $checkout->checkedOutByUser ?? auth()->user() ?? new User(['name' => 'IT Admin']);
         $receiver = $checkout->checkedOutToUser ?? $asset->assignedToUser ?? new User(['name' => 'User']);
         $knowingUser = $checkout->supervisor;
-        $knowingName = $knowingUser?->name ?? 'Afrizal Rajab';
-        $knowingPosition = $knowingUser?->position?->name ?? 'IT Manager';
+
+        if (! $knowingUser || $knowingUser->id === $giver->id || $knowingUser->id === $receiver->id) {
+            $knowingName = 'Afrizal Rajab';
+            $knowingPosition = 'IT Manager';
+        } else {
+            $knowingName = $knowingUser->name;
+            $knowingPosition = $knowingUser->position?->name ?? 'Department Head';
+        }
 
         $pdf = Pdf::loadView('pdf.bast', [
             'asset' => $asset,
