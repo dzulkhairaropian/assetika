@@ -197,9 +197,11 @@
             <div style="font-size:11px; color:#4b5563;">{{ $user->position?->name ?? $user_position ?? '' }}</div>
         </div>
         <div class="signature-box">
-            Knowing,<br><br><br><br><br>
-            <div class="signature-name">({{ $knowing_name ?? 'Afrizal Rajab' }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ $knowing_position ?? 'IT Manager' }}</div>
+            @if(!empty($knowing_name))
+                Knowing,<br><br><br><br><br>
+                <div class="signature-name">({{ $knowing_name }})</div>
+                <div style="font-size:11px; color:#4b5563;">{{ $knowing_position ?? '' }}</div>
+            @endif
         </div>
         <div class="signature-box">
             The Receiver,<br><br><br><br><br>
