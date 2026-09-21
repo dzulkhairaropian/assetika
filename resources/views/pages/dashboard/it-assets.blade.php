@@ -199,19 +199,56 @@
             @endif
         </div>
 
-        <!-- Chart 3: Component Allocation Pie Chart -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
+        <!-- Chart 3: Component Allocation Doughnut Chart (TailAdmin Pro API Token Usages Style) -->
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Components Allocation</h3>
                     <p class="text-xs text-gray-400">Stock & installation status ratio</p>
                 </div>
+                <a href="{{ route('components.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
-            @if(($totalComponentUnits ?? 0) > 0)
-                <div id="componentPieChart" class="h-64 flex items-center justify-center"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No component unit data available</div>
-            @endif
+
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    @if(($totalComponentUnits ?? 0) > 0)
+                        <div id="componentPieChart" class="h-52 w-full flex items-center justify-center"></div>
+                    @else
+                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No component unit data available</div>
+                    @endif
+                </div>
+
+                <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
+                    <li class="flex items-center justify-between py-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10">
+                                <i data-lucide="circle-check" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Ready in Stock</p>
+                                <p class="text-[10px] text-gray-400">Available for installation</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-gray-900 dark:text-white">{{ number_format($readyComponents ?? 0) }} units</span>
+                        </div>
+                    </li>
+                    <li class="flex items-center justify-between py-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/10">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Installed on Asset</p>
+                                <p class="text-[10px] text-gray-400">Attached to active hardware</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-gray-900 dark:text-white">{{ number_format($installedComponents ?? 0) }} units</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     </div>

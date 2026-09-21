@@ -378,12 +378,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 9. Component Status Doughnut Chart with Center Number
+    // 9. Component Status Doughnut Chart with Center Number (TailAdmin Pro API Token Usages Style)
     const componentCanvas = mountCanvas('#componentPieChart');
     if (componentCanvas && componentChartData && componentChartData.data?.length) {
         const compTotal = totalComponentUnits !== undefined ? totalComponentUnits : componentChartData.data.reduce((a, b) => Number(a) + Number(b), 0);
         const compColors = componentChartData.colors || ['#12b76a', '#465fff', '#f79009', '#ef4444'];
-        new Chart(componentCanvas, createDoughnutConfig(componentChartData.labels, componentChartData.data, compColors, 'Total Units', compTotal));
+        
+        new Chart(componentCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: componentChartData.labels,
+                datasets: [{
+                    data: componentChartData.data,
+                    backgroundColor: compColors,
+                    borderWidth: 2,
+                    borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                    hoverOffset: 6,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: {
+                    centerText: {
+                        label: 'Total Units',
+                        value: compTotal
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => ' ' + ctx.label + ': ' + ctx.raw + ' units'
+                        }
+                    }
+                }
+            }
+        });
     }
 });
 
