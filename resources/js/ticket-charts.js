@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 1. Trend Line Chart (Crisp Linear Line)
+    // 1. Trend Line Chart (TailAdmin Pro Statistics Line Style)
     const trendCanvas = mountCanvas('#ticketTrendChart');
     if (trendChart && trendCanvas) {
         new Chart(trendCanvas, {
@@ -116,15 +116,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Tickets',
                     data: trendChart.data,
-                    fill: false,
-                    borderColor: chartColors.blue,
+                    fill: true,
+                    backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return 'rgba(70, 95, 255, 0.1)';
+                        const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                        const isDark = document.documentElement.classList.contains('dark');
+                        gradient.addColorStop(0, isDark ? 'rgba(70, 95, 255, 0.35)' : 'rgba(70, 95, 255, 0.25)');
+                        gradient.addColorStop(1, 'rgba(70, 95, 255, 0.0)');
+                        return gradient;
+                    },
+                    borderColor: '#465fff',
                     borderWidth: 2,
                     tension: 0,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: chartColors.blue,
+                    pointBackgroundColor: '#465fff',
+                    pointBorderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
                     pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: '#465fff',
+                    pointHoverBorderColor: '#ffffff'
                 }]
             },
             options: {
@@ -135,6 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     legend: { display: false },
                     tooltip: {
                         backgroundColor: '#0f172a',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
                         titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
                         bodyFont: { family: 'Outfit, sans-serif', size: 12 },
                         padding: { top: 8, bottom: 8, left: 12, right: 12 },
@@ -145,12 +159,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 } }
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
                     },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                        grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8', precision: 0 }
                     }
                 }
             }

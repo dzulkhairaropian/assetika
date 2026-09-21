@@ -107,22 +107,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const createLineConfig = (labels, data, label, lineColor = chartColors.green) => ({
+    const createLineConfig = (labels, data, label, lineColor = '#465fff') => ({
         type: 'line',
         data: {
             labels,
             datasets: [{
                 label,
                 data,
-                fill: false,
+                fill: true,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return 'rgba(70, 95, 255, 0.1)';
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    const isDark = document.documentElement.classList.contains('dark');
+                    gradient.addColorStop(0, lineColor === '#465fff' ? (isDark ? 'rgba(70, 95, 255, 0.35)' : 'rgba(70, 95, 255, 0.25)') : 'rgba(18, 183, 106, 0.25)');
+                    gradient.addColorStop(1, lineColor === '#465fff' ? (isDark ? 'rgba(70, 95, 255, 0.0)' : 'rgba(70, 95, 255, 0.0)') : 'rgba(18, 183, 106, 0.0)');
+                    return gradient;
+                },
                 borderColor: lineColor,
                 borderWidth: 2,
-                tension: 0, // Crisp linear line matching shadcn ChartLineLinear
-                pointBackgroundColor: '#ffffff',
-                pointBorderColor: lineColor,
+                tension: 0, // Straight line matching TailAdmin Pro curve: straight
+                pointBackgroundColor: lineColor,
+                pointBorderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                pointRadius: 0,
+                pointHoverRadius: 5,
                 pointHoverBackgroundColor: lineColor,
                 pointHoverBorderColor: '#ffffff'
             }]
@@ -278,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (purchaseCanvas && purchaseChartData && purchaseChartData.data?.length) {
         window.purchaseTimelineChartInstance = new Chart(
             purchaseCanvas,
-            createLineConfig(purchaseChartData.labels, purchaseChartData.data, 'Assets Purchased', chartColors.blue)
+            createLineConfig(purchaseChartData.labels, purchaseChartData.data, 'Assets Purchased', '#465fff')
         );
 
         window.updatePurchaseTimelineChartJS = (catId) => {
@@ -292,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 7. Hardware Lifecycle & Age Distribution Bar Chart
+    // 7. Hardware Lifecycle & Age Distribution Bar Chart (TailAdmin Pro ChartSix Style)
     const ageCanvas = mountCanvas('#assetAgeChart');
     const { assetAgeDistribution } = window.chartData || {};
     if (ageCanvas && assetAgeDistribution && assetAgeDistribution.data?.length) {
@@ -303,9 +313,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Asset Count',
                     data: assetAgeDistribution.data,
-                    backgroundColor: ['#12b76a', '#3b82f6', '#06b6d4', '#f79009', '#f04438'],
-                    borderRadius: 6,
-                    borderSkipped: false
+                    backgroundColor: '#465fff',
+                    borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                    borderSkipped: false,
+                    barThickness: 28,
+                    maxBarThickness: 36
                 }]
             },
             options: {
@@ -324,18 +336,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
+                    },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                        grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8', precision: 0 }
                     }
                 }
             }
         });
     }
 
-    // 8. Top Hardware Vendors Bar Chart
+    // 8. Top Hardware Vendors Bar Chart (TailAdmin Pro ChartSix Style)
     const vendorCanvas = mountCanvas('#vendorAssetChart');
     const { vendorChartData } = window.chartData || {};
     if (vendorCanvas && vendorChartData && vendorChartData.data?.length) {
@@ -346,9 +362,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Units Registered',
                     data: vendorChartData.data,
-                    backgroundColor: '#465fff',
-                    borderRadius: 6,
-                    borderSkipped: false
+                    backgroundColor: '#7592ff',
+                    borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                    borderSkipped: false,
+                    barThickness: 28,
+                    maxBarThickness: 36
                 }]
             },
             options: {
@@ -367,62 +385,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
+                    },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                        grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8', precision: 0 }
                     }
                 }
             }
         });
     }
 
-    // 9. Component Status Doughnut Chart with Center Number (TailAdmin Pro API Token Usages Style)
+    // 9. Component Status Doughnut Chart with Center Number
     const componentCanvas = mountCanvas('#componentPieChart');
     if (componentCanvas && componentChartData && componentChartData.data?.length) {
         const compTotal = totalComponentUnits !== undefined ? totalComponentUnits : componentChartData.data.reduce((a, b) => Number(a) + Number(b), 0);
         const compColors = componentChartData.colors || ['#12b76a', '#465fff', '#f79009', '#ef4444'];
-        
-        new Chart(componentCanvas, {
-            type: 'doughnut',
-            data: {
-                labels: componentChartData.labels,
-                datasets: [{
-                    data: componentChartData.data,
-                    backgroundColor: compColors,
-                    borderWidth: 2,
-                    borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
-                    hoverOffset: 6,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '72%',
-                plugins: {
-                    centerText: {
-                        label: 'Total Units',
-                        value: compTotal
-                    },
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#e2e8f0',
-                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
-                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: (ctx) => ' ' + ctx.label + ': ' + ctx.raw + ' units'
-                        }
-                    }
-                }
-            }
-        });
+        new Chart(componentCanvas, createDoughnutConfig(componentChartData.labels, componentChartData.data, compColors, 'Total Units', compTotal));
     }
 });
 
