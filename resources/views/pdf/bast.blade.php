@@ -192,11 +192,9 @@
             <div style="font-size:11px; color:#4b5563;">{{ $giver->position?->name ?? $giver_position ?? '' }}</div>
         </div>
         <div class="signature-box">
-            @if(!empty($knowing_name))
-                Knowing,<br><br><br><br><br>
-                <div class="signature-name">({{ $knowing_name }})</div>
-                <div style="font-size:11px; color:#4b5563;">{{ $knowing_position ?? '' }}</div>
-            @endif
+            Knowing,<br><br><br><br><br>
+            <div class="signature-name">({{ !empty($knowing_name) ? $knowing_name : '....................................' }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ !empty($knowing_position) ? $knowing_position : 'Manager / Supervisor' }}</div>
         </div>
         <div class="signature-box">
             The Receiver,<br><br><br><br><br>
