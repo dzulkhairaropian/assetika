@@ -192,32 +192,19 @@
 
     <div class="signature-area clearfix">
         <div class="signature-box">
-            The Returner,<br><br><br>
-            @php
-                $userPosition = '';
-                if ($user->position) {
-                    $userPosition = $user->position->name;
-                }
-            @endphp
-            <div class="signature-name">({{ $user->name }} @if ($userPosition)
-                    - {{ $userPosition }}
-                @endif)</div><br><br><br><br>
+            The Returner,<br><br><br><br><br>
+            <div class="signature-name">({{ $user->name }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ $user->position?->name ?? $user_position ?? '' }}</div>
         </div>
         <div class="signature-box">
-            <br><br><br><br><br><br><br>
-            Knowing
+            Knowing,<br><br><br><br><br>
+            <div class="signature-name">({{ $knowing_name ?? 'Afrizal Rajab' }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ $knowing_position ?? 'IT Manager' }}</div>
         </div>
         <div class="signature-box">
-            The Receiver,<br><br><br>
-            @php
-                $adminPosition = '';
-                if ($admin->position) {
-                    $adminPosition = $admin->position->name;
-                }
-            @endphp
-            <div class="signature-name">({{ $admin->name }} @if ($adminPosition)
-                    - {{ $adminPosition }}
-                @endif)</div><br><br><br><br>
+            The Receiver,<br><br><br><br><br>
+            <div class="signature-name">({{ $admin->name }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ $admin->position?->name ?? $admin_position ?? '' }}</div>
         </div>
     </div>
 

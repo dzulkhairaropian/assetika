@@ -187,28 +187,19 @@
 
     <div class="signature-area clearfix">
         <div class="signature-box">
-            The Submitted,<br><br><br>
-            <div class="signature-name">({{ $giver->name }})</div><br><br><br><br>
-            <!-- Placeholder for additional signature if needed -->
-            <div style="margin-top:12px; font-weight:bold;">(Afrizal Rajab)</div>
+            The Submitted,<br><br><br><br><br>
+            <div class="signature-name">({{ $giver->name }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ $giver->position?->name ?? $giver_position ?? '' }}</div>
         </div>
         <div class="signature-box">
-            <br><br><br><br><br><br><br>
-            Knowing
+            Knowing,<br><br><br><br><br>
+            <div class="signature-name">({{ $knowing_name ?? 'Afrizal Rajab' }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ $knowing_position ?? 'IT Manager' }}</div>
         </div>
         <div class="signature-box">
-            The Receiver,<br><br><br>
-            <div class="signature-name">({{ $receiver->name }})</div><br><br><br>
-            <!-- Placeholder for additional signature if needed -->
-            @php
-                $supervisorPosition = '';
-                if (isset($receiver_supervisor) && $receiver_supervisor && $receiver_supervisor->position) {
-                    $supervisorPosition = $receiver_supervisor->position->name;
-                }
-            @endphp
-            <div style="margin-top:30px; font-weight:bold;">({{ isset($receiver_supervisor) && $receiver_supervisor ? $receiver_supervisor->name : '' }} @if ($supervisorPosition)
-                    - {{ $supervisorPosition }}
-                @endif)</div>
+            The Receiver,<br><br><br><br><br>
+            <div class="signature-name">({{ $receiver->name }})</div>
+            <div style="font-size:11px; color:#4b5563;">{{ $receiver->position?->name ?? $receiver_position ?? '' }}</div>
         </div>
     </div>
 
