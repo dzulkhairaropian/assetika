@@ -34,8 +34,8 @@ class BastService
             $admin = $checkout->checkedInByUser ?? auth()->user() ?? new User(['name' => 'IT Admin']);
 
             $knowingUser = $checkout->supervisor;
-            $knowingName = $knowingUser?->name ?? 'Afrizal Rajab';
-            $knowingPosition = $knowingUser?->position?->name ?? 'IT Manager';
+            $supervisorName = $knowingUser?->name;
+            $supervisorPosition = $knowingUser?->position?->name ?? 'Supervisor';
 
             $pdf = Pdf::loadView('pdf.bast_checkin', [
                 'asset' => $asset,
@@ -51,9 +51,10 @@ class BastService
                 'user_position' => $user->position?->name ?? 'Staff',
                 'admin' => $admin,
                 'admin_position' => $admin->position?->name ?? 'IT Staff',
-                'knowing_name' => $knowingName,
-                'knowing_position' => $knowingPosition,
-                'receiver_supervisor' => $knowingUser ?? $admin,
+                'it_manager_name' => 'Afrizal Rajab',
+                'it_manager_position' => 'IT Manager',
+                'supervisor_name' => $supervisorName,
+                'supervisor_position' => $supervisorPosition,
             ]);
 
             $fileName = 'BAST-IT-RETURN-'.str_replace(' ', '-', $user->name ?? 'User').'-'.$dateForBast->format('Ymd').'.pdf';
@@ -74,8 +75,8 @@ class BastService
         $giver = $checkout->checkedOutByUser ?? auth()->user() ?? new User(['name' => 'IT Admin']);
         $receiver = $checkout->checkedOutToUser ?? $asset->assignedToUser ?? new User(['name' => 'User']);
         $knowingUser = $checkout->supervisor;
-        $knowingName = $knowingUser?->name ?? 'Afrizal Rajab';
-        $knowingPosition = $knowingUser?->position?->name ?? 'IT Manager';
+        $supervisorName = $knowingUser?->name;
+        $supervisorPosition = $knowingUser?->position?->name ?? 'Supervisor';
 
         $pdf = Pdf::loadView('pdf.bast', [
             'asset' => $asset,
@@ -91,9 +92,10 @@ class BastService
             'giver_position' => $giver->position?->name ?? 'IT Staff',
             'receiver' => $receiver,
             'receiver_position' => $receiver->position?->name ?? 'Staff',
-            'knowing_name' => $knowingName,
-            'knowing_position' => $knowingPosition,
-            'receiver_supervisor' => $knowingUser ?? $giver,
+            'it_manager_name' => 'Afrizal Rajab',
+            'it_manager_position' => 'IT Manager',
+            'supervisor_name' => $supervisorName,
+            'supervisor_position' => $supervisorPosition,
         ]);
 
         $fileName = 'BAST-IT-'.str_replace(' ', '-', $receiver->name ?? 'User').'-'.$dateForBast->format('Ymd').'.pdf';

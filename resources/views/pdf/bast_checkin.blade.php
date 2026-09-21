@@ -205,10 +205,22 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="text-align: center; vertical-align: top; border: none; padding-top: 35px;">
-                    Knowing,<br><br><br><br><br>
-                    <div style="font-weight: bold; text-decoration: underline;">({{ $knowing_name ?? 'Afrizal Rajab' }})</div>
-                    <div style="font-size: 11px; color: #4b5563;">{{ $knowing_position ?? 'IT Manager' }}</div>
+                <td colspan="2" style="text-align: center; border: none; padding-top: 20px; padding-bottom: 5px;">
+                    <strong style="text-transform: uppercase; font-size: 12px;">Knowing</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    <br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $it_manager_name ?? 'Afrizal Rajab' }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $it_manager_position ?? 'IT Manager' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    @if(!empty($supervisor_name))
+                        <br><br><br><br>
+                        <div style="font-weight: bold; text-decoration: underline;">({{ $supervisor_name }})</div>
+                        <div style="font-size: 11px; color: #4b5563;">{{ $supervisor_position ?? 'Supervisor' }}</div>
+                    @endif
                 </td>
             </tr>
         </table>
