@@ -185,22 +185,28 @@
 
     <p>Thus, the Handover Minutes are made and used as they should.</p>
 
-    <div class="signature-area clearfix">
-        <div class="signature-box">
-            The Submitted,<br><br><br><br><br>
-            <div class="signature-name">({{ $giver->name }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ $giver->position?->name ?? $giver_position ?? '' }}</div>
-        </div>
-        <div class="signature-box">
-            Knowing,<br><br><br><br><br>
-            <div class="signature-name">({{ !empty($knowing_name) ? $knowing_name : '....................................' }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ !empty($knowing_position) ? $knowing_position : 'Manager / Supervisor' }}</div>
-        </div>
-        <div class="signature-box">
-            The Receiver,<br><br><br><br><br>
-            <div class="signature-name">({{ $receiver->name }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ $receiver->position?->name ?? $receiver_position ?? '' }}</div>
-        </div>
+    <div class="signature-area clearfix" style="margin-top: 15px;">
+        <table style="width: 100%; border: none; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Submitted,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $giver->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $giver->position?->name ?? $giver_position ?? '' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Receiver,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $receiver->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $receiver->position?->name ?? $receiver_position ?? '' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; vertical-align: top; border: none; padding-top: 35px;">
+                    Knowing,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $knowing_name ?? 'Afrizal Rajab' }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $knowing_position ?? 'IT Manager' }}</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <footer>

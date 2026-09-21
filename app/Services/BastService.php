@@ -34,8 +34,8 @@ class BastService
             $admin = $checkout->checkedInByUser ?? auth()->user() ?? new User(['name' => 'IT Admin']);
 
             $knowingUser = $checkout->supervisor;
-            $knowingName = $knowingUser?->name ?? '';
-            $knowingPosition = $knowingUser?->position?->name ?? '';
+            $knowingName = $knowingUser?->name ?? 'Afrizal Rajab';
+            $knowingPosition = $knowingUser?->position?->name ?? 'IT Manager';
 
             $pdf = Pdf::loadView('pdf.bast_checkin', [
                 'asset' => $asset,
@@ -74,8 +74,8 @@ class BastService
         $giver = $checkout->checkedOutByUser ?? auth()->user() ?? new User(['name' => 'IT Admin']);
         $receiver = $checkout->checkedOutToUser ?? $asset->assignedToUser ?? new User(['name' => 'User']);
         $knowingUser = $checkout->supervisor;
-        $knowingName = $knowingUser?->name ?? '';
-        $knowingPosition = $knowingUser?->position?->name ?? '';
+        $knowingName = $knowingUser?->name ?? 'Afrizal Rajab';
+        $knowingPosition = $knowingUser?->position?->name ?? 'IT Manager';
 
         $pdf = Pdf::loadView('pdf.bast', [
             'asset' => $asset,

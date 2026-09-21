@@ -190,22 +190,28 @@
         <p><strong>Additional Notes:</strong> {{ $checkout->checkin_notes }}</p>
     @endif
 
-    <div class="signature-area clearfix">
-        <div class="signature-box">
-            The Returner,<br><br><br><br><br>
-            <div class="signature-name">({{ $user->name }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ $user->position?->name ?? $user_position ?? '' }}</div>
-        </div>
-        <div class="signature-box">
-            Knowing,<br><br><br><br><br>
-            <div class="signature-name">({{ !empty($knowing_name) ? $knowing_name : '....................................' }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ !empty($knowing_position) ? $knowing_position : 'Manager / Supervisor' }}</div>
-        </div>
-        <div class="signature-box">
-            The Receiver,<br><br><br><br><br>
-            <div class="signature-name">({{ $admin->name }})</div>
-            <div style="font-size:11px; color:#4b5563;">{{ $admin->position?->name ?? $admin_position ?? '' }}</div>
-        </div>
+    <div class="signature-area clearfix" style="margin-top: 15px;">
+        <table style="width: 100%; border: none; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Returner,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $user->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $user->position?->name ?? $user_position ?? '' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Receiver,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $admin->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $admin->position?->name ?? $admin_position ?? '' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; vertical-align: top; border: none; padding-top: 35px;">
+                    Knowing,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $knowing_name ?? 'Afrizal Rajab' }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $knowing_position ?? 'IT Manager' }}</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <footer>
