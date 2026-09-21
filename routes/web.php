@@ -166,6 +166,8 @@ Route::middleware('auth')->group(function () {
         Route::get('checkin', [AssetManagementController::class, 'showCheckin'])->name('assets.checkin');
         Route::post('checkin', [AssetManagementController::class, 'processCheckin'])->name('assets.checkin.process');
         Route::get('bast/{checkout}', [AssetManagementController::class, 'showBAST'])->name('assets.bast');
+        Route::get('bast/{checkout}/edit', [AssetManagementController::class, 'editBAST'])->name('assets.bast.edit');
+        Route::put('bast/{checkout}', [AssetManagementController::class, 'updateBAST'])->name('assets.bast.update');
         Route::get('maintenance', [AssetManagementController::class, 'showMaintenance'])->name('assets.maintenance');
         Route::post('maintenance', [AssetManagementController::class, 'processMaintenance'])->name('assets.maintenance.process');
         Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
