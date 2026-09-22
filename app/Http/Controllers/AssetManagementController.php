@@ -92,11 +92,13 @@ class AssetManagementController extends Controller
         $request->validate([
             'checkin_notes' => 'nullable|string',
             'condition_report' => 'required|string',
+            'supervisor_user_id' => 'nullable|exists:users,id',
         ]);
 
         $this->assetService->processCheckin($asset, [
             'notes' => $request->checkin_notes,
             'condition_report' => $request->condition_report,
+            'supervisor_user_id' => $request->supervisor_user_id,
         ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked in successfully.');

@@ -51,6 +51,23 @@
                             @error('status_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Supervisor (Knowing) -->
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                Supervisor / Knowing (Optional)
+                            </label>
+                            <select name="supervisor_user_id"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                                <option value="">Select Supervisor</option>
+                                @foreach(\App\Models\User::orderBy('name')->get() as $supervisor)
+                                    <option value="{{ $supervisor->id }}" {{ old('supervisor_user_id', $asset->currentCheckout?->supervisor_user_id) == $supervisor->id ? 'selected' : '' }}>
+                                        {{ $supervisor->name }}{{ $supervisor->department ? ' - ' . $supervisor->department->name : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('supervisor_user_id') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                        </div>
+
                         <!-- Asset Condition -->
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
