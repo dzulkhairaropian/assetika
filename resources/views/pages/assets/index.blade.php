@@ -169,8 +169,8 @@
             </div>
         </div>
 
-        <div class="overflow-hidden xl:overflow-visible rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            {{-- Card Header: Tabs + Toolbar --}}
+		        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/3">
+		            {{-- Card Header: Tabs + Toolbar --}}
             <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
                 @php
                     $currentTab = request('tab');
@@ -313,16 +313,16 @@
                         </div>
                     </form>
 
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('assets.export', request()->query()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                            <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
-                            Export Excel
-                        </a>
-                        <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                            Add Asset
-                        </a>
-                    </div>
+	                    <div class="flex items-center gap-2">
+	                        <a href="{{ route('assets.export', request()->query()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+	                            <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
+	                            Export Excel
+	                        </a>
+	                        <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+	                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+	                            Add Asset
+	                        </a>
+	                    </div>
                 </div>
             </div>
 
