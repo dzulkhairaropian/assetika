@@ -112,13 +112,13 @@
                 $currentTab = request('tab');
                 $tabFilters = array_filter(request()->except(['page', 'tab']));
                 $tabs = [
-                    ['key' => null,           'label' => 'All Tickets',    'count' => $ticketSummary['total'],         'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
-                    ['key' => 'created_today','label' => 'Created Today',   'count' => $ticketSummary['created_today'], 'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
-                    ['key' => 'new',          'label' => 'New',            'count' => $ticketSummary['new'],           'icon' => 'alert-circle', 'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
-                    ['key' => 'in_progress',  'label' => 'In Progress',    'count' => $ticketSummary['in_progress'],   'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
-                    ['key' => 'pending',      'label' => 'Pending',        'count' => $ticketSummary['pending'],       'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
-                    ['key' => 'unassigned',   'label' => 'Unassigned',     'count' => $ticketSummary['unassigned'],    'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
-                    ['key' => 'closed',       'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],    'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
+                    ['key' => null,           'label' => 'All Tickets',    'count' => $ticketSummary['total'] ?? 0,         'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                    ['key' => 'created_today','label' => 'Created Today',   'count' => $ticketSummary['created_today'] ?? 0, 'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                    ['key' => 'new',          'label' => 'New',            'count' => $ticketSummary['new'] ?? 0,           'icon' => 'alert-circle', 'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
+                    ['key' => 'in_progress',  'label' => 'In Progress',    'count' => $ticketSummary['in_progress'] ?? 0,   'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
+                    ['key' => 'pending',      'label' => 'Pending',        'count' => $ticketSummary['pending'] ?? 0,       'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
+                    ['key' => 'unassigned',   'label' => 'Unassigned',     'count' => $ticketSummary['unassigned'] ?? 0,    'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
+                    ['key' => 'closed',       'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'] ?? 0,    'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
                 ];
             @endphp
             <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">

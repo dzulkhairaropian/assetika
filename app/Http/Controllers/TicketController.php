@@ -101,6 +101,7 @@ class TicketController extends Controller
             'completed' => (clone $query)->whereHas('status', fn ($q) => $q->where('is_closed', true)->orWhereIn('name', ['Completed', 'Resolved', 'Closed']))->count(),
             'assigned_to_me' => (clone $query)->where('assigned_to_id', auth()->id())->count(),
             'unclaimed' => (clone $query)->whereNull('assigned_to_id')->count(),
+            'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
             'created_today' => (clone $query)->whereDate('tickets.created_at', Carbon::today())->count(),
             'new' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'New'))->count(),
             'in_progress' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'In Progress'))->count(),
