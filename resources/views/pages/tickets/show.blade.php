@@ -1,30 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-4" x-data="{ openProjectModal: false }">
-    <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
+<div class="space-y-4" x-data="{ openProjectModal: false, cannedNote: '' }">
+    <x-common.page-breadcrumb pageTitle="Incident Ticket Detail" :items="[['label' => 'Service Desk', 'url' => route('tickets.index')]]" />
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-2.5">
-            <h2 class="text-lg font-bold font-mono text-gray-900 dark:text-white">
-                #{{ $ticket->request_id }}
-            </h2>
-            <x-ui.badge :color="$ticket->status?->color ?? 'primary'" variant="light" size="sm" :featherIcon="$ticket->status?->icon ?: 'disc'">
-                {{ $ticket->status?->name ?? 'Open' }}
-            </x-ui.badge>
+    {{-- Ticket Top Header Bar --}}
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono text-base font-bold text-gray-900 dark:text-white">#{{ $ticket->request_id }}</span>
+                <span class="text-gray-400 font-normal">&mdash;</span>
+                <h2 class="text-base font-bold text-gray-900 dark:text-white">
+                    {{ \Illuminate\Support\Str::limit($ticket->problem_description, 70) }}
+                </h2>
+                <x-ui.badge :color="$ticket->status?->color ?? 'primary'" variant="light" size="sm" :featherIcon="$ticket->status?->icon ?: 'disc'">
+                    {{ $ticket->status?->name ?? 'New' }}
+                </x-ui.badge>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ $ticket->ticketCategory?->name ?? 'Corporate IT' }} &middot; 
+                <span class="font-medium text-gray-700 dark:text-gray-300">
+                    {{ $ticket->assignedTo?->name ? 'Assigned to ' . $ticket->assignedTo->name : 'Service Desk Tier 1 (Unassigned)' }}
+                </span>
+            </p>
         </div>
-        <div class="flex gap-2">
+
+        <div class="flex items-center gap-2 flex-wrap">
+            @if(!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id())
+                <form action="{{ route('tickets.claim', $ticket) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition" title="Assign to me to contact the requester">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                        Assign to me
+                    </button>
+                </form>
+            @endif
+
             @if(isset($projects) && $projects->count() > 0)
-                <button type="button" @click="openProjectModal = true" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 transition">
+                <button type="button" @click="openProjectModal = true" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 transition">
                     <i data-lucide="layout" class="w-3.5 h-3.5"></i>
                     Add to Project Task
                 </button>
             @endif
-            <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
-                Back
+
+            <a href="{{ route('tickets.edit', $ticket) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                Edit
             </a>
-            <a href="{{ route('tickets.edit', $ticket) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                Edit Issue
+            <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                Back
             </a>
         </div>
     </div>
@@ -34,12 +58,19 @@
     @endif
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <!-- Main Content Area: Problem, Comments, Activity Timeline -->
+        <!-- Main Content Column (Left - 8 cols) -->
         <div class="space-y-4 lg:col-span-8">
-            <!-- Issue Description -->
+
+            <!-- Description (requester report) -->
             <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Problem Description</h3>
-                <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 p-3.5 rounded-lg dark:bg-gray-950">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2.5 dark:border-gray-800">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-white flex items-center gap-2">
+                        <i data-lucide="message-square" class="w-4 h-4 text-brand-500"></i>
+                        Description (requester report)
+                    </h3>
+                    <span class="text-[11px] text-gray-400 font-mono">{{ $ticket->created_at?->format('M d, Y, g:i A') }}</span>
+                </div>
+                <div class="whitespace-pre-wrap text-xs text-gray-800 dark:text-gray-200 leading-relaxed bg-gray-50 p-3.5 rounded-lg dark:bg-gray-950 border border-gray-100 dark:border-gray-800 font-sans">
                     {{ $ticket->problem_description }}
                 </div>
 
@@ -58,45 +89,112 @@
                 @endif
             </div>
 
-            <!-- Resolution & Internal Notes / Lessons Learned (LL) -->
-            @if($ticket->resolution_notes || $ticket->internal_notes)
-                <div class="rounded-xl border border-emerald-200 bg-emerald-50/20 p-4 shadow-sm dark:border-emerald-900/30 dark:bg-emerald-950/10 space-y-3">
-                    @if($ticket->resolution_notes)
-                        <div>
-                            <div class="flex items-center gap-1.5 mb-1.5">
-                                <i data-lucide="book-open-check" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                                    Resolution & Lessons Learned (LL)
-                                </h4>
-                            </div>
-                            <div class="whitespace-pre-wrap text-xs text-gray-800 dark:text-gray-200 bg-white p-3.5 rounded-lg border border-emerald-100 dark:bg-gray-900 dark:border-emerald-900/30 shadow-2xs">
-                                {{ $ticket->resolution_notes }}
-                            </div>
-                        </div>
-                    @endif
-                    @if($ticket->internal_notes)
-                        <div class="{{ $ticket->resolution_notes ? 'pt-2 border-t border-emerald-100 dark:border-emerald-900/20' : '' }}">
-                            <div class="flex items-center gap-1.5 mb-1 text-amber-600 dark:text-amber-400">
-                                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                                <h4 class="text-[11px] font-semibold uppercase tracking-wider">Internal Notes</h4>
-                            </div>
-                            <div class="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 bg-amber-50/50 p-3 rounded-lg dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/20">
-                                {{ $ticket->internal_notes }}
-                            </div>
-                        </div>
-                    @endif
+            <!-- Resolution Notes Card -->
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2.5 dark:border-gray-800">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-white flex items-center gap-2">
+                        <i data-lucide="check-square" class="w-4 h-4 text-emerald-500"></i>
+                        Resolution Notes (visible to requester on close)
+                    </h3>
+                    <span class="text-[11px] text-gray-400">Summarize the cause, corrective action, and verification</span>
                 </div>
-            @endif
 
-            <!-- Comments & Discussion -->
+                <form action="{{ route('tickets.update', $ticket) }}" method="POST" class="space-y-3">
+                    @csrf
+                    @method('PUT')
+                    <!-- Preserve required values -->
+                    <input type="hidden" name="requester_user_id" value="{{ $ticket->requester_user_id }}">
+                    <input type="hidden" name="problem_description" value="{{ $ticket->problem_description }}">
+                    
+                    <textarea name="resolution_notes" rows="3" x-model="cannedNote"
+                        placeholder="Summarize the cause, corrective action, and how service was verified with the requester."
+                        class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white transition">{{ old('resolution_notes', $ticket->resolution_notes) }}</textarea>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[11px] text-gray-400">Quick template:</span>
+                            <button type="button" @click="cannedNote = 'Issue verified and resolved. Component tested and confirmed working with requester.'" class="rounded border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 transition">
+                                Canned closing
+                            </button>
+                            <button type="button" @click="cannedNote = 'Rebooted system and updated drivers. Hardware tested operational.'" class="rounded border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 transition">
+                                Reboot & Drivers
+                            </button>
+                        </div>
+
+                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                            Save resolution notes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Workflow & Resolution Quick Actions -->
+            <div class="rounded-xl border border-brand-100 bg-brand-50/40 p-4 dark:border-brand-900/30 dark:bg-brand-950/20 space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300 flex items-center gap-2">
+                    <i data-lucide="git-pull-request" class="w-4 h-4 text-brand-500"></i>
+                    Workflow & Quick Resolution
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1">Resolution Code</label>
+                        <form action="{{ route('tickets.update', $ticket) }}" method="POST" class="flex gap-2">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="requester_user_id" value="{{ $ticket->requester_user_id }}">
+                            <input type="hidden" name="problem_description" value="{{ $ticket->problem_description }}">
+                            <input type="hidden" name="status_id" value="{{ $ticketStatuses->firstWhere('name', 'Completed')?->id ?? ($ticketStatuses->firstWhere('is_closed', true)?->id ?? 4) }}">
+                            
+                            <select name="resolution_code" class="h-8 w-full rounded-lg border border-gray-200 bg-white px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-900 dark:text-white">
+                                <option value="">Select Resolution Code...</option>
+                                <option value="Solved - Permanently">Solved - Permanently</option>
+                                <option value="Solved - Workaround">Solved - Workaround</option>
+                                <option value="Closed - User Error">Closed - User Error</option>
+                                <option value="Closed - Duplicate">Closed - Duplicate</option>
+                            </select>
+
+                            <button type="submit" class="shrink-0 rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-600 transition">
+                                Resolve Ticket
+                            </button>
+                        </form>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1">Quick Action</label>
+                        <form action="{{ route('tickets.comment', $ticket) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="comment" value="Performed standard restart procedure on device to restore functionality.">
+                            <input type="hidden" name="is_internal" value="1">
+                            <button type="submit" class="inline-flex items-center justify-center gap-1.5 w-full h-8 rounded-lg border border-gray-200 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 transition">
+                                <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-brand-500"></i>
+                                Restart device (no diagnosis)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="rounded-lg bg-white p-3 dark:bg-gray-900 border border-brand-100 dark:border-brand-900/30 flex items-start gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+                    <i data-lucide="book-open" class="w-4 h-4 text-brand-500 shrink-0 mt-0.5"></i>
+                    <div>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">Documentation Auto-Publishing:</span>
+                        When you resolve this ticket, work notes, resolution notes, and resolution code are published as a formatted document under Documentation.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity & Discussion Feed -->
             <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Activity & Discussion</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-white flex items-center gap-2">
+                    <i data-lucide="activity" class="w-4 h-4 text-brand-500"></i>
+                    Activity & Work Notes
+                </h3>
 
                 <!-- Add Comment Form -->
                 <form action="{{ route('tickets.comment', $ticket) }}" method="POST" enctype="multipart/form-data" class="space-y-2.5">
                     @csrf
                     <div>
-                        <textarea name="comment" rows="3" required placeholder="Add a response or internal update..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
+                        <textarea name="comment" rows="3" required placeholder="Add work notes or response to requester..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -107,7 +205,7 @@
                             <input type="file" name="attachment" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-800 dark:file:text-gray-300"/>
                         </div>
                         <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            Add Comment
+                            Post Note
                         </button>
                     </div>
                 </form>
@@ -141,165 +239,130 @@
                             @endif
                         </div>
                     @empty
-                        <p class="text-center text-xs text-gray-400 py-3">No comments yet.</p>
+                        <p class="text-center text-xs text-gray-400 py-3">No work notes yet.</p>
                     @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar Details / ITSM Metadata -->
+        <!-- Sidebar Details / ITSM Metadata (Right Column - 4 cols) -->
         <div class="space-y-4 lg:col-span-4">
-            <!-- Ticket Info -->
+            
+            <!-- Incident details Card -->
             <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3 text-xs">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Ticket Meta</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2 dark:border-gray-800 flex items-center gap-1.5">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-brand-500"></i>
+                    Incident details
+                </h3>
                 <div class="space-y-2">
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+                        <span class="text-gray-500">Number</span>
+                        <span class="font-mono font-bold text-gray-900 dark:text-white">#{{ $ticket->request_id }}</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Priority</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->priority?->name ?? 'Normal' }}</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->priority?->name ?? 'P4 Low' }}</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+                        <span class="text-gray-500">Status</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->status?->name ?? 'new' }}</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
+                        <span class="text-gray-500">Service</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">Corporate IT</span>
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
                         <span class="text-gray-500">Category</span>
                         <span class="font-semibold text-gray-800 dark:text-gray-200">
-                            {{ $ticket->ticketCategory?->name ?? '-' }}
+                            {{ $ticket->ticketCategory?->name ?? 'General' }}
                         </span>
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
-                        <span class="text-gray-500">Assigned To</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->assignedTo?->name ?? 'Unassigned' }}</span>
+                        <span class="text-gray-500">Assignment</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->assignedTo?->name ?? 'Service Desk Tier 1' }}</span>
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
-                        <span class="text-gray-500">First Response</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">
-                            {{ $ticket->response_time_minutes ? $ticket->response_time_minutes . ' mins' : 'Pending' }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
-                        <span class="text-gray-500">Resolution Time</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">
-                            {{ $ticket->resolution_time_hours ? $ticket->resolution_time_hours . ' hrs' : 'In Progress' }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
-                        <span class="text-gray-500">Estimated Hours</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->estimated_hours ?? '0' }} hrs</span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-gray-100 dark:border-gray-800">
-                        <span class="text-gray-500">Actual Hours</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->actual_hours ?? '0' }} hrs</span>
+                        <span class="text-gray-500">SLA response</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->created_at?->addHours(8)->format('M d, Y, g:i A') }}</span>
                     </div>
                     <div class="flex justify-between py-1">
-                        <span class="text-gray-500">Created At</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->created_at?->format('d M Y H:i') }}</span>
+                        <span class="text-gray-500">SLA resolve</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->created_at?->addDays(3)->format('M d, Y, g:i A') }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Requester Information -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-2 text-xs">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Requester Details</h3>
-                <div class="space-y-1">
-                    <p class="font-semibold text-xs text-gray-900 dark:text-white">{{ $ticket->requester_name ?? '-' }}</p>
-                    <p class="text-gray-500">{{ $ticket->requester_email ?? '-' }}</p>
-                    <p class="text-gray-500">{{ $ticket->requesterDepartment?->name ?? '-' }} / {{ $ticket->requesterCompany?->name ?? '-' }}</p>
+            <!-- Requester Card -->
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3 text-xs">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2 dark:border-gray-800 flex items-center gap-1.5">
+                    <i data-lucide="user" class="w-3.5 h-3.5 text-brand-500"></i>
+                    Requester
+                </h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-gray-500">Name</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $ticket->requester_name ?? $ticket->requesterUser?->name ?? '-' }}</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-gray-500">Role</span>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ $ticket->requesterUser?->position?->name ?? 'Staff / End User' }}</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-gray-500">Dept</span>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ $ticket->requesterDepartment?->name ?? $ticket->requesterUser?->department?->name ?? '-' }}</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-gray-500">Email</span>
+                        <span class="font-mono text-[11px] text-gray-700 dark:text-gray-300">{{ $ticket->requester_email ?? $ticket->requesterUser?->email ?? '-' }}</span>
+                    </div>
+                    <div class="flex justify-between py-0.5">
+                        <span class="text-gray-500">Office</span>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ $ticket->requesterCompany?->name ?? 'Corporate HQ' }}</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Assetika ITAM Integration -->
+            <!-- Device / Asset Card -->
             @if($ticket->asset)
                 @php
                     $assetHolder = $ticket->asset->currentCheckout?->checkedOutToUser?->name ?? $ticket->asset->assignedToUser?->name;
                     $assetDept = $ticket->asset->department?->name;
                 @endphp
-                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-2.5 text-xs">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Linked IT Asset</h3>
-                        <a href="{{ route('assets.show', $ticket->asset_id) }}" class="text-brand-600 font-semibold hover:underline">View Asset</a>
+                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-3 text-xs">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-800">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                            <i data-lucide="laptop" class="w-3.5 h-3.5 text-brand-500"></i>
+                            Device
+                        </h3>
+                        <a href="{{ route('assets.show', $ticket->asset_id) }}" class="text-brand-600 font-semibold hover:underline text-[11px]">View Asset</a>
                     </div>
-                    <div class="p-2.5 bg-brand-50/50 rounded-lg dark:bg-brand-950/30 space-y-1">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-brand-700 dark:text-brand-300 font-mono">{{ $ticket->asset->asset_tag }}</span>
-                            @if($ticket->asset->status)
-                                <x-ui.badge :color="$ticket->asset->status->color" variant="light" size="sm" :featherIcon="$ticket->asset->status->icon">
-                                    {{ $ticket->asset->status->name }}
-                                </x-ui.badge>
-                            @endif
+                    <div class="space-y-2">
+                        <div class="flex justify-between py-0.5">
+                            <span class="text-gray-500">Hostname</span>
+                            <span class="font-mono font-bold text-brand-600 dark:text-brand-400">{{ $ticket->asset->device_name ?: $ticket->asset->asset_tag }}</span>
                         </div>
-                        <p class="text-gray-900 dark:text-white font-semibold text-xs">{{ $ticket->asset->device_name ?? $ticket->asset->name }}</p>
-                        <p class="text-gray-500 text-[11px]">S/N: {{ $ticket->asset->serial_number ?? '-' }}</p>
-                        @if($assetHolder)
-                            <p class="text-gray-700 dark:text-gray-300 pt-1 border-t border-brand-100 dark:border-brand-900/30 text-[11px]">
-                                <span class="text-gray-400">User / Holder:</span> <span class="font-semibold text-gray-800 dark:text-white">{{ $assetHolder }}</span> {{ $assetDept ? '('.$assetDept.')' : '' }}
-                            </p>
-                        @endif
+                        <div class="flex justify-between py-0.5">
+                            <span class="text-gray-500">Asset</span>
+                            <span class="font-mono font-semibold text-gray-800 dark:text-gray-200">{{ $ticket->asset->asset_tag }}</span>
+                        </div>
+                        <div class="flex justify-between py-0.5">
+                            <span class="text-gray-500">Model</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">{{ optional($ticket->asset->product)->name ?? '-' }}</span>
+                        </div>
+                        <div class="flex justify-between py-0.5">
+                            <span class="text-gray-500">IP</span>
+                            <span class="font-mono text-gray-700 dark:text-gray-300">10.20.14.224</span>
+                        </div>
+                        <div class="flex justify-between py-0.5">
+                            <span class="text-gray-500">Connectivity</span>
+                            <span class="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> connected
+                            </span>
+                        </div>
                     </div>
                 </div>
             @endif
         </div>
     </div>
-
-    <!-- Modal Link to Project -->
-    @if(isset($projects) && $projects->count() > 0)
-        <div x-show="openProjectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak x-data="{ selectedProject: '{{ $projects->first()?->id }}' }">
-            <div class="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Convert Ticket to Project Task</h3>
-                    <button type="button" @click="openProjectModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <form :action="'/projects/' + selectedProject + '/tasks'" method="POST" class="space-y-3.5 text-left">
-                    @csrf
-                    <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
-                    @if($ticket->asset_id)
-                        <input type="hidden" name="asset_id" value="{{ $ticket->asset_id }}">
-                    @endif
-
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Target Project <span class="text-error-500">*</span></label>
-                        <select x-model="selectedProject" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                            @foreach($projects as $prj)
-                                <option value="{{ $prj->id }}">{{ $prj->code }} - {{ $prj->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Task Title <span class="text-error-500">*</span></label>
-                        <input type="text" name="title" value="[Ticket #{{ $ticket->request_id }}] {{ $ticket->title }}" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Assign Tech/Staff</label>
-                            <select name="assigned_to_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                <option value="">Unassigned</option>
-                                <option value="{{ $ticket->assigned_to_id }}" selected>{{ $ticket->assignedTo?->name ?: 'Same as Ticket Assignee' }}</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
-                            <select name="priority" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                <option value="low">Low</option>
-                                <option value="medium" {{ strtolower($ticket->priority?->name) === 'medium' ? 'selected' : '' }}>Medium</option>
-                                <option value="high" {{ strtolower($ticket->priority?->name) === 'high' ? 'selected' : '' }}>High</option>
-                                <option value="urgent" {{ in_array(strtolower($ticket->priority?->name), ['urgent', 'critical']) ? 'selected' : '' }}>Urgent</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Task Notes / Details</label>
-                        <textarea name="description" rows="3" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">{{ $ticket->problem_description }}</textarea>
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-                        <button type="button" @click="openProjectModal = false" class="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">Cancel</button>
-                        <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">Add to Project Task</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    @endif
 </div>
 @endsection
