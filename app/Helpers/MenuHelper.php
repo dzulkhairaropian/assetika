@@ -194,6 +194,7 @@ class MenuHelper
                     ['name' => 'Maintenance Types', 'path' => '/maintenance-types'],
                     ['name' => 'Ticket Statuses', 'path' => '/admin/ticket-statuses'],
                     ['name' => 'Ticket Types', 'path' => '/admin/ticket-types'],
+                    ['name' => 'Ticket Categories', 'path' => '/admin/ticket-categories'],
                     ['name' => 'Priorities', 'path' => '/admin/priorities'],
                     ['name' => 'SLA Statuses', 'path' => '/admin/sla-statuses'],
                     ['name' => 'SLA Policies', 'path' => '/sla-policies'],
