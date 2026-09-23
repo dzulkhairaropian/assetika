@@ -64,9 +64,17 @@
     }">
         <x-common.page-breadcrumb pageTitle="Asset Management" />
 
-        <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Manage inventory, checkouts, and asset lifecycle across your organization.
-        </p>
+        <div class="flex flex-wrap items-center gap-1.5 -mt-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mr-1">CMDB Category:</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">CMDB</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">laptops</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">desktops</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">phones</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">headsets</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">cables</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">docks</span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">warranty</span>
+        </div>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
