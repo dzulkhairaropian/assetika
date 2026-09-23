@@ -343,8 +343,9 @@ class TicketController extends Controller
         ]);
 
         $projects = Project::latest()->get();
+        $ticketStatuses = TicketStatus::all();
 
-        return view('pages.tickets.show', compact('ticket', 'projects'));
+        return view('pages.tickets.show', compact('ticket', 'projects', 'ticketStatuses'));
     }
 
     public function claim(Ticket $ticket): RedirectResponse
