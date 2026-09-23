@@ -158,8 +158,6 @@
                                             <option value="out_of_stock" {{ (request('status') === 'out_of_stock' || request('tab') === 'out_of_stock') ? 'selected' : '' }}>Out of Stock</option>
                                         </select>
                                     </div>
-                                        </select>
-                                    </div>
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
