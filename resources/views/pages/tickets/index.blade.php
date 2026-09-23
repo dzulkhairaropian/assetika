@@ -21,58 +21,11 @@
         this.selectAll = this.selectedTickets.length === document.querySelectorAll('.ticket-checkbox').length;
     }
 }">
-    <x-common.page-breadcrumb pageTitle="Service Desk — Incidents" />
+    <x-common.page-breadcrumb pageTitle="Support Tickets" />
 
-    {{-- Top Header Summary Cards --}}
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
-        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-500/10 text-brand-500">
-                    <i data-lucide="life-buoy" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="block text-[11px] font-medium uppercase tracking-wider text-gray-400">Open Tickets</span>
-                    <span class="text-lg font-bold text-gray-900 dark:text-white">{{ number_format($ticketSummary['open'] ?? 0) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400">
-                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="block text-[11px] font-medium uppercase tracking-wider text-gray-400">Completed</span>
-                    <span class="text-lg font-bold text-gray-900 dark:text-white">{{ number_format($ticketSummary['completed'] ?? 0) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                    <i data-lucide="user-x" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="block text-[11px] font-medium uppercase tracking-wider text-gray-400">Unclaimed</span>
-                    <span class="text-lg font-bold text-gray-900 dark:text-white">{{ number_format($ticketSummary['unclaimed'] ?? 0) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                    <i data-lucide="user-check" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <span class="block text-[11px] font-medium uppercase tracking-wider text-gray-400">Assigned To Me</span>
-                    <span class="text-lg font-bold text-gray-900 dark:text-white">{{ number_format($ticketSummary['assigned_to_me'] ?? 0) }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
+    <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
+        Track, assign, and resolve IT support requests across your organization.
+    </p>
 
     @if(session('success'))
         <x-ui.alert variant="success" message="{{ session('success') }}" />
@@ -112,13 +65,13 @@
                 $currentTab = request('tab');
                 $tabFilters = array_filter(request()->except(['page', 'tab']));
                 $tabs = [
-                    ['key' => null,           'label' => 'All Tickets',    'count' => $ticketSummary['total'] ?? 0,         'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
-                    ['key' => 'created_today','label' => 'Created Today',   'count' => $ticketSummary['created_today'] ?? 0, 'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
-                    ['key' => 'new',          'label' => 'New',            'count' => $ticketSummary['new'] ?? 0,           'icon' => 'alert-circle', 'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
-                    ['key' => 'in_progress',  'label' => 'In Progress',    'count' => $ticketSummary['in_progress'] ?? 0,   'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
-                    ['key' => 'pending',      'label' => 'Pending',        'count' => $ticketSummary['pending'] ?? 0,       'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
-                    ['key' => 'unassigned',   'label' => 'Unassigned',     'count' => $ticketSummary['unassigned'] ?? 0,    'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
-                    ['key' => 'closed',       'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'] ?? 0,    'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
+                    ['key' => null,          'label' => 'All Tickets', 'count' => $ticketSummary['total'],       'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                    ['key' => 'created_today','label' => 'Created Today', 'count' => $ticketSummary['created_today'], 'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                    ['key' => 'new',         'label' => 'New',         'count' => $ticketSummary['new'],         'icon' => 'alert-circle', 'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
+                    ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $ticketSummary['in_progress'], 'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
+                    ['key' => 'pending',     'label' => 'Pending',     'count' => $ticketSummary['pending'],     'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
+                    ['key' => 'unassigned',  'label' => 'Unassigned',  'count' => $ticketSummary['unassigned'],  'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
+                    ['key' => 'closed',      'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],      'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
                 ];
             @endphp
             <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
@@ -142,7 +95,7 @@
                         <span class="absolute left-2.5 text-gray-400">
                             <i data-lucide="search" class="w-3.5 h-3.5"></i>
                         </span>
-                        <input type="text" name="search" value="{{ $search }}" placeholder="Search Number, summary, requester..."
+                        <input type="text" name="search" value="{{ $search }}" placeholder="Search ID, requester, issue..."
                             class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                     </div>
 
@@ -382,14 +335,14 @@
                                 </div>
                             </label>
                         </th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Number</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Created Date</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Ticket Key / Problem</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Requester</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Summary & Requester</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assignment</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">SLA</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Created</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">SLA Risk</th>
+                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assignee</th>
                         <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                     </tr>
                 </thead>
@@ -397,20 +350,23 @@
                     @forelse($tickets as $ticket)
                         @php
                             $isOverdue = !($ticket->status?->is_closed) && $ticket->created_at->diffInDays(now()) >= 3;
+                            $priorityIcon = $ticket->priority?->icon ?: 'flag';
+                            $statusIcon = $ticket->status?->icon ?: 'disc';
+                            $slaIcon = $isOverdue ? 'alert-circle' : 'circle-check';
                             
                             $rowBg = 'hover:bg-gray-50/50 dark:hover:bg-white/[0.02]';
                             if ($isOverdue) {
-                                $rowBg = 'bg-red-50/40 dark:bg-red-500/10 hover:bg-red-100/40';
+                                $rowBg = 'bg-red-50/50 dark:bg-red-500/10 hover:bg-red-100/50';
                             } elseif ($ticket->status?->is_closed) {
                                 $rowBg = 'bg-gray-50 dark:bg-white/[0.02] hover:bg-gray-100/50';
                             } elseif ($ticket->priority?->name === 'High') {
-                                $rowBg = 'bg-orange-50/40 dark:bg-orange-500/10 hover:bg-orange-100/40';
+                                $rowBg = 'bg-orange-50/50 dark:bg-orange-500/10 hover:bg-orange-100/50';
                             } elseif ($ticket->priority?->name === 'Urgent' || $ticket->priority?->name === 'Critical') {
                                 $rowBg = 'bg-red-50/40 dark:bg-red-500/10 hover:bg-red-100/40';
                             }
                         @endphp
                         <tr class="transition {{ $rowBg }}">
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-2.5">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox"
@@ -429,45 +385,35 @@
                                     </div>
                                 </label>
                             </td>
-
-                            {{-- Number --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <a href="{{ route('tickets.show', $ticket) }}" class="inline-flex items-center gap-1 rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-bold text-brand-600 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-400 dark:hover:bg-brand-500/20 transition">
-                                    #{{ $ticket->request_id }}
-                                </a>
+                            <td class="px-4 py-2.5 whitespace-nowrap">
+                                <span class="font-mono text-xs text-gray-600 dark:text-gray-300">
+                                    {{ $ticket->created_at?->format('d/m/Y') ?? '-' }}
+                                </span>
                             </td>
-
-                            {{-- Category --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2.5">
                                 <div class="flex flex-col">
-                                    <span class="font-semibold text-gray-900 dark:text-white">
-                                        {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? 'General' }}
+                                    <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
+                                    <span class="text-[11px] text-gray-400">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 60) }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-2.5">
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-gray-900 dark:text-white">
+                                        {{ $ticket->requester_name ?? $ticket->requesterUser?->name }}
                                     </span>
-                                    @if($ticket->asset)
-                                        <span class="text-[10px] text-gray-400 font-mono">
-                                            {{ $ticket->asset->asset_tag }}
+                                    @if($ticket->requesterDepartment || $ticket->requesterUser?->department)
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            {{ $ticket->requesterDepartment?->name ?? $ticket->requesterUser?->department?->name }}
                                         </span>
                                     @endif
                                 </div>
                             </td>
-
-                            {{-- Summary & Requester --}}
-                            <td class="px-4 py-3">
-                                <div class="flex flex-col max-w-xs sm:max-w-md">
-                                    <a href="{{ route('tickets.show', $ticket) }}" class="font-medium text-gray-900 hover:text-brand-600 dark:text-gray-100 dark:hover:text-brand-400 line-clamp-1 transition">
-                                        {{ $ticket->problem_description }}
-                                    </a>
-                                    <span class="text-[11px] text-gray-400">
-                                        by <strong class="font-semibold text-gray-700 dark:text-gray-300">{{ $ticket->requester_name ?? $ticket->requesterUser?->name ?? 'Unknown' }}</strong>
-                                        @if($ticket->requesterDepartment || $ticket->requesterUser?->department)
-                                            <span class="text-[10px] text-gray-400 font-normal">({{ $ticket->requesterDepartment?->name ?? $ticket->requesterUser?->department?->name }})</span>
-                                        @endif
-                                    </span>
-                                </div>
+                            <td class="px-4 py-2.5 whitespace-nowrap">
+                                <x-ui.badge color="primary" variant="light" size="sm">
+                                    {{ $ticket->ticketCategory?->name ?? $ticket->category?->name ?? 'General' }}
+                                </x-ui.badge>
                             </td>
-
-                            {{-- Priority --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2.5">
                                 @if($ticket->priority)
                                     <x-ui.badge 
                                         size="sm" 
@@ -476,13 +422,9 @@
                                     >
                                         {{ $ticket->priority->name }}
                                     </x-ui.badge>
-                                @else
-                                    <x-ui.badge color="secondary" size="sm">Normal</x-ui.badge>
                                 @endif
                             </td>
-
-                            {{-- Status --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2.5">
                                 @if($ticket->status)
                                     <x-ui.badge 
                                         size="sm" 
@@ -493,33 +435,7 @@
                                     </x-ui.badge>
                                 @endif
                             </td>
-
-                            {{-- Assignment --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                @if($ticket->assignedTo)
-                                    <div class="flex items-center gap-1.5">
-                                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-[10px] font-bold text-brand-600 dark:bg-brand-900 dark:text-brand-300">
-                                            {{ strtoupper(substr($ticket->assignedTo->name, 0, 1)) }}
-                                        </div>
-                                        <span class="font-medium text-gray-800 dark:text-gray-200">
-                                            {{ $ticket->assignedTo->name }}
-                                        </span>
-                                    </div>
-                                @else
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">Unclaimed</span>
-                                        <form action="{{ route('tickets.claim', $ticket) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit" class="inline-flex items-center gap-1 rounded bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-600 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-400 transition" title="Assign ticket to me">
-                                                Claim
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endif
-                            </td>
-
-                            {{-- SLA --}}
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2.5">
                                 @if($ticket->slaStatus)
                                     <x-ui.badge 
                                         size="sm" 
@@ -534,18 +450,23 @@
                                         :color="$isOverdue ? 'danger' : 'success'"
                                         :featherIcon="$isOverdue ? 'alert-circle' : 'circle-check'"
                                     >
-                                        {{ $isOverdue ? 'Overdue' : '72h SLA' }}
+                                        {{ $isOverdue ? 'SLA Risk' : 'On Track' }}
                                     </x-ui.badge>
                                 @endif
                             </td>
-
-                            {{-- Created --}}
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                                {{ $ticket->created_at?->format('M d, Y, g:i A') ?? '-' }}
+                            <td class="px-4 py-2.5">
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-gray-900 dark:text-white">
+                                        {{ $ticket->assignedTo?->name ?? 'Unassigned' }}
+                                    </span>
+                                    @if($ticket->assignedTo?->department)
+                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            {{ $ticket->assignedTo->department->name }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
-
-                            {{-- Actions --}}
-                            <td class="px-4 py-3 text-end whitespace-nowrap">
+                            <td class="px-4 py-2.5 text-end">
                                 <div x-data="{
                                     open: false,
                                     dropdownStyle: '',
@@ -600,10 +521,10 @@
                             <td colspan="10" class="px-4 py-8 text-center">
                                 <div class="flex flex-col items-center justify-center space-y-1.5">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                        <i data-lucide="inbox" class="w-5 h-5"></i>
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
                                     </div>
                                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No tickets found</p>
-                                    <p class="text-[11px] text-gray-400 dark:text-gray-500">Try adjusting your filters or create a new support ticket.</p>
+                                    <p class="text-[11px] text-gray-400 dark:text-gray-500">Start by creating your first support ticket.</p>
                                 </div>
                             </td>
                         </tr>
@@ -611,15 +532,20 @@
                 </tbody>
             </table>
         </div>
-
-        {{-- Footer Stats Bar & Pagination --}}
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-t border-gray-100 p-3.5 dark:border-gray-800 sm:p-4 text-xs text-gray-500 dark:text-gray-400">
+        <div class="border-t border-gray-100 p-3 dark:border-gray-800 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-                <span class="font-semibold text-gray-700 dark:text-gray-300">{{ number_format($ticketSummary['assigned_to_me'] ?? 0) }}</span> assigned to you · 
-                <span class="font-semibold text-gray-700 dark:text-gray-300">{{ number_format($ticketSummary['unclaimed'] ?? 0) }}</span> unclaimed · 
-                <span class="font-semibold text-gray-700 dark:text-gray-300">{{ number_format($ticketSummary['completed'] ?? 0) }}</span> completed
+                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Per page:</span>
+                <select onchange="const url = new URL(window.location.href); url.searchParams.set('per_page', this.value); url.searchParams.set('page', 1); window.location.href = url.toString();"
+                    class="h-8 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                    <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                    <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
+                    <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
+                </select>
             </div>
-            <div>
+            <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
                 {{ $tickets->links() }}
             </div>
         </div>

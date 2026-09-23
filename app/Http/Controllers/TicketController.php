@@ -97,15 +97,11 @@ class TicketController extends Controller
 
         $ticketSummary = [
             'total' => (clone $query)->count(),
-            'open' => (clone $query)->whereHas('status', fn ($q) => $q->where('is_closed', false))->count(),
-            'completed' => (clone $query)->whereHas('status', fn ($q) => $q->where('is_closed', true)->orWhereIn('name', ['Completed', 'Resolved', 'Closed']))->count(),
-            'assigned_to_me' => (clone $query)->where('assigned_to_id', auth()->id())->count(),
-            'unclaimed' => (clone $query)->whereNull('assigned_to_id')->count(),
-            'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
             'created_today' => (clone $query)->whereDate('tickets.created_at', Carbon::today())->count(),
             'new' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'New'))->count(),
             'in_progress' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'In Progress'))->count(),
             'pending' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'Pending'))->count(),
+            'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
             'closed' => (clone $query)->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true))->count(),
         ];
 
@@ -343,23 +339,8 @@ class TicketController extends Controller
         ]);
 
         $projects = Project::latest()->get();
-        $ticketStatuses = TicketStatus::all();
 
-        return view('pages.tickets.show', compact('ticket', 'projects', 'ticketStatuses'));
-    }
-
-    public function claim(Ticket $ticket): RedirectResponse
-    {
-        $ticket->update(['assigned_to_id' => auth()->id()]);
-
-        TicketHistory::create([
-            'ticket_id' => $ticket->id,
-            'user_id' => auth()->id(),
-            'action' => 'Claimed Ticket',
-            'description' => 'Ticket #'.$ticket->request_id.' claimed by '.auth()->user()->name.'.',
-        ]);
-
-        return redirect()->back()->with('success', 'Ticket #'.$ticket->request_id.' claimed successfully.');
+        return view('pages.tickets.show', compact('ticket', 'projects'));
     }
 
     public function edit(Ticket $ticket): View
