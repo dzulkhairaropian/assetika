@@ -52,6 +52,7 @@ class TicketCategoryController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ]);
 
@@ -59,6 +60,7 @@ class TicketCategoryController extends Controller
             $data['code'] = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $data['name']), 0, 8));
         }
 
+        $data['sort_order'] = (int) ($request->input('sort_order') ?? 0);
         $data['is_active'] = $request->boolean('is_active', true);
 
         TicketCategory::create($data);
@@ -77,6 +79,7 @@ class TicketCategoryController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ]);
 
@@ -84,6 +87,7 @@ class TicketCategoryController extends Controller
             $data['code'] = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $data['name']), 0, 8));
         }
 
+        $data['sort_order'] = (int) ($request->input('sort_order') ?? 0);
         $data['is_active'] = $request->boolean('is_active', true);
 
         $ticketCategory->update($data);
