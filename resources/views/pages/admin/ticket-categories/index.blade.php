@@ -59,9 +59,9 @@
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/3">
             {{-- Card Header: Search + Filters + Actions --}}
-            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
+            <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('admin.ticket-categories.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
                         <div class="relative flex items-center">
@@ -128,10 +128,10 @@
             </div>
 
             {{-- Table --}}
-            <div class="max-w-full overflow-x-auto">
+            <div class="max-w-full overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
+                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/90 backdrop-blur dark:border-gray-800 dark:bg-gray-800/90">
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
