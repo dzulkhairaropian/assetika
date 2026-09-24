@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const { trendChart, chartStatusData, categoryChart, priorityChart, typeChart, requesterChart } = window.ticketChartData || {};
+    const { trendChart, chartStatusData, categoryChart, priorityChart, typeChart, requesterChart, funnelChart } = window.ticketChartData || {};
 
     const chartColors = {
         blue: '#3b82f6',
@@ -62,6 +62,48 @@ document.addEventListener('DOMContentLoaded', () => {
                     bodyFont: { family: 'Outfit, sans-serif', size: 12 },
                     padding: { top: 8, bottom: 8, left: 12, right: 12 },
                     cornerRadius: 8,
+                }
+            }
+        }
+    });
+
+    // Vertical Bar Chart Config (Matching IT Dashboard #assetAgeChart style)
+    const createVBarConfig = (labels, data, color) => ({
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: color,
+                borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
+                borderSkipped: false,
+                barThickness: 28,
+                maxBarThickness: 36
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                    cornerRadius: 8
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b' }
+                },
+                y: {
+                    border: { display: false },
+                    grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                    ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b', precision: 0 }
                 }
             }
         }
@@ -190,13 +232,64 @@ document.addEventListener('DOMContentLoaded', () => {
         new Chart(typeCanvas, createDoughnutConfig(typeChart.labels, typeChart.data, [chartColors.cyan, chartColors.purple, chartColors.blue, chartColors.orange, chartColors.green], 'Types'));
     }
 
-    // 5. Priority Horizontal Bar
+    // 5. Priority Vertical Bar Chart (Matching IT Dashboard Bar Chart Style)
     const priorityCanvas = mountCanvas('#ticketPriorityChart');
     if (priorityChart && priorityCanvas) {
-        new Chart(priorityCanvas, createHBarConfig(priorityChart.labels, priorityChart.data, chartColors.orange));
+        new Chart(priorityCanvas, createVBarConfig(priorityChart.labels, priorityChart.data, chartColors.orange));
     }
 
-    // 6. Requester Horizontal Bar
+    // 6. Conversion Funnel Chart (TailAdmin SaaS Funnel Style)
+    const funnelCanvas = mountCanvas('#ticketFunnelChart');
+    if (funnelCanvas && funnelChart) {
+        new Chart(funnelCanvas, {
+            type: 'bar',
+            data: {
+                labels: funnelChart.labels,
+                datasets: [{
+                    label: 'Tickets Volume',
+                    data: funnelChart.data,
+                    backgroundColor: ['#2a31d8', '#465fff', '#7592ff', '#c2d6ff'],
+                    borderRadius: { topLeft: 0, topRight: 6, bottomLeft: 0, bottomRight: 6 },
+                    borderSkipped: false,
+                    barThickness: 28,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => {
+                                const rate = funnelChart.rates ? funnelChart.rates[ctx.dataIndex] : 0;
+                                return ` Count: ${ctx.raw} (${rate}% conversion)`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, precision: 0 }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11, weight: '600' } }
+                    }
+                }
+            }
+        });
+    }
+
+    // 7. Requester Horizontal Bar
     const reqCanvas = mountCanvas('#ticketRequesterChart');
     if (reqCanvas && requesterChart) {
         new Chart(reqCanvas, createHBarConfig(requesterChart.labels, requesterChart.data, chartColors.green));
@@ -206,4 +299,3 @@ document.addEventListener('DOMContentLoaded', () => {
         window.createIcons({ icons: window.lucideIcons });
     }
 });
-

@@ -91,7 +91,24 @@ class ComponentController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $components = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'component_tag' || $sortBy === 'tag') {
+            $query->orderBy('component_tag', $sortDir);
+        } elseif ($sortBy === 'name') {
+            $query->orderBy('name', $sortDir);
+        } elseif ($sortBy === 'quantity' || $sortBy === 'qty') {
+            $query->orderBy('quantity', $sortDir);
+        } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
+            $query->orderBy('purchase_cost', $sortDir);
+        } elseif ($sortBy === 'created_at') {
+            $query->orderBy('created_at', $sortDir);
+        } else {
+            $query->latest();
+        }
+
+        $components = $query->paginate($perPage)->withQueryString();
 
         $componentMasterCat = MasterCategory::where('name', 'IT Component')->first();
 

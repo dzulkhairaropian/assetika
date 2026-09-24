@@ -18,11 +18,11 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $users = User::with(['roles', 'department', 'company', 'position', 'location'])
-            ->filter($request->all())
-            ->latest()
-            ->paginate($perPage)
-            ->withQueryString();
+        $sortBy = in_array($request->input('sort_by'), ['name', 'email', 'is_active', 'created_at']) ? $request->input('sort_by') : 'created_at';
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        $query = User::with(['roles', 'department', 'company', 'position', 'location'])->filter($request->all());
+        $users = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
 
         $roles = Role::all();
         $departments = Department::all();

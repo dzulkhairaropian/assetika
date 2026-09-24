@@ -36,7 +36,10 @@ class TicketCategoryController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
-        $categories = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = in_array($request->input('sort_by'), ['code', 'name', 'description', 'is_active', 'created_at']) ? $request->input('sort_by') : 'created_at';
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        $categories = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
 
         return view('pages.admin.ticket-categories.index', compact('categories', 'search', 'categorySummary'));
     }

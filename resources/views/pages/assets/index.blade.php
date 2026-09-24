@@ -345,13 +345,19 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Asset Tag / Name</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Product / Serial</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="asset_tag" label="Asset Tag / Name" />
+                            </th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="serial_number" label="Product / Serial" />
+                            </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Depreciation / Value</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Holder</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Age</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Warranty</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="warranty_expiry_date" label="Warranty" />
+                            </th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

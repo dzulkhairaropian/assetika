@@ -68,7 +68,20 @@ class ConsumableController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $consumables = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'quantity' || $sortBy === 'qty') {
+            $query->orderBy('quantity', $sortDir);
+        } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
+            $query->orderBy('purchase_cost', $sortDir);
+        } elseif ($sortBy === 'created_at') {
+            $query->orderBy('created_at', $sortDir);
+        } else {
+            $query->latest();
+        }
+
+        $consumables = $query->paginate($perPage)->withQueryString();
 
         $products = Product::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Consumable');

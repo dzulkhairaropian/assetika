@@ -128,7 +128,20 @@ class TicketController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $tickets = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'request_id' || $sortBy === 'number') {
+            $query->orderBy('request_id', $sortDir);
+        } elseif ($sortBy === 'requester_name' || $sortBy === 'requester') {
+            $query->orderBy('requester_name', $sortDir);
+        } elseif ($sortBy === 'created_at') {
+            $query->orderBy('created_at', $sortDir);
+        } else {
+            $query->latest();
+        }
+
+        $tickets = $query->paginate($perPage)->withQueryString();
         $statuses = TicketStatus::all();
         $priorities = Priority::all();
 

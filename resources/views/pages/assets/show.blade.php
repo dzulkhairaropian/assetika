@@ -168,7 +168,7 @@
                     @endif
                 </div>
 
-                <!-- Quick Specs -->
+                <!-- System Info -->
                 <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">System Info</h3>
                     <div class="space-y-2.5">
@@ -180,7 +180,25 @@
                             <span class="text-gray-500">Serial Number</span>
                             <span class="font-medium text-gray-900 dark:text-white">{{ $asset->serial_number ?? '-' }}</span>
                         </div>
-                        <div class="flex items-center justify-between text-xs">
+                        @php
+                            $catName = strtolower(optional($asset->product?->category)->name ?? '');
+                            $isComputer = Str::contains($catName, ['laptop', 'computer', 'pc', 'desktop', 'server', 'workstation']);
+                        @endphp
+                        @if($isComputer)
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Encryption</span>
+                                <span class="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 text-[11px]">
+                                    <i data-lucide="shield-check" class="w-3 h-3"></i> Encrypted
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-500">Domain</span>
+                                <span class="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 text-[11px]">
+                                    <i data-lucide="globe" class="w-3 h-3"></i> Domain Joined
+                                </span>
+                            </div>
+                        @endif
+                        <div class="flex items-center justify-between text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
                             <span class="text-gray-500">Warranty Expiry</span>
                             <div class="text-end">
                                 <span class="font-medium {{ $asset->warranty_expiry_date?->isPast() ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">

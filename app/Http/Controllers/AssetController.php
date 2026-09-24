@@ -266,7 +266,26 @@ class AssetController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $assets = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'asset_tag') {
+            $query->orderBy('asset_tag', $sortDir);
+        } elseif ($sortBy === 'name' || $sortBy === 'device_name') {
+            $query->orderBy('device_name', $sortDir);
+        } elseif ($sortBy === 'serial_number' || $sortBy === 'serial') {
+            $query->orderBy('serial_number', $sortDir);
+        } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
+            $query->orderBy('purchase_cost', $sortDir);
+        } elseif ($sortBy === 'purchase_date') {
+            $query->orderBy('purchase_date', $sortDir);
+        } elseif ($sortBy === 'warranty_expiry_date' || $sortBy === 'warranty') {
+            $query->orderBy('warranty_expiry_date', $sortDir);
+        } else {
+            $query->latest();
+        }
+
+        $assets = $query->paginate($perPage)->withQueryString();
         $statuses = Status::whereHas('masterCategory', function ($q) {
             $q->where('name', 'IT Asset');
         })->get();

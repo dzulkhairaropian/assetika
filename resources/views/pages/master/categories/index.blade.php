@@ -148,8 +148,12 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Code</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Name</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="code" label="Code" />
+                            </th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="name" label="Name" />
+                            </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Master Category</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Products Count</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>

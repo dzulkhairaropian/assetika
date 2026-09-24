@@ -68,7 +68,22 @@ class LicenseController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $licenses = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'name') {
+            $query->orderBy('name', $sortDir);
+        } elseif ($sortBy === 'seats') {
+            $query->orderBy('seats', $sortDir);
+        } elseif ($sortBy === 'expiration_date' || $sortBy === 'expiration') {
+            $query->orderBy('expiration_date', $sortDir);
+        } elseif ($sortBy === 'created_at') {
+            $query->orderBy('created_at', $sortDir);
+        } else {
+            $query->latest();
+        }
+
+        $licenses = $query->paginate($perPage)->withQueryString();
         $manufacturers = License::whereNotNull('manufacturer')->select('manufacturer')->distinct()->pluck('manufacturer');
 
         return view('pages.licenses.index', compact('licenses', 'summary', 'manufacturers'));

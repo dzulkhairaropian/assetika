@@ -158,28 +158,89 @@
         />
     </div>
 
-    <!-- 3. Ticket Analytics Charts Grid -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Ticket Volume Trend</h3>
-                    <p class="text-xs text-gray-400">Monthly submissions</p>
-                </div>
-            </div>
-            <div id="ticketTrendChart" class="h-64"></div>
-        </div>
+	    <!-- 3. Ticket Analytics & Conversion Funnel Grid -->
+	    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+	        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+	            <div class="flex items-center justify-between mb-4">
+	                <div>
+	                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Ticket Volume Trend</h3>
+	                    <p class="text-xs text-gray-400">Monthly submissions</p>
+	                </div>
+	            </div>
+	            <div id="ticketTrendChart" class="h-64"></div>
+	        </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Status Breakdown</h3>
-                    <p class="text-xs text-gray-400">Distribution across lifecycle</p>
-                </div>
-            </div>
-            <div id="ticketStatusChart" class="h-64 flex items-center justify-center"></div>
-        </div>
-    </div>
+	        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+	            <div class="flex items-center justify-between mb-4">
+	                <div>
+	                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Status Breakdown</h3>
+	                    <p class="text-xs text-gray-400">Distribution across lifecycle</p>
+	                </div>
+	            </div>
+	            <div id="ticketStatusChart" class="h-64 flex items-center justify-center"></div>
+	        </div>
+	    </div>
+
+	    <!-- Conversion Funnel Card (TailAdmin SaaS Funnel Style) -->
+	    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+	        <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3 dark:border-gray-800">
+	            <div>
+	                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+	                    <i data-lucide="filter" class="w-5 h-5 text-brand-500"></i>
+	                    Ticket Resolution Conversion Funnel
+	                </h3>
+	                <p class="text-xs text-gray-400 mt-0.5">Stage-by-stage progression from intake to resolution</p>
+	            </div>
+	            <div class="flex items-center gap-2 text-xs">
+	                <span class="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+	                    Conversion Rate: {{ $funnelChart['rates'][3] ?? 0 }}%
+	                </span>
+	            </div>
+	        </div>
+
+	        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+	            <div class="lg:col-span-8">
+	                <div id="ticketFunnelChart" class="h-64"></div>
+	            </div>
+	            <div class="lg:col-span-4 space-y-3 border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-6 dark:border-gray-800">
+	                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Funnel Stages Breakdown</h4>
+	                
+	                <div class="space-y-2">
+	                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-blue-50/50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-900/30">
+	                        <div class="flex items-center gap-2">
+	                            <span class="h-3 w-3 rounded-full bg-blue-500"></span>
+	                            <span class="text-xs font-medium text-gray-800 dark:text-gray-200">1. Received</span>
+	                        </div>
+	                        <span class="font-bold text-xs text-gray-900 dark:text-white">{{ number_format($funnelChart['data'][0] ?? 0) }} <span class="text-gray-400 font-normal">({{ $funnelChart['rates'][0] ?? 100 }}%)</span></span>
+	                    </div>
+
+	                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-cyan-50/50 dark:bg-cyan-500/10 border border-cyan-100 dark:border-cyan-900/30">
+	                        <div class="flex items-center gap-2">
+	                            <span class="h-3 w-3 rounded-full bg-cyan-500"></span>
+	                            <span class="text-xs font-medium text-gray-800 dark:text-gray-200">2. Assigned</span>
+	                        </div>
+	                        <span class="font-bold text-xs text-gray-900 dark:text-white">{{ number_format($funnelChart['data'][1] ?? 0) }} <span class="text-gray-400 font-normal">({{ $funnelChart['rates'][1] ?? 0 }}%)</span></span>
+	                    </div>
+
+	                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-amber-50/50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-900/30">
+	                        <div class="flex items-center gap-2">
+	                            <span class="h-3 w-3 rounded-full bg-amber-500"></span>
+	                            <span class="text-xs font-medium text-gray-800 dark:text-gray-200">3. In Progress</span>
+	                        </div>
+	                        <span class="font-bold text-xs text-gray-900 dark:text-white">{{ number_format($funnelChart['data'][2] ?? 0) }} <span class="text-gray-400 font-normal">({{ $funnelChart['rates'][2] ?? 0 }}%)</span></span>
+	                    </div>
+
+	                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-emerald-50/50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-900/30">
+	                        <div class="flex items-center gap-2">
+	                            <span class="h-3 w-3 rounded-full bg-emerald-500"></span>
+	                            <span class="text-xs font-medium text-gray-800 dark:text-gray-200">4. Resolved & Closed</span>
+	                        </div>
+	                        <span class="font-bold text-xs text-gray-900 dark:text-white">{{ number_format($funnelChart['data'][3] ?? 0) }} <span class="text-gray-400 font-normal">({{ $funnelChart['rates'][3] ?? 0 }}%)</span></span>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
 
     <!-- 4. Category & Priority Charts -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -312,6 +373,7 @@
         priorityChart: @json($priorityChart),
         typeChart: @json($typeChart),
         requesterChart: @json($requesterChart),
+        funnelChart: @json($funnelChart),
     };
 </script>
 @vite('resources/js/ticket-charts.js')
