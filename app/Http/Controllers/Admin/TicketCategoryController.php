@@ -12,6 +12,12 @@ class TicketCategoryController extends Controller
 {
     public function index(Request $request): View
     {
+        $categorySummary = [
+            'total' => TicketCategory::count(),
+            'active' => TicketCategory::where('is_active', true)->count(),
+            'inactive' => TicketCategory::where('is_active', false)->count(),
+        ];
+
         $query = TicketCategory::withCount('subcategories');
 
         if ($search = $request->string('search')->trim()->toString()) {
@@ -22,14 +28,17 @@ class TicketCategoryController extends Controller
             });
         }
 
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('is_active', $request->boolean('status'));
+        $tab = $request->input('tab') ?: $request->input('status');
+        if ($tab === 'active' || $tab === '1') {
+            $query->where('is_active', true);
+        } elseif ($tab === 'inactive' || $tab === '0') {
+            $query->where('is_active', false);
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
         $categories = $query->latest()->paginate($perPage)->withQueryString();
 
-        return view('pages.admin.ticket-categories.index', compact('categories', 'search'));
+        return view('pages.admin.ticket-categories.index', compact('categories', 'search', 'categorySummary'));
     }
 
     public function create(): View

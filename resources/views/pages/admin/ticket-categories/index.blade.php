@@ -60,8 +60,32 @@
         </div>
 
         <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/3">
-            {{-- Card Header: Search + Filters + Actions --}}
+            {{-- Card Header: Tabs + Toolbar --}}
             <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
+                @php
+                    $currentTab = request('tab') ?: request('status');
+                    $tabFilters = array_filter(request()->except(['page', 'tab', 'status']));
+                    $tabs = [
+                        ['key' => null,       'label' => 'All Categories', 'count' => $categorySummary['total'] ?? 0,    'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'active',   'label' => 'Active',         'count' => $categorySummary['active'] ?? 0,   'icon' => 'circle-check', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'inactive', 'label' => 'Inactive',       'count' => $categorySummary['inactive'] ?? 0, 'icon' => 'x-circle',     'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                    ];
+                @endphp
+                <div class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5">
+                    @foreach($tabs as $tab)
+                        @php
+                            $isActive = ($tab['key'] === null && empty($currentTab)) || ($tab['key'] === $currentTab) || ($tab['key'] === 'active' && $currentTab === '1') || ($tab['key'] === 'inactive' && $currentTab === '0');
+                            $tabUrl = route('admin.ticket-categories.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
+                        @endphp
+                        <a href="{{ $tabUrl }}"
+                           class="flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white' }}">
+                            <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
+                            {{ $tab['label'] }}
+                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('admin.ticket-categories.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
                         <div class="relative flex items-center">
