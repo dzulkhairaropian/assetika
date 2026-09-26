@@ -32,7 +32,10 @@ class CategoryController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $categories = $query->latest()->paginate($perPage)->withQueryString();
+        $sortBy = in_array($request->input('sort_by'), ['code', 'name', 'created_at']) ? $request->input('sort_by') : 'created_at';
+        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        $categories = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
         $masterCategories = MasterCategory::all();
 
         return view('pages.master.categories.index', compact('categories', 'masterCategories', 'summary'));

@@ -303,7 +303,7 @@
             ));
         }
 
-        // 4. Investment Spend Timeline Line Chart
+        // 4. Investment Spend Timeline Line Chart (TailAdmin Pro Statistics Line Style)
         const purchaseCanvas = mountCanvas("#gaSpendTimelineChart");
         if (purchaseCanvas && @json($purchaseChart['data'])?.length) {
             new Chart(purchaseCanvas, {
@@ -313,37 +313,61 @@
                     datasets: [{
                         label: 'Acquisition Spend',
                         data: @json($purchaseChart['data']),
-                        fill: false,
-                        borderColor: chartColors.green,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const { ctx, chartArea } = chart;
+                            if (!chartArea) return 'rgba(18, 183, 106, 0.1)';
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            const isDark = document.documentElement.classList.contains('dark');
+                            gradient.addColorStop(0, isDark ? 'rgba(18, 183, 106, 0.35)' : 'rgba(18, 183, 106, 0.25)');
+                            gradient.addColorStop(1, 'rgba(18, 183, 106, 0.0)');
+                            return gradient;
+                        },
+                        borderColor: '#12b76a',
                         borderWidth: 2,
                         tension: 0,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: chartColors.green,
+                        pointBackgroundColor: '#12b76a',
+                        pointBorderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
                         pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: '#12b76a',
+                        pointHoverBorderColor: '#ffffff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: '#0f172a',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#e2e8f0',
+                            titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                            bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                            padding: { top: 8, bottom: 8, left: 12, right: 12 },
                             cornerRadius: 8,
+                            displayColors: false,
                             callbacks: {
                                 label: (context) => ' Spend: ' + formatRupiah(context.raw)
                             }
                         }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
+                        },
                         y: {
                             border: { display: false },
-                            grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                            grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
                             ticks: {
                                 font: { family: 'Outfit, sans-serif', size: 11 },
+                                color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8',
                                 callback: (val) => 'Rp ' + (val >= 1000000 ? (val / 1000000) + 'M' : val)
                             }
                         }
@@ -352,7 +376,7 @@
             });
         }
 
-        // 5. Maintenance Cost by Category Bar Chart
+        // 5. Maintenance Cost by Category Bar Chart (TailAdmin Pro ChartSix Style)
         const maintCatCanvas = mountCanvas("#gaMaintCategoryChart");
         if (maintCatCanvas && @json($maintCategoryChart['data'])?.length) {
             new Chart(maintCatCanvas, {
@@ -362,8 +386,11 @@
                     datasets: [{
                         label: 'Maintenance Cost',
                         data: @json($maintCategoryChart['data']),
-                        backgroundColor: chartColors.blue,
-                        borderRadius: 4
+                        backgroundColor: '#465fff',
+                        borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                        borderSkipped: false,
+                        barThickness: 28,
+                        maxBarThickness: 36
                     }]
                 },
                 options: {
@@ -373,19 +400,30 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: '#0f172a',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#e2e8f0',
+                            titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                            bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                            padding: { top: 8, bottom: 8, left: 12, right: 12 },
                             cornerRadius: 8,
+                            displayColors: false,
                             callbacks: {
                                 label: (context) => ' Cost: ' + formatRupiah(context.raw)
                             }
                         }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { family: 'Outfit, sans-serif', size: 11 } } },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
+                        },
                         y: {
                             border: { display: false },
-                            grid: { color: 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
+                            grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)', dash: [4, 4] },
                             ticks: {
                                 font: { family: 'Outfit, sans-serif', size: 11 },
+                                color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8',
                                 callback: (val) => 'Rp ' + (val >= 1000000 ? (val / 1000000) + 'M' : val)
                             }
                         }

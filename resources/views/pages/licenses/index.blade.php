@@ -191,10 +191,16 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Software Name</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="name" label="Software Name" />
+                            </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Product Key</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Seats Utilization</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Expiration Status</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="seats" label="Seats Utilization" />
+                            </th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="expiration_date" label="Expiration Status" />
+                            </th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

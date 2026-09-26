@@ -247,6 +247,23 @@ class TicketDashboardController extends Controller
             ->get();
         $staffNames = User::whereIn('id', $workload->pluck('assigned_to_id'))->pluck('name', 'id');
 
+        // Conversion Funnel Data (Stages: Received -> Assigned -> In Progress -> Resolved)
+        $totalF = (clone $totalTicketsQuery)->count();
+        $assignedF = (clone $totalTicketsQuery)->whereNotNull('assigned_to_id')->count();
+        $inProgressF = (clone $totalTicketsQuery)->whereHas('status', fn ($q) => $q->whereIn('name', ['In Progress', 'Pending']))->count();
+        $resolvedF = (clone $totalTicketsQuery)->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed', 'Completed'])->orWhere('is_closed', true))->count();
+
+        $funnelChart = [
+            'labels' => ['Received', 'Assigned', 'In Progress', 'Resolved & Closed'],
+            'data' => [$totalF, $assignedF, $inProgressF, $resolvedF],
+            'rates' => [
+                100,
+                $totalF > 0 ? round(($assignedF / $totalF) * 100, 1) : 0,
+                $totalF > 0 ? round(($inProgressF / $totalF) * 100, 1) : 0,
+                $totalF > 0 ? round(($resolvedF / $totalF) * 100, 1) : 0,
+            ],
+        ];
+
         // Top problematic assets
         $problemAssetsQuery = $applyGlobalFilters(Ticket::select('asset_id', DB::raw('count(*) as count'))->whereNotNull('asset_id'));
         $problemAssets = $problemAssetsQuery->groupBy('asset_id')
@@ -281,6 +298,7 @@ class TicketDashboardController extends Controller
             'priorityChart',
             'categoryChart',
             'requesterChart',
+            'funnelChart',
             'workload',
             'staffNames',
             'problemAssets',

@@ -185,31 +185,40 @@
 
     <p>Thus, the Handover Minutes are made and used as they should.</p>
 
-    <div class="signature-area clearfix">
-        <div class="signature-box">
-            The Submitted,<br><br><br>
-            <div class="signature-name">({{ $giver->name }})</div><br><br><br><br>
-            <!-- Placeholder for additional signature if needed -->
-            <div style="margin-top:12px; font-weight:bold;">(Afrizal Rajab)</div>
-        </div>
-        <div class="signature-box">
-            <br><br><br><br><br><br><br>
-            Knowing
-        </div>
-        <div class="signature-box">
-            The Receiver,<br><br><br>
-            <div class="signature-name">({{ $receiver->name }})</div><br><br><br>
-            <!-- Placeholder for additional signature if needed -->
-            @php
-                $supervisorPosition = '';
-                if (isset($receiver_supervisor) && $receiver_supervisor && $receiver_supervisor->position) {
-                    $supervisorPosition = $receiver_supervisor->position->name;
-                }
-            @endphp
-            <div style="margin-top:30px; font-weight:bold;">({{ isset($receiver_supervisor) && $receiver_supervisor ? $receiver_supervisor->name : '' }} @if ($supervisorPosition)
-                    - {{ $supervisorPosition }}
-                @endif)</div>
-        </div>
+    <div class="signature-area clearfix" style="margin-top: 15px;">
+        <table style="width: 100%; border: none; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Submitted,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $giver->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $giver->position?->name ?? $giver_position ?? '' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Receiver,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $receiver->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $receiver->position?->name ?? $receiver_position ?? '' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; border: none; padding-top: 20px; padding-bottom: 5px;">
+                    <strong style="text-transform: uppercase; font-size: 12px;">Knowing</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    <br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $it_manager_name ?? 'Afrizal Rajab' }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $it_manager_position ?? 'IT Manager' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    @if(!empty($supervisor_name))
+                        <br><br><br><br>
+                        <div style="font-weight: bold; text-decoration: underline;">({{ $supervisor_name }})</div>
+                        <div style="font-size: 11px; color: #4b5563;">{{ $supervisor_position ?? 'Supervisor' }}</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
     </div>
 
     <footer>

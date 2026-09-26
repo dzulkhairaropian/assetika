@@ -92,11 +92,13 @@ class AssetManagementController extends Controller
         $request->validate([
             'checkin_notes' => 'nullable|string',
             'condition_report' => 'required|string',
+            'supervisor_user_id' => 'nullable|exists:users,id',
         ]);
 
         $this->assetService->processCheckin($asset, [
             'notes' => $request->checkin_notes,
             'condition_report' => $request->condition_report,
+            'supervisor_user_id' => $request->supervisor_user_id,
         ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked in successfully.');
@@ -109,6 +111,46 @@ class AssetManagementController extends Controller
         }
 
         return BastService::generateBastPdf($asset, $checkout);
+    }
+
+    public function editBAST(Request $request, $asset, AssetCheckout $checkout)
+    {
+        if (! ($asset instanceof Asset)) {
+            $asset = Asset::findOrFail($asset);
+        }
+
+        $users = User::orderBy('name')->get();
+        $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.($u->email ? ' ('.$u->email.')' : '')])->values()->all();
+
+        return view('pages.assets.management.edit-bast', compact('asset', 'checkout', 'userOpts'));
+    }
+
+    public function updateBAST(Request $request, $asset, AssetCheckout $checkout)
+    {
+        if (! ($asset instanceof Asset)) {
+            $asset = Asset::findOrFail($asset);
+        }
+
+        $validated = $request->validate([
+            'checked_out_by_user_id' => 'required|exists:users,id',
+            'checked_out_to_user_id' => 'required|exists:users,id',
+            'supervisor_user_id' => 'nullable|exists:users,id',
+            'checked_out_at' => 'required|date',
+            'checkout_notes' => 'nullable|string',
+        ]);
+
+        $checkout->update($validated);
+
+        if ($asset->current_checkout_id === $checkout->id) {
+            $toUser = User::find($validated['checked_out_to_user_id']);
+            $asset->update([
+                'assigned_to_user_id' => $toUser?->id,
+                'user_name' => $toUser?->name,
+                'department_id' => $toUser?->department_id ?? $asset->department_id,
+            ]);
+        }
+
+        return redirect()->route('assets.show', $asset)->with('success', 'BAST document updated successfully.');
     }
 
     public function showMaintenance(Request $request, $asset)

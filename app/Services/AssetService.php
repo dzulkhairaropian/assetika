@@ -79,6 +79,7 @@ class AssetService
             if ($checkout) {
                 $checkout->update([
                     'checked_in_by_user_id' => auth()->id() ?? $checkout->checked_out_to_user_id,
+                    'supervisor_user_id' => $params['supervisor_user_id'] ?? $checkout->supervisor_user_id,
                     'checked_in_at' => $params['checkin_date'] ?? now(),
                     'checkin_notes' => $params['notes'] ?? $params['checkin_notes'] ?? null,
                     'condition_report' => $params['condition_report'] ?? null,

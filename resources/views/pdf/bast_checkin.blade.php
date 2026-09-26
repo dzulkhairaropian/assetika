@@ -190,35 +190,40 @@
         <p><strong>Additional Notes:</strong> {{ $checkout->checkin_notes }}</p>
     @endif
 
-    <div class="signature-area clearfix">
-        <div class="signature-box">
-            The Returner,<br><br><br>
-            @php
-                $userPosition = '';
-                if ($user->position) {
-                    $userPosition = $user->position->name;
-                }
-            @endphp
-            <div class="signature-name">({{ $user->name }} @if ($userPosition)
-                    - {{ $userPosition }}
-                @endif)</div><br><br><br><br>
-        </div>
-        <div class="signature-box">
-            <br><br><br><br><br><br><br>
-            Knowing
-        </div>
-        <div class="signature-box">
-            The Receiver,<br><br><br>
-            @php
-                $adminPosition = '';
-                if ($admin->position) {
-                    $adminPosition = $admin->position->name;
-                }
-            @endphp
-            <div class="signature-name">({{ $admin->name }} @if ($adminPosition)
-                    - {{ $adminPosition }}
-                @endif)</div><br><br><br><br>
-        </div>
+    <div class="signature-area clearfix" style="margin-top: 15px;">
+        <table style="width: 100%; border: none; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Returner,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $user->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $user->position?->name ?? $user_position ?? '' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    The Receiver,<br><br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $admin->name }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $admin->position?->name ?? $admin_position ?? '' }}</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; border: none; padding-top: 20px; padding-bottom: 5px;">
+                    <strong style="text-transform: uppercase; font-size: 12px;">Knowing</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    <br><br><br><br>
+                    <div style="font-weight: bold; text-decoration: underline;">({{ $it_manager_name ?? 'Afrizal Rajab' }})</div>
+                    <div style="font-size: 11px; color: #4b5563;">{{ $it_manager_position ?? 'IT Manager' }}</div>
+                </td>
+                <td style="width: 50%; text-align: center; vertical-align: top; border: none; padding: 0;">
+                    @if(!empty($supervisor_name))
+                        <br><br><br><br>
+                        <div style="font-weight: bold; text-decoration: underline;">({{ $supervisor_name }})</div>
+                        <div style="font-size: 11px; color: #4b5563;">{{ $supervisor_position ?? 'Supervisor' }}</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
     </div>
 
     <footer>

@@ -98,22 +98,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const createLineConfig = (labels, data, label, lineColor = chartColors.green) => ({
+    const createLineConfig = (labels, data, label, lineColor = '#465fff') => ({
         type: 'line',
         data: {
             labels,
             datasets: [{
                 label,
                 data,
-                fill: false,
+                fill: true,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return 'rgba(70, 95, 255, 0.1)';
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    const isDark = document.documentElement.classList.contains('dark');
+                    gradient.addColorStop(0, lineColor === '#465fff' ? (isDark ? 'rgba(70, 95, 255, 0.35)' : 'rgba(70, 95, 255, 0.25)') : 'rgba(18, 183, 106, 0.25)');
+                    gradient.addColorStop(1, lineColor === '#465fff' ? (isDark ? 'rgba(70, 95, 255, 0.0)' : 'rgba(70, 95, 255, 0.0)') : 'rgba(18, 183, 106, 0.0)');
+                    return gradient;
+                },
                 borderColor: lineColor,
                 borderWidth: 2,
-                tension: 0, // Crisp linear line matching shadcn ChartLineLinear
-                pointBackgroundColor: '#ffffff',
-                pointBorderColor: lineColor,
+                tension: 0, // Straight line matching TailAdmin Pro curve: straight
+                pointBackgroundColor: lineColor,
+                pointBorderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                pointRadius: 0,
+                pointHoverRadius: 5,
                 pointHoverBackgroundColor: lineColor,
                 pointHoverBorderColor: '#ffffff'
             }]
@@ -269,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (purchaseCanvas && purchaseChartData && purchaseChartData.data?.length) {
         window.purchaseTimelineChartInstance = new Chart(
             purchaseCanvas,
-            createLineConfig(purchaseChartData.labels, purchaseChartData.data, 'Assets Purchased', chartColors.blue)
+            createLineConfig(purchaseChartData.labels, purchaseChartData.data, 'Assets Purchased', '#465fff')
         );
 
         window.updatePurchaseTimelineChartJS = (catId) => {
@@ -283,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 7. Hardware Lifecycle & Age Distribution Bar Chart
+    // 7. Hardware Lifecycle & Age Distribution Bar Chart (TailAdmin Pro ChartSix Style)
     const ageCanvas = mountCanvas('#assetAgeChart');
     const { assetAgeDistribution } = window.chartData || {};
     if (ageCanvas && assetAgeDistribution && assetAgeDistribution.data?.length) {
@@ -320,19 +330,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     x: {
                         grid: { display: false },
                         border: { display: false },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8' }
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
                     },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.4)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8', precision: 0 }
+                        grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.4)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8', precision: 0 }
                     }
                 }
             }
         });
     }
 
-    // 8. Top Hardware Vendors Bar Chart
+    // 8. Top Hardware Vendors Bar Chart (TailAdmin Pro ChartSix Style)
     const vendorCanvas = mountCanvas('#vendorAssetChart');
     const { vendorChartData } = window.chartData || {};
     if (vendorCanvas && vendorChartData && vendorChartData.data?.length) {
@@ -342,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: vendorChartData.labels,
                 datasets: [{
                     label: 'Units Registered',
-                    data: vendorChartData.data,
                     backgroundColor: '#465fff',
                     borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
                     borderSkipped: false,
@@ -369,12 +378,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     x: {
                         grid: { display: false },
                         border: { display: false },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8' }
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
                     },
                     y: {
                         border: { display: false },
-                        grid: { color: 'rgba(226, 232, 240, 0.4)', dash: [4, 4] },
-                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: '#94a3b8', precision: 0 }
+                        grid: { color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.4)', dash: [4, 4] },
+                        ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8', precision: 0 }
                     }
                 }
             }

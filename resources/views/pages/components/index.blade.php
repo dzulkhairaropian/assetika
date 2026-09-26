@@ -218,7 +218,9 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Tag / Component</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="component_tag" label="Tag / Component" />
+                            </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category & Model</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Asset</th>

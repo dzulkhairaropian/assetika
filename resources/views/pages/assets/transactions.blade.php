@@ -207,10 +207,15 @@
                                 </td>
                                 <td class="px-4 py-2.5 text-center whitespace-nowrap">
                                     @if($tx->asset)
-                                        <a href="{{ route('assets.bast', [$tx->asset->id, $tx->id]) }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-brand-600 shadow-sm hover:bg-brand-50 dark:border-gray-800 dark:bg-gray-950 dark:text-brand-400 dark:hover:bg-brand-500/10 transition" title="Download BAST PDF">
-                                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                                            <span>BAST PDF</span>
-                                        </a>
+                                        <div class="flex items-center justify-center gap-1">
+                                            <a href="{{ route('assets.bast', [$tx->asset->id, $tx->id]) }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-brand-600 shadow-sm hover:bg-brand-50 dark:border-gray-800 dark:bg-gray-950 dark:text-brand-400 dark:hover:bg-brand-500/10 transition" title="Download BAST PDF">
+                                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                                <span>PDF</span>
+                                            </a>
+                                            <a href="{{ route('assets.bast.edit', [$tx->asset->id, $tx->id]) }}" class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-200 bg-white text-gray-500 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 transition" title="Edit BAST Document">
+                                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                            </a>
+                                        </div>
                                     @else
                                         <span class="text-gray-300 dark:text-gray-700">-</span>
                                     @endif

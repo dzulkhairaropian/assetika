@@ -166,6 +166,8 @@ Route::middleware('auth')->group(function () {
         Route::get('checkin', [AssetManagementController::class, 'showCheckin'])->name('assets.checkin');
         Route::post('checkin', [AssetManagementController::class, 'processCheckin'])->name('assets.checkin.process');
         Route::get('bast/{checkout}', [AssetManagementController::class, 'showBAST'])->name('assets.bast');
+        Route::get('bast/{checkout}/edit', [AssetManagementController::class, 'editBAST'])->name('assets.bast.edit');
+        Route::put('bast/{checkout}', [AssetManagementController::class, 'updateBAST'])->name('assets.bast.update');
         Route::get('maintenance', [AssetManagementController::class, 'showMaintenance'])->name('assets.maintenance');
         Route::post('maintenance', [AssetManagementController::class, 'processMaintenance'])->name('assets.maintenance.process');
         Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
@@ -259,12 +261,8 @@ Route::middleware('auth')->group(function () {
     Route::post('admin/sla-statuses/bulk-edit', [SlaStatusController::class, 'bulkEdit'])->name('admin.sla-statuses.bulk-edit');
 
     // Admin CRUD Routes (Ticketing)
-    Route::get('admin/ticket-categories', [TicketCategoryController::class, 'index'])->name('admin.ticket-categories.index');
-    Route::post('admin/ticket-categories', [TicketCategoryController::class, 'storeCategory'])->name('admin.ticket-categories.store');
-    Route::delete('admin/ticket-categories/{category}', [TicketCategoryController::class, 'destroyCategory'])->name('admin.ticket-categories.destroy');
-    Route::post('admin/ticket-subcategories', [TicketCategoryController::class, 'storeSubcategory'])->name('admin.ticket-subcategories.store');
-    Route::delete('admin/ticket-subcategories/{subcategory}', [TicketCategoryController::class, 'destroySubcategory'])->name('admin.ticket-subcategories.destroy');
-    Route::get('api/ticket-categories/{category}/subcategories', [TicketCategoryController::class, 'getSubcategories'])->name('api.ticket-categories.subcategories');
+    Route::post('admin/ticket-categories/bulk-delete', [TicketCategoryController::class, 'bulkDelete'])->name('admin.ticket-categories.bulk-delete');
+    Route::resource('admin/ticket-categories', TicketCategoryController::class, ['names' => 'admin.ticket-categories']);
 
     // Calendar Page
     Route::get('calendar', function () {

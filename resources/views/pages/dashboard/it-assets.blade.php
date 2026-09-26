@@ -199,7 +199,7 @@
             @endif
         </div>
 
-        <!-- Chart 3: Component Allocation Pie Chart -->
+        <!-- Chart 3: Component Allocation Doughnut Chart -->
         <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>

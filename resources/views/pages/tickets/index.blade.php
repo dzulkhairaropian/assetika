@@ -335,9 +335,15 @@
                                 </div>
                             </label>
                         </th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Created Date</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Ticket Key / Problem</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Requester</th>
+                        <th class="px-4 py-2.5 text-start">
+                            <x-common.sortable-header column="created_at" label="Created Date" />
+                        </th>
+                        <th class="px-4 py-2.5 text-start">
+                            <x-common.sortable-header column="request_id" label="Ticket Key / Problem" />
+                        </th>
+                        <th class="px-4 py-2.5 text-start">
+                            <x-common.sortable-header column="requester_name" label="Requester" />
+                        </th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>

@@ -158,8 +158,6 @@
                                             <option value="out_of_stock" {{ (request('status') === 'out_of_stock' || request('tab') === 'out_of_stock') ? 'selected' : '' }}>Out of Stock</option>
                                         </select>
                                     </div>
-                                        </select>
-                                    </div>
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
@@ -206,9 +204,13 @@
                             </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Product</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category / Brand</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Qty / Threshold</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="quantity" label="Qty / Threshold" />
+                            </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Purchase Cost</th>
+                            <th class="px-4 py-2.5 text-start">
+                                <x-common.sortable-header column="purchase_cost" label="Purchase Cost" />
+                            </th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
