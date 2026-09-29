@@ -95,29 +95,71 @@
         </div>
 
         <!-- Cost by Category (Donut) -->
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="mb-4">
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Cost by Category</h3>
                 <p class="text-xs text-gray-400">Top 5 categories by initial spend</p>
             </div>
-            @if(array_sum($categoryChartData['data']) > 0)
-                <div id="financeCategoryChart" class="h-64 flex items-center justify-center"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No category spend data available</div>
-            @endif
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    @if(array_sum($categoryChartData['data']) > 0)
+                        <div id="financeCategoryChart" class="h-48 w-full flex items-center justify-center"></div>
+                    @else
+                        <div class="flex items-center justify-center h-48 text-xs text-gray-400">No category spend data available</div>
+                    @endif
+                </div>
+
+                @if(isset($categoryChartData['labels']) && count($categoryChartData['labels']) > 0)
+                    @php $finColors = ['#465fff', '#12b76a', '#f79009', '#06b6d4', '#8b5cf6']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($categoryChartData['labels'] as $index => $label)
+                            @php
+                                $val = $categoryChartData['data'][$index] ?? 0;
+                                $color = $finColors[$index % count($finColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">(Rp {{ number_format($val, 0, ',', '.') }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
         <!-- Cost by Department (Donut - Full width below or span) -->
-        <div class="lg:col-span-3 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="mb-4">
+        <div class="lg:col-span-3 rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Asset Valuation by Department</h3>
                 <p class="text-xs text-gray-400">Top departments by total allocated asset capital</p>
             </div>
-            @if(array_sum($departmentChartData['data']) > 0)
-                <div id="financeDeptChart" class="h-64 flex items-center justify-center"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No department spend data available</div>
-            @endif
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    @if(array_sum($departmentChartData['data']) > 0)
+                        <div id="financeDeptChart" class="h-48 w-full flex items-center justify-center"></div>
+                    @else
+                        <div class="flex items-center justify-center h-48 text-xs text-gray-400">No department spend data available</div>
+                    @endif
+                </div>
+
+                @if(isset($departmentChartData['labels']) && count($departmentChartData['labels']) > 0)
+                    @php $finDeptColors = ['#3b82f6', '#22c55e', '#f97316', '#8b5cf6', '#06b6d4', '#ec4899', '#f59e0b']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($departmentChartData['labels'] as $index => $label)
+                            @php
+                                $val = $departmentChartData['data'][$index] ?? 0;
+                                $color = $finDeptColors[$index % count($finDeptColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">(Rp {{ number_format($val, 0, ',', '.') }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
     </div>

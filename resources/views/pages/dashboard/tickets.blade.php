@@ -176,14 +176,32 @@
             <div id="ticketTrendChart" class="h-64"></div>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Status Breakdown</h3>
-                    <p class="text-xs text-gray-400">Distribution across lifecycle</p>
-                </div>
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Status Breakdown</h3>
+                <p class="text-xs text-gray-400">Distribution across lifecycle</p>
             </div>
-            <div id="ticketStatusChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="ticketStatusChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+
+                @if(isset($chartStatusData['labels']) && count($chartStatusData['labels']) > 0)
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($chartStatusData['labels'] as $index => $label)
+                            @php
+                                $count = $chartStatusData['data'][$index] ?? 0;
+                                $color = $chartStatusData['colors'][$index] ?? '#465fff';
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -250,28 +268,88 @@
 
     <!-- 4. Category & Priority Charts -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Top Categories</h3>
-                <p class="text-xs text-gray-400">By issue type</p>
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Top Categories</h3>
+                <p class="text-xs text-gray-400">By issue category</p>
             </div>
-            <div id="ticketCategoryChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="ticketCategoryChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+                @if(isset($categoryChart['labels']) && count($categoryChart['labels']) > 0)
+                    @php $catColors = ['#3b82f6', '#22c55e', '#f97316', '#06b6d4', '#8b5cf6']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($categoryChart['labels'] as $index => $label)
+                            @php
+                                $count = $categoryChart['data'][$index] ?? 0;
+                                $color = $catColors[$index % count($catColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Priority Distribution</h3>
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Priority Distribution</h3>
                 <p class="text-xs text-gray-400">Urgency breakdown</p>
             </div>
-            <div id="ticketPriorityChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="ticketPriorityChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+                @if(isset($priorityChart['labels']) && count($priorityChart['labels']) > 0)
+                    @php $prioColors = ['#ef4444', '#f97316', '#3b82f6', '#22c55e', '#8b5cf6']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($priorityChart['labels'] as $index => $label)
+                            @php
+                                $count = $priorityChart['data'][$index] ?? 0;
+                                $color = $prioColors[$index % count($prioColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Classification</h3>
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">Classification</h3>
                 <p class="text-xs text-gray-400">Incident vs Request</p>
             </div>
-            <div id="ticketTypeChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="ticketTypeChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+                @if(isset($typeChart['labels']) && count($typeChart['labels']) > 0)
+                    @php $typeColors = ['#06b6d4', '#8b5cf6', '#3b82f6', '#f97316', '#22c55e']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($typeChart['labels'] as $index => $label)
+                            @php
+                                $count = $typeChart['data'][$index] ?? 0;
+                                $color = $typeColors[$index % count($typeColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 

@@ -101,28 +101,88 @@
 
     <!-- 3. GA Charts Grid (3 Donut Charts) -->
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-            <div class="mb-4">
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Status Breakdown</h3>
                 <p class="text-xs text-gray-400">GA Asset availability</p>
             </div>
-            <div id="gaStatusChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="gaStatusChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+                @if(isset($gaStatusChart['labels']) && count($gaStatusChart['labels']) > 0)
+                    @php $gaColors = ['#465fff', '#12b76a', '#f79009', '#ef4444', '#8b5cf6']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($gaStatusChart['labels'] as $index => $label)
+                            @php
+                                $count = $gaStatusChart['data'][$index] ?? 0;
+                                $color = $gaColors[$index % count($gaColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-            <div class="mb-4">
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Assets by Category</h3>
                 <p class="text-xs text-gray-400">Facilities vs Furniture</p>
             </div>
-            <div id="gaCategoryChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="gaCategoryChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+                @if(isset($gaCategoryChart['labels']) && count($gaCategoryChart['labels']) > 0)
+                    @php $gaCatColors = ['#3b82f6', '#22c55e', '#f97316', '#06b6d4', '#8b5cf6']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($gaCategoryChart['labels'] as $index => $label)
+                            @php
+                                $count = $gaCategoryChart['data'][$index] ?? 0;
+                                $color = $gaCatColors[$index % count($gaCatColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 md:col-span-2 xl:col-span-1">
-            <div class="mb-4">
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 md:col-span-2 xl:col-span-1 flex flex-col justify-between">
+            <div class="p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">Asset Condition</h3>
                 <p class="text-xs text-gray-400">Physical rating</p>
             </div>
-            <div id="gaConditionChart" class="h-64 flex items-center justify-center"></div>
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    <div id="gaConditionChart" class="h-48 w-full flex items-center justify-center"></div>
+                </div>
+                @if(isset($gaConditionChart['labels']) && count($gaConditionChart['labels']) > 0)
+                    @php $gaCondColors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']; @endphp
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($gaConditionChart['labels'] as $index => $label)
+                            @php
+                                $count = $gaConditionChart['data'][$index] ?? 0;
+                                $color = $gaCondColors[$index % count($gaCondColors)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
