@@ -147,7 +147,7 @@
     <!-- Main Grid: Row 1 - Donut & Pie Charts (Max 3 per row) -->
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-        <!-- Chart 1: Status Distribution (TailAdmin Pro API Token Usages Style) -->
+        <!-- Chart 1: Status Distribution (ChartPieLegend Style) -->
         <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between"
              x-data="{ activeStatusCat: 'all', categoryLabel: 'All Categories', updateStatusChart(catId, label) { this.activeStatusCat = catId; this.categoryLabel = label; if (window.updateStatusChartJS) { window.updateStatusChartJS(catId); } } }">
             <div class="flex items-center justify-between gap-3 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
@@ -180,39 +180,29 @@
             <div class="flex flex-col gap-4 p-5">
                 <div class="flex justify-center">
                     @if($totalAssets > 0)
-                        <div id="assetStatusChart" class="h-52 w-full flex items-center justify-center"></div>
+                        <div id="assetStatusChart" class="h-48 w-full flex items-center justify-center"></div>
                     @else
-                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No asset status data available</div>
+                        <div class="flex items-center justify-center h-48 text-xs text-gray-400">No asset status data available</div>
                     @endif
                 </div>
 
-                <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
-                    <li class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#465fff]"></span>
-                            <span class="font-medium text-gray-900 dark:text-white">Deployed</span>
+                <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                    @foreach($chartData['labels'] as $index => $label)
+                        @php
+                            $count = $chartData['data'][$index] ?? 0;
+                            $color = $chartData['colors'][$index] ?? '#98a2b3';
+                        @endphp
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                            <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
                         </div>
-                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($deployed ?? 0) }} units</span>
-                    </li>
-                    <li class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#12b76a]"></span>
-                            <span class="font-medium text-gray-900 dark:text-white">Ready to Deploy</span>
-                        </div>
-                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($readyToDeploy ?? 0) }} units</span>
-                    </li>
-                    <li class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#f79009]"></span>
-                            <span class="font-medium text-gray-900 dark:text-white">In Repair / Service</span>
-                        </div>
-                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($service ?? 0) }} units</span>
-                    </li>
-                </ul>
+                    @endforeach
+                </div>
             </div>
         </div>
 
-        <!-- Chart 2: Department Distribution (TailAdmin Pro API Token Usages Style) -->
+        <!-- Chart 2: Department Distribution (ChartPieLegend Style) -->
         <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between"
              x-data="{ activeDeptCat: 'all', categoryLabel: 'All Categories', updateDeptChart(catId, label) { this.activeDeptCat = catId; this.categoryLabel = label; if (window.updateDeptChartJS) { window.updateDeptChartJS(catId); } } }">
             <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
@@ -226,36 +216,34 @@
             <div class="flex flex-col gap-4 p-5">
                 <div class="flex justify-center">
                     @if(count($deptChartData['data']) > 0)
-                        <div id="deptAssetChart" class="h-52 w-full flex items-center justify-center"></div>
+                        <div id="deptAssetChart" class="h-48 w-full flex items-center justify-center"></div>
                     @else
-                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No department asset data available</div>
+                        <div class="flex items-center justify-center h-48 text-xs text-gray-400">No department asset data available</div>
                     @endif
                 </div>
 
-                @if(isset($deptOverall) && $deptOverall->count() > 0)
+                @if(isset($deptChartData['labels']) && count($deptChartData['labels']) > 0)
                     @php
-                        $deptColorsList = ['#3b82f6', '#22c55e', '#f97316', '#8b5cf6', '#06b6d4'];
+                        $deptColorsList = ['#3b82f6', '#22c55e', '#f97316', '#8b5cf6', '#06b6d4', '#ec4899', '#f59e0b'];
                     @endphp
-                    <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
-                        @foreach($deptOverall->take(3) as $index => $dept)
-                            <li class="flex items-center justify-between py-2">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $deptColorsList[$index % count($deptColorsList)] }}"></span>
-                                    <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">{{ $dept->name }}</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="font-bold text-gray-900 dark:text-white">{{ number_format($dept->assets_count) }} assets</span>
-                                </div>
-                            </li>
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($deptChartData['labels'] as $index => $label)
+                            @php
+                                $count = $deptChartData['data'][$index] ?? 0;
+                                $color = $deptColorsList[$index % count($deptColorsList)];
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
                         @endforeach
-                    </ul>
+                    </div>
                 @endif
             </div>
         </div>
 
-        <!-- Chart 3: Component Allocation Doughnut Chart (TailAdmin Pro API Token Usages Style) -->
+        <!-- Chart 3: Component Allocation Doughnut Chart (ChartPieLegend Style) -->
         <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
             <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
@@ -268,25 +256,29 @@
             <div class="flex flex-col gap-4 p-5">
                 <div class="flex justify-center">
                     @if(($totalComponentUnits ?? 0) > 0)
-                        <div id="componentPieChart" class="h-52 w-full flex items-center justify-center"></div>
+                        <div id="componentPieChart" class="h-48 w-full flex items-center justify-center"></div>
                     @else
-                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No component unit data available</div>
+                        <div class="flex items-center justify-center h-48 text-xs text-gray-400">No component unit data available</div>
                     @endif
                 </div>
 
-                <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
-                    <li class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#12b76a]"></span>
-                            <span class="font-medium text-gray-900 dark:text-white">Ready in Stock</span>
-                        </div>
-                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($readyComponents ?? 0) }} units</span>
-                    </li>
-                    <li class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#465fff]"></span>
-                            <span class="font-medium text-gray-900 dark:text-white">Installed on Asset</span>
-                        </div>
+                @if(isset($componentChartData['labels']) && count($componentChartData['labels']) > 0)
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                        @foreach($componentChartData['labels'] as $index => $label)
+                            @php
+                                $count = $componentChartData['data'][$index] ?? 0;
+                                $color = $componentChartData['colors'][$index] ?? '#465fff';
+                            @endphp
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
                         <span class="font-bold text-gray-900 dark:text-white">{{ number_format($installedComponents ?? 0) }} units</span>
                     </li>
                 </ul>
