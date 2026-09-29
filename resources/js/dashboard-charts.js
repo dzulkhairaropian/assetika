@@ -378,9 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     x: {
                         grid: { display: false },
                         border: { display: false },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false },
                         ticks: { font: { family: 'Outfit, sans-serif', size: 11 }, color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8' }
                     },
                     y: {

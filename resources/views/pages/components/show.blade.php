@@ -59,24 +59,24 @@
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="border-b border-gray-200 dark:border-gray-800">
-            <nav class="-mb-px flex space-x-6">
+        <div class="border-b border-gray-100 p-3 dark:border-gray-800 sm:p-4 rounded-xl bg-white dark:bg-gray-900 border">
+            <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
                 <button @click="activeTab = 'details'"
-                    :class="activeTab === 'details' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                    class="flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition">
-                    <i data-lucide="info" class="w-4 h-4"></i>
+                    :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
                     Overview & Specifications
                 </button>
                 <button @click="activeTab = 'assignment'"
-                    :class="activeTab === 'assignment' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                    class="flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition">
-                    <i data-lucide="laptop" class="w-4 h-4"></i>
+                    :class="activeTab === 'assignment' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                    <i data-lucide="laptop" class="w-3.5 h-3.5"></i>
                     Installed Asset
                 </button>
                 <button @click="activeTab = 'tickets'"
-                    :class="activeTab === 'tickets' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                    class="flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition">
-                    <i data-lucide="wrench" class="w-4 h-4"></i>
+                    :class="activeTab === 'tickets' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                    <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
                     Maintenance & Tickets Log
                 </button>
             </nav>

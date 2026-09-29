@@ -136,29 +136,31 @@
             <div class="lg:col-span-2">
                 <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <!-- Tabs Navigation -->
-                    <div class="flex border-b border-gray-100 px-4 dark:border-gray-800">
-                        <button @click="activeTab = 'details'"
-                            :class="activeTab === 'details' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-3 py-3 text-xs font-semibold transition-all">
-                            Details
-                        </button>
-                        @if($asset->vehicle)
-                            <button @click="activeTab = 'vehicle'"
-                                :class="activeTab === 'vehicle' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                                class="border-b-2 px-3 py-3 text-xs font-semibold transition-all">
-                                Vehicle Specs
+                    <div class="border-b border-gray-100 p-3 dark:border-gray-800 sm:p-4">
+                        <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
+                            <button @click="activeTab = 'details'"
+                                :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                Details
                             </button>
-                        @endif
-                        <button @click="activeTab = 'history'"
-                            :class="activeTab === 'history' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-3 py-3 text-xs font-semibold transition-all">
-                            Movement History
-                        </button>
-                        <button @click="activeTab = 'maintenance'"
-                            :class="activeTab === 'maintenance' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
-                            class="border-b-2 px-3 py-3 text-xs font-semibold transition-all">
-                            Maintenance
-                        </button>
+                            @if($asset->vehicle)
+                                <button @click="activeTab = 'vehicle'"
+                                    :class="activeTab === 'vehicle' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                    class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                    Vehicle Specs
+                                </button>
+                            @endif
+                            <button @click="activeTab = 'history'"
+                                :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                Movement History
+                            </button>
+                            <button @click="activeTab = 'maintenance'"
+                                :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                Maintenance
+                            </button>
+                        </nav>
                     </div>
 
                     <!-- Tabs Content -->
