@@ -518,10 +518,12 @@
 	        vendorChartData: @json($vendorChartData),
 	        consumableChartData: @json($consumableChartData),
         consumableDataByCategory: @json($consumableDataByCategory),
-        consumableTimelineChartData: @json($consumableTimelineChartData),
-        consumableTimelineByCategory: @json($consumableTimelineByCategory),
-        purchaseChartData: @json($purchaseChartData),
-        purchaseDataByCategory: @json($purchaseDataByCategory)
+	        consumableTimelineChartData: @json($consumableTimelineChartData),
+	        consumableTimelineByCategory: @json($consumableTimelineByCategory),
+	        consumableTimeframes: @json($consumableTimeframes ?? []),
+	        purchaseChartData: @json($purchaseChartData),
+	        purchaseDataByCategory: @json($purchaseDataByCategory),
+	        purchaseTimeframes: @json($purchaseTimeframes ?? [])
     };
 </script>
 @vite('resources/js/dashboard-charts.js')

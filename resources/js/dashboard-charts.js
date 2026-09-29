@@ -274,23 +274,12 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         window.updateConsumableTimelineTimeframe = (timeframe) => {
-            if (!window.consumableTLChartInstance || !consumableTimelineChartData) return;
-            let labels = [...consumableTimelineChartData.labels];
-            let data = [...consumableTimelineChartData.data];
+            if (!window.consumableTLChartInstance) return;
+            const tfMap = window.chartData?.consumableTimeframes;
+            const tfData = (tfMap && tfMap[timeframe]) || { labels: ['No Data'], data: [0] };
 
-            if (timeframe === '7days') {
-                labels = labels.slice(-7);
-                data = data.slice(-7);
-            } else if (timeframe === '30days') {
-                labels = labels.slice(-30);
-                data = data.slice(-30);
-            } else if (timeframe === '24hours') {
-                labels = labels.slice(-1);
-                data = data.slice(-1);
-            }
-
-            window.consumableTLChartInstance.data.labels = labels;
-            window.consumableTLChartInstance.data.datasets[0].data = data;
+            window.consumableTLChartInstance.data.labels = tfData.labels;
+            window.consumableTLChartInstance.data.datasets[0].data = tfData.data;
             window.consumableTLChartInstance.update();
         };
     }
@@ -314,23 +303,12 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         window.updatePurchaseTimelineTimeframe = (timeframe) => {
-            if (!window.purchaseTimelineChartInstance || !purchaseChartData) return;
-            let labels = [...purchaseChartData.labels];
-            let data = [...purchaseChartData.data];
+            if (!window.purchaseTimelineChartInstance) return;
+            const tfMap = window.chartData?.purchaseTimeframes;
+            const tfData = (tfMap && tfMap[timeframe]) || { labels: ['No Data'], data: [0] };
 
-            if (timeframe === '7days') {
-                labels = labels.slice(-7);
-                data = data.slice(-7);
-            } else if (timeframe === '30days') {
-                labels = labels.slice(-30);
-                data = data.slice(-30);
-            } else if (timeframe === '24hours') {
-                labels = labels.slice(-1);
-                data = data.slice(-1);
-            }
-
-            window.purchaseTimelineChartInstance.data.labels = labels;
-            window.purchaseTimelineChartInstance.data.datasets[0].data = data;
+            window.purchaseTimelineChartInstance.data.labels = tfData.labels;
+            window.purchaseTimelineChartInstance.data.datasets[0].data = tfData.data;
             window.purchaseTimelineChartInstance.update();
         };
     }

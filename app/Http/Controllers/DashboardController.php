@@ -390,6 +390,94 @@ class DashboardController extends Controller
             ];
         }
 
+        // Realtime Timeframe Datasets for Consumables & Asset Purchases
+        $nowTime = now();
+        $consumableTxAll = ConsumableTransaction::where('type', 'checkout')->whereNotNull('transaction_date')->get();
+
+        $consumableTimeframes = [
+            '12months' => [
+                'labels' => collect(range(11, 0))->map(fn ($i) => $nowTime->copy()->subMonths($i)->format('M Y'))->toArray(),
+                'data' => collect(range(11, 0))->map(function ($i) use ($consumableTxAll, $nowTime) {
+                    $m = $nowTime->copy()->subMonths($i);
+
+                    return (int) $consumableTxAll->filter(fn ($t) => $t->transaction_date && $t->transaction_date->format('Y-m') === $m->format('Y-m'))->sum('quantity');
+                })->toArray(),
+            ],
+            '30days' => [
+                'labels' => collect(range(29, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('d M'))->toArray(),
+                'data' => collect(range(29, 0))->map(function ($i) use ($consumableTxAll, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $consumableTxAll->filter(fn ($t) => $t->transaction_date && $t->transaction_date->format('Y-m-d') === $d->format('Y-m-d'))->sum('quantity');
+                })->toArray(),
+            ],
+            '7days' => [
+                'labels' => collect(range(6, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('D d M'))->toArray(),
+                'data' => collect(range(6, 0))->map(function ($i) use ($consumableTxAll, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $consumableTxAll->filter(fn ($t) => $t->transaction_date && $t->transaction_date->format('Y-m-d') === $d->format('Y-m-d'))->sum('quantity');
+                })->toArray(),
+            ],
+            '24hours' => [
+                'labels' => collect(range(23, 0))->map(fn ($i) => $nowTime->copy()->subHours($i)->format('H:00'))->toArray(),
+                'data' => collect(range(23, 0))->map(function ($i) use ($consumableTxAll, $nowTime) {
+                    $h = $nowTime->copy()->subHours($i);
+
+                    return (int) $consumableTxAll->filter(fn ($t) => $t->created_at && $t->created_at->format('Y-m-d H') === $h->format('Y-m-d H'))->sum('quantity');
+                })->toArray(),
+            ],
+        ];
+
+        $allAssetDates = Asset::whereNotNull('purchase_date')->orWhereNotNull('release_date')->get();
+
+        $purchaseTimeframes = [
+            '12months' => [
+                'labels' => collect(range(11, 0))->map(fn ($i) => $nowTime->copy()->subMonths($i)->format('M Y'))->toArray(),
+                'data' => collect(range(11, 0))->map(function ($i) use ($allAssetDates, $nowTime) {
+                    $m = $nowTime->copy()->subMonths($i);
+
+                    return (int) $allAssetDates->filter(function ($a) use ($m) {
+                        $date = $a->purchase_date ?? $a->release_date;
+
+                        return $date && $date->format('Y-m') === $m->format('Y-m');
+                    })->count();
+                })->toArray(),
+            ],
+            '30days' => [
+                'labels' => collect(range(29, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('d M'))->toArray(),
+                'data' => collect(range(29, 0))->map(function ($i) use ($allAssetDates, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allAssetDates->filter(function ($a) use ($d) {
+                        $date = $a->purchase_date ?? $a->release_date;
+
+                        return $date && $date->format('Y-m-d') === $d->format('Y-m-d');
+                    })->count();
+                })->toArray(),
+            ],
+            '7days' => [
+                'labels' => collect(range(6, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('D d M'))->toArray(),
+                'data' => collect(range(6, 0))->map(function ($i) use ($allAssetDates, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allAssetDates->filter(function ($a) use ($d) {
+                        $date = $a->purchase_date ?? $a->release_date;
+
+                        return $date && $date->format('Y-m-d') === $d->format('Y-m-d');
+                    })->count();
+                })->toArray(),
+            ],
+            '24hours' => [
+                'labels' => collect(range(23, 0))->map(fn ($i) => $nowTime->copy()->subHours($i)->format('H:00'))->toArray(),
+                'data' => collect(range(23, 0))->map(function ($i) use ($allAssetDates, $nowTime) {
+                    $h = $nowTime->copy()->subHours($i);
+
+                    return (int) $allAssetDates->filter(fn ($a) => $a->created_at && $a->created_at->format('Y-m-d H') === $h->format('Y-m-d H'))->count();
+                })->toArray(),
+            ],
+        ];
+
         $consumableTimelineChartData = $consumableTimelineByCategory['all'];
         $consumableTimelineYears = $consumableTxYears->toArray();
         $consumableTimelineYear = $consumableTxYear;
@@ -589,6 +677,8 @@ class DashboardController extends Controller
             'consumableDataByCategory',
             'consumableTimelineChartData',
             'consumableTimelineByCategory',
+            'consumableTimeframes',
+            'purchaseTimeframes',
             'consumableTimelineYears',
             'consumableTimelineYear',
             'assetsOlderThan4Years',
