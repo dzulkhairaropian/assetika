@@ -279,11 +279,6 @@
                 @endif
             </div>
         </div>
-                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($installedComponents ?? 0) }} units</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
 
     </div>
 
