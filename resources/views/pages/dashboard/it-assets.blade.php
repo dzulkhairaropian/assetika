@@ -224,7 +224,7 @@
 
                 @if(isset($deptChartData['labels']) && count($deptChartData['labels']) > 0)
                     @php
-                        $deptColorsList = ['#3b82f6', '#22c55e', '#f97316', '#8b5cf6', '#06b6d4', '#ec4899', '#f59e0b'];
+                        $deptColorsList = $deptChartData['colors'] ?? ['#465fff', '#12b76a', '#f79009', '#8b5cf6', '#06b6d4', '#ec4899', '#f43f5e', '#14b8a6', '#6366f1', '#d97706'];
                     @endphp
                     <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
                         @foreach($deptChartData['labels'] as $index => $label)

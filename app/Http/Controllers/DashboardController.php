@@ -120,21 +120,32 @@ class DashboardController extends Controller
         }
 
         // Chart Data 1: Status Distribution with Category filter
+        $statusColorsPalette = [
+            'Ready to Deploy' => '#12b76a', // Emerald Green
+            'Deployed' => '#465fff',        // Brand Blue
+            'Borrowed' => '#8b5cf6',        // Purple
+            'Service' => '#f79009',         // Amber
+            'In Repair' => '#f59e0b',       // Amber
+            'Maintenance' => '#d97706',     // Dark Amber
+            'Draft' => '#06b6d4',           // Cyan
+            'Broken' => '#f04438',          // Red
+            'Retired' => '#64748b',         // Slate
+            'Disposal' => '#475569',        // Dark Slate
+            'Checked Out' => '#3b82f6',     // Indigo Blue
+            'Returned' => '#10b981',        // Teal
+            'Ready for Sale' => '#ec4899',  // Pink
+            'For Sale' => '#f43f5e',        // Rose
+            'Sold' => '#059669',            // Dark Green
+        ];
+
+        $fallbackColors = ['#a855f7', '#14b8a6', '#eab308', '#6366f1', '#d97706', '#ec4899', '#f43f5e'];
+
         $chartDataByCategory = [];
         $chartDataByCategory['all'] = [
             'labels' => $statuses->pluck('name')->toArray(),
             'data' => $statuses->map(fn ($status) => Asset::where('status_id', $status->id)->count())->toArray(),
-            'colors' => $statuses->map(function ($status) {
-                return match ($status->name) {
-                    'Ready to Deploy' => '#12b76a',
-                    'Deployed' => '#465fff',
-                    'Borrowed' => '#8b5cf6',
-                    'Service' => '#f79009',
-                    'Draft' => '#06b6d4',
-                    'Broken' => '#f04438',
-                    'Retired' => '#64748b',
-                    default => '#98a2b3'
-                };
+            'colors' => $statuses->map(function ($status, $idx) use ($statusColorsPalette, $fallbackColors) {
+                return $statusColorsPalette[$status->name] ?? $fallbackColors[$idx % count($fallbackColors)];
             })->toArray(),
         ];
 
@@ -150,6 +161,7 @@ class DashboardController extends Controller
 
         // Chart Data 2: Department with most assets by Category
         $deptDataByCategory = [];
+        $deptColorsList = ['#465fff', '#12b76a', '#f79009', '#8b5cf6', '#06b6d4', '#ec4899', '#f43f5e', '#14b8a6', '#6366f1', '#d97706'];
 
         $deptOverall = Department::withCount('assets')
             ->orderBy('assets_count', 'desc')
@@ -159,6 +171,7 @@ class DashboardController extends Controller
         $deptDataByCategory['all'] = [
             'labels' => $deptOverall->pluck('name')->toArray(),
             'data' => $deptOverall->pluck('assets_count')->toArray(),
+            'colors' => array_slice($deptColorsList, 0, $deptOverall->count()),
         ];
 
         foreach ($categories as $cat) {
@@ -172,6 +185,7 @@ class DashboardController extends Controller
             $deptDataByCategory[$cat->id] = [
                 'labels' => $deptCat->pluck('name')->toArray(),
                 'data' => $deptCat->pluck('assets_count')->toArray(),
+                'colors' => array_slice($deptColorsList, 0, $deptCat->count()),
             ];
         }
 
