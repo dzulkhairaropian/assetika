@@ -147,10 +147,10 @@
     <!-- Main Grid: Row 1 - Donut & Pie Charts (Max 3 per row) -->
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-        <!-- Chart 1: Status Distribution -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
+        <!-- Chart 1: Status Distribution (TailAdmin Pro API Token Usages Style) -->
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between"
              x-data="{ activeStatusCat: 'all', categoryLabel: 'All Categories', updateStatusChart(catId, label) { this.activeStatusCat = catId; this.categoryLabel = label; if (window.updateStatusChartJS) { window.updateStatusChartJS(catId); } } }">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between gap-3 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Status Breakdown</h3>
                     <p class="text-xs text-gray-400">Availability ratio</p>
@@ -176,42 +176,121 @@
                     </div>
                 </div>
             </div>
-            @if($totalAssets > 0)
-                <div id="assetStatusChart" class="h-64 flex items-center justify-center"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No asset status data available</div>
-            @endif
+
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    @if($totalAssets > 0)
+                        <div id="assetStatusChart" class="h-52 w-full flex items-center justify-center"></div>
+                    @else
+                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No asset status data available</div>
+                    @endif
+                </div>
+
+                <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
+                    <li class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="h-2.5 w-2.5 rounded-full bg-[#465fff]"></span>
+                            <span class="font-medium text-gray-900 dark:text-white">Deployed</span>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($deployed ?? 0) }} units</span>
+                    </li>
+                    <li class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="h-2.5 w-2.5 rounded-full bg-[#12b76a]"></span>
+                            <span class="font-medium text-gray-900 dark:text-white">Ready to Deploy</span>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($readyToDeploy ?? 0) }} units</span>
+                    </li>
+                    <li class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="h-2.5 w-2.5 rounded-full bg-[#f79009]"></span>
+                            <span class="font-medium text-gray-900 dark:text-white">In Repair / Service</span>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($service ?? 0) }} units</span>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Chart 2: Department Distribution -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900"
+        <!-- Chart 2: Department Distribution (TailAdmin Pro API Token Usages Style) -->
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between"
              x-data="{ activeDeptCat: 'all', categoryLabel: 'All Categories', updateDeptChart(catId, label) { this.activeDeptCat = catId; this.categoryLabel = label; if (window.updateDeptChartJS) { window.updateDeptChartJS(catId); } } }">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Assets by Department</h3>
                     <p class="text-xs text-gray-400">Top allocated departments</p>
                 </div>
+                <a href="{{ route('departments.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
-            @if(count($deptChartData['data']) > 0)
-                <div id="deptAssetChart" class="h-64 flex items-center justify-center"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No department asset data available</div>
-            @endif
+
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    @if(count($deptChartData['data']) > 0)
+                        <div id="deptAssetChart" class="h-52 w-full flex items-center justify-center"></div>
+                    @else
+                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No department asset data available</div>
+                    @endif
+                </div>
+
+                @if(isset($deptOverall) && $deptOverall->count() > 0)
+                    @php
+                        $deptColorsList = ['#3b82f6', '#22c55e', '#f97316', '#8b5cf6', '#06b6d4'];
+                    @endphp
+                    <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
+                        @foreach($deptOverall->take(3) as $index => $dept)
+                            <li class="flex items-center justify-between py-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $deptColorsList[$index % count($deptColorsList)] }}"></span>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $dept->name }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-bold text-gray-900 dark:text-white">{{ number_format($dept->assets_count) }} assets</span>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
         </div>
 
-        <!-- Chart 3: Component Allocation Doughnut Chart -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
-            <div class="flex items-center justify-between mb-4">
+        <!-- Chart 3: Component Allocation Doughnut Chart (TailAdmin Pro API Token Usages Style) -->
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Components Allocation</h3>
                     <p class="text-xs text-gray-400">Stock & installation status ratio</p>
                 </div>
+                <a href="{{ route('components.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
-            @if(($totalComponentUnits ?? 0) > 0)
-                <div id="componentPieChart" class="h-64 flex items-center justify-center"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No component unit data available</div>
-            @endif
+
+            <div class="flex flex-col gap-4 p-5">
+                <div class="flex justify-center">
+                    @if(($totalComponentUnits ?? 0) > 0)
+                        <div id="componentPieChart" class="h-52 w-full flex items-center justify-center"></div>
+                    @else
+                        <div class="flex items-center justify-center h-52 text-xs text-gray-400">No component unit data available</div>
+                    @endif
+                </div>
+
+                <ul class="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800 text-xs">
+                    <li class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="h-2.5 w-2.5 rounded-full bg-[#12b76a]"></span>
+                            <span class="font-medium text-gray-900 dark:text-white">Ready in Stock</span>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($readyComponents ?? 0) }} units</span>
+                    </li>
+                    <li class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="h-2.5 w-2.5 rounded-full bg-[#465fff]"></span>
+                            <span class="font-medium text-gray-900 dark:text-white">Installed on Asset</span>
+                        </div>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ number_format($installedComponents ?? 0) }} units</span>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     </div>
@@ -257,14 +336,14 @@
             <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Consumable Usage Timeline</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Visitor analytics of last 30 days</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Distribution trend by timeframe</span>
                 </div>
 
                 <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                    <button @click="timeframe = '12months'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
+                    <button @click="timeframe = '30days'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
+                    <button @click="timeframe = '7days'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
+                    <button @click="timeframe = '24hours'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
                 </div>
             </div>
             @if(count($consumableTimelineChartData['data']) > 0)
@@ -279,14 +358,14 @@
             <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Acquisition Timeline</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Visitor analytics of last 30 days</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Historical acquisition volume</span>
                 </div>
 
                 <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                    <button @click="timeframe = '12months'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
+                    <button @click="timeframe = '30days'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
+                    <button @click="timeframe = '7days'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
+                    <button @click="timeframe = '24hours'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
                 </div>
             </div>
             @if(count($purchaseChartData['data']) > 0)

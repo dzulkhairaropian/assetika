@@ -272,6 +272,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.consumableTLChartInstance.update();
             }
         };
+
+        window.updateConsumableTimelineTimeframe = (timeframe) => {
+            if (!window.consumableTLChartInstance || !consumableTimelineChartData) return;
+            let labels = [...consumableTimelineChartData.labels];
+            let data = [...consumableTimelineChartData.data];
+
+            if (timeframe === '7days') {
+                labels = labels.slice(-7);
+                data = data.slice(-7);
+            } else if (timeframe === '30days') {
+                labels = labels.slice(-30);
+                data = data.slice(-30);
+            } else if (timeframe === '24hours') {
+                labels = labels.slice(-1);
+                data = data.slice(-1);
+            }
+
+            window.consumableTLChartInstance.data.labels = labels;
+            window.consumableTLChartInstance.data.datasets[0].data = data;
+            window.consumableTLChartInstance.update();
+        };
     }
 
     // 6. Purchase Timeline Chart (Linear Line)
@@ -290,6 +311,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.purchaseTimelineChartInstance.data.datasets[0].data = newData.data;
                 window.purchaseTimelineChartInstance.update();
             }
+        };
+
+        window.updatePurchaseTimelineTimeframe = (timeframe) => {
+            if (!window.purchaseTimelineChartInstance || !purchaseChartData) return;
+            let labels = [...purchaseChartData.labels];
+            let data = [...purchaseChartData.data];
+
+            if (timeframe === '7days') {
+                labels = labels.slice(-7);
+                data = data.slice(-7);
+            } else if (timeframe === '30days') {
+                labels = labels.slice(-30);
+                data = data.slice(-30);
+            } else if (timeframe === '24hours') {
+                labels = labels.slice(-1);
+                data = data.slice(-1);
+            }
+
+            window.purchaseTimelineChartInstance.data.labels = labels;
+            window.purchaseTimelineChartInstance.data.datasets[0].data = data;
+            window.purchaseTimelineChartInstance.update();
         };
     }
 

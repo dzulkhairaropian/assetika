@@ -577,6 +577,7 @@ class DashboardController extends Controller
             'chartDataByCategory',
             'deptChartData',
             'deptDataByCategory',
+            'deptOverall',
             'categories',
             'consumableCategories',
             'productDataByCategory',
