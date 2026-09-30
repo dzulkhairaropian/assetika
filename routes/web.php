@@ -245,6 +245,9 @@ Route::middleware('auth')->group(function () {
     // System Settings Routes
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::post('settings/ldap/test', [SettingController::class, 'testLdap'])->name('settings.ldap.test');
+    Route::post('settings/ldap/sync-users', [SettingController::class, 'syncLdapUsers'])->name('settings.ldap.sync-users');
+    Route::post('settings/ldap/sync-devices', [SettingController::class, 'syncLdapDevices'])->name('settings.ldap.sync-devices');
 
     // Admin Bulk Delete Routes (must be before resource routes)
     Route::post('admin/priorities/bulk-delete', [PriorityController::class, 'bulkDestroy'])->name('admin.priorities.bulk-delete');

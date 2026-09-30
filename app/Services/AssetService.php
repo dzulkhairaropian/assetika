@@ -2,12 +2,18 @@
 
 namespace App\Services;
 
+use App\Mail\AssetCheckinMail;
+use App\Mail\AssetCheckoutMail;
+use App\Mail\AssetMaintenanceCompletedMail;
+use App\Mail\AssetMaintenanceStartedMail;
 use App\Models\Asset;
 use App\Models\AssetCheckout;
 use App\Models\AssetMaintenance;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AssetService
 {
@@ -65,6 +71,14 @@ class AssetService
 
             AssetTicketService::createCheckoutTicket($asset, $toUser, $params['notes'] ?? null);
 
+            try {
+                if ($toUser->email) {
+                    Mail::to($toUser->email)->send(new AssetCheckoutMail($asset, $checkout));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed sending asset checkout email: '.$e->getMessage());
+            }
+
             return $checkout;
         });
     }
@@ -95,6 +109,15 @@ class AssetService
 
             AssetTicketService::createCheckinTicket($asset, $fromUser, $params['condition_report'] ?? null);
 
+            try {
+                $recipientEmail = $fromUser?->email ?? auth()->user()?->email;
+                if ($recipientEmail) {
+                    Mail::to($recipientEmail)->send(new AssetCheckinMail($asset, $checkout));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed sending asset checkin email: '.$e->getMessage());
+            }
+
             return $checkout;
         });
     }
@@ -120,6 +143,15 @@ class AssetService
 
             AssetTicketService::createMaintenanceTicket($asset, $params['service_provider'], $params['description']);
 
+            try {
+                $recipientEmail = $asset->assignedToUser?->email ?? auth()->user()?->email;
+                if ($recipientEmail) {
+                    Mail::to($recipientEmail)->send(new AssetMaintenanceStartedMail($asset, $maintenance));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed sending asset maintenance started email: '.$e->getMessage());
+            }
+
             return $maintenance;
         });
     }
@@ -144,6 +176,15 @@ class AssetService
             ]);
 
             AssetTicketService::createCompleteMaintenanceTicket($asset, $maintenance);
+
+            try {
+                $recipientEmail = $asset->assignedToUser?->email ?? auth()->user()?->email;
+                if ($recipientEmail) {
+                    Mail::to($recipientEmail)->send(new AssetMaintenanceCompletedMail($asset, $maintenance));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed sending asset maintenance completed email: '.$e->getMessage());
+            }
 
             return $maintenance;
         });

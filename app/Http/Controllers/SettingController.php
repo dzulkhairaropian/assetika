@@ -3,15 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppSetting;
+use App\Services\LdapService;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    public function index()
+    public function index(LdapService $ldapService)
     {
         $settings = AppSetting::all();
+        $ldapInfo = $ldapService->testConnection();
 
-        return view('pages.settings.index', compact('settings'));
+        return view('pages.settings.index', compact('settings', 'ldapInfo'));
+    }
+
+    public function testLdap(LdapService $ldapService)
+    {
+        $res = $ldapService->testConnection();
+
+        return back()->with($res['success'] ? 'success' : 'error', $res['message']);
+    }
+
+    public function syncLdapUsers(LdapService $ldapService)
+    {
+        $res = $ldapService->syncUsers();
+
+        return back()->with('success', $res['message']);
+    }
+
+    public function syncLdapDevices(LdapService $ldapService)
+    {
+        $res = $ldapService->syncComputerDevices();
+
+        return back()->with('success', $res['message']);
     }
 
     public function update(Request $request)
