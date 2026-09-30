@@ -516,9 +516,10 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'bar',
             data: {
                 labels: vendorChartData.labels,
-                datasets: [{
-                    label: 'Units Registered',
-                    backgroundColor: '#465fff',
+	                datasets: [{
+	                    label: 'Units Registered',
+	                    data: vendorChartData.data,
+	                    backgroundColor: '#465fff',
                     borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
                     borderSkipped: false,
                     barThickness: 24,

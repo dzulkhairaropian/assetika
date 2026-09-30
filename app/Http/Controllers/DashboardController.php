@@ -578,7 +578,7 @@ class DashboardController extends Controller
                         return $date && $date->format('Y-m-d') === $d->format('Y-m-d');
                     })->count();
                 })->toArray(),
-                ],
+            ],
             '7days' => [
                 'labels' => collect(range(6, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('D d M'))->toArray(),
                 'data' => collect(range(6, 0))->map(function ($i) use ($allMaintenances, $nowTime) {
@@ -590,7 +590,7 @@ class DashboardController extends Controller
                         return $date && $date->format('Y-m-d') === $d->format('Y-m-d');
                     })->count();
                 })->toArray(),
-                ],
+            ],
             '24hours' => [
                 'labels' => collect(range(23, 0))->map(fn ($i) => $nowTime->copy()->subHours($i)->format('H:00'))->toArray(),
                 'data' => collect(range(23, 0))->map(function ($i) use ($allMaintenances, $nowTime) {
@@ -598,7 +598,7 @@ class DashboardController extends Controller
 
                     return (int) $allMaintenances->filter(fn ($main) => $main->created_at && $main->created_at->format('Y-m-d H') === $h->format('Y-m-d H'))->count();
                 })->toArray(),
-                ],
+            ],
         ];
 
         $maintenanceTimelineChartData = $maintenanceTimeframes['30days'];
@@ -711,15 +711,28 @@ class DashboardController extends Controller
         ];
 
         // Top Hardware Vendors by Volume
-        $topVendorsRaw = Brand::withCount('products')
-            ->select('brands.id', 'brands.name')
-            ->leftJoin('products', 'products.brand_id', '=', 'brands.id')
-            ->leftJoin('assets', 'assets.product_id', '=', 'products.id')
-            ->selectRaw('count(assets.id) as total_assets')
-            ->groupBy('brands.id', 'brands.name')
+        $topVendorsRaw = Brand::query()
+            ->withCount(['products as total_assets' => function ($query) {
+                $query->join('assets', 'assets.product_id', '=', 'products.id')
+                    ->whereNull('assets.deleted_at');
+            }])
+            ->having('total_assets', '>', 0)
             ->orderByDesc('total_assets')
             ->limit(5)
             ->get();
+
+        if ($topVendorsRaw->isEmpty()) {
+            $topVendorsRaw = Brand::withCount('products')
+                ->having('products_count', '>', 0)
+                ->orderByDesc('products_count')
+                ->limit(5)
+                ->get()
+                ->map(function ($b) {
+                    $b->total_assets = $b->products_count;
+
+                    return $b;
+                });
+        }
 
         $vendorChartData = [
             'labels' => $topVendorsRaw->pluck('name')->toArray(),
