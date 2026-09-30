@@ -439,6 +439,26 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // 6c. Asset Maintenance Timeline Chart (Linear Line)
+    const maintenanceCanvas = mountCanvas('#maintenanceTimelineChart');
+    const { maintenanceTimelineChartData } = window.chartData || {};
+    if (maintenanceCanvas && maintenanceTimelineChartData && maintenanceTimelineChartData.data?.length) {
+        window.maintenanceTimelineChartInstance = new Chart(
+            maintenanceCanvas,
+            createLineConfig(maintenanceTimelineChartData.labels, maintenanceTimelineChartData.data, 'Maintenances Conducted', '#f79009')
+        );
+
+        window.updateMaintenanceTimelineTimeframe = (timeframe) => {
+            if (!window.maintenanceTimelineChartInstance) return;
+            const tfMap = window.chartData?.maintenanceTimeframes;
+            const tfData = (tfMap && tfMap[timeframe]) || { labels: ['No Data'], data: [0] };
+
+            window.maintenanceTimelineChartInstance.data.labels = tfData.labels;
+            window.maintenanceTimelineChartInstance.data.datasets[0].data = tfData.data;
+            window.maintenanceTimelineChartInstance.update();
+        };
+    }
+
     // 7. Hardware Lifecycle & Age Distribution Bar Chart (TailAdmin Pro ChartSix Style)
     const ageCanvas = mountCanvas('#assetAgeChart');
     const { assetAgeDistribution } = window.chartData || {};

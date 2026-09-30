@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\AssetCheckout;
+use App\Models\AssetMaintenance;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Component;
@@ -520,7 +521,7 @@ class DashboardController extends Controller
 
                     return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m-d') === $d->format('Y-m-d'))->count();
                 })->toArray(),
-                ],
+            ],
             '7days' => [
                 'labels' => collect(range(6, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('D d M'))->toArray(),
                 'checkouts' => collect(range(6, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
@@ -533,7 +534,7 @@ class DashboardController extends Controller
 
                     return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m-d') === $d->format('Y-m-d'))->count();
                 })->toArray(),
-                ],
+            ],
             '24hours' => [
                 'labels' => collect(range(23, 0))->map(fn ($i) => $nowTime->copy()->subHours($i)->format('H:00'))->toArray(),
                 'checkouts' => collect(range(23, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
@@ -546,10 +547,61 @@ class DashboardController extends Controller
 
                     return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m-d H') === $h->format('Y-m-d H'))->count();
                 })->toArray(),
-                ],
+            ],
         ];
 
         $checkoutCheckinTimelineChartData = $checkoutCheckinTimeframes['30days'];
+
+        $allMaintenances = AssetMaintenance::all();
+
+        $maintenanceTimeframes = [
+            '12months' => [
+                'labels' => collect(range(11, 0))->map(fn ($i) => $nowTime->copy()->subMonths($i)->format('M Y'))->toArray(),
+                'data' => collect(range(11, 0))->map(function ($i) use ($allMaintenances, $nowTime) {
+                    $m = $nowTime->copy()->subMonths($i);
+
+                    return (int) $allMaintenances->filter(function ($main) use ($m) {
+                        $date = $main->start_date ?? $main->created_at;
+
+                        return $date && $date->format('Y-m') === $m->format('Y-m');
+                    })->count();
+                })->toArray(),
+            ],
+            '30days' => [
+                'labels' => collect(range(29, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('d M'))->toArray(),
+                'data' => collect(range(29, 0))->map(function ($i) use ($allMaintenances, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allMaintenances->filter(function ($main) use ($d) {
+                        $date = $main->start_date ?? $main->created_at;
+
+                        return $date && $date->format('Y-m-d') === $d->format('Y-m-d');
+                    })->count();
+                })->toArray(),
+                ],
+            '7days' => [
+                'labels' => collect(range(6, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('D d M'))->toArray(),
+                'data' => collect(range(6, 0))->map(function ($i) use ($allMaintenances, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allMaintenances->filter(function ($main) use ($d) {
+                        $date = $main->start_date ?? $main->created_at;
+
+                        return $date && $date->format('Y-m-d') === $d->format('Y-m-d');
+                    })->count();
+                })->toArray(),
+                ],
+            '24hours' => [
+                'labels' => collect(range(23, 0))->map(fn ($i) => $nowTime->copy()->subHours($i)->format('H:00'))->toArray(),
+                'data' => collect(range(23, 0))->map(function ($i) use ($allMaintenances, $nowTime) {
+                    $h = $nowTime->copy()->subHours($i);
+
+                    return (int) $allMaintenances->filter(fn ($main) => $main->created_at && $main->created_at->format('Y-m-d H') === $h->format('Y-m-d H'))->count();
+                })->toArray(),
+                ],
+        ];
+
+        $maintenanceTimelineChartData = $maintenanceTimeframes['30days'];
 
         $consumableTimelineChartData = $consumableTimelineByCategory['all'];
         $consumableTimelineYears = $consumableTxYears->toArray();
@@ -754,6 +806,8 @@ class DashboardController extends Controller
             'purchaseTimeframes',
             'checkoutCheckinTimelineChartData',
             'checkoutCheckinTimeframes',
+            'maintenanceTimelineChartData',
+            'maintenanceTimeframes',
             'consumableTimelineYears',
             'consumableTimelineYear',
             'assetsOlderThan4Years',

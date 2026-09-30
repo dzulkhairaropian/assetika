@@ -315,8 +315,8 @@
         </div>
     </div>
 
-    <!-- Timeline & Purchases Section -->
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <!-- Timeline & Purchases Section: Row 1 -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         
         <!-- Timeline Chart: Consumable Usage -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
@@ -362,6 +362,11 @@
             @endif
         </div>
 
+    </div>
+
+    <!-- Timeline & Purchases Section: Row 2 -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-6">
+
         <!-- Timeline Chart: Asset Checkout/Checkin -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
             <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
@@ -381,6 +386,28 @@
                 <div id="checkoutCheckinTimelineChart" class="h-64"></div>
             @else
                 <div class="flex items-center justify-center h-64 text-xs text-gray-400">No checkout/checkin timeline data available</div>
+            @endif
+        </div>
+
+        <!-- Timeline Chart: Asset Maintenance -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Maintenance Timeline</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Historical maintenance and service volume</span>
+                </div>
+
+                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
+                    <button @click="timeframe = '12months'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
+                    <button @click="timeframe = '30days'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
+                    <button @click="timeframe = '7days'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
+                    <button @click="timeframe = '24hours'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                </div>
+            </div>
+            @if(isset($maintenanceTimelineChartData['data']) && count($maintenanceTimelineChartData['data']) > 0)
+                <div id="maintenanceTimelineChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No maintenance timeline data available</div>
             @endif
         </div>
 
@@ -546,8 +573,10 @@
 		        purchaseChartData: @json($purchaseChartData),
 		        purchaseDataByCategory: @json($purchaseDataByCategory),
 		        purchaseTimeframes: @json($purchaseTimeframes ?? []),
-		        checkoutCheckinTimelineChartData: @json($checkoutCheckinTimelineChartData ?? []),
-		        checkoutCheckinTimeframes: @json($checkoutCheckinTimeframes ?? [])
+			        checkoutCheckinTimelineChartData: @json($checkoutCheckinTimelineChartData ?? []),
+			        checkoutCheckinTimeframes: @json($checkoutCheckinTimeframes ?? []),
+			        maintenanceTimelineChartData: @json($maintenanceTimelineChartData ?? []),
+			        maintenanceTimeframes: @json($maintenanceTimeframes ?? [])
     };
 </script>
 @vite('resources/js/dashboard-charts.js')
