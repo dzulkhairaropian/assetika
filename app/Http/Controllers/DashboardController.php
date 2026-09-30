@@ -492,6 +492,65 @@ class DashboardController extends Controller
             ],
         ];
 
+        $allCheckouts = AssetCheckout::whereNotNull('checked_out_at')->orWhereNotNull('checked_in_at')->get();
+
+        $checkoutCheckinTimeframes = [
+            '12months' => [
+                'labels' => collect(range(11, 0))->map(fn ($i) => $nowTime->copy()->subMonths($i)->format('M Y'))->toArray(),
+                'checkouts' => collect(range(11, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $m = $nowTime->copy()->subMonths($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_out_at && $c->checked_out_at->format('Y-m') === $m->format('Y-m'))->count();
+                })->toArray(),
+                'checkins' => collect(range(11, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $m = $nowTime->copy()->subMonths($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m') === $m->format('Y-m'))->count();
+                })->toArray(),
+            ],
+            '30days' => [
+                'labels' => collect(range(29, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('d M'))->toArray(),
+                'checkouts' => collect(range(29, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_out_at && $c->checked_out_at->format('Y-m-d') === $d->format('Y-m-d'))->count();
+                })->toArray(),
+                'checkins' => collect(range(29, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m-d') === $d->format('Y-m-d'))->count();
+                })->toArray(),
+                ],
+            '7days' => [
+                'labels' => collect(range(6, 0))->map(fn ($i) => $nowTime->copy()->subDays($i)->format('D d M'))->toArray(),
+                'checkouts' => collect(range(6, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_out_at && $c->checked_out_at->format('Y-m-d') === $d->format('Y-m-d'))->count();
+                })->toArray(),
+                'checkins' => collect(range(6, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $d = $nowTime->copy()->subDays($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m-d') === $d->format('Y-m-d'))->count();
+                })->toArray(),
+                ],
+            '24hours' => [
+                'labels' => collect(range(23, 0))->map(fn ($i) => $nowTime->copy()->subHours($i)->format('H:00'))->toArray(),
+                'checkouts' => collect(range(23, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $h = $nowTime->copy()->subHours($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_out_at && $c->checked_out_at->format('Y-m-d H') === $h->format('Y-m-d H'))->count();
+                })->toArray(),
+                'checkins' => collect(range(23, 0))->map(function ($i) use ($allCheckouts, $nowTime) {
+                    $h = $nowTime->copy()->subHours($i);
+
+                    return (int) $allCheckouts->filter(fn ($c) => $c->checked_in_at && $c->checked_in_at->format('Y-m-d H') === $h->format('Y-m-d H'))->count();
+                })->toArray(),
+                ],
+        ];
+
+        $checkoutCheckinTimelineChartData = $checkoutCheckinTimeframes['30days'];
+
         $consumableTimelineChartData = $consumableTimelineByCategory['all'];
         $consumableTimelineYears = $consumableTxYears->toArray();
         $consumableTimelineYear = $consumableTxYear;
@@ -693,6 +752,8 @@ class DashboardController extends Controller
             'consumableTimelineByCategory',
             'consumableTimeframes',
             'purchaseTimeframes',
+            'checkoutCheckinTimelineChartData',
+            'checkoutCheckinTimeframes',
             'consumableTimelineYears',
             'consumableTimelineYear',
             'assetsOlderThan4Years',

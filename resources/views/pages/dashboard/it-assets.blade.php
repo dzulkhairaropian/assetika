@@ -316,7 +316,7 @@
     </div>
 
     <!-- Timeline & Purchases Section -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
         
         <!-- Timeline Chart: Consumable Usage -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
@@ -359,6 +359,28 @@
                 <div id="purchaseTimelineChart" class="h-64"></div>
             @else
                 <div class="flex items-center justify-center h-64 text-xs text-gray-400">No purchase timeline data available</div>
+            @endif
+        </div>
+
+        <!-- Timeline Chart: Asset Checkout/Checkin -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Checkout / Checkin Timeline</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Historical checkout and checkin activity</span>
+                </div>
+
+                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
+                    <button @click="timeframe = '12months'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
+                    <button @click="timeframe = '30days'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
+                    <button @click="timeframe = '7days'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
+                    <button @click="timeframe = '24hours'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                </div>
+            </div>
+            @if(isset($checkoutCheckinTimelineChartData['labels']) && count($checkoutCheckinTimelineChartData['labels']) > 0)
+                <div id="checkoutCheckinTimelineChart" class="h-64"></div>
+            @else
+                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No checkout/checkin timeline data available</div>
             @endif
         </div>
 
@@ -521,9 +543,11 @@
 	        consumableTimelineChartData: @json($consumableTimelineChartData),
 	        consumableTimelineByCategory: @json($consumableTimelineByCategory),
 	        consumableTimeframes: @json($consumableTimeframes ?? []),
-	        purchaseChartData: @json($purchaseChartData),
-	        purchaseDataByCategory: @json($purchaseDataByCategory),
-	        purchaseTimeframes: @json($purchaseTimeframes ?? [])
+		        purchaseChartData: @json($purchaseChartData),
+		        purchaseDataByCategory: @json($purchaseDataByCategory),
+		        purchaseTimeframes: @json($purchaseTimeframes ?? []),
+		        checkoutCheckinTimelineChartData: @json($checkoutCheckinTimelineChartData ?? []),
+		        checkoutCheckinTimeframes: @json($checkoutCheckinTimeframes ?? [])
     };
 </script>
 @vite('resources/js/dashboard-charts.js')

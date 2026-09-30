@@ -313,6 +313,132 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // 6b. Asset Checkout / Checkin Timeline Chart (Dual Line)
+    const checkoutCheckinCanvas = mountCanvas('#checkoutCheckinTimelineChart');
+    const { checkoutCheckinTimelineChartData } = window.chartData || {};
+    if (checkoutCheckinCanvas && checkoutCheckinTimelineChartData && checkoutCheckinTimelineChartData.labels?.length) {
+        window.checkoutCheckinTLChartInstance = new Chart(checkoutCheckinCanvas, {
+            type: 'line',
+            data: {
+                labels: checkoutCheckinTimelineChartData.labels,
+                datasets: [
+                    {
+                        label: 'Checkouts',
+                        data: checkoutCheckinTimelineChartData.checkouts,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const { ctx, chartArea } = chart;
+                            if (!chartArea) return 'rgba(70, 95, 255, 0.1)';
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            const isDark = document.documentElement.classList.contains('dark');
+                            gradient.addColorStop(0, isDark ? 'rgba(70, 95, 255, 0.35)' : 'rgba(70, 95, 255, 0.25)');
+                            gradient.addColorStop(1, 'rgba(70, 95, 255, 0.0)');
+                            return gradient;
+                        },
+                        borderColor: '#465fff',
+                        borderWidth: 2,
+                        tension: 0,
+                        pointBackgroundColor: '#465fff',
+                        pointBorderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: '#465fff',
+                        pointHoverBorderColor: '#ffffff'
+                    },
+                    {
+                        label: 'Checkins',
+                        data: checkoutCheckinTimelineChartData.checkins,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const { ctx, chartArea } = chart;
+                            if (!chartArea) return 'rgba(18, 183, 106, 0.1)';
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            const isDark = document.documentElement.classList.contains('dark');
+                            gradient.addColorStop(0, isDark ? 'rgba(18, 183, 106, 0.35)' : 'rgba(18, 183, 106, 0.25)');
+                            gradient.addColorStop(1, 'rgba(18, 183, 106, 0.0)');
+                            return gradient;
+                        },
+                        borderColor: '#12b76a',
+                        borderWidth: 2,
+                        tension: 0,
+                        pointBackgroundColor: '#12b76a',
+                        pointBorderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: '#12b76a',
+                        pointHoverBorderColor: '#ffffff'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            font: { family: 'Outfit, sans-serif', size: 11 },
+                            color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+                        bodyFont: { family: 'Outfit, sans-serif', size: 12 },
+                        padding: { top: 8, bottom: 8, left: 12, right: 12 },
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: {
+                            font: { family: 'Outfit, sans-serif', size: 11 },
+                            color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8'
+                        }
+                    },
+                    y: {
+                        border: { display: false },
+                        grid: {
+                            color: document.documentElement.classList.contains('dark') ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.6)',
+                            dash: [4, 4]
+                        },
+                        ticks: {
+                            font: { family: 'Outfit, sans-serif', size: 11 },
+                            color: document.documentElement.classList.contains('dark') ? '#64748b' : '#94a3b8',
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+
+        window.updateCheckoutCheckinTimelineTimeframe = (timeframe) => {
+            if (!window.checkoutCheckinTLChartInstance) return;
+            const tfMap = window.chartData?.checkoutCheckinTimeframes;
+            const tfData = (tfMap && tfMap[timeframe]) || { labels: ['No Data'], checkouts: [0], checkins: [0] };
+
+            window.checkoutCheckinTLChartInstance.data.labels = tfData.labels;
+            window.checkoutCheckinTLChartInstance.data.datasets[0].data = tfData.checkouts;
+            window.checkoutCheckinTLChartInstance.data.datasets[1].data = tfData.checkins;
+            window.checkoutCheckinTLChartInstance.update();
+        };
+    }
+
     // 7. Hardware Lifecycle & Age Distribution Bar Chart (TailAdmin Pro ChartSix Style)
     const ageCanvas = mountCanvas('#assetAgeChart');
     const { assetAgeDistribution } = window.chartData || {};
