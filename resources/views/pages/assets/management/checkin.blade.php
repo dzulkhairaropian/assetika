@@ -59,7 +59,7 @@
                             <select name="supervisor_user_id"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
                                 <option value="">Select Supervisor</option>
-                                @foreach(\App\Models\User::orderBy('name')->get() as $supervisor)
+                                @foreach($supervisors as $supervisor)
                                     <option value="{{ $supervisor->id }}" {{ old('supervisor_user_id', $asset->currentCheckout?->supervisor_user_id) == $supervisor->id ? 'selected' : '' }}>
                                         {{ $supervisor->name }}{{ $supervisor->department ? ' - ' . $supervisor->department->name : '' }}
                                     </option>

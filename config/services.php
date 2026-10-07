@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'ldap' => [
+        'enabled' => env('LDAP_ENABLED', false),
+        'host' => env('LDAP_HOST', '127.0.0.1'),
+        'port' => env('LDAP_PORT', 389),
+        'base_dn' => env('LDAP_BASE_DN'),
+        'username' => env('LDAP_USERNAME'),
+        'password' => env('LDAP_PASSWORD'),
+    ],
+
+    // Public-facing base URL used for printed labels & QR codes (reachable from scanned devices)
+    'url_production' => rtrim(env('URL_PRODUCTION', env('APP_URL', 'http://localhost')), '/'),
+
 ];

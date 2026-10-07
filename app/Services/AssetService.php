@@ -90,11 +90,14 @@ class AssetService
             $checkout = $asset->currentCheckout;
             $fromUser = $asset->assignedToUser;
 
+            // Honor the operator-selected post-checkin status; fall back to Ready to Deploy
+            $statusId = ! empty($params['status_id']) ? (int) $params['status_id'] : ($readyStatus?->id ?? $asset->status_id);
+
             if ($checkout) {
                 $checkout->update([
                     'checked_in_by_user_id' => auth()->id() ?? $checkout->checked_out_to_user_id,
                     'supervisor_user_id' => $params['supervisor_user_id'] ?? $checkout->supervisor_user_id,
-                    'checked_in_at' => $params['checkin_date'] ?? now(),
+                    'checked_in_at' => $params['checkin_date'] ?? $params['checked_in_at'] ?? now(),
                     'checkin_notes' => $params['notes'] ?? $params['checkin_notes'] ?? null,
                     'condition_report' => $params['condition_report'] ?? null,
                 ]);
@@ -104,7 +107,10 @@ class AssetService
                 'current_checkout_id' => null,
                 'assigned_to_user_id' => null,
                 'user_name' => null,
-                'status_id' => $readyStatus?->id ?? $asset->status_id,
+                'status_id' => $statusId,
+                'is_components_stripped' => array_key_exists('is_components_stripped', $params)
+                    ? (bool) $params['is_components_stripped']
+                    : $asset->is_components_stripped,
             ]);
 
             AssetTicketService::createCheckinTicket($asset, $fromUser, $params['condition_report'] ?? null);

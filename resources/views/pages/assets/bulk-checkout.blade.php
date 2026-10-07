@@ -2,6 +2,12 @@
 @section('content')
 <div class="space-y-4">
     <x-common.page-breadcrumb pageTitle="Bulk Checkout Assets" :items="[['label' => 'IT Assets', 'url' => route('assets.index')]]" />
+    @if(session('success'))
+        <x-ui.alert variant="success" message="{{ session('success') }}" />
+    @endif
+    @if(session('error'))
+        <x-ui.alert variant="error" message="{{ session('error') }}" />
+    @endif
     <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Selected Assets ({{ count($assets) }})</h3>
         <div class="flex flex-wrap gap-1.5 mb-5">

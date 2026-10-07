@@ -79,8 +79,9 @@ class AssetManagementController extends Controller
         }
 
         $statuses = Status::all();
+        $supervisors = User::with('department')->orderBy('name')->get();
 
-        return view('pages.assets.management.checkin', compact('asset', 'statuses'));
+        return view('pages.assets.management.checkin', compact('asset', 'statuses', 'supervisors'));
     }
 
     public function processCheckin(Request $request, $asset)
@@ -93,12 +94,17 @@ class AssetManagementController extends Controller
             'checkin_notes' => 'nullable|string',
             'condition_report' => 'required|string',
             'supervisor_user_id' => 'nullable|exists:users,id',
+            'status_id' => 'required|exists:statuses,id',
+            'checked_in_at' => 'required|date',
         ]);
 
         $this->assetService->processCheckin($asset, [
             'notes' => $request->checkin_notes,
             'condition_report' => $request->condition_report,
             'supervisor_user_id' => $request->supervisor_user_id,
+            'status_id' => $request->status_id,
+            'checkin_date' => $request->checked_in_at,
+            'is_components_stripped' => $request->boolean('is_components_stripped'),
         ]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked in successfully.');
@@ -222,6 +228,15 @@ class AssetManagementController extends Controller
         ]);
 
         $retiredStatus = Status::where('name', 'Retired')->first();
+
+        // Close any open checkout so utilization history does not run indefinitely
+        if ($asset->currentCheckout) {
+            $asset->currentCheckout->update([
+                'checked_in_at' => now(),
+                'checked_in_by_user_id' => auth()->id(),
+                'checkin_notes' => trim(($asset->currentCheckout->checkin_notes ? $asset->currentCheckout->checkin_notes.' ' : '').'Auto closed on asset retirement.'),
+            ]);
+        }
 
         $asset->update([
             'status_id' => $retiredStatus?->id ?? $asset->status_id,

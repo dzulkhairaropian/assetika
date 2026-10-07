@@ -11,6 +11,9 @@
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
+        @if(session('error'))
+            <x-ui.alert variant="error" message="{{ session('error') }}" />
+        @endif
 
         <form action="{{ route('assets.store') }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
             @csrf

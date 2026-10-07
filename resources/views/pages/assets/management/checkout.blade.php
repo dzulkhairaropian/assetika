@@ -26,19 +26,23 @@
                     </h3>
                     <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2"
                          x-data="{
-                             selectedUser: '{{ old('checked_out_to_user_id') }}',
                              selectedLocation: '{{ old('location_id', $asset->location_id) }}',
                              selectedDepartment: '{{ old('department_id', $asset->department_id) }}',
-                             onUserChange(e) {
-                                 const opt = e.target.options[e.target.selectedIndex];
-                                 if (opt) {
-                                     const dept = opt.getAttribute('data-department');
-                                     const loc = opt.getAttribute('data-location');
-                                     if (dept) this.selectedDepartment = dept;
-                                     if (loc) this.selectedLocation = loc;
-                                 }
+                             userMeta: @json($users->mapWithKeys(fn ($u) => [
+                                 (string) $u->id => [
+                                     'department' => (string) ($u->department_id ?? ''),
+                                     'location' => (string) ($u->location_id ?? ''),
+                                 ],
+                             ])),
+                             onUserSelected(e) {
+                                 if (e.detail.name !== 'checked_out_to_user_id') return;
+                                 const meta = this.userMeta[String(e.detail.id)];
+                                 if (!meta) return;
+                                 if (meta.department) this.selectedDepartment = meta.department;
+                                 if (meta.location) this.selectedLocation = meta.location;
                              }
-                         }">
+                         }"
+                         @select-changed.window="onUserSelected($event)">
                         <div class="lg:col-span-2">
                             @php
                                 $userOptions = array_merge(

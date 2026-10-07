@@ -16,7 +16,7 @@ class LdapService
 {
     public function isEnabled(): bool
     {
-        return (bool) config('services.ldap.enabled', env('LDAP_ENABLED', false));
+        return (bool) config('services.ldap.enabled', false);
     }
 
     public function testConnection(): array
@@ -29,8 +29,8 @@ class LdapService
             ];
         }
 
-        $host = config('services.ldap.host', env('LDAP_HOST', '127.0.0.1'));
-        $port = (int) config('services.ldap.port', env('LDAP_PORT', 389));
+        $host = config('services.ldap.host', '127.0.0.1');
+        $port = (int) config('services.ldap.port', 389);
 
         if (! function_exists('ldap_connect')) {
             return [

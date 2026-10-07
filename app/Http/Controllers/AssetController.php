@@ -428,7 +428,8 @@ class AssetController extends Controller
     public function show(Asset $asset)
     {
         $asset->load([
-            'product.category', 'status', 'vendor', 'operatingSystem', 'department.company', 'location',
+            'product.category', 'product.brand', 'status', 'vendor', 'operatingSystem', 'department.company', 'location',
+            'currentCheckout.checkedOutToUser.department', 'currentCheckout.location',
             'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType',
             'tickets.status', 'tickets.priority', 'tickets.assignedTo',
             'activityLogs.user', 'installedComponents.product', 'installedComponents.vendor',
@@ -614,29 +615,29 @@ class AssetController extends Controller
             'ids' => 'required|array',
             'ids.*' => 'exists:assets,id',
             'checked_out_to_user_id' => 'required|exists:users,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'department_id' => 'nullable|exists:departments,id',
             'notes' => 'nullable|string',
         ]);
 
+        $toUser = User::findOrFail($request->checked_out_to_user_id);
         $assets = Asset::whereIn('id', $request->ids)
             ->whereNull('current_checkout_id')
             ->get();
 
         $count = 0;
         foreach ($assets as $asset) {
-            $checkout = $asset->checkouts()->create([
-                'checked_out_to_user_id' => $request->checked_out_to_user_id,
-                'checked_out_by_user_id' => auth()->id(),
-                'checked_out_at' => now(),
-                'checkout_notes' => $request->notes,
-            ]);
-            $asset->update([
-                'assigned_to_user_id' => $request->checked_out_to_user_id,
-                'current_checkout_id' => $checkout->id,
+            $this->assetService->processCheckout($asset, $toUser, [
+                'location_id' => $request->location_id,
+                'department_id' => $request->department_id,
+                'notes' => $request->notes,
             ]);
             $count++;
         }
 
-        return redirect()->route('assets.index')->with('success', "{$count} assets checked out. ".($assets->count() < count($request->ids) ? 'Some were already checked out.' : ''));
+        $skipped = count($request->ids) - $count;
+
+        return redirect()->route('assets.index')->with('success', "{$count} assets checked out successfully.".($skipped > 0 ? " {$skipped} skipped (already checked out)." : ''));
     }
 
     public function publicScan($assetId)
