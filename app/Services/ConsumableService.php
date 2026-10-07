@@ -8,12 +8,22 @@ use App\Models\User;
 use App\Notifications\SystemNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ConsumableService
 {
     public function processCheckout(Consumable $consumable, User $toUser, int $quantity, array $params, ?UploadedFile $evidence = null): ConsumableTransaction
     {
         return DB::transaction(function () use ($consumable, $toUser, $quantity, $params, $evidence) {
+            // Re-read with a row lock to prevent overselling under concurrent checkouts
+            $consumable = Consumable::whereKey($consumable->id)->lockForUpdate()->first() ?? $consumable;
+
+            if ($quantity > $consumable->quantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Insufficient stock for '.($consumable->product?->name ?? 'Consumable')." (available: {$consumable->quantity}).",
+                ]);
+            }
+
             $unitCost = $consumable->purchase_cost ?? 0;
             $totalCost = $quantity * $unitCost;
 
@@ -46,7 +56,7 @@ class ConsumableService
 
             // Alert IT Admins when stock drops to or below low threshold
             if ($after <= ($consumable->low_threshold ?? 5)) {
-                $admins = User::whereHas('roles', fn ($q) => $q->whereIn('name', ['Admin', 'Super Admin', 'IT Admin']))->get();
+                $admins = User::whereHas('roles', fn ($q) => $q->whereIn('name', ['super_admin', 'it_admin']))->get();
                 foreach ($admins as $admin) {
                     $admin->notify(new SystemNotification(
                         'Consumable Low Stock Alert',
@@ -87,7 +97,15 @@ class ConsumableService
                     continue;
                 }
 
-                $consumable = Consumable::findOrFail($consumableId);
+                // Lock each row to prevent overselling under concurrent checkouts
+                $consumable = Consumable::whereKey($consumableId)->lockForUpdate()->firstOrFail();
+
+                if ($qty > $consumable->quantity) {
+                    throw ValidationException::withMessages([
+                        'quantities.'.$consumableId => 'Insufficient stock for '.($consumable->product?->name ?? 'Consumable')." (available: {$consumable->quantity}).",
+                    ]);
+                }
+
                 $unitCost = $consumable->purchase_cost ?? 0;
                 $totalCost = $qty * $unitCost;
 
@@ -133,6 +151,9 @@ class ConsumableService
     public function processRestock(Consumable $consumable, int $quantity, array $params, ?UploadedFile $evidence = null): ConsumableTransaction
     {
         return DB::transaction(function () use ($consumable, $quantity, $params, $evidence) {
+            // Lock the row so concurrent checkouts cannot interleave with the restock update
+            $consumable = Consumable::whereKey($consumable->id)->lockForUpdate()->first() ?? $consumable;
+
             $unitCost = $params['unit_cost'] ?? ($consumable->purchase_cost ?? 0);
             $totalCost = $quantity * $unitCost;
 

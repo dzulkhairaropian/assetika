@@ -131,6 +131,18 @@ class ConsumableController extends Controller
         return redirect()->route('consumables.index')->with('success', 'Consumable created successfully.');
     }
 
+    public function show(Consumable $consumable)
+    {
+        $consumable->load(['product.brand', 'product.category', 'status']);
+
+        $transactions = $consumable->transactions()
+            ->with(['user', 'checkedOutToUser'])
+            ->limit(20)
+            ->get();
+
+        return view('pages.consumables.show', compact('consumable', 'transactions'));
+    }
+
     public function edit(Consumable $consumable)
     {
         $products = Product::with(['brand', 'category'])

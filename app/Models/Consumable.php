@@ -46,28 +46,13 @@ class Consumable extends Model
 
     protected static function booted()
     {
+        // saving fires for both create and update — no need for creating/updating hooks
         static::saving(function (self $model) {
             $statusId = $model->determineStatusId();
             if ($statusId !== null) {
                 $model->status_id = $statusId;
             }
         });
-
-        static::creating(function (self $model) {
-            $statusId = $model->determineStatusId();
-            if ($statusId !== null) {
-                $model->status_id = $statusId;
-            }
-        });
-
-        static::updating(
-            function (self $model) {
-                $statusId = $model->determineStatusId();
-                if ($statusId !== null) {
-                    $model->status_id = $statusId;
-                }
-            }
-        );
     }
 
     private function determineStatusId(): ?int
