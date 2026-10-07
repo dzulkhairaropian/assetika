@@ -4,7 +4,7 @@
 @php
     $isStaff = auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
 @endphp
-<div class="space-y-4" x-data="{ openProjectModal: false }">
+<div class="space-y-4" x-data="{ openProjectModal: false, statusModalOpen: false }">
     <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -23,6 +23,10 @@
                     Add to Project Task
                 </button>
             @endif
+            <button type="button" @click="statusModalOpen = true" class="inline-flex items-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                Update Status
+            </button>
             <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                 Back
             </a>
@@ -245,6 +249,101 @@
                     </div>
                 </div>
             @endif
+        </div>
+    </div>
+
+    <!-- Modal: Quick Update Ticket Status -->
+    <div x-show="statusModalOpen" x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+        <div @click.away="statusModalOpen = false"
+            x-data="{
+                closedIds: {{ json_encode($statuses->where('is_closed')->pluck('id')->map(fn ($id) => (int) $id)->values()) }},
+                autoComplete() {
+                    const sel = document.getElementById('updateStatusSelect');
+                    const isClosed = this.closedIds.includes(parseInt(sel.value));
+                    const dateInput = document.getElementById('updateCompletedDate');
+                    const timeInput = document.getElementById('updateCompletedTime');
+                    if (isClosed) {
+                        if (!dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+                        if (!timeInput.value) timeInput.value = new Date().toTimeString().slice(0, 5);
+                    } else {
+                        dateInput.value = '';
+                        timeInput.value = '';
+                    }
+                }
+            }"
+            class="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-success-50 text-success-600 dark:bg-success-500/10">
+                        <i data-lucide="refresh-cw" class="h-5 w-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white">Update Ticket Status</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Quick update for <strong>#{{ $ticket->request_id }}</strong> — for full changes use Edit Issue.</p>
+                    </div>
+                </div>
+                <button type="button" @click="statusModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+
+            <form action="{{ route('tickets.update-status', $ticket) }}" method="POST" class="mt-4 space-y-4">
+                @csrf
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        New Status <span class="text-error-500">*</span>
+                    </label>
+                    <select id="updateStatusSelect" name="status_id" required @change="autoComplete()"
+                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                        @foreach($statuses as $st)
+                            <option value="{{ $st->id }}" {{ $ticket->status_id == $st->id ? 'selected' : '' }}>{{ $st->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Resolution Notes
+                    </label>
+                    <textarea name="resolution_notes" rows="3" placeholder="Describe the resolution or lesson learned..."
+                        class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('resolution_notes', $ticket->resolution_notes) }}</textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Completed Date
+                        </label>
+                        <input type="date" id="updateCompletedDate" name="completed_date" value="{{ old('completed_date', $ticket->completed_date?->format('Y-m-d')) }}"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Completed Time
+                        </label>
+                        <input type="time" id="updateCompletedTime" name="completed_time" value="{{ old('completed_time', $ticket->completed_time?->format('H:i')) }}"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Actual Hours Spent
+                    </label>
+                    <input type="number" name="actual_hours" step="0.5" min="0" value="{{ old('actual_hours', $ticket->actual_hours) }}" placeholder="e.g. 2.5"
+                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                </div>
+
+                <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                    <button type="button" @click="statusModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="rounded-lg bg-success-500 px-4 py-2 text-xs font-semibold text-white hover:bg-success-600 transition">
+                        Update Status
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

@@ -359,8 +359,74 @@ class TicketController extends Controller
         ]);
 
         $projects = Project::latest()->get();
+        $statuses = TicketStatus::orderBy('name')->get();
 
-        return view('pages.tickets.show', compact('ticket', 'projects'));
+        return view('pages.tickets.show', compact('ticket', 'projects', 'statuses'));
+    }
+
+    /**
+     * Quick status update from the ticket detail page (distinct from full edit).
+     */
+    public function updateStatus(Request $request, Ticket $ticket): RedirectResponse
+    {
+        $data = $request->validate([
+            'status_id' => ['required', 'exists:ticket_statuses,id'],
+            'resolution_notes' => ['nullable', 'string'],
+            'completed_date' => ['nullable', 'date'],
+            'completed_time' => ['nullable'],
+            'actual_hours' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $oldStatus = $ticket->status;
+        $status = TicketStatus::find($data['status_id']);
+        $oldStatusId = $ticket->status_id;
+
+        // Auto-complete bookkeeping when moving to a closed status
+        if ($status && $status->is_closed) {
+            if (empty($data['completed_date'])) {
+                $data['completed_date'] = now()->toDateString();
+            }
+            if (empty($data['completed_time'])) {
+                $data['completed_time'] = now();
+            }
+            if (empty($ticket->resolution_time_hours)) {
+                $data['resolution_time_hours'] = round($ticket->created_at->diffInMinutes(now()) / 60, 2);
+            }
+            if (empty($ticket->sla_status_id)) {
+                $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+                if ($fulfilledSla) {
+                    $data['sla_status_id'] = $fulfilledSla->id;
+                }
+            }
+        } else {
+            // Moving between open statuses clears completion data
+            $data['completed_date'] = null;
+            $data['completed_time'] = null;
+        }
+
+        $ticket->fill($data);
+        $ticket->save();
+
+        if ($status && (string) $oldStatusId !== (string) $status->id) {
+            TicketHistory::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => auth()->id(),
+                'action' => 'Status Updated',
+                'description' => 'Status changed from '.($oldStatus?->name ?? 'None').' to '.$status->name.'.',
+            ]);
+
+            if ($ticket->requesterUser) {
+                $ticket->requesterUser->notify(new SystemNotification(
+                    'Ticket Status Updated',
+                    'Ticket #'.$ticket->request_id.' status is now '.$status->name.'.',
+                    route('tickets.show', $ticket),
+                    'info',
+                    'ITSM'
+                ));
+            }
+        }
+
+        return back()->with('success', 'Ticket status updated to '.$status?->name.'.');
     }
 
     public function edit(Ticket $ticket): View
