@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $isStaff = auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
+@endphp
 <div class="space-y-4" x-data="{ openProjectModal: false }">
     <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
 
@@ -32,6 +35,9 @@
     @if (session('success'))
         <x-ui.alert variant="success" message="{{ session('success') }}" />
     @endif
+    @if (session('error'))
+        <x-ui.alert variant="error" message="{{ session('error') }}" />
+    @endif
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <!-- Main Content Area: Problem, Comments, Activity Timeline -->
@@ -59,7 +65,7 @@
             </div>
 
             <!-- Resolution & Internal Notes / Lessons Learned (LL) -->
-            @if($ticket->resolution_notes || $ticket->internal_notes)
+            @if($ticket->resolution_notes || ($isStaff && $ticket->internal_notes))
                 <div class="rounded-xl border border-emerald-200 bg-emerald-50/20 p-4 shadow-sm dark:border-emerald-900/30 dark:bg-emerald-950/10 space-y-3">
                     @if($ticket->resolution_notes)
                         <div>
@@ -74,7 +80,7 @@
                             </div>
                         </div>
                     @endif
-                    @if($ticket->internal_notes)
+                    @if($isStaff && $ticket->internal_notes)
                         <div class="{{ $ticket->resolution_notes ? 'pt-2 border-t border-emerald-100 dark:border-emerald-900/20' : '' }}">
                             <div class="flex items-center gap-1.5 mb-1 text-amber-600 dark:text-amber-400">
                                 <i data-lucide="lock" class="w-3.5 h-3.5"></i>
@@ -100,10 +106,12 @@
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                            <label class="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                <input type="checkbox" name="is_internal" value="1" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
-                                Internal note (visible to staff only)
-                            </label>
+                            @if($isStaff)
+                                <label class="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                    <input type="checkbox" name="is_internal" value="1" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+                                    Internal note (visible to staff only)
+                                </label>
+                            @endif
                             <input type="file" name="attachment" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-800 dark:file:text-gray-300"/>
                         </div>
                         <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
@@ -117,6 +125,9 @@
                 <!-- Comment Feed -->
                 <div class="space-y-3">
                     @forelse($ticket->comments as $comment)
+                        @if($comment->is_internal && ! $isStaff)
+                            @continue
+                        @endif
                         <div class="rounded-lg border border-gray-100 p-3 dark:border-gray-800 {{ $comment->is_internal ? 'bg-orange-50/30 dark:bg-orange-950/20' : 'bg-gray-50/50 dark:bg-gray-950' }}">
                             <div class="flex items-center justify-between mb-1.5">
                                 <span class="font-semibold text-xs text-gray-900 dark:text-white">
@@ -266,7 +277,7 @@
 
                     <div>
                         <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Task Title <span class="text-error-500">*</span></label>
-                        <input type="text" name="title" value="[Ticket #{{ $ticket->request_id }}] {{ $ticket->title }}" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
+                        <input type="text" name="title" value="[Ticket #{{ $ticket->request_id }}] {{ \Illuminate\Support\Str::limit($ticket->problem_description, 80) }}" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">

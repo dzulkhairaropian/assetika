@@ -40,6 +40,7 @@ class Ticket extends Model
         'resolution_notes',
         'status_id',
         'sla_status_id',
+        'sla_due_at',
         'internal_notes',
         'estimated_hours',
         'actual_hours',
@@ -53,11 +54,29 @@ class Ticket extends Model
             'request_time' => 'datetime', // Cast to datetime to use time functions
             'completed_date' => 'date',
             'completed_time' => 'datetime',
+            'sla_due_at' => 'datetime',
             'response_time_minutes' => 'integer',
             'resolution_time_hours' => 'decimal:2',
             'estimated_hours' => 'decimal:2',
             'actual_hours' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Whether the ticket has breached its SLA resolution target.
+     * Uses sla_due_at (computed from sla_policies) with a legacy 3-day fallback.
+     */
+    public function isSlaOverdue(): bool
+    {
+        if ($this->status?->is_closed || $this->status?->is_paused) {
+            return false;
+        }
+
+        if ($this->sla_due_at) {
+            return now()->gt($this->sla_due_at);
+        }
+
+        return $this->created_at !== null && $this->created_at->diffInDays(now()) >= 3;
     }
 
     public function scopeFilter($query, array $filters)

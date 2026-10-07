@@ -30,6 +30,9 @@
     @if(session('success'))
         <x-ui.alert variant="success" message="{{ session('success') }}" />
     @endif
+    @if(session('error'))
+        <x-ui.alert variant="error" message="{{ session('error') }}" />
+    @endif
 
     <form id="bulkDeleteTicketsForm" action="{{ route('tickets.bulk-delete') }}" method="POST" class="hidden">
         @csrf
@@ -91,6 +94,9 @@
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <form method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
+                    @if(request('tab'))
+                        <input type="hidden" name="tab" value="{{ request('tab') }}">
+                    @endif
                     <div class="relative flex items-center">
                         <span class="absolute left-2.5 text-gray-400">
                             <i data-lucide="search" class="w-3.5 h-3.5"></i>
@@ -355,7 +361,7 @@
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                     @forelse($tickets as $ticket)
                         @php
-                            $isOverdue = !($ticket->status?->is_closed) && $ticket->created_at->diffInDays(now()) >= 3;
+                            $isOverdue = $ticket->isSlaOverdue();
                             $priorityIcon = $ticket->priority?->icon ?: 'flag';
                             $statusIcon = $ticket->status?->icon ?: 'disc';
                             $slaIcon = $isOverdue ? 'alert-circle' : 'circle-check';

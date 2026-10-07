@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Label;
 use App\Models\Priority;
 use App\Models\Project;
+use App\Models\SlaPolicy;
 use App\Models\SlaStatus;
 use App\Models\Source;
 use App\Models\Ticket;
@@ -251,20 +252,20 @@ class TicketController extends Controller
         $requestCode = strtoupper($ticketType?->code ?: 'REQ');
         $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
 
-        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-            ->orderBy('id', 'desc')
-            ->first();
-
+        // Race-safe daily sequence: find a free slot even under concurrent creation
         $nextSeq = 1;
-        if ($latestTicket) {
-            $parts = explode('-', $latestTicket->request_id);
-            $lastNum = (int) end($parts);
-            $nextSeq = $lastNum + 1;
-        }
+        do {
+            $candidate = $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
+            $exists = Ticket::where('request_id', $candidate)->exists();
+            if (! $exists) {
+                break;
+            }
+            $nextSeq++;
+        } while (true);
 
         $dailySequence = str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
 
-        $data['request_id'] = $requestCode.'-'.$ticketDate->format('ymd').'-'.$dailySequence;
+        $data['request_id'] = $candidate;
         $data['request_date'] = $ticketDate->toDateString();
         $data['request_time'] = $ticketDate;
         $data['created_at'] = $ticketDate;
@@ -292,13 +293,19 @@ class TicketController extends Controller
             if (empty($data['completed_time'])) {
                 $data['completed_time'] = now();
             }
+            // SLA is fulfilled only for tickets that are already completed on creation
+            if (empty($data['sla_status_id'])) {
+                $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+                if ($fulfilledSla) {
+                    $data['sla_status_id'] = $fulfilledSla->id;
+                }
+            }
         }
 
-        if (empty($data['sla_status_id'])) {
-            $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
-            if ($fulfilledSla) {
-                $data['sla_status_id'] = $fulfilledSla->id;
-            }
+        // Compute SLA due date from the SLA policy of the selected priority
+        $slaDueAt = $this->computeSlaDueAt($ticketDate, $data['priority_id'] ?? null, $data['status_id'] ?? null);
+        if ($slaDueAt) {
+            $data['sla_due_at'] = $slaDueAt;
         }
 
         $ticket = new Ticket;
@@ -418,6 +425,7 @@ class TicketController extends Controller
     public function update(Request $request, Ticket $ticket): RedirectResponse
     {
         $oldStatusId = $ticket->status_id;
+        $oldAssignedToId = $ticket->assigned_to_id;
         $data = $request->validate([
             'created_at' => ['nullable', 'date'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
@@ -454,6 +462,20 @@ class TicketController extends Controller
             $data['requester_email'] = $requester->email;
             $data['requester_company_id'] = $requester->company_id;
             $data['requester_department_id'] = $requester->department_id;
+        }
+
+        // Recompute SLA due date when the ticket date or priority changed and the ticket is not closed
+        $statusIdForSla = isset($data['status_id']) ? (int) $data['status_id'] : $ticket->status_id;
+        $statusForSla = $statusIdForSla ? TicketStatus::find($statusIdForSla) : null;
+        if ($statusForSla && ! $statusForSla->is_closed) {
+            $baseDate = isset($data['created_at']) ? Carbon::parse($data['created_at']) : $ticket->created_at;
+            $priorityIdForSla = isset($data['priority_id']) ? (int) $data['priority_id'] : $ticket->priority_id;
+            $slaDueAt = $this->computeSlaDueAt($baseDate ? Carbon::parse($baseDate) : null, $priorityIdForSla, $statusIdForSla);
+            if ($slaDueAt) {
+                $data['sla_due_at'] = $slaDueAt;
+            }
+        } elseif ($statusForSla && $statusForSla->is_closed) {
+            $data['sla_due_at'] = null;
         }
 
         // If completed_date is provided and status is not explicitly set to a closed status, auto-set status to Completed
@@ -531,6 +553,20 @@ class TicketController extends Controller
             ));
         }
 
+        // Notify the new assignee when the assignment changed to a different user
+        if (isset($data['assigned_to_id'])
+            && $data['assigned_to_id']
+            && (string) $data['assigned_to_id'] !== (string) $oldAssignedToId
+            && ($newAssignee = User::find($data['assigned_to_id']))) {
+            $newAssignee->notify(new SystemNotification(
+                'Ticket Assigned to You',
+                'Ticket #'.$ticket->request_id.' has been assigned to you.',
+                route('tickets.show', $ticket),
+                'ticket',
+                'ITSM'
+            ));
+        }
+
         return redirect()->route('tickets.index')->with('success', 'Ticket updated successfully.');
     }
 
@@ -561,8 +597,10 @@ class TicketController extends Controller
             ]);
         }
 
-        // Compute First Response Time Metrics
-        if (is_null($ticket->response_time_minutes) && auth()->id() !== $ticket->requester_user_id) {
+        // Compute First Response Time Metrics (public replies only, excluding the requester)
+        if (is_null($ticket->response_time_minutes)
+            && ! $request->boolean('is_internal')
+            && auth()->id() !== $ticket->requester_user_id) {
             $responseMins = (int) round($ticket->created_at->diffInMinutes(now()));
             $ticket->update(['response_time_minutes' => $responseMins]);
         }
@@ -608,5 +646,26 @@ class TicketController extends Controller
         Ticket::whereIn('id', $data['ids'])->delete();
 
         return redirect()->route('tickets.index')->with('success', 'Selected tickets deleted successfully.');
+    }
+
+    /**
+     * Compute the SLA due timestamp from the SLA policy of the ticket priority.
+     * Returns null for already-closed tickets or when no base date exists.
+     */
+    private function computeSlaDueAt(?Carbon $ticketDate, ?int $priorityId, ?int $statusId): ?Carbon
+    {
+        if (! $ticketDate) {
+            return null;
+        }
+
+        $status = $statusId ? TicketStatus::find($statusId) : null;
+        if ($status && $status->is_closed) {
+            return null;
+        }
+
+        $policy = $priorityId ? SlaPolicy::where('priority_id', $priorityId)->first() : null;
+        $hours = (int) ($policy?->resolution_target_hours ?? 72);
+
+        return $ticketDate->copy()->addHours($hours);
     }
 }
