@@ -281,6 +281,8 @@ class TicketController extends Controller
         }
 
         $ticketDate = ! empty($data['created_at']) ? Carbon::parse($data['created_at']) : now();
+        $data['estimated_hours'] = $data['estimated_hours'] ?? 0;
+        $data['actual_hours'] = $data['actual_hours'] ?? 0;
         $ticketType = ! empty($data['ticket_type_id']) ? TicketType::find($data['ticket_type_id']) : null;
         $requestCode = strtoupper($ticketType?->code ?: 'REQ');
         $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
@@ -454,6 +456,10 @@ class TicketController extends Controller
             // Moving between open statuses clears completion data
             $data['completed_date'] = null;
             $data['completed_time'] = null;
+        }
+
+        if (array_key_exists('actual_hours', $data) && is_null($data['actual_hours'])) {
+            $data['actual_hours'] = $ticket->actual_hours ?? 0;
         }
 
         $ticket->fill($data);
@@ -642,6 +648,10 @@ class TicketController extends Controller
                     }
                 }
             }
+        }
+
+        if (array_key_exists('actual_hours', $data) && is_null($data['actual_hours'])) {
+            $data['actual_hours'] = $ticket->actual_hours ?? 0;
         }
 
         $ticket->fill($data);
