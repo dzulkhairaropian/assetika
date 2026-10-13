@@ -215,11 +215,13 @@ class TicketController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $isStaff = auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
+
         $data = $request->validate([
             'created_at' => ['nullable', 'date'],
             'subject' => ['nullable', 'string', 'max:255'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
-            'requester_user_id' => ['required', 'exists:users,id'],
+            'requester_user_id' => [$isStaff ? 'required' : 'nullable', 'exists:users,id'],
             'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
             'priority_id' => ['nullable', 'exists:priorities,id'],
             'label_id' => ['nullable', 'exists:labels,id'],
@@ -238,6 +240,30 @@ class TicketController extends Controller
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
+
+        // Security & workflow enforcement for non-staff users (requesters)
+        if (! $isStaff) {
+            $data['requester_user_id'] = auth()->id();
+            $data['created_at'] = now();
+            $data['assigned_to_id'] = null;
+            $data['internal_notes'] = null;
+            $data['completed_date'] = null;
+            $data['completed_time'] = null;
+            $data['actual_hours'] = 0;
+            $data['estimated_hours'] = 0;
+
+            // Default status to New
+            $newStatus = TicketStatus::where('name', 'New')->first();
+            $data['status_id'] = $newStatus?->id;
+
+            // Default portal source
+            $portalSource = Source::where('code', 'PORTAL')->orWhere('name', 'Portal')->first();
+            $data['source_id'] = $portalSource?->id ?? $data['source_id'] ?? null;
+
+            // Default Incident type
+            $incidentType = TicketType::where('code', 'INCIDENT')->orWhere('name', 'Incident')->first();
+            $data['ticket_type_id'] = $incidentType?->id ?? $data['ticket_type_id'] ?? null;
+        }
 
         if (empty($data['subject'])) {
             $firstLine = trim(strtok((string) $data['problem_description'], "\r\n") ?: (string) $data['problem_description']);

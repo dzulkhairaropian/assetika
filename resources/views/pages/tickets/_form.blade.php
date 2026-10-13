@@ -29,6 +29,9 @@
     $selStatusId = old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? ''));
     $selLabelId = old('label_id', $ticket?->label_id);
     $selSourceId = old('source_id', $ticket?->source_id ?? ($sources->first()?->id ?? ''));
+
+    $isStaff = auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
+    $initialRequesterId = old('requester_user_id', $ticket?->requester_user_id ?? ($isStaff ? '' : auth()->id()));
 @endphp
 <div class="space-y-4" x-data="{
     selectedCategory: '{{ old('ticket_category_id', $ticket?->ticket_category_id) }}',
@@ -38,7 +41,7 @@
     completedDate: '{{ old('completed_date', $ticket?->completed_date?->format('Y-m-d')) }}',
     completedTime: '{{ old('completed_time', $ticket?->completed_time?->format('H:i')) }}',
     allAssets: {{ json_encode($allAssetItems) }},
-    currentRequesterId: '{{ old('requester_user_id', $ticket?->requester_user_id) }}',
+    currentRequesterId: '{{ $initialRequesterId }}',
     currentAssetId: '{{ old('asset_id', $ticket?->asset_id) }}',
 
     init() {
@@ -126,94 +129,113 @@
                 Ticket Information
             </h3>
 
-            <div class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-                <!-- Ticket Creation Date (Backdate) -->
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Ticket Date & Time <span class="text-[11px] text-gray-400 font-normal">(Backdate supported)</span>
-                    </label>
-                    <input type="datetime-local" name="created_at"
-                        value="{{ old('created_at', isset($ticket) ? ($ticket->created_at ? $ticket->created_at->format('Y-m-d\TH:i') : '') : date('Y-m-d\TH:i')) }}"
-                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
-                    @error('created_at') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
-                </div>
+            @if($isStaff)
+                {{-- Full Staff / Admin Ticket Setup --}}
+                <div class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+                    <!-- Ticket Creation Date (Backdate) -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Ticket Date & Time <span class="text-[11px] text-gray-400 font-normal">(Backdate supported)</span>
+                        </label>
+                        <input type="datetime-local" name="created_at"
+                            value="{{ old('created_at', isset($ticket) ? ($ticket->created_at ? $ticket->created_at->format('Y-m-d\TH:i') : '') : date('Y-m-d\TH:i')) }}"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        @error('created_at') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                    </div>
 
-                <!-- Ticket Type -->
-                <div>
-                    <x-form.searchable-select name="ticket_type_id" label="Ticket Type" :options="$typeOpts" :selected="$selTypeId" placeholder="Select Type" />
-                </div>
+                    <!-- Ticket Type -->
+                    <div>
+                        <x-form.searchable-select name="ticket_type_id" label="Ticket Type" :options="$typeOpts" :selected="$selTypeId" placeholder="Select Type" />
+                    </div>
 
-                <!-- Requester -->
-                <div>
-                    <x-form.searchable-select name="requester_user_id" label="Requester User" :options="$userOpts" :selected="$selRequesterId" placeholder="Select User" required="true" />
-                </div>
+                    <!-- Requester -->
+                    <div>
+                        <x-form.searchable-select name="requester_user_id" label="Requester User" :options="$userOpts" :selected="$selRequesterId" placeholder="Select User" required="true" />
+                    </div>
 
-                <!-- Assigned To -->
-                <div>
-                    <x-form.searchable-select name="assigned_to_id" label="Assigned Staff" :options="$staffOpts" :selected="$selAssignedId" placeholder="Unassigned" />
-                </div>
+                    <!-- Assigned To -->
+                    <div>
+                        <x-form.searchable-select name="assigned_to_id" label="Assigned Staff" :options="$staffOpts" :selected="$selAssignedId" placeholder="Unassigned" />
+                    </div>
 
-                <!-- ITSM Ticket Category -->
-                <div>
-                    <x-form.searchable-select name="ticket_category_id" label="ITSM Category" :options="$catOpts" :selected="$selCatId" placeholder="Select Category (Auto-mapped if Asset selected)" />
-                </div>
+                    <!-- ITSM Ticket Category -->
+                    <div>
+                        <x-form.searchable-select name="ticket_category_id" label="ITSM Category" :options="$catOpts" :selected="$selCatId" placeholder="Select Category (Auto-mapped if Asset selected)" />
+                    </div>
 
-                <!-- Priority -->
-                <div>
-                    <x-form.searchable-select name="priority_id" label="Priority" :options="$priorityOpts" :selected="$selPriorityId" placeholder="Select Priority" />
-                </div>
+                    <!-- Priority -->
+                    <div>
+                        <x-form.searchable-select name="priority_id" label="Priority" :options="$priorityOpts" :selected="$selPriorityId" placeholder="Select Priority" />
+                    </div>
 
-                <!-- Status -->
-                <div>
-                    <x-form.searchable-select name="status_id" label="Status" :options="$statusOpts" :selected="$selStatusId" placeholder="Select Status" />
-                </div>
+                    <!-- Status -->
+                    <div>
+                        <x-form.searchable-select name="status_id" label="Status" :options="$statusOpts" :selected="$selStatusId" placeholder="Select Status" />
+                    </div>
 
-                <!-- Label -->
-                <div>
-                    <x-form.searchable-select name="label_id" label="Label" :options="$labelOpts" :selected="$selLabelId" placeholder="Select Label" />
-                </div>
+                    <!-- Label -->
+                    <div>
+                        <x-form.searchable-select name="label_id" label="Label" :options="$labelOpts" :selected="$selLabelId" placeholder="Select Label" />
+                    </div>
 
-                <!-- Source -->
-                <div>
-                    <x-form.searchable-select name="source_id" label="Source" :options="$sourceOpts" :selected="$selSourceId" placeholder="Select Source" />
-                </div>
+                    <!-- Source -->
+                    <div>
+                        <x-form.searchable-select name="source_id" label="Source" :options="$sourceOpts" :selected="$selSourceId" placeholder="Select Source" />
+                    </div>
 
-                <!-- SLA Status -->
-                <div>
-                    <x-form.searchable-select
-                        name="sla_status_id"
-                        label="SLA Status"
-                        :options="$slaStatuses->map(fn($sla) => ['id' => $sla->id, 'text' => $sla->name])->toArray()"
-                        :selected="old('sla_status_id', $ticket?->sla_status_id ?? ($slaStatuses->where('name', 'Fulfilled')->first()?->id ?? ''))"
-                        placeholder="Select SLA Status"
-                    />
-                </div>
+                    <!-- SLA Status -->
+                    <div>
+                        <x-form.searchable-select
+                            name="sla_status_id"
+                            label="SLA Status"
+                            :options="$slaStatuses->map(fn($sla) => ['id' => $sla->id, 'text' => $sla->name])->toArray()"
+                            :selected="old('sla_status_id', $ticket?->sla_status_id ?? ($slaStatuses->where('name', 'Fulfilled')->first()?->id ?? ''))"
+                            placeholder="Select SLA Status"
+                        />
+                    </div>
 
-                <!-- Linked IT Asset -->
-                @php
-                    $assetOptions = array_merge(
-                        [['id' => '', 'text' => 'No Asset Linked']],
-                        $assets->map(function($asset) {
-                            $holder = $asset->currentCheckout?->checkedOutToUser?->name ?? $asset->assignedToUser?->name;
-                            $dept = $asset->department?->name;
-                            $statusName = $asset->status?->name;
-                            $brandName = optional($asset->product?->brand)->name;
-                            $modelName = optional($asset->product)->model;
-                            $productTitle = optional($asset->product)->title ?? optional($asset->product)->name;
-                            $productInfo = array_filter([$productTitle, trim($brandName . ' ' . $modelName)]);
-                            $productStr = !empty($productInfo) ? implode(' / ', array_unique($productInfo)) : '';
-                            $deviceName = $asset->device_name ? $asset->device_name . ($productStr ? ' (' . $productStr . ')' : '') : ($productStr ?: 'Unknown Product');
-                            return [
-                                'id' => $asset->id,
-                                'text' => '[' . $asset->asset_tag . '] ' . $deviceName . ' — ' . ($holder ? 'User: ' . $holder : 'Unassigned') . ($dept ? ' ('.$dept.')' : '') . ($statusName ? ' [' . $statusName . ']' : '')
-                            ];
-                        })->toArray()
-                    );
-                @endphp
-                <div class="sm:col-span-2">
-                    <x-form.searchable-select name="asset_id" label="Linked Asset (ITAM)" :options="[['id' => '', 'text' => 'No Asset Linked'], ...$allAssetItems]" :selected="old('asset_id', $ticket?->asset_id)" placeholder="No Asset Linked" />
+                    <!-- Linked IT Asset -->
+                    <div class="sm:col-span-2">
+                        <x-form.searchable-select name="asset_id" label="Linked Asset (ITAM)" :options="[['id' => '', 'text' => 'No Asset Linked'], ...$allAssetItems]" :selected="old('asset_id', $ticket?->asset_id)" placeholder="No Asset Linked" />
+                    </div>
                 </div>
-            </div>
+            @else
+                {{-- Clean Self-Service Portal Form for Standard Employees (Requesters) --}}
+                <div class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+                    <input type="hidden" name="requester_user_id" value="{{ auth()->id() }}">
+
+                    <!-- Requester Profile Summary Card -->
+                    <div class="sm:col-span-2 rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 dark:border-gray-800 dark:bg-gray-950/40 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 font-bold">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-semibold text-gray-900 dark:text-white">{{ auth()->user()->name }}</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ auth()->user()->email }} • {{ auth()->user()->department?->name ?? 'General Department' }}</p>
+                            </div>
+                        </div>
+                        <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-[10px] font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                            Helpdesk Requester
+                        </span>
+                    </div>
+
+                    <!-- ITSM Ticket Category -->
+                    <div>
+                        <x-form.searchable-select name="ticket_category_id" label="Category of Issue" :options="$catOpts" :selected="$selCatId" placeholder="Select Issue Category" />
+                    </div>
+
+                    <!-- Priority -->
+                    <div>
+                        <x-form.searchable-select name="priority_id" label="Urgency / Priority" :options="$priorityOpts" :selected="$selPriorityId" placeholder="Select Priority" />
+                    </div>
+
+                    <!-- Linked IT Asset -->
+                    <div class="sm:col-span-2">
+                        <x-form.searchable-select name="asset_id" label="Which Hardware Device has this problem? (Optional)" :options="[['id' => '', 'text' => 'No Asset Linked / Not Device Specific'], ...$allAssetItems]" :selected="old('asset_id', $ticket?->asset_id)" placeholder="Select Device" />
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Problem Description -->
@@ -247,12 +269,12 @@
             </div>
         </div>
 
-        <!-- Internal & Resolution Notes for Edit -->
-        @if($ticket)
+        <!-- Internal & Resolution Notes for Edit (Staff Only) -->
+        @if($ticket && $isStaff)
             <div class="pt-1">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
                     <i data-lucide="check-square" class="w-4 h-4 text-brand-500"></i>
-                    Notes & Resolution
+                    Notes & Resolution (Staff Only)
                 </h3>
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
@@ -283,32 +305,34 @@
             </div>
         @endif
 
-        <!-- Hours -->
-        <div class="pt-1">
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                <i data-lucide="clock" class="w-4 h-4 text-brand-500"></i>
-                Hours
-            </h3>
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <!-- Estimated Hours -->
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Estimated Hours</label>
-                    <input type="number" name="estimated_hours" value="{{ old('estimated_hours', $ticket?->estimated_hours ?? 0) }}" step="0.5" min="0" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
-                    @error('estimated_hours')
-                        <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
+        <!-- Hours (Staff Only) -->
+        @if($isStaff)
+            <div class="pt-1">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
+                    <i data-lucide="clock" class="w-4 h-4 text-brand-500"></i>
+                    Hours & Workload Estimation
+                </h3>
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <!-- Estimated Hours -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Estimated Hours</label>
+                        <input type="number" name="estimated_hours" value="{{ old('estimated_hours', $ticket?->estimated_hours ?? 0) }}" step="0.5" min="0" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        @error('estimated_hours')
+                            <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <!-- Actual Hours -->
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Actual Hours</label>
-                    <input type="number" name="actual_hours" value="{{ old('actual_hours', $ticket?->actual_hours ?? 0) }}" step="0.5" min="0" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
-                    @error('actual_hours')
-                        <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
-                    @enderror
+                    <!-- Actual Hours -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Actual Hours</label>
+                        <input type="number" name="actual_hours" value="{{ old('actual_hours', $ticket?->actual_hours ?? 0) }}" step="0.5" min="0" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        @error('actual_hours')
+                            <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>
 
