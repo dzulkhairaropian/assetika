@@ -24,6 +24,7 @@ use App\Services\AssetTicketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class TicketController extends Controller
@@ -216,6 +217,7 @@ class TicketController extends Controller
     {
         $data = $request->validate([
             'created_at' => ['nullable', 'date'],
+            'subject' => ['nullable', 'string', 'max:255'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
             'requester_user_id' => ['required', 'exists:users,id'],
             'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
@@ -236,6 +238,11 @@ class TicketController extends Controller
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
+
+        if (empty($data['subject'])) {
+            $firstLine = trim(strtok((string) $data['problem_description'], "\r\n") ?: (string) $data['problem_description']);
+            $data['subject'] = Str::limit($firstLine, 120);
+        }
 
         // Auto-map category and subcategory from asset if asset_id is provided
         if (! empty($data['asset_id']) && empty($data['ticket_category_id'])) {
@@ -292,6 +299,11 @@ class TicketController extends Controller
             }
             if (empty($data['completed_time'])) {
                 $data['completed_time'] = now();
+            }
+            // Auto compute resolution_time_hours if not specified
+            if (empty($data['resolution_time_hours'])) {
+                $completedAt = Carbon::parse($data['completed_date'].' '.Carbon::parse($data['completed_time'])->format('H:i:s'));
+                $data['resolution_time_hours'] = max(0.1, round($ticketDate->diffInMinutes($completedAt) / 60, 2));
             }
             // SLA is fulfilled only for tickets that are already completed on creation
             if (empty($data['sla_status_id'])) {
@@ -381,6 +393,16 @@ class TicketController extends Controller
         $status = TicketStatus::find($data['status_id']);
         $oldStatusId = $ticket->status_id;
 
+        // Auto first-response tracking if moved to in-progress or resolved by staff
+        if (is_null($ticket->first_responded_at) && auth()->id() !== $ticket->requester_user_id) {
+            $inProgressOrClosed = $status && ($status->is_closed || in_array(strtolower($status->name), ['in progress', 'in-progress']));
+            if ($inProgressOrClosed) {
+                $now = now();
+                $data['first_responded_at'] = $now;
+                $data['response_time_minutes'] = (int) round($ticket->created_at->diffInMinutes($now));
+            }
+        }
+
         // Auto-complete bookkeeping when moving to a closed status
         if ($status && $status->is_closed) {
             if (empty($data['completed_date'])) {
@@ -390,7 +412,11 @@ class TicketController extends Controller
                 $data['completed_time'] = now();
             }
             if (empty($ticket->resolution_time_hours)) {
-                $data['resolution_time_hours'] = round($ticket->created_at->diffInMinutes(now()) / 60, 2);
+                $createdAt = $ticket->created_at ?? now();
+                $compDate = $data['completed_date'] ?? now()->toDateString();
+                $compTime = $data['completed_time'] ?? now();
+                $completedAt = Carbon::parse($compDate.' '.Carbon::parse($compTime)->format('H:i:s'));
+                $data['resolution_time_hours'] = max(0.1, round($createdAt->diffInMinutes($completedAt) / 60, 2));
             }
             if (empty($ticket->sla_status_id)) {
                 $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
@@ -494,6 +520,7 @@ class TicketController extends Controller
         $oldAssignedToId = $ticket->assigned_to_id;
         $data = $request->validate([
             'created_at' => ['nullable', 'date'],
+            'subject' => ['nullable', 'string', 'max:255'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
             'requester_user_id' => ['required', 'exists:users,id'],
             'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
@@ -514,6 +541,11 @@ class TicketController extends Controller
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
+
+        if (empty($data['subject'])) {
+            $firstLine = trim(strtok((string) $data['problem_description'], "\r\n") ?: (string) $data['problem_description']);
+            $data['subject'] = Str::limit($firstLine, 120);
+        }
 
         if (! empty($data['created_at'])) {
             $ticketDate = Carbon::parse($data['created_at']);
@@ -571,7 +603,10 @@ class TicketController extends Controller
                 }
                 if (! isset($data['resolution_time_hours']) || ! $data['resolution_time_hours']) {
                     $createdAt = isset($data['created_at']) ? Carbon::parse($data['created_at']) : ($ticket->created_at ?? now());
-                    $hours = $createdAt ? round($createdAt->diffInMinutes(now()) / 60, 2) : 0;
+                    $compDate = $data['completed_date'] ?? now()->toDateString();
+                    $compTime = $data['completed_time'] ?? now();
+                    $completedAt = Carbon::parse($compDate.' '.Carbon::parse($compTime)->format('H:i:s'));
+                    $hours = $createdAt ? max(0.1, round($createdAt->diffInMinutes($completedAt) / 60, 2)) : 0;
                     $data['resolution_time_hours'] = $hours;
                 }
                 if (empty($data['sla_status_id'])) {
@@ -667,8 +702,12 @@ class TicketController extends Controller
         if (is_null($ticket->response_time_minutes)
             && ! $request->boolean('is_internal')
             && auth()->id() !== $ticket->requester_user_id) {
-            $responseMins = (int) round($ticket->created_at->diffInMinutes(now()));
-            $ticket->update(['response_time_minutes' => $responseMins]);
+            $now = now();
+            $responseMins = (int) round($ticket->created_at->diffInMinutes($now));
+            $ticket->update([
+                'first_responded_at' => $now,
+                'response_time_minutes' => $responseMins,
+            ]);
         }
 
         TicketHistory::create([
@@ -695,8 +734,53 @@ class TicketController extends Controller
         return redirect()->back()->with('success', 'Comment added.');
     }
 
+    /**
+     * Take / claim ticket to current logged-in staff user.
+     */
+    public function takeTicket(Ticket $ticket): RedirectResponse
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return back()->with('error', 'Authentication required.');
+        }
+
+        $inProgressStatus = TicketStatus::where('name', 'In Progress')->first();
+        $updates = [
+            'assigned_to_id' => $user->id,
+        ];
+
+        // Move to In Progress if currently New
+        if ($ticket->status && in_array(strtolower($ticket->status->name), ['new', 'open']) && $inProgressStatus) {
+            $updates['status_id'] = $inProgressStatus->id;
+        }
+
+        // Record first response if first time taken
+        if (is_null($ticket->first_responded_at) && $ticket->requester_user_id !== $user->id) {
+            $now = now();
+            $updates['first_responded_at'] = $now;
+            $updates['response_time_minutes'] = (int) round($ticket->created_at->diffInMinutes($now));
+        }
+
+        $ticket->update($updates);
+
+        TicketHistory::create([
+            'ticket_id' => $ticket->id,
+            'user_id' => $user->id,
+            'action' => 'Ticket Claimed',
+            'description' => "Ticket claimed by {$user->name}.",
+        ]);
+
+        return back()->with('success', 'Ticket claimed successfully.');
+    }
+
     public function destroy(Ticket $ticket): RedirectResponse
     {
+        // Enforce role authorization: only super_admin or it_admin can delete tickets
+        $user = auth()->user();
+        if (! $user || ! $user->hasAnyRole(['super_admin', 'it_admin'])) {
+            return back()->with('error', 'Unauthorized. Only IT Administrators can delete support tickets.');
+        }
+
         $ticket->delete();
 
         return redirect()->route('tickets.index')->with('success', 'Ticket deleted successfully.');
@@ -704,6 +788,12 @@ class TicketController extends Controller
 
     public function bulkDestroy(Request $request): RedirectResponse
     {
+        // Enforce role authorization: only super_admin or it_admin can bulk delete tickets
+        $user = auth()->user();
+        if (! $user || ! $user->hasAnyRole(['super_admin', 'it_admin'])) {
+            return back()->with('error', 'Unauthorized. Only IT Administrators can delete support tickets.');
+        }
+
         $data = $request->validate([
             'ids' => ['required', 'array', 'min:1'],
             'ids.*' => ['integer', 'exists:tickets,id'],

@@ -223,9 +223,20 @@
                 Details & Description
             </h3>
             <div class="space-y-3">
+                <!-- Subject / Title -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Subject / Ticket Title <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="subject" value="{{ old('subject', $ticket?->subject) }}" required
+                        placeholder="e.g. Laptop Bluescreen after Windows Update, Wi-Fi Printer offline"
+                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    @error('subject') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                </div>
+
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Problem Description <span class="text-red-500">*</span></label>
-                    <textarea name="problem_description" rows="4" required class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('problem_description', $ticket?->problem_description) }}</textarea>
+                    <textarea name="problem_description" rows="4" required class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" placeholder="Describe the incident, issue symptoms, error messages, and troubleshooting steps...">{{ old('problem_description', $ticket?->problem_description) }}</textarea>
                 </div>
 
                 <!-- Attachment -->

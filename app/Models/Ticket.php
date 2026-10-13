@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Traits\LogsActivity;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Ticket extends Model
 {
@@ -16,6 +18,7 @@ class Ticket extends Model
 
     protected $fillable = [
         'request_id',
+        'subject',
         'ticket_type_id',
         'requester_user_id',
         'request_date',
@@ -35,6 +38,7 @@ class Ticket extends Model
         'created_by_id',
         'completed_date',
         'completed_time',
+        'first_responded_at',
         'response_time_minutes',
         'resolution_time_hours',
         'resolution_notes',
@@ -54,12 +58,43 @@ class Ticket extends Model
             'request_time' => 'datetime', // Cast to datetime to use time functions
             'completed_date' => 'date',
             'completed_time' => 'datetime',
+            'first_responded_at' => 'datetime',
             'sla_due_at' => 'datetime',
             'response_time_minutes' => 'integer',
             'resolution_time_hours' => 'decimal:2',
             'estimated_hours' => 'decimal:2',
             'actual_hours' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Display title / subject with graceful fallback.
+     */
+    public function getDisplaySubjectAttribute(): string
+    {
+        if (! empty($this->subject)) {
+            return $this->subject;
+        }
+
+        $desc = (string) ($this->problem_description ?? '');
+        $firstLine = trim(strtok($desc, "\r\n") ?: $desc);
+
+        return Str::limit($firstLine ?: ('Ticket #'.$this->request_id), 80);
+    }
+
+    /**
+     * Full completed timestamp combining completed_date and completed_time.
+     */
+    public function getCompletedAtAttribute(): ?Carbon
+    {
+        if (! $this->completed_date) {
+            return null;
+        }
+
+        $dateStr = $this->completed_date->format('Y-m-d');
+        $timeStr = $this->completed_time ? $this->completed_time->format('H:i:s') : '00:00:00';
+
+        return Carbon::parse("{$dateStr} {$timeStr}");
     }
 
     /**
@@ -86,6 +121,7 @@ class Ticket extends Model
             $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
                 $q->where('request_id', 'like', $like)
+                    ->orWhere('subject', 'like', $like)
                     ->orWhere('problem_description', 'like', $like)
                     ->orWhere('requester_name', 'like', $like)
                     ->orWhere('requester_email', 'like', $like);

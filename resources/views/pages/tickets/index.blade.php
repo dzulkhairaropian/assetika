@@ -4,6 +4,30 @@
 <div class="space-y-4" x-data="{
     selectedTickets: [],
     selectAll: false,
+    statusModalOpen: false,
+    activeTicketId: null,
+    activeTicketKey: '',
+    activeStatusId: '',
+    closedIds: {{ json_encode($statuses->where('is_closed')->pluck('id')->map(fn ($id) => (int) $id)->values()) }},
+    openStatusModal(id, key, statusId) {
+        this.activeTicketId = id;
+        this.activeTicketKey = key;
+        this.activeStatusId = String(statusId || '');
+        this.statusModalOpen = true;
+    },
+    autoCompleteModal() {
+        const sel = document.getElementById('tableUpdateStatusSelect');
+        const isClosed = this.closedIds.includes(parseInt(sel.value));
+        const dateInput = document.getElementById('tableUpdateCompletedDate');
+        const timeInput = document.getElementById('tableUpdateCompletedTime');
+        if (isClosed) {
+            if (!dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+            if (!timeInput.value) timeInput.value = new Date().toTimeString().slice(0, 5);
+        } else {
+            dateInput.value = '';
+            timeInput.value = '';
+        }
+    },
     toggleAll() {
         this.selectAll = !this.selectAll;
         if (this.selectAll) {
@@ -345,7 +369,7 @@
                             <x-common.sortable-header column="created_at" label="Created Date" />
                         </th>
                         <th class="px-4 py-2.5 text-start">
-                            <x-common.sortable-header column="request_id" label="Ticket Key / Problem" />
+                            <x-common.sortable-header column="request_id" label="Key / Subject" />
                         </th>
                         <th class="px-4 py-2.5 text-start">
                             <x-common.sortable-header column="requester_name" label="Requester" />
@@ -405,7 +429,8 @@
                             <td class="px-4 py-2.5">
                                 <div class="flex flex-col">
                                     <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
-                                    <span class="text-[11px] text-gray-400">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 60) }}</span>
+                                    <span class="text-xs font-medium text-gray-900 dark:text-white line-clamp-1">{{ $ticket->display_subject }}</span>
+                                    <span class="text-[11px] text-gray-400 line-clamp-1">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 50) }}</span>
                                 </div>
                             </td>
                             <td class="px-4 py-2.5">
@@ -509,21 +534,38 @@
                                             View Details
                                         </a>
 
+                                        <button type="button" @click="open = false; openStatusModal({{ $ticket->id }}, '{{ $ticket->request_id }}', {{ $ticket->status_id ?? 'null' }})" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
+                                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                            Update Status
+                                        </button>
+
+                                        @if(!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id())
+                                            <form action="{{ route('tickets.take', $ticket) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-500/10 transition-colors">
+                                                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                                                    Take Ticket
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         <a href="{{ route('tickets.edit', $ticket) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                                             <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
                                             Edit
                                         </a>
 
-                                        <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+                                        @if(auth()->user()?->hasAnyRole(['super_admin', 'it_admin']))
+                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
 
-                                        <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this ticket?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
-                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                                Delete Ticket
-                                            </button>
-                                        </form>
+                                            <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this ticket?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
+                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                    Delete Ticket
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -560,6 +602,85 @@
             <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
                 {{ $tickets->links() }}
             </div>
+        </div>
+    </div>
+
+    <!-- Modal: Quick Update Ticket Status From Table -->
+    <div x-show="statusModalOpen" x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+        <div @click.away="statusModalOpen = false"
+            class="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-success-50 text-success-600 dark:bg-success-500/10">
+                        <i data-lucide="refresh-cw" class="h-5 w-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white">Quick Update Status</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Update status for Ticket <strong class="font-mono text-brand-600" x-text="'#' + activeTicketKey"></strong></p>
+                    </div>
+                </div>
+                <button type="button" @click="statusModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+
+            <form :action="'/tickets/' + activeTicketId + '/update-status'" method="POST" class="mt-4 space-y-4">
+                @csrf
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        New Status <span class="text-red-500">*</span>
+                    </label>
+                    <select id="tableUpdateStatusSelect" name="status_id" required x-model="activeStatusId" @change="autoCompleteModal()"
+                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+                        @foreach($statuses as $st)
+                            <option value="{{ $st->id }}">{{ $st->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Resolution Notes
+                    </label>
+                    <textarea name="resolution_notes" rows="3" placeholder="Describe the resolution or lesson learned..."
+                        class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Completed Date
+                        </label>
+                        <input type="date" id="tableUpdateCompletedDate" name="completed_date"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Completed Time
+                        </label>
+                        <input type="time" id="tableUpdateCompletedTime" name="completed_time"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Actual Hours Spent
+                    </label>
+                    <input type="number" name="actual_hours" step="0.5" min="0" placeholder="e.g. 1.5"
+                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                </div>
+
+                <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                    <button type="button" @click="statusModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="rounded-lg bg-success-500 px-4 py-2 text-xs font-semibold text-white hover:bg-success-600 transition">
+                        Apply Status
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

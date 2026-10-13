@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::get('tickets/export', [TicketController::class, 'export'])->name('tickets.export');
     Route::post('tickets/{ticket}/comment', [TicketController::class, 'comment'])->name('tickets.comment');
     Route::post('tickets/{ticket}/update-status', [TicketController::class, 'updateStatus'])->name('tickets.update-status');
+    Route::post('tickets/{ticket}/take', [TicketController::class, 'takeTicket'])->name('tickets.take');
     Route::post('tickets/bulk-delete', [TicketController::class, 'bulkDestroy'])->name('tickets.bulk-delete');
     Route::resource('tickets', TicketController::class);
 

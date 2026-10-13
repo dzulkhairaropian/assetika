@@ -33,6 +33,7 @@ class AssetTicketService
         }
 
         return static::buildAndSaveTicket([
+            'subject' => "Checkout Asset: {$asset->asset_tag} - {$assetName}",
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -71,6 +72,7 @@ class AssetTicketService
         }
 
         return static::buildAndSaveTicket([
+            'subject' => "Checkin Asset: {$asset->asset_tag} - {$assetName}",
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -104,6 +106,7 @@ class AssetTicketService
         $user = $asset->assignedToUser ?? auth()->user();
 
         return static::buildAndSaveTicket([
+            'subject' => "Send to Service: {$asset->asset_tag} - {$assetName}",
             'ticket_type_id' => $incType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -152,6 +155,7 @@ class AssetTicketService
         }
 
         return static::buildAndSaveTicket([
+            'subject' => "Service Completed: {$asset->asset_tag} - {$assetName}",
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],

@@ -49,16 +49,25 @@
 	                                    @endforeach
 	                                </select>
 	                            </div>
-	                            <div>
-	                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
-	                                <select name="priority_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-	                                    <option value="">All Priorities</option>
-	                                    @foreach($priorities as $priority)
-	                                        <option value="{{ $priority->id }}" {{ (string) $filterPriorityId === (string) $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
-	                                    @endforeach
-	                                </select>
-	                            </div>
-	                        </div>
+		                            <div>
+		                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
+		                                <select name="priority_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+		                                    <option value="">All Priorities</option>
+		                                    @foreach($priorities as $priority)
+		                                        <option value="{{ $priority->id }}" {{ (string) $filterPriorityId === (string) $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
+		                                    @endforeach
+		                                </select>
+		                            </div>
+		                            <div>
+		                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">ITSM Category</label>
+		                                <select name="category_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+		                                    <option value="">All Categories</option>
+		                                    @foreach($categories as $category)
+		                                        <option value="{{ $category->id }}" {{ (string) $filterCategoryId === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+		                                    @endforeach
+		                                </select>
+		                            </div>
+		                        </div>
 
 	                        <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
 	                            <a href="{{ route('ticket-dashboard') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear All</a>
@@ -129,7 +138,7 @@
     </div>
 
     <!-- 2. Performance Metric Cards Grid -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <x-common.small-box
             title="My Assigned Tickets"
             icon="user"
@@ -138,12 +147,23 @@
             color="info"
             :url="route('tickets.index')"
         />
+        @php
+            $avgRespFormatted = $avgResponse >= 60 ? round($avgResponse / 60, 1).' hrs' : round($avgResponse).' mins';
+        @endphp
+        <x-common.small-box
+            title="Avg First Response"
+            icon="message-square"
+            value="{{ $avgRespFormatted }}"
+            description="Mean Time to Acknowledge (MTTA)"
+            color="info"
+            :url="route('tickets.index')"
+        />
         @php $avgResolution = round($avgResolution, 1); @endphp
         <x-common.small-box
             title="Avg Resolution Time"
             icon="clock"
             value="{{ $avgResolution }} hrs"
-            description="Turnaround time from open to close"
+            description="Mean Time to Resolve (MTTR)"
             color="brand"
             :url="route('tickets.index')"
         />

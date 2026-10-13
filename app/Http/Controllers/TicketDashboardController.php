@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\Category;
 use App\Models\Priority;
 use App\Models\Ticket;
+use App\Models\TicketCategory;
 use App\Models\TicketStatus;
 use App\Models\TicketType;
 use App\Models\User;
@@ -44,7 +45,10 @@ class TicketDashboardController extends Controller
                 $query->where('priority_id', $filterPriorityId);
             }
             if (! empty($filterCategoryId)) {
-                $query->where('category_id', $filterCategoryId);
+                $query->where(function ($q) use ($filterCategoryId) {
+                    $q->where('ticket_category_id', $filterCategoryId)
+                        ->orWhere('category_id', $filterCategoryId);
+                });
             }
             if (! empty($filterYear) && $filterYear !== 'all') {
                 $query->whereRaw('YEAR(created_at) = ?', [$filterYear]);
@@ -84,6 +88,9 @@ class TicketDashboardController extends Controller
         $avgResolution = $applyGlobalFilters(Ticket::whereIn('status_id', $completedStatusIds)->whereNotNull('resolution_time_hours'))
             ->avg('resolution_time_hours') ?? 0;
 
+        $avgResponse = $applyGlobalFilters(Ticket::whereNotNull('response_time_minutes'))
+            ->avg('response_time_minutes') ?? 0;
+
         $myTickets = $applyGlobalFilters(Ticket::where('assigned_to_id', $user->id))->count();
         $myOpenTickets = $applyGlobalFilters(Ticket::where('assigned_to_id', $user->id)->whereIn('status_id', $openStatusIds))->count();
 
@@ -93,7 +100,7 @@ class TicketDashboardController extends Controller
             ->limit(8)
             ->get();
 
-        $unassignedTickets = $applyGlobalFilters(Ticket::with(['priority', 'category'])->whereNull('assigned_to_id')->whereIn('status_id', $openStatusIds))
+        $unassignedTickets = $applyGlobalFilters(Ticket::with(['priority', 'ticketCategory', 'category'])->whereNull('assigned_to_id')->whereIn('status_id', $openStatusIds))
             ->latest()
             ->limit(5)
             ->get();
@@ -101,7 +108,7 @@ class TicketDashboardController extends Controller
         // Master Data for Filters
         $statuses = TicketStatus::all();
         $priorities = Priority::all();
-        $categories = Category::all();
+        $categories = TicketCategory::where('is_active', true)->orderBy('name')->get();
 
         $ticketYears = Ticket::selectRaw('YEAR(created_at) as year')
             ->whereNotNull('created_at')
@@ -192,19 +199,23 @@ class TicketDashboardController extends Controller
             'data' => $ticketsByPriority->values()->toArray(),
         ];
 
-        // 4. Top categories
+        // 4. Top categories (ITSM Ticket Categories)
         $categoryYear = (string) $request->get('category_year', 'all');
         $categoryMonth = (string) $request->get('category_month', 'all');
-        $catQuery = Ticket::select('category_id', DB::raw('count(*) as count'))->whereNotNull('category_id');
+        $catQuery = Ticket::select(DB::raw('COALESCE(ticket_category_id, category_id) as cat_id'), DB::raw('count(*) as count'))
+            ->where(function ($q) {
+                $q->whereNotNull('ticket_category_id')->orWhereNotNull('category_id');
+            });
         $catQuery = $chartFilter($catQuery, 'category_year', 'category_month');
-        $ticketsByCategory = $catQuery->groupBy('category_id')
+        $ticketsByCategory = $catQuery->groupBy('cat_id')
             ->orderByDesc(DB::raw('count(*)'))
             ->limit(5)
-            ->pluck('count', 'category_id');
+            ->pluck('count', 'cat_id');
 
-        $categoryNames = Category::whereIn('id', $ticketsByCategory->keys())->pluck('name', 'id');
+        $ticketCatNames = TicketCategory::whereIn('id', $ticketsByCategory->keys())->pluck('name', 'id');
+        $assetCatNames = Category::whereIn('id', $ticketsByCategory->keys())->pluck('name', 'id');
         $categoryChart = [
-            'labels' => $ticketsByCategory->keys()->map(fn ($id) => $categoryNames[$id] ?? 'Unknown')->values()->toArray(),
+            'labels' => $ticketsByCategory->keys()->map(fn ($id) => $ticketCatNames[$id] ?? ($assetCatNames[$id] ?? 'General'))->values()->toArray(),
             'data' => $ticketsByCategory->values()->toArray(),
         ];
 
@@ -289,6 +300,7 @@ class TicketDashboardController extends Controller
             'resolved',
             'resolvedTrend',
             'avgResolution',
+            'avgResponse',
             'myTickets',
             'myOpenTickets',
             'recentTickets',

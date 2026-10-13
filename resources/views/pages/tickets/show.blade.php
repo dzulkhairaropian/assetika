@@ -8,15 +8,29 @@
     <x-common.page-breadcrumb pageTitle="Ticket Detail" :items="[['label' => 'Tickets', 'url' => route('tickets.index')]]" />
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-2.5">
-            <h2 class="text-lg font-bold font-mono text-gray-900 dark:text-white">
-                #{{ $ticket->request_id }}
-            </h2>
-            <x-ui.badge :color="$ticket->status?->color ?? 'primary'" variant="light" size="sm" :featherIcon="$ticket->status?->icon ?: 'disc'">
-                {{ $ticket->status?->name ?? 'Open' }}
-            </x-ui.badge>
+        <div class="space-y-1">
+            <div class="flex items-center gap-2.5">
+                <h2 class="text-lg font-bold font-mono text-gray-900 dark:text-white">
+                    #{{ $ticket->request_id }}
+                </h2>
+                <x-ui.badge :color="$ticket->status?->color ?? 'primary'" variant="light" size="sm" :featherIcon="$ticket->status?->icon ?: 'disc'">
+                    {{ $ticket->status?->name ?? 'Open' }}
+                </x-ui.badge>
+            </div>
+            <h1 class="text-base font-semibold text-gray-900 dark:text-white">
+                {{ $ticket->display_subject }}
+            </h1>
         </div>
         <div class="flex gap-2">
+            @if(!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id())
+                <form action="{{ route('tickets.take', $ticket) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3.5 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300 transition">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                        Take Ticket
+                    </button>
+                </form>
+            @endif
             @if(isset($projects) && $projects->count() > 0)
                 <button type="button" @click="openProjectModal = true" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 transition">
                     <i data-lucide="layout" class="w-3.5 h-3.5"></i>
