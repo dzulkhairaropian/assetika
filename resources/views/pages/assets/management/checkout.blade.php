@@ -24,16 +24,19 @@
                         <i data-lucide="user" class="w-4 h-4 text-brand-500"></i>
                         Assignment Details
                     </h3>
+                    @php
+                        $userMeta = $users->mapWithKeys(fn ($u) => [
+                            (string) $u->id => [
+                                'department' => (string) ($u->department_id ?? ''),
+                                'location'   => (string) ($u->location_id ?? ''),
+                            ],
+                        ]);
+                    @endphp
                     <div class="grid grid-cols-1 gap-x-4 gap-y-3.5 lg:grid-cols-2"
                          x-data="{
                              selectedLocation: '{{ old('location_id', $asset->location_id) }}',
                              selectedDepartment: '{{ old('department_id', $asset->department_id) }}',
-                             userMeta: @json($users->mapWithKeys(fn ($u) => [
-                                 (string) $u->id => [
-                                     'department' => (string) ($u->department_id ?? ''),
-                                     'location' => (string) ($u->location_id ?? ''),
-                                 ],
-                             ])),
+                             userMeta: @json($userMeta),
                              onUserSelected(e) {
                                  if (e.detail.name !== 'checked_out_to_user_id') return;
                                  const meta = this.userMeta[String(e.detail.id)];
