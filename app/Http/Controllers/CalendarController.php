@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CalendarEvent;
 use App\Models\Renewal;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -26,6 +27,27 @@ class CalendarController extends Controller
                     'real_id' => $renew->id,
                 ],
             ];
+        }
+
+        // 2. Custom User Scheduled Events
+        try {
+            $customEvents = CalendarEvent::all();
+            foreach ($customEvents as $ce) {
+                $events[] = [
+                    'id' => (string) $ce->id,
+                    'title' => $ce->title,
+                    'start' => $ce->start?->toIso8601String() ?? $ce->start,
+                    'end' => $ce->end ? $ce->end->toIso8601String() : null,
+                    'allDay' => false,
+                    'extendedProps' => [
+                        'calendar' => $ce->calendar ?: 'Primary',
+                        'type' => 'custom',
+                        'real_id' => $ce->id,
+                    ],
+                ];
+            }
+        } catch (\Throwable) {
+            // Table might not exist yet if migration pending
         }
 
         // 3. Tickets Due
@@ -53,10 +75,18 @@ class CalendarController extends Controller
             'title' => 'required|string|max:255',
             'start' => 'required|date',
             'end' => 'nullable|date',
-            'calendar' => 'nullable|string',
+            'calendar' => 'nullable|string|max:50',
         ]);
 
-        return response()->json(['success' => true, 'event' => $validated]);
+        $event = CalendarEvent::create([
+            'user_id' => auth()->id(),
+            'title' => $validated['title'],
+            'start' => $validated['start'],
+            'end' => $validated['end'] ?? null,
+            'calendar' => $validated['calendar'] ?? 'Primary',
+        ]);
+
+        return response()->json(['success' => true, 'event' => $event]);
     }
 
     public function update(Request $request, $id)
@@ -65,13 +95,23 @@ class CalendarController extends Controller
             'title' => 'required|string|max:255',
             'start' => 'required|date',
             'end' => 'nullable|date',
+            'calendar' => 'nullable|string|max:50',
         ]);
 
-        return response()->json(['success' => true]);
+        $numericId = (int) str_replace('custom_', '', (string) $id);
+        $event = CalendarEvent::find($numericId);
+        if ($event) {
+            $event->update($validated);
+        }
+
+        return response()->json(['success' => true, 'event' => $event]);
     }
 
     public function destroy($id)
     {
+        $numericId = (int) str_replace('custom_', '', (string) $id);
+        CalendarEvent::where('id', $numericId)->delete();
+
         return response()->json(['success' => true]);
     }
 }

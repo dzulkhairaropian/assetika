@@ -232,42 +232,54 @@ Route::middleware('auth')->group(function () {
     Route::post('ga-assets/{asset}/maintenance', [GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');
 
     // User & Role Management
-    Route::post('users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('users.bulk-delete');
-    Route::post('users/bulk-status', [UserController::class, 'bulkStatus'])->name('users.bulk-status');
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class);
+    Route::middleware('role:super_admin')->group(function () {
+        Route::resource('roles', RoleController::class);
 
-    // Backup Management Routes
-    Route::get('backups', [BackupController::class, 'index'])->name('backups.index');
-    Route::post('backups/create', [BackupController::class, 'create'])->name('backups.create');
-    Route::get('backups/download/{fileName}', [BackupController::class, 'download'])->name('backups.download');
-    Route::delete('backups/{fileName}', [BackupController::class, 'destroy'])->name('backups.destroy');
-    Route::post('backups/settings', [BackupController::class, 'updateSettings'])->name('backups.settings');
+        // Backup Management Routes
+        Route::get('backups', [BackupController::class, 'index'])->name('backups.index');
+        Route::post('backups/create', [BackupController::class, 'create'])->name('backups.create');
+        Route::get('backups/download/{fileName}', [BackupController::class, 'download'])->name('backups.download');
+        Route::delete('backups/{fileName}', [BackupController::class, 'destroy'])->name('backups.destroy');
+        Route::post('backups/settings', [BackupController::class, 'updateSettings'])->name('backups.settings');
+    });
 
-    // System Settings Routes
-    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
-    Route::post('settings/ldap/test', [SettingController::class, 'testLdap'])->name('settings.ldap.test');
-    Route::post('settings/ldap/sync-users', [SettingController::class, 'syncLdapUsers'])->name('settings.ldap.sync-users');
-    Route::post('settings/ldap/sync-devices', [SettingController::class, 'syncLdapDevices'])->name('settings.ldap.sync-devices');
+    Route::middleware('role:super_admin|it_admin')->group(function () {
+        Route::post('users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('users.bulk-delete');
+        Route::post('users/bulk-status', [UserController::class, 'bulkStatus'])->name('users.bulk-status');
+        Route::resource('users', UserController::class);
 
-    // Admin Bulk Delete Routes (must be before resource routes)
-    Route::post('admin/priorities/bulk-delete', [PriorityController::class, 'bulkDestroy'])->name('admin.priorities.bulk-delete');
-    Route::post('admin/priorities/bulk-edit', [PriorityController::class, 'bulkEdit'])->name('admin.priorities.bulk-edit');
-    Route::post('admin/labels/bulk-delete', [LabelController::class, 'bulkDestroy'])->name('admin.labels.bulk-delete');
-    Route::post('admin/labels/bulk-edit', [LabelController::class, 'bulkEdit'])->name('admin.labels.bulk-edit');
-    Route::post('admin/sources/bulk-delete', [SourceController::class, 'bulkDestroy'])->name('admin.sources.bulk-delete');
-    Route::post('admin/sources/bulk-edit', [SourceController::class, 'bulkEdit'])->name('admin.sources.bulk-edit');
-    Route::post('admin/ticket-types/bulk-delete', [TicketTypeController::class, 'bulkDestroy'])->name('admin.ticket-types.bulk-delete');
-    Route::post('admin/ticket-types/bulk-edit', [TicketTypeController::class, 'bulkEdit'])->name('admin.ticket-types.bulk-edit');
-    Route::post('admin/ticket-statuses/bulk-delete', [TicketStatusController::class, 'bulkDestroy'])->name('admin.ticket-statuses.bulk-delete');
-    Route::post('admin/ticket-statuses/bulk-edit', [TicketStatusController::class, 'bulkEdit'])->name('admin.ticket-statuses.bulk-edit');
-    Route::post('admin/sla-statuses/bulk-delete', [SlaStatusController::class, 'bulkDestroy'])->name('admin.sla-statuses.bulk-delete');
-    Route::post('admin/sla-statuses/bulk-edit', [SlaStatusController::class, 'bulkEdit'])->name('admin.sla-statuses.bulk-edit');
+        // System Settings Routes
+        Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::post('settings/ldap/test', [SettingController::class, 'testLdap'])->name('settings.ldap.test');
+        Route::post('settings/ldap/sync-users', [SettingController::class, 'syncLdapUsers'])->name('settings.ldap.sync-users');
+        Route::post('settings/ldap/sync-devices', [SettingController::class, 'syncLdapDevices'])->name('settings.ldap.sync-devices');
 
-    // Admin CRUD Routes (Ticketing)
-    Route::post('admin/ticket-categories/bulk-delete', [TicketCategoryController::class, 'bulkDelete'])->name('admin.ticket-categories.bulk-delete');
-    Route::resource('admin/ticket-categories', TicketCategoryController::class, ['names' => 'admin.ticket-categories']);
+        // Admin Bulk Delete Routes (must be before resource routes)
+        Route::post('admin/priorities/bulk-delete', [PriorityController::class, 'bulkDestroy'])->name('admin.priorities.bulk-delete');
+        Route::post('admin/priorities/bulk-edit', [PriorityController::class, 'bulkEdit'])->name('admin.priorities.bulk-edit');
+        Route::post('admin/labels/bulk-delete', [LabelController::class, 'bulkDestroy'])->name('admin.labels.bulk-delete');
+        Route::post('admin/labels/bulk-edit', [LabelController::class, 'bulkEdit'])->name('admin.labels.bulk-edit');
+        Route::post('admin/sources/bulk-delete', [SourceController::class, 'bulkDestroy'])->name('admin.sources.bulk-delete');
+        Route::post('admin/sources/bulk-edit', [SourceController::class, 'bulkEdit'])->name('admin.sources.bulk-edit');
+        Route::post('admin/ticket-types/bulk-delete', [TicketTypeController::class, 'bulkDestroy'])->name('admin.ticket-types.bulk-delete');
+        Route::post('admin/ticket-types/bulk-edit', [TicketTypeController::class, 'bulkEdit'])->name('admin.ticket-types.bulk-edit');
+        Route::post('admin/ticket-statuses/bulk-delete', [TicketStatusController::class, 'bulkDestroy'])->name('admin.ticket-statuses.bulk-delete');
+        Route::post('admin/ticket-statuses/bulk-edit', [TicketStatusController::class, 'bulkEdit'])->name('admin.ticket-statuses.bulk-edit');
+        Route::post('admin/sla-statuses/bulk-delete', [SlaStatusController::class, 'bulkDestroy'])->name('admin.sla-statuses.bulk-delete');
+        Route::post('admin/sla-statuses/bulk-edit', [SlaStatusController::class, 'bulkEdit'])->name('admin.sla-statuses.bulk-edit');
+
+        // Admin CRUD Routes (Ticketing)
+        Route::post('admin/ticket-categories/bulk-delete', [TicketCategoryController::class, 'bulkDelete'])->name('admin.ticket-categories.bulk-delete');
+        Route::resource('admin/ticket-categories', TicketCategoryController::class, ['names' => 'admin.ticket-categories']);
+
+        Route::resource('admin/priorities', PriorityController::class, ['names' => 'admin.priorities']);
+        Route::resource('admin/labels', LabelController::class, ['names' => 'admin.labels']);
+        Route::resource('admin/sources', SourceController::class, ['names' => 'admin.sources']);
+        Route::resource('admin/ticket-types', TicketTypeController::class, ['names' => 'admin.ticket-types']);
+        Route::resource('admin/ticket-statuses', TicketStatusController::class, ['names' => 'admin.ticket-statuses']);
+        Route::resource('admin/sla-statuses', SlaStatusController::class, ['names' => 'admin.sla-statuses']);
+    });
 
     // Calendar Page
     Route::get('calendar', function () {
@@ -288,13 +300,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('kb', KbController::class);
     Route::resource('sla-policies', SlaPolicyController::class)->only(['index', 'store']);
     Route::resource('renewals', RenewalController::class);
-
-    Route::resource('admin/priorities', PriorityController::class, ['names' => 'admin.priorities']);
-    Route::resource('admin/labels', LabelController::class, ['names' => 'admin.labels']);
-    Route::resource('admin/sources', SourceController::class, ['names' => 'admin.sources']);
-    Route::resource('admin/ticket-types', TicketTypeController::class, ['names' => 'admin.ticket-types']);
-    Route::resource('admin/ticket-statuses', TicketStatusController::class, ['names' => 'admin.ticket-statuses']);
-    Route::resource('admin/sla-statuses', SlaStatusController::class, ['names' => 'admin.sla-statuses']);
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });

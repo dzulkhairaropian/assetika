@@ -102,14 +102,20 @@ class StockCountController extends Controller
         ]);
 
         $existing = $stockCount->items()->pluck('asset_id')->toArray();
-        $newIds = array_diff($request->asset_ids, $existing);
+        $newIds = array_values(array_diff($request->asset_ids, $existing));
 
-        foreach ($newIds as $assetId) {
-            $asset = Asset::find($assetId);
-            $stockCount->items()->create([
-                'asset_id' => $assetId,
-                'expected_status' => $asset && $asset->isCurrentlyCheckedOut() ? 'checked_out' : 'available',
-            ]);
+        if (! empty($newIds)) {
+            $assets = Asset::with('currentCheckout')->whereIn('id', $newIds)->get();
+            $now = now();
+            $records = $assets->map(fn ($asset) => [
+                'stock_count_id' => $stockCount->id,
+                'asset_id' => $asset->id,
+                'expected_status' => $asset->isCurrentlyCheckedOut() ? 'checked_out' : 'available',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ])->all();
+
+            StockCountItem::insert($records);
         }
 
         return redirect()->route('stock-counts.show', $stockCount)->with('success', count($newIds).' assets added to stock count.');

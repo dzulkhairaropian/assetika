@@ -78,8 +78,14 @@ class ConsumableRequest extends Model
             }
         }
 
-        // Format: CR/YYMMDD/001
-        return sprintf('%s/%s/%03d', $prefix, $dateString, $sequence);
+        // ponytail: collision loop prevents duplicate key on concurrent submits
+        do {
+            $candidate = sprintf('%s/%s/%03d', $prefix, $dateString, $sequence);
+            if (! static::where('request_number', $candidate)->exists()) {
+                return $candidate;
+            }
+            $sequence++;
+        } while (true);
     }
 
     // Relationships
