@@ -23,7 +23,7 @@
 
     $selTypeId = old('ticket_type_id', $ticket?->ticket_type_id ?? ($ticketTypes->where('name', 'Incident')->first()?->id ?? ''));
     $selRequesterId = old('requester_user_id', $ticket?->requester_user_id);
-    $selAssignedId = old('assigned_to_id', $ticket?->assigned_to_id);
+    $selAssignedId = old('assigned_to_id', $ticket?->assigned_to_id ?? ($isStaff ? auth()->id() : ''));
     $selCatId = old('ticket_category_id', $ticket?->ticket_category_id);
     $selPriorityId = old('priority_id', $ticket?->priority_id ?? ($priorities->where('name', 'Medium')->first()?->id ?? ''));
     $selStatusId = old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? ''));
@@ -269,8 +269,8 @@
             </div>
         </div>
 
-        <!-- Internal & Resolution Notes for Edit (Staff Only) -->
-        @if($ticket && $isStaff)
+        <!-- Internal & Resolution Notes (Staff Only - Can be filled upon creation if already resolved) -->
+        @if($isStaff)
             <div class="pt-1">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
                     <i data-lucide="check-square" class="w-4 h-4 text-brand-500"></i>
@@ -294,12 +294,12 @@
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Internal Notes</label>
-                        <textarea name="internal_notes" rows="3" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('internal_notes', $ticket->internal_notes) }}</textarea>
+                        <textarea name="internal_notes" rows="3" placeholder="Notes for IT internal reference only..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('internal_notes', $ticket?->internal_notes) }}</textarea>
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Resolution Notes</label>
-                        <textarea name="resolution_notes" rows="3" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('resolution_notes', $ticket->resolution_notes) }}</textarea>
+                        <textarea name="resolution_notes" rows="3" placeholder="Describe the resolution steps or troubleshooting outcome..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('resolution_notes', $ticket?->resolution_notes) }}</textarea>
                     </div>
                 </div>
             </div>

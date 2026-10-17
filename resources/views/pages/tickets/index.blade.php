@@ -45,10 +45,13 @@
         this.selectAll = this.selectedTickets.length === document.querySelectorAll('.ticket-checkbox').length;
     }
 }">
-    <x-common.page-breadcrumb pageTitle="Support Tickets" />
+    @php
+        $isStaff = auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
+    @endphp
+    <x-common.page-breadcrumb :pageTitle="$isStaff ? 'Support Tickets' : 'My Support Tickets'" />
 
     <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-        Track, assign, and resolve IT support requests across your organization.
+        {{ $isStaff ? 'Track, assign, and resolve IT support requests across your organization.' : 'Submit and track your IT support requests and hardware issues.' }}
     </p>
 
     @if(session('success'))
@@ -91,15 +94,24 @@
             @php
                 $currentTab = request('tab');
                 $tabFilters = array_filter(request()->except(['page', 'tab']));
-                $tabs = [
-                    ['key' => null,          'label' => 'All Tickets', 'count' => $ticketSummary['total'],       'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
-                    ['key' => 'created_today','label' => 'Created Today', 'count' => $ticketSummary['created_today'], 'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
-                    ['key' => 'new',         'label' => 'New',         'count' => $ticketSummary['new'],         'icon' => 'alert-circle', 'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
-                    ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $ticketSummary['in_progress'], 'icon' => 'clock',        'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
-                    ['key' => 'pending',     'label' => 'Pending',     'count' => $ticketSummary['pending'],     'icon' => 'pause-circle', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
-                    ['key' => 'unassigned',  'label' => 'Unassigned',  'count' => $ticketSummary['unassigned'],  'icon' => 'user-x',       'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
-                    ['key' => 'closed',      'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'],      'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
-                ];
+                if ($isStaff) {
+                    $tabs = [
+                        ['key' => null,            'label' => 'All Tickets',        'count' => $ticketSummary['total'],          'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'assigned_to_me', 'label' => 'Assigned to Me',     'count' => $ticketSummary['assigned_to_me'], 'icon' => 'user-check',    'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
+                        ['key' => 'unassigned',     'label' => 'Unassigned',         'count' => $ticketSummary['unassigned'],     'icon' => 'user-x',        'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
+                        ['key' => 'created_today',  'label' => 'Created Today',      'count' => $ticketSummary['created_today'],  'icon' => 'calendar',      'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                        ['key' => 'new',            'label' => 'New',                'count' => $ticketSummary['new'],            'icon' => 'alert-circle',  'badge' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400'],
+                        ['key' => 'in_progress',    'label' => 'In Progress',        'count' => $ticketSummary['in_progress'],    'icon' => 'clock',         'badge' => 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400'],
+                        ['key' => 'pending',        'label' => 'Pending',            'count' => $ticketSummary['pending'],        'icon' => 'pause-circle',  'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400'],
+                        ['key' => 'closed',         'label' => 'Closed / Resolved',  'count' => $ticketSummary['closed'],         'icon' => 'circle-check',  'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
+                    ];
+                } else {
+                    $tabs = [
+                        ['key' => null,     'label' => 'All My Tickets',    'count' => $ticketSummary['total'],  'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'open',   'label' => 'Open / Active',     'count' => $ticketSummary['open'],   'icon' => 'clock',        'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                        ['key' => 'closed', 'label' => 'Closed / Resolved', 'count' => $ticketSummary['closed'], 'icon' => 'circle-check', 'badge' => 'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400'],
+                    ];
+                }
             @endphp
                 <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
                     @foreach($tabs as $tab)
@@ -222,13 +234,15 @@
                 </form>
 
                 <div class="flex items-center gap-2" x-data="{ exportModalOpen: false }">
-                    <button type="button" @click="exportModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                        <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
-                        Export Excel
-                    </button>
+                    @if($isStaff)
+                        <button type="button" @click="exportModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                            <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
+                            Export Excel
+                        </button>
+                    @endif
                     <a href="{{ route('tickets.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        Create Ticket
+                        {{ $isStaff ? 'Create Ticket' : 'Report Issue / New Ticket' }}
                     </a>
 
                     <!-- Export Modal -->

@@ -110,15 +110,24 @@ class TicketController extends Controller
 
         $ticketSummary = [
             'total' => (clone $query)->count(),
+            'assigned_to_me' => (clone $query)->where('assigned_to_id', auth()->id())->whereHas('status', fn ($q) => $q->where('is_closed', false))->count(),
+            'unassigned' => (clone $query)->whereNull('assigned_to_id')->whereHas('status', fn ($q) => $q->where('is_closed', false))->count(),
             'created_today' => (clone $query)->whereDate('tickets.created_at', Carbon::today())->count(),
             'new' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'New'))->count(),
             'in_progress' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'In Progress'))->count(),
             'pending' => (clone $query)->whereHas('status', fn ($q) => $q->where('name', 'Pending'))->count(),
-            'unassigned' => (clone $query)->whereNull('assigned_to_id')->count(),
+            'open' => (clone $query)->whereHas('status', fn ($q) => $q->where('is_closed', false))->count(),
             'closed' => (clone $query)->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true))->count(),
         ];
 
         switch ($request->input('tab')) {
+            case 'assigned_to_me':
+            case 'my_assigned':
+                $query->where('assigned_to_id', auth()->id())->whereHas('status', fn ($q) => $q->where('is_closed', false));
+                break;
+            case 'unassigned':
+                $query->whereNull('assigned_to_id')->whereHas('status', fn ($q) => $q->where('is_closed', false));
+                break;
             case 'created_today':
             case 'today':
                 $query->whereDate('tickets.created_at', Carbon::today());
@@ -132,8 +141,8 @@ class TicketController extends Controller
             case 'pending':
                 $query->whereHas('status', fn ($q) => $q->where('name', 'Pending'));
                 break;
-            case 'unassigned':
-                $query->whereNull('assigned_to_id');
+            case 'open':
+                $query->whereHas('status', fn ($q) => $q->where('is_closed', false));
                 break;
             case 'closed':
                 $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Resolved', 'Closed'])->orWhere('is_closed', true));
@@ -189,7 +198,10 @@ class TicketController extends Controller
         ])->latest('id')->get();
 
         $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
-        $staffOpts = $staffUsers->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
+        $staffOpts = collect([['id' => '', 'text' => 'Unassigned (Queue)']])
+            ->concat($staffUsers->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')']))
+            ->values()
+            ->all();
         $typeOpts = $ticketTypes->map(fn ($t) => ['id' => $t->id, 'text' => $t->name])->values()->all();
         $catOpts = $ticketCategories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
         $priorityOpts = $priorities->map(fn ($p) => ['id' => $p->id, 'text' => $p->name])->values()->all();
@@ -326,18 +338,22 @@ class TicketController extends Controller
 
         $data['created_by_id'] = auth()->id();
 
-        // If completed_date is provided, auto-set status to Completed
-        if (! empty($data['completed_date'])) {
-            $currentStatus = ! empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
-            if (! $currentStatus || ! $currentStatus->is_closed) {
-                $completedStatus = TicketStatus::where('name', 'Completed')->first()
-                    ?? TicketStatus::where('is_closed', true)->first();
-                if ($completedStatus) {
-                    $data['status_id'] = $completedStatus->id;
-                }
+        // If status is closed or completed_date is provided, auto-set resolution fields
+        $selectedStatus = ! empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
+        if (($selectedStatus && $selectedStatus->is_closed) || ! empty($data['completed_date'])) {
+            if (empty($data['completed_date'])) {
+                $data['completed_date'] = $ticketDate->toDateString();
             }
             if (empty($data['completed_time'])) {
                 $data['completed_time'] = now();
+            }
+            if (! $selectedStatus || ! $selectedStatus->is_closed) {
+                $resolvedStatus = TicketStatus::where('name', 'Resolved')->first()
+                    ?? TicketStatus::where('name', 'Closed')->first()
+                    ?? TicketStatus::where('is_closed', true)->first();
+                if ($resolvedStatus) {
+                    $data['status_id'] = $resolvedStatus->id;
+                }
             }
             // Auto compute resolution_time_hours if not specified
             if (empty($data['resolution_time_hours'])) {
@@ -380,8 +396,17 @@ class TicketController extends Controller
             'ticket_id' => $ticket->id,
             'user_id' => auth()->id(),
             'action' => 'Created Ticket',
-            'description' => 'Ticket #'.$ticket->request_id.' created.',
+            'description' => 'Ticket #'.$ticket->request_id.' created'.($ticket->requester_name ? ' for '.$ticket->requester_name : '').'.',
         ]);
+
+        if ($ticket->status?->is_closed) {
+            TicketHistory::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => auth()->id(),
+                'action' => 'Status Updated',
+                'description' => 'Ticket resolved upon creation: '.($ticket->resolution_notes ?: 'Resolved directly by IT staff').'.',
+            ]);
+        }
 
         if ($ticket->assignedTo()->exists()) {
             $ticket->assignedTo->notify(new SystemNotification(
@@ -391,6 +416,24 @@ class TicketController extends Controller
                 'ticket',
                 'ITSM'
             ));
+        } else {
+            // Notify IT Administrators of new incoming unassigned ticket from self-service portal
+            try {
+                $itAdmins = User::role(['it_admin', 'super_admin'])->where('is_active', true)->get();
+                foreach ($itAdmins as $admin) {
+                    if ($admin->id !== auth()->id()) {
+                        $admin->notify(new SystemNotification(
+                            'New Support Ticket',
+                            'Ticket #'.$ticket->request_id.' submitted by '.($ticket->requester_name ?: 'User').'.',
+                            route('tickets.show', $ticket),
+                            'ticket',
+                            'ITSM'
+                        ));
+                    }
+                }
+            } catch (\Throwable) {
+                // Ignore if roles not seeded
+            }
         }
 
         if ($request->has('create_another')) {
@@ -538,7 +581,10 @@ class TicketController extends Controller
         ])->latest('id')->get();
 
         $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
-        $staffOpts = $staffUsers->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')'])->values()->all();
+        $staffOpts = collect([['id' => '', 'text' => 'Unassigned (Queue)']])
+            ->concat($staffUsers->map(fn ($u) => ['id' => $u->id, 'text' => $u->name.' ('.($u->department?->name ?? $u->email).')']))
+            ->values()
+            ->all();
         $typeOpts = $ticketTypes->map(fn ($t) => ['id' => $t->id, 'text' => $t->name])->values()->all();
         $catOpts = $ticketCategories->map(fn ($c) => ['id' => $c->id, 'text' => $c->name])->values()->all();
         $priorityOpts = $priorities->map(fn ($p) => ['id' => $p->id, 'text' => $p->name])->values()->all();
