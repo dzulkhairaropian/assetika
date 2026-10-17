@@ -1,6 +1,6 @@
 @php
     $closedStatusIds = $ticketStatuses->filter(fn($s) => $s->is_closed || in_array($s->name, ['Completed', 'Closed', 'Resolved']))->pluck('id')->toArray();
-    $completedStatusId = $ticketStatuses->firstWhere('name', 'Completed')?->id ?? ($ticketStatuses->firstWhere('is_closed', true)?->id ?? 4);
+    $completedStatusId = $ticketStatuses->firstWhere('name', 'Resolved')?->id ?? ($ticketStatuses->firstWhere('is_closed', true)?->id ?? 4);
 
     $allAssetItems = $assets->map(function($asset) {
         $holderUser = $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser;
@@ -188,9 +188,9 @@
                         <x-form.searchable-select
                             name="sla_status_id"
                             label="SLA Status"
-                            :options="$slaStatuses->map(fn($sla) => ['id' => $sla->id, 'text' => $sla->name])->toArray()"
-                            :selected="old('sla_status_id', $ticket?->sla_status_id ?? ($slaStatuses->where('name', 'Fulfilled')->first()?->id ?? ''))"
-                            placeholder="Select SLA Status"
+                            :options="[['id' => '', 'text' => 'Auto (Computed from SLA Targets)'], ...$slaStatuses->map(fn($sla) => ['id' => $sla->id, 'text' => $sla->name])->toArray()]"
+                            :selected="old('sla_status_id', $ticket?->sla_status_id)"
+                            placeholder="Auto (Computed from SLA Targets)"
                         />
                     </div>
 

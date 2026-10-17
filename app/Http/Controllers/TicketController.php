@@ -36,11 +36,22 @@ class TicketController extends Controller
 
     public function index(Request $request): View
     {
+        $user = auth()->user();
+        $isStaff = $user?->hasAnyRole(['it_admin', 'super_admin']);
+
         $query = Ticket::with(['ticketCategory', 'priority', 'status', 'slaStatus', 'assignedTo.department', 'requesterUser.department', 'requesterDepartment']);
+
+        if (! $isStaff && $user) {
+            $query->where(function ($q) use ($user) {
+                $q->where('requester_user_id', $user->id)
+                    ->orWhere('created_by_id', $user->id);
+            });
+        }
 
         if ($search = $request->string('search')->trim()->toString()) {
             $query->where(function ($q) use ($search): void {
                 $q->where('request_id', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%")
                     ->orWhere('requester_name', 'like', "%{$search}%")
                     ->orWhere('problem_description', 'like', "%{$search}%");
             });
@@ -391,6 +402,12 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket): View
     {
+        $user = auth()->user();
+        $isStaff = $user?->hasAnyRole(['it_admin', 'super_admin']);
+        if (! $isStaff && $user && $ticket->requester_user_id !== $user->id && $ticket->created_by_id !== $user->id) {
+            abort(403, 'Unauthorized. You can only view your own tickets.');
+        }
+
         $ticket->load([
             'ticketType', 'requesterUser', 'requesterCompany', 'requesterDepartment',
             'ticketCategory', 'priority', 'label', 'source', 'assignedTo', 'createdBy',
@@ -409,6 +426,11 @@ class TicketController extends Controller
      */
     public function updateStatus(Request $request, Ticket $ticket): RedirectResponse
     {
+        $user = auth()->user();
+        if (! $user || ! $user->hasAnyRole(['it_admin', 'super_admin'])) {
+            return back()->with('error', 'Unauthorized. Only IT Staff can update ticket status.');
+        }
+
         $data = $request->validate([
             'status_id' => ['required', 'exists:ticket_statuses,id'],
             'resolution_notes' => ['nullable', 'string'],
@@ -489,6 +511,12 @@ class TicketController extends Controller
 
     public function edit(Ticket $ticket): View
     {
+        $user = auth()->user();
+        $isStaff = $user?->hasAnyRole(['it_admin', 'super_admin']);
+        if (! $isStaff && ($ticket->requester_user_id !== $user->id || $ticket->status?->is_closed)) {
+            abort(403, 'Unauthorized. Only IT Staff can edit this ticket.');
+        }
+
         $users = User::with('department')->orderBy('name')->get();
         $staffUsers = User::role(['it_admin', 'super_admin'])->with('department')->orderBy('name')->get();
         if ($staffUsers->isEmpty()) {
@@ -548,13 +576,19 @@ class TicketController extends Controller
 
     public function update(Request $request, Ticket $ticket): RedirectResponse
     {
+        $user = auth()->user();
+        $isStaff = $user?->hasAnyRole(['it_admin', 'super_admin']);
+        if (! $isStaff && ($ticket->requester_user_id !== $user->id || $ticket->status?->is_closed)) {
+            abort(403, 'Unauthorized.');
+        }
+
         $oldStatusId = $ticket->status_id;
         $oldAssignedToId = $ticket->assigned_to_id;
         $data = $request->validate([
             'created_at' => ['nullable', 'date'],
             'subject' => ['nullable', 'string', 'max:255'],
             'ticket_type_id' => ['nullable', 'exists:ticket_types,id'],
-            'requester_user_id' => ['required', 'exists:users,id'],
+            'requester_user_id' => [$isStaff ? 'required' : 'nullable', 'exists:users,id'],
             'ticket_category_id' => ['nullable', 'exists:ticket_categories,id'],
             'priority_id' => ['nullable', 'exists:priorities,id'],
             'label_id' => ['nullable', 'exists:labels,id'],
@@ -573,6 +607,19 @@ class TicketController extends Controller
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
             'attachment' => ['nullable', 'file', 'max:10240'],
         ]);
+
+        if (! $isStaff) {
+            $data['requester_user_id'] = $ticket->requester_user_id;
+            $data['assigned_to_id'] = $ticket->assigned_to_id;
+            $data['status_id'] = $ticket->status_id;
+            $data['internal_notes'] = $ticket->internal_notes;
+            $data['resolution_notes'] = $ticket->resolution_notes;
+            $data['completed_date'] = $ticket->completed_date;
+            $data['completed_time'] = $ticket->completed_time;
+            $data['created_at'] = $ticket->created_at;
+            $data['actual_hours'] = $ticket->actual_hours;
+            $data['estimated_hours'] = $ticket->estimated_hours;
+        }
 
         if (empty($data['subject'])) {
             $firstLine = trim(strtok((string) $data['problem_description'], "\r\n") ?: (string) $data['problem_description']);
@@ -709,6 +756,12 @@ class TicketController extends Controller
 
     public function comment(Request $request, Ticket $ticket): RedirectResponse
     {
+        $user = auth()->user();
+        $isStaff = $user?->hasAnyRole(['it_admin', 'super_admin']);
+        if (! $isStaff && $user && $ticket->requester_user_id !== $user->id && $ticket->created_by_id !== $user->id) {
+            abort(403, 'Unauthorized to comment on this ticket.');
+        }
+
         $validated = $request->validate([
             'comment' => 'required|string',
             'is_internal' => 'nullable|boolean',
@@ -719,7 +772,7 @@ class TicketController extends Controller
             'ticket_id' => $ticket->id,
             'user_id' => auth()->id(),
             'body' => $validated['comment'],
-            'is_internal' => $request->boolean('is_internal'),
+            'is_internal' => $isStaff && $request->boolean('is_internal'),
         ]);
 
         if ($request->hasFile('attachment')) {
@@ -776,8 +829,8 @@ class TicketController extends Controller
     public function takeTicket(Ticket $ticket): RedirectResponse
     {
         $user = auth()->user();
-        if (! $user) {
-            return back()->with('error', 'Authentication required.');
+        if (! $user || ! $user->hasAnyRole(['it_admin', 'super_admin'])) {
+            return back()->with('error', 'Unauthorized. Only IT Staff can take or be assigned tickets.');
         }
 
         $inProgressStatus = TicketStatus::where('name', 'In Progress')->first();

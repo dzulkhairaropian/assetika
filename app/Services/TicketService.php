@@ -13,6 +13,7 @@ use App\Notifications\SystemNotification;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class TicketService
 {
@@ -24,21 +25,25 @@ class TicketService
             $requestCode = strtoupper($ticketType?->code ?: 'REQ');
             $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
 
-            $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-                ->orderBy('id', 'desc')
-                ->first();
-
             $nextSeq = 1;
-            if ($latestTicket) {
-                $parts = explode('-', $latestTicket->request_id);
-                $nextSeq = ((int) end($parts)) + 1;
-            }
+            do {
+                $candidate = $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
+                $exists = Ticket::where('request_id', $candidate)->exists();
+                if (! $exists) {
+                    break;
+                }
+                $nextSeq++;
+            } while (true);
 
-            $dailySequence = str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
-            $data['request_id'] = $requestCode.'-'.$ticketDate->format('ymd').'-'.$dailySequence;
+            $data['request_id'] = $candidate;
             $data['request_date'] = $ticketDate->toDateString();
             $data['request_time'] = $ticketDate;
             $data['created_at'] = $ticketDate;
+
+            if (empty($data['subject']) && ! empty($data['problem_description'])) {
+                $firstLine = trim(strtok((string) $data['problem_description'], "\r\n") ?: (string) $data['problem_description']);
+                $data['subject'] = Str::limit($firstLine, 120);
+            }
 
             // Auto-map category and subcategory from asset if asset_id is provided
             if (! empty($data['asset_id']) && empty($data['ticket_category_id'])) {
@@ -63,7 +68,8 @@ class TicketService
             if (! empty($data['completed_date'])) {
                 $currentStatus = ! empty($data['status_id']) ? TicketStatus::find($data['status_id']) : null;
                 if (! $currentStatus || ! $currentStatus->is_closed) {
-                    $completedStatus = TicketStatus::where('name', 'Completed')->first()
+                    $completedStatus = TicketStatus::where('name', 'Resolved')->first()
+                        ?? TicketStatus::where('name', 'Closed')->first()
                         ?? TicketStatus::where('is_closed', true)->first();
                     if ($completedStatus) {
                         $data['status_id'] = $completedStatus->id;
@@ -72,12 +78,12 @@ class TicketService
                 if (empty($data['completed_time'])) {
                     $data['completed_time'] = now();
                 }
-            }
 
-            if (empty($data['sla_status_id'])) {
-                $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
-                if ($fulfilledSla) {
-                    $data['sla_status_id'] = $fulfilledSla->id;
+                if (empty($data['sla_status_id'])) {
+                    $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->orWhere('name', 'Fulfilled')->first();
+                    if ($fulfilledSla) {
+                        $data['sla_status_id'] = $fulfilledSla->id;
+                    }
                 }
             }
 

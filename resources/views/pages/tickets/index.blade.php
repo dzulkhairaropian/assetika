@@ -430,7 +430,9 @@
                                 <div class="flex flex-col">
                                     <a href="{{ route('tickets.show', $ticket) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 dark:text-brand-400">#{{ $ticket->request_id }}</a>
                                     <span class="text-xs font-medium text-gray-900 dark:text-white line-clamp-1">{{ $ticket->display_subject }}</span>
-                                    <span class="text-[11px] text-gray-400 line-clamp-1">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 50) }}</span>
+                                    @if($ticket->subject && ! str_starts_with($ticket->problem_description, $ticket->subject))
+                                        <span class="text-[11px] text-gray-400 line-clamp-1">{{ \Illuminate\Support\Str::limit($ticket->problem_description, 50) }}</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-4 py-2.5">
@@ -473,21 +475,27 @@
                                 @endif
                             </td>
                             <td class="px-4 py-2.5">
-                                @if($ticket->slaStatus)
-                                    <x-ui.badge 
-                                        size="sm" 
-                                        :color="$ticket->slaStatus->color ?? ($isOverdue ? 'danger' : 'success')"
-                                        :featherIcon="$ticket->slaStatus->icon ?: ($isOverdue ? 'alert-circle' : 'circle-check')"
-                                    >
-                                        {{ $ticket->slaStatus->name }}
+                                @if($ticket->status?->is_closed)
+                                    @if($ticket->slaStatus?->code === 'BREACHED' || $isOverdue)
+                                        <x-ui.badge size="sm" color="danger" featherIcon="alert-circle">
+                                            Breached
+                                        </x-ui.badge>
+                                    @else
+                                        <x-ui.badge size="sm" color="success" featherIcon="check-circle">
+                                            Fulfilled
+                                        </x-ui.badge>
+                                    @endif
+                                @elseif($isOverdue)
+                                    <x-ui.badge size="sm" color="danger" featherIcon="alert-circle">
+                                        SLA Overdue
+                                    </x-ui.badge>
+                                @elseif($ticket->status?->is_paused)
+                                    <x-ui.badge size="sm" color="gray" featherIcon="pause-circle">
+                                        Paused
                                     </x-ui.badge>
                                 @else
-                                    <x-ui.badge 
-                                        size="sm" 
-                                        :color="$isOverdue ? 'danger' : 'success'"
-                                        :featherIcon="$isOverdue ? 'alert-circle' : 'circle-check'"
-                                    >
-                                        {{ $isOverdue ? 'SLA Risk' : 'On Track' }}
+                                    <x-ui.badge size="sm" color="success" featherIcon="clock">
+                                        On Track
                                     </x-ui.badge>
                                 @endif
                             </td>
@@ -534,25 +542,29 @@
                                             View Details
                                         </a>
 
-                                        <button type="button" @click="open = false; openStatusModal({{ $ticket->id }}, '{{ $ticket->request_id }}', {{ $ticket->status_id ?? 'null' }})" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
-                                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                                            Update Status
-                                        </button>
+                                        @if(auth()->user()?->hasAnyRole(['super_admin', 'it_admin']))
+                                            <button type="button" @click="open = false; openStatusModal({{ $ticket->id }}, '{{ $ticket->request_id }}', {{ $ticket->status_id ?? 'null' }})" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
+                                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                                Update Status
+                                            </button>
 
-                                        @if(!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id())
-                                            <form action="{{ route('tickets.take', $ticket) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-500/10 transition-colors">
-                                                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-                                                    Take Ticket
-                                                </button>
-                                            </form>
+                                            @if(!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id())
+                                                <form action="{{ route('tickets.take', $ticket) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-500/10 transition-colors">
+                                                        <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                                                        Take Ticket
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @endif
 
-                                        <a href="{{ route('tickets.edit', $ticket) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
-                                            Edit
-                                        </a>
+                                        @if(auth()->user()?->hasAnyRole(['super_admin', 'it_admin']) || ($ticket->requester_user_id === auth()->id() && !$ticket->status?->is_closed))
+                                            <a href="{{ route('tickets.edit', $ticket) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
+                                                Edit
+                                            </a>
+                                        @endif
 
                                         @if(auth()->user()?->hasAnyRole(['super_admin', 'it_admin']))
                                             <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>

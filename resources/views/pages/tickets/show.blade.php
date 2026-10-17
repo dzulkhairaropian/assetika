@@ -21,8 +21,8 @@
                 {{ $ticket->display_subject }}
             </h1>
         </div>
-        <div class="flex gap-2">
-            @if(!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id())
+        <div class="flex flex-wrap items-center gap-2">
+            @if($isStaff && (!$ticket->assigned_to_id || $ticket->assigned_to_id !== auth()->id()))
                 <form action="{{ route('tickets.take', $ticket) }}" method="POST">
                     @csrf
                     <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3.5 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300 transition">
@@ -31,21 +31,26 @@
                     </button>
                 </form>
             @endif
-            @if(isset($projects) && $projects->count() > 0)
+            @if($isStaff && isset($projects) && $projects->count() > 0)
                 <button type="button" @click="openProjectModal = true" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3.5 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 transition">
                     <i data-lucide="layout" class="w-3.5 h-3.5"></i>
                     Add to Project Task
                 </button>
             @endif
-            <button type="button" @click="statusModalOpen = true" class="inline-flex items-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                Update Status
-            </button>
+            @if($isStaff)
+                <button type="button" @click="statusModalOpen = true" class="inline-flex items-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    Update Status
+                </button>
+            @endif
+            @if($isStaff || ($ticket->requester_user_id === auth()->id() && !$ticket->status?->is_closed))
+                <a href="{{ route('tickets.edit', $ticket) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    Edit Issue
+                </a>
+            @endif
             <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
                 Back
-            </a>
-            <a href="{{ route('tickets.edit', $ticket) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                Edit Issue
             </a>
         </div>
     </div>
@@ -112,66 +117,121 @@
                 </div>
             @endif
 
-            <!-- Comments & Discussion -->
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Activity & Discussion</h3>
-
-                <!-- Add Comment Form -->
-                <form action="{{ route('tickets.comment', $ticket) }}" method="POST" enctype="multipart/form-data" class="space-y-2.5">
-                    @csrf
-                    <div>
-                        <textarea name="comment" rows="3" required placeholder="Add a response or internal update..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                            @if($isStaff)
-                                <label class="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                    <input type="checkbox" name="is_internal" value="1" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
-                                    Internal note (visible to staff only)
-                                </label>
-                            @endif
-                            <input type="file" name="attachment" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-800 dark:file:text-gray-300"/>
-                        </div>
-                        <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            Add Comment
+            <!-- Activity & Discussion (Comments + Audit History Timeline) -->
+            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4" x-data="{ activityTab: 'comments' }">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i data-lucide="activity" class="w-4 h-4 text-brand-500"></i>
+                        Activity Stream
+                    </h3>
+                    <div class="flex items-center gap-1 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-800 text-xs">
+                        <button type="button" @click="activityTab = 'comments'"
+                            :class="activityTab === 'comments' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-900 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                            class="rounded-md px-2.5 py-1 transition-colors">
+                            Discussion ({{ $ticket->comments->count() }})
+                        </button>
+                        <button type="button" @click="activityTab = 'history'"
+                            :class="activityTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-900 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                            class="rounded-md px-2.5 py-1 transition-colors">
+                            Audit Timeline ({{ $ticket->histories->count() }})
                         </button>
                     </div>
-                </form>
+                </div>
 
-                <hr class="border-gray-100 dark:border-gray-800" />
-
-                <!-- Comment Feed -->
-                <div class="space-y-3">
-                    @forelse($ticket->comments as $comment)
-                        @if($comment->is_internal && ! $isStaff)
-                            @continue
-                        @endif
-                        <div class="rounded-lg border border-gray-100 p-3 dark:border-gray-800 {{ $comment->is_internal ? 'bg-orange-50/30 dark:bg-orange-950/20' : 'bg-gray-50/50 dark:bg-gray-950' }}">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="font-semibold text-xs text-gray-900 dark:text-white">
-                                    {{ $comment->user?->name ?? 'System' }}
-                                    @if($comment->is_internal)
-                                        <span class="ml-1.5 rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">Internal</span>
-                                    @endif
-                                </span>
-                                <span class="text-[11px] text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
-                            </div>
-                            <p class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $comment->body ?? $comment->comment }}</p>
-
-                            @if($comment->attachments->count() > 0)
-                                <div class="mt-2 pt-1.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
-                                    @foreach($comment->attachments as $attachment)
-                                        <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-medium text-brand-600 hover:underline">
-                                            <i data-lucide="paperclip" class="w-3 h-3"></i>
-                                            {{ $attachment->filename }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @endif
+                <!-- Discussion & Comments Tab -->
+                <div x-show="activityTab === 'comments'" class="space-y-4">
+                    <!-- Add Comment Form -->
+                    <form action="{{ route('tickets.comment', $ticket) }}" method="POST" enctype="multipart/form-data" class="space-y-2.5">
+                        @csrf
+                        <div>
+                            <textarea name="comment" rows="3" required placeholder="Add a response or update..." class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
                         </div>
-                    @empty
-                        <p class="text-center text-xs text-gray-400 py-3">No comments yet.</p>
-                    @endforelse
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                @if($isStaff)
+                                    <label class="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                        <input type="checkbox" name="is_internal" value="1" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+                                        Internal note (visible to staff only)
+                                    </label>
+                                @endif
+                                <input type="file" name="attachment" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-800 dark:file:text-gray-300"/>
+                            </div>
+                            <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                                Add Comment
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="border-gray-100 dark:border-gray-800" />
+
+                    <!-- Comment Feed -->
+                    <div class="space-y-3">
+                        @forelse($ticket->comments as $comment)
+                            @if($comment->is_internal && ! $isStaff)
+                                @continue
+                            @endif
+                            <div class="rounded-lg border border-gray-100 p-3 dark:border-gray-800 {{ $comment->is_internal ? 'bg-orange-50/30 dark:bg-orange-950/20' : 'bg-gray-50/50 dark:bg-gray-950' }}">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="font-semibold text-xs text-gray-900 dark:text-white">
+                                        {{ $comment->user?->name ?? 'System' }}
+                                        @if($comment->is_internal)
+                                            <span class="ml-1.5 rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">Internal</span>
+                                        @endif
+                                    </span>
+                                    <span class="text-[11px] text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $comment->body ?? $comment->comment }}</p>
+
+                                @if($comment->attachments->count() > 0)
+                                    <div class="mt-2 pt-1.5 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
+                                        @foreach($comment->attachments as $attachment)
+                                            <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-medium text-brand-600 hover:underline">
+                                                <i data-lucide="paperclip" class="w-3 h-3"></i>
+                                                {{ $attachment->filename }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-center text-xs text-gray-400 py-3">No comments yet.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Audit History / Timeline Tab -->
+                <div x-show="activityTab === 'history'" x-cloak class="space-y-3">
+                    <div class="relative pl-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200 dark:before:bg-gray-800 space-y-3">
+                        @forelse($ticket->histories->sortByDesc('id') as $history)
+                            @php
+                                $dotColor = match($history->action) {
+                                    'Status Updated' => 'bg-emerald-500',
+                                    'Ticket Claimed' => 'bg-brand-500',
+                                    'Created Ticket' => 'bg-blue-500',
+                                    'Comment Added'  => 'bg-purple-500',
+                                    'Updated Ticket' => 'bg-amber-500',
+                                    default          => 'bg-gray-400'
+                                };
+                            @endphp
+                            <div class="relative">
+                                <span class="absolute -left-6 top-1.5 h-2.5 w-2.5 rounded-full {{ $dotColor }} ring-4 ring-white dark:ring-gray-900"></span>
+                                <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-2.5 dark:border-gray-800 dark:bg-gray-950">
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-semibold text-gray-900 dark:text-white">{{ $history->action ?? 'Event' }}</span>
+                                            @if($history->user)
+                                                <span class="text-gray-500 text-[11px]">by {{ $history->user->name }}</span>
+                                            @endif
+                                        </div>
+                                        <span class="text-[11px] text-gray-400 font-mono">{{ $history->created_at->format('d M Y H:i') }}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-700 dark:text-gray-300">{{ $history->description }}</p>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-center text-xs text-gray-400 py-3">No history events recorded.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
