@@ -162,7 +162,7 @@ class AssetController extends Controller
                         break;
                     case 'fully_depreciated':
                         $q->whereHas('depreciation', function ($sub) use ($now) {
-                            $sub->whereRaw('TIMESTAMPDIFF(MONTH, assets.release_date, ?) >= depreciations.months', [$now->format('Y-m-d')]);
+                            $sub->whereRaw('TIMESTAMPDIFF(MONTH, COALESCE(assets.release_date, assets.purchase_date, assets.created_at), ?) >= depreciations.months', [$now->format('Y-m-d')]);
                         });
                         break;
                     case 'no_depreciation':
@@ -600,11 +600,20 @@ class AssetController extends Controller
 
     public function bulkCheckoutForm(Request $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:assets,id',
-        ]);
-        $assets = Asset::whereIn('id', $request->ids)->get();
+        $rawIds = $request->input('ids');
+        if (empty($rawIds)) {
+            return redirect()->route('assets.index')->with('error', 'Please select at least one available asset to check out using the checkboxes.');
+        }
+
+        $ids = is_array($rawIds) ? $rawIds : array_filter(explode(',', (string) $rawIds));
+        $assets = Asset::whereIn('id', $ids)
+            ->whereNull('current_checkout_id')
+            ->get();
+
+        if ($assets->isEmpty()) {
+            return redirect()->route('assets.index')->with('error', 'None of the selected assets are currently available for checkout.');
+        }
+
         $users = User::orderBy('name')->get();
         $departments = Department::all();
         $locations = Location::all();
@@ -620,6 +629,8 @@ class AssetController extends Controller
             'checked_out_to_user_id' => 'required|exists:users,id',
             'location_id' => 'nullable|exists:locations,id',
             'department_id' => 'nullable|exists:departments,id',
+            'supervisor_user_id' => 'nullable|exists:users,id',
+            'checked_out_at' => 'nullable|date',
             'notes' => 'nullable|string',
         ]);
 
@@ -633,6 +644,8 @@ class AssetController extends Controller
             $this->assetService->processCheckout($asset, $toUser, [
                 'location_id' => $request->location_id,
                 'department_id' => $request->department_id,
+                'supervisor_user_id' => $request->supervisor_user_id,
+                'checkout_date' => $request->checked_out_at ?? now(),
                 'notes' => $request->notes,
             ]);
             $count++;

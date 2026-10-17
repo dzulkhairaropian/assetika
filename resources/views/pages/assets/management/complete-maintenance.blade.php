@@ -15,7 +15,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('assets.maintenance.complete.process', [$asset, $maintenance]) }}" method="POST" class="space-y-6">
+            <form action="{{ route('assets.maintenance.complete.process', [$asset, $maintenance]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
                 <!-- Section: Service History Summary (Read-Only) -->
@@ -78,6 +78,16 @@
                             <textarea name="notes" rows="3" placeholder="Describe the resolution or work done during service..."
                                 class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('notes', $maintenance->notes) }}</textarea>
                             @error('notes') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Service Invoice / Receipt Upload -->
+                        <div class="lg:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                Service Invoice / Receipt (PDF, PNG, JPG - Max 5MB)
+                            </label>
+                            <input type="file" name="evidence" accept=".pdf,image/png,image/jpeg,image/jpg"
+                                class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-600 hover:file:bg-brand-100 dark:file:bg-gray-800 dark:file:text-gray-300" />
+                            @error('evidence') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>

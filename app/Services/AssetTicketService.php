@@ -19,7 +19,7 @@ class AssetTicketService
     public static function createCheckoutTicket(Asset $asset, ?User $toUser, ?string $notes = null): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);
-        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $completedStatus = TicketStatus::where('name', 'Resolved')->first() ?? TicketStatus::where('name', 'Closed')->first() ?? TicketStatus::where('is_closed', true)->first();
         $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
         $mediumPriority = Priority::where('name', 'Medium')->first();
         $portalSource = Source::first();
@@ -58,7 +58,7 @@ class AssetTicketService
     public static function createCheckinTicket(Asset $asset, ?User $fromUser, ?string $condition = null): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);
-        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $completedStatus = TicketStatus::where('name', 'Resolved')->first() ?? TicketStatus::where('name', 'Closed')->first() ?? TicketStatus::where('is_closed', true)->first();
         $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
         $mediumPriority = Priority::where('name', 'Medium')->first();
         $portalSource = Source::first();
@@ -129,7 +129,7 @@ class AssetTicketService
     public static function createCompleteMaintenanceTicket(Asset $asset, AssetMaintenance $maintenance): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);
-        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $completedStatus = TicketStatus::where('name', 'Resolved')->first() ?? TicketStatus::where('name', 'Closed')->first() ?? TicketStatus::where('is_closed', true)->first();
         $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
         $mediumPriority = Priority::where('name', 'Medium')->first();
         $portalSource = Source::first();
@@ -179,7 +179,7 @@ class AssetTicketService
 
     public static function completeOpenTicketsForRetiredAsset(Asset $asset, string $reason, ?string $notes = null): void
     {
-        $completedStatus = TicketStatus::where('name', 'Completed')->first() ?? TicketStatus::where('is_closed', true)->first();
+        $completedStatus = TicketStatus::where('name', 'Resolved')->first() ?? TicketStatus::where('name', 'Closed')->first() ?? TicketStatus::where('is_closed', true)->first();
         $fulfilledSla = SlaStatus::where('code', 'FULFILLED')->first();
 
         $openTickets = Ticket::where('asset_id', $asset->id)
@@ -204,17 +204,17 @@ class AssetTicketService
         $requestCode = strtoupper($ticketType?->code ?: 'REQ');
         $prefix = $requestCode.'-'.$ticketDate->format('ymd').'-';
 
-        $latestTicket = Ticket::where('request_id', 'like', $prefix.'%')
-            ->orderBy('id', 'desc')
-            ->first();
-
         $nextSeq = 1;
-        if ($latestTicket) {
-            $parts = explode('-', $latestTicket->request_id);
-            $nextSeq = ((int) end($parts)) + 1;
-        }
+        do {
+            $candidate = $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
+            $exists = Ticket::where('request_id', $candidate)->exists();
+            if (! $exists) {
+                break;
+            }
+            $nextSeq++;
+        } while (true);
 
-        $data['request_id'] = $prefix.str_pad((string) $nextSeq, 3, '0', STR_PAD_LEFT);
+        $data['request_id'] = $candidate;
         $data['request_date'] = $ticketDate->toDateString();
         $data['request_time'] = $ticketDate;
         $data['created_at'] = $ticketDate;

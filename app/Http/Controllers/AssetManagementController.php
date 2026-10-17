@@ -14,6 +14,7 @@ use App\Services\AssetService;
 use App\Services\AssetTicketService;
 use App\Services\BastService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class AssetManagementController extends Controller
 {
@@ -55,15 +56,18 @@ class AssetManagementController extends Controller
             'supervisor_user_id' => 'nullable|exists:users,id',
             'checked_out_at' => 'required|date',
             'checkout_notes' => 'nullable|string',
+            'checkout_evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $toUser = User::findOrFail($request->checked_out_to_user_id);
 
         $this->assetService->processCheckout($asset, $toUser, [
             'location_id' => $request->location_id,
+            'department_id' => $request->department_id,
+            'supervisor_user_id' => $request->supervisor_user_id,
             'checkout_date' => $request->checked_out_at,
             'notes' => $request->checkout_notes,
-        ]);
+        ], $request->file('checkout_evidence'));
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked out successfully.');
     }
@@ -96,6 +100,7 @@ class AssetManagementController extends Controller
             'supervisor_user_id' => 'nullable|exists:users,id',
             'status_id' => 'required|exists:statuses,id',
             'checked_in_at' => 'required|date',
+            'checkin_evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $this->assetService->processCheckin($asset, [
@@ -105,7 +110,7 @@ class AssetManagementController extends Controller
             'status_id' => $request->status_id,
             'checkin_date' => $request->checked_in_at,
             'is_components_stripped' => $request->boolean('is_components_stripped'),
-        ]);
+        ], $request->file('checkin_evidence'));
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked in successfully.');
     }
@@ -194,9 +199,10 @@ class AssetManagementController extends Controller
             'cost' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',
             'is_components_stripped' => 'nullable|boolean',
+            'evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        $this->assetService->processMaintenance($asset, $request->all());
+        $this->assetService->processMaintenance($asset, $request->all(), $request->file('evidence'));
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset sent to maintenance successfully. Ticket created.');
     }
@@ -229,9 +235,10 @@ class AssetManagementController extends Controller
             'cost' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
             'resolution_notes' => 'nullable|string',
+            'evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        $this->assetService->processCompleteMaintenance($asset, $maintenance, $request->all());
+        $this->assetService->processCompleteMaintenance($asset, $maintenance, $request->all(), $request->file('evidence'));
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset maintenance completed successfully.');
     }
@@ -242,17 +249,19 @@ class AssetManagementController extends Controller
             $asset = Asset::findOrFail($asset);
         }
 
-        $request->validate([
+        $validated = $request->validate([
+            'retired_at' => 'nullable|date',
             'retirement_reason' => 'required|string|max:255',
             'retirement_notes' => 'nullable|string',
         ]);
 
         $retiredStatus = Status::where('name', 'Retired')->first();
+        $retiredDate = ! empty($validated['retired_at']) ? Carbon::parse($validated['retired_at']) : now();
 
         // Close any open checkout so utilization history does not run indefinitely
         if ($asset->currentCheckout) {
             $asset->currentCheckout->update([
-                'checked_in_at' => now(),
+                'checked_in_at' => $retiredDate,
                 'checked_in_by_user_id' => auth()->id(),
                 'checkin_notes' => trim(($asset->currentCheckout->checkin_notes ? $asset->currentCheckout->checkin_notes.' ' : '').'Auto closed on asset retirement.'),
             ]);
@@ -260,15 +269,15 @@ class AssetManagementController extends Controller
 
         $asset->update([
             'status_id' => $retiredStatus?->id ?? $asset->status_id,
-            'retired_at' => now(),
-            'retirement_reason' => $request->retirement_reason,
-            'retirement_notes' => $request->retirement_notes,
+            'retired_at' => $retiredDate,
+            'retirement_reason' => $validated['retirement_reason'],
+            'retirement_notes' => $validated['retirement_notes'] ?? null,
             'assigned_to_user_id' => null,
             'user_name' => null,
             'current_checkout_id' => null,
         ]);
 
-        AssetTicketService::completeOpenTicketsForRetiredAsset($asset, $request->retirement_reason, $request->retirement_notes);
+        AssetTicketService::completeOpenTicketsForRetiredAsset($asset, $validated['retirement_reason'], $validated['retirement_notes'] ?? null);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset retired successfully. All open tickets closed.');
     }

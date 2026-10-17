@@ -28,17 +28,15 @@
                         <!-- Service Provider -->
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                Service Provider
+                                Service Provider / Vendor <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative z-20 bg-transparent">
-                                <select name="service_provider"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                                    <option value="">Select Service Provider</option>
-                                    @foreach($vendors as $vendor)
-                                        <option value="{{ $vendor->name }}" {{ old('service_provider') == $vendor->name ? 'selected' : '' }}>{{ $vendor->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <input list="serviceProviderList" name="service_provider" value="{{ old('service_provider') }}" required placeholder="Type or select service provider..."
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                            <datalist id="serviceProviderList">
+                                @foreach($vendors as $vendor)
+                                    <option value="{{ $vendor->name }}">
+                                @endforeach
+                            </datalist>
                             @error('service_provider') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
@@ -65,9 +63,9 @@
                         <!-- Description of Issue -->
                         <div class="lg:col-span-2">
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                                Description of Issue / Service Required
+                                Description of Issue / Service Required <span class="text-red-500">*</span>
                             </label>
-                            <textarea name="description" rows="3" placeholder="Describe what needs to be repaired or serviced..."
+                            <textarea name="description" rows="3" required placeholder="Describe what needs to be repaired or serviced..."
                                 class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('description') }}</textarea>
                             @error('description') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>

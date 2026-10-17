@@ -37,6 +37,7 @@
                     ],
                     'Service Desk' => [
                         ['label' => 'Tickets Feed', 'route' => 'tickets.index', 'icon' => 'ticket'],
+                        ['label' => 'Asset Movements', 'route' => 'asset-transactions.index', 'icon' => 'activity'],
                         ['label' => 'Bulk Checkout', 'route' => 'assets.bulk-checkout', 'icon' => 'log-out'],
                     ],
                     'Master Data' => [

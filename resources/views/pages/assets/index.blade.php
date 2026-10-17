@@ -100,6 +100,23 @@
                     <input type="number" id="labelCopies" min="1" max="10" value="1"
                         class="w-14 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1 text-center text-xs font-semibold text-gray-800 dark:text-white">
                 </div>
+                <button type="button" @click="
+                    const form = document.createElement('form');
+                    form.method = 'GET';
+                    form.action = '{{ route('assets.bulk-checkout') }}';
+                    selectedAssets.forEach(a => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = a.id;
+                        form.appendChild(input);
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                " class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    Bulk Checkout
+                </button>
                 <button type="button" @click="bulkStatusModalOpen = true"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-800 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
