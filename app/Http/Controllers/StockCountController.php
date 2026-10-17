@@ -117,11 +117,20 @@ class StockCountController extends Controller
 
     public function verifyItem(StockCount $stockCount, StockCountItem $item)
     {
+        if ($item->stock_count_id !== $stockCount->id) {
+            abort(404);
+        }
+
+        $validated = request()->validate([
+            'found_status' => 'required|string|max:50',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
         $item->update([
-            'found_status' => request('found_status'),
+            'found_status' => $validated['found_status'],
             'verified_by_user_id' => auth()->id(),
             'verified_at' => now(),
-            'notes' => request('notes'),
+            'notes' => $validated['notes'] ?? null,
         ]);
 
         // Auto-complete if all items verified

@@ -116,6 +116,10 @@ class AssetManagementController extends Controller
             $asset = Asset::findOrFail($asset);
         }
 
+        if ($checkout->asset_id !== $asset->id) {
+            abort(404);
+        }
+
         return BastService::generateBastPdf($asset, $checkout);
     }
 
@@ -123,6 +127,10 @@ class AssetManagementController extends Controller
     {
         if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
+        }
+
+        if ($checkout->asset_id !== $asset->id) {
+            abort(404);
         }
 
         $users = User::orderBy('name')->get();
@@ -135,6 +143,10 @@ class AssetManagementController extends Controller
     {
         if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
+        }
+
+        if ($checkout->asset_id !== $asset->id) {
+            abort(404);
         }
 
         $validated = $request->validate([
@@ -195,6 +207,10 @@ class AssetManagementController extends Controller
             $asset = Asset::findOrFail($asset);
         }
 
+        if ($maintenance->asset_id !== $asset->id) {
+            abort(404);
+        }
+
         return view('pages.assets.management.complete-maintenance', compact('asset', 'maintenance'));
     }
 
@@ -202,6 +218,10 @@ class AssetManagementController extends Controller
     {
         if (! ($asset instanceof Asset)) {
             $asset = Asset::findOrFail($asset);
+        }
+
+        if ($maintenance->asset_id !== $asset->id) {
+            abort(404);
         }
 
         $request->validate([

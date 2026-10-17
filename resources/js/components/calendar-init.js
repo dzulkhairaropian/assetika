@@ -108,13 +108,16 @@ export function calendarInit() {
 
       // TailAdmin Official Event Structure Format
       eventContent(eventInfo) {
-        const level = eventInfo.event.extendedProps.calendar || "Primary";
+        const level = String(eventInfo.event.extendedProps.calendar || "Primary").replace(/[^a-zA-Z0-9_-]/g, "");
         const colorClass = `fc-bg-${level.toLowerCase()}`;
+        const tempDiv = document.createElement("div");
+        tempDiv.textContent = eventInfo.event.title || "";
+        const safeTitle = tempDiv.innerHTML;
         return {
           html: `
             <div class="event-fc-color flex items-center fc-event-main ${colorClass}">
               <div class="fc-daygrid-event-dot"></div>
-              <div class="fc-event-title">${eventInfo.event.title}</div>
+              <div class="fc-event-title">${safeTitle}</div>
             </div>
           `,
         };

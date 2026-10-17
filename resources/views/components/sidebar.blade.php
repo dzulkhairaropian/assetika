@@ -49,9 +49,9 @@
                         ['label' => 'Statuses', 'route' => 'statuses.index', 'icon' => 'circle-check'],
                     ],
                     'System & Sync' => [
-                        ['label' => 'Assetika Sync', 'route' => 'admin.sync.index', 'params' => ['table' => 'assets'], 'icon' => 'refresh-cw'],
+                        ['label' => 'Settings & Sync', 'route' => 'settings.index', 'icon' => 'settings'],
                         ['label' => 'Users & Access', 'route' => 'users.index', 'icon' => 'users'],
-                        ['label' => 'System Backup', 'route' => 'admin.system.backup', 'icon' => 'database'],
+                        ['label' => 'System Backup', 'route' => 'backups.index', 'icon' => 'database'],
                     ]
                 ];
             @endphp

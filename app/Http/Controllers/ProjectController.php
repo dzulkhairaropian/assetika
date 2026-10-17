@@ -167,7 +167,7 @@ class ProjectController extends Controller
     {
         $project = $task->project;
         $task->delete();
-        $project->syncAutoStatus();
+        $project?->syncAutoStatus();
 
         return redirect()->back()->with('success', 'Task deleted.');
     }

@@ -370,6 +370,10 @@ class GaAssetController extends Controller
 
     public function showBAST(GaAsset $asset, GaAssetAssignment $assignment)
     {
+        if ($assignment->asset_id !== $asset->id) {
+            abort(404);
+        }
+
         $assignment->load(['user.department', 'user.company', 'checkedOutByUser']);
         $asset->load(['category', 'subcategory', 'vehicle']);
 

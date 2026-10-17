@@ -679,7 +679,7 @@ class TicketController extends Controller
             'description' => 'Ticket #'.$ticket->request_id.' updated.',
         ]);
 
-        if (isset($data['status_id']) && $data['status_id'] !== $oldStatusId && $ticket->requesterUser) {
+        if (isset($data['status_id']) && (string) $data['status_id'] !== (string) $oldStatusId && $ticket->requesterUser) {
             $newStatus = TicketStatus::find($data['status_id']);
             $ticket->requesterUser->notify(new SystemNotification(
                 'Ticket Status Updated',

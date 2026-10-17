@@ -12,8 +12,8 @@
         @endif
 
         <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-            <p class="text-sm text-gray-600 dark:text-gray-400">Backup action temporary. You can wire real backup command later.</p>
-            <form method="POST" action="{{ route('admin.system.backup.run') }}" class="mt-5">
+            <p class="text-sm text-gray-600 dark:text-gray-400">Trigger system database and asset backup.</p>
+            <form method="POST" action="{{ route('backups.create') }}" class="mt-5">
                 @csrf
                 <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-5 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">Run Backup</button>
             </form>

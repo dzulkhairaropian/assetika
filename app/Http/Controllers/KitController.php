@@ -107,6 +107,18 @@ class KitController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'assets' => 'nullable|array',
+            'assets.*.id' => 'required|integer|exists:assets,id',
+            'assets.*.qty' => 'nullable|integer|min:1',
+            'licenses' => 'nullable|array',
+            'licenses.*.id' => 'required|integer|exists:licenses,id',
+            'licenses.*.qty' => 'nullable|integer|min:1',
+            'components' => 'nullable|array',
+            'components.*.id' => 'required|integer|exists:components,id',
+            'components.*.qty' => 'nullable|integer|min:1',
+            'consumables' => 'nullable|array',
+            'consumables.*.id' => 'required|integer|exists:consumables,id',
+            'consumables.*.qty' => 'nullable|integer|min:1',
         ]);
 
         $kit->update($validated);

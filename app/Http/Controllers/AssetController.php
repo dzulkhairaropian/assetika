@@ -600,7 +600,10 @@ class AssetController extends Controller
 
     public function bulkCheckoutForm(Request $request)
     {
-        $request->validate(['ids' => 'required|array']);
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:assets,id',
+        ]);
         $assets = Asset::whereIn('id', $request->ids)->get();
         $users = User::orderBy('name')->get();
         $departments = Department::all();

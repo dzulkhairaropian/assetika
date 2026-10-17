@@ -307,7 +307,8 @@ class ComponentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if ($component->status === 'Installed' && $component->assigned_asset_id) {
+        $statusName = is_object($component->status) ? $component->status->name : (string) $component->status;
+        if ($component->assigned_asset_id || $statusName === 'Installed') {
             return back()->with('error', 'This component unit is already installed on another asset.');
         }
 

@@ -52,7 +52,7 @@ class ConsumableRequestController extends Controller
     public function process(Request $request, ConsumableRequest $consumable_request)
     {
         $request->validate([
-            'action' => 'required|in:approve,reject,complete',
+            'action' => 'required|in:approve,reject,complete,reopen',
             'admin_notes' => 'nullable|string',
         ]);
 
@@ -101,14 +101,14 @@ class ConsumableRequestController extends Controller
 
                     $fulfilled[] = $item->quantity_requested.'x '.($consumable->product?->name ?? 'Item');
                 }
-            });
 
-            $consumable_request->update([
-                'status' => ConsumableRequestStatus::APPROVED,
-                'processed_by' => auth()->id(),
-                'processed_at' => now(),
-                'admin_notes' => $request->admin_notes,
-            ]);
+                $consumable_request->update([
+                    'status' => ConsumableRequestStatus::APPROVED,
+                    'processed_by' => auth()->id(),
+                    'processed_at' => now(),
+                    'admin_notes' => $request->admin_notes,
+                ]);
+            });
 
             if ($consumable_request->requester) {
                 $message = ! empty($fulfilled)

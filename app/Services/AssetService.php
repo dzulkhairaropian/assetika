@@ -48,6 +48,12 @@ class AssetService
     public function processCheckout(Asset $asset, User $toUser, array $params): AssetCheckout
     {
         return DB::transaction(function () use ($asset, $toUser, $params) {
+            // ponytail: row lock prevents concurrent double checkout
+            $lockedAsset = Asset::lockForUpdate()->find($asset->id);
+            if ($lockedAsset && $lockedAsset->isCurrentlyCheckedOut()) {
+                throw new \RuntimeException('Asset is already checked out.');
+            }
+
             $deployedStatus = Status::where('name', 'Deployed')->first();
 
             $checkout = AssetCheckout::create([
@@ -139,7 +145,6 @@ class AssetService
                 'cost' => $params['cost'] ?? 0,
                 'start_date' => $params['start_date'] ?? now(),
                 'notes' => $params['description'] ?? null,
-                'is_components_stripped' => $params['is_components_stripped'] ?? false,
             ]);
 
             $asset->update([
@@ -147,7 +152,7 @@ class AssetService
                 'is_components_stripped' => $params['is_components_stripped'] ?? false,
             ]);
 
-            AssetTicketService::createMaintenanceTicket($asset, $params['service_provider'], $params['description']);
+            AssetTicketService::createMaintenanceTicket($asset, $params['service_provider'], $params['description'] ?? 'Maintenance');
 
             try {
                 $recipientEmail = $asset->assignedToUser?->email ?? auth()->user()?->email;

@@ -60,21 +60,21 @@
                 <td>1</td>
                 <td>Laptop</td>
                 <td>
-                    <img src="{{ route('qrcode.inventory', ['id' => 1]) }}" alt="QR Code" width="50" height="50">
+                    <img src="{{ Route::has('qrcode.inventory') ? route('qrcode.inventory', ['id' => 1]) : '#' }}" alt="QR Code" width="50" height="50">
                 </td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>Monitor</td>
                 <td>
-                    <img src="{{ route('qrcode.inventory', ['id' => 2]) }}" alt="QR Code" width="50" height="50">
+                    <img src="{{ Route::has('qrcode.inventory') ? route('qrcode.inventory', ['id' => 2]) : '#' }}" alt="QR Code" width="50" height="50">
                 </td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>Keyboard</td>
                 <td>
-                    <img src="{{ route('qrcode.inventory', ['id' => 3]) }}" alt="QR Code" width="50" height="50">
+                    <img src="{{ Route::has('qrcode.inventory') ? route('qrcode.inventory', ['id' => 3]) : '#' }}" alt="QR Code" width="50" height="50">
                 </td>
             </tr>
         </tbody>

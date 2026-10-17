@@ -386,7 +386,11 @@ class Asset extends Model
             return $this->purchase_cost ? (float) $this->purchase_cost : null;
         }
 
-        $months = $this->depreciation->months;
+        $months = (int) $this->depreciation->months;
+        if ($months <= 0) {
+            return (float) $this->purchase_cost;
+        }
+
         $perMonth = (float) $this->purchase_cost / $months;
         $elapsed = $this->release_date->diffInMonths(now());
         $depreciated = $perMonth * min($elapsed, $months);

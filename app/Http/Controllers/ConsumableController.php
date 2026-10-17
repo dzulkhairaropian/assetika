@@ -268,6 +268,12 @@ class ConsumableController extends Controller
         $consumableIds = array_keys($quantities);
         $consumables = Consumable::whereIn('id', $consumableIds)->get();
 
+        if ($consumables->count() !== count($consumableIds)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'One or more selected consumables do not exist.');
+        }
+
         foreach ($consumables as $consumable) {
             $qty = (int) ($quantities[$consumable->id] ?? 0);
             if ($qty > $consumable->quantity) {

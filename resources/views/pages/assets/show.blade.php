@@ -33,7 +33,7 @@
             <div class="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-red-800 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400">
                 <i data-lucide="triangle-alert" class="h-4 w-4 shrink-0"></i>
                 <div class="text-xs">
-                    <strong>Aging Alert:</strong> This asset is {{ $ageDisplay }} (Released on {{ $asset->release_date->format('d M Y') }}). It has reached or exceeded its 4-year lifecycle since release and may require replacement or retirement.
+                    <strong>Aging Alert:</strong> This asset is {{ $ageDisplay }} (Released on {{ $asset->release_date?->format('d M Y') ?? '-' }}). It has reached or exceeded its 4-year lifecycle since release and may require replacement or retirement.
                 </div>
             </div>
         @endif
@@ -209,7 +209,7 @@
                     <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Depreciation & Value</h3>
                     @if($asset->depreciation && $asset->purchase_cost && $asset->release_date)
                         @php
-                            $totalMonths = $asset->depreciation->months;
+                            $totalMonths = max(1, (int) $asset->depreciation->months);
                             $elapsedMonths = (int) $asset->release_date->diffInMonths(now());
                             $percent = min(100, (int) round(($elapsedMonths / $totalMonths) * 100));
                             $remainingMonths = max(0, $totalMonths - $elapsedMonths);
@@ -221,7 +221,7 @@
                             </div>
                             <div class="flex items-center justify-between text-xs">
                                 <span class="text-gray-500">Release Date</span>
-                                <span class="font-medium text-gray-900 dark:text-white">{{ $asset->release_date->format('d M Y') }}</span>
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $asset->release_date?->format('d M Y') ?? '-' }}</span>
                             </div>
                             <div class="flex items-center justify-between text-xs">
                                 <span class="text-gray-500">Original Cost</span>

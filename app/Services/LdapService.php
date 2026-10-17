@@ -200,10 +200,11 @@ class LdapService
                 ['asset_tag' => $pc['asset_tag']],
                 [
                     'serial_number' => $pc['serial_number'],
-                    'name' => $pc['name'],
+                    'device_name' => $pc['name'],
                     'product_id' => $product->id,
                     'status_id' => $readyStatus->id,
-                    'specs' => json_encode(['ip' => $pc['ip'], 'mac' => $pc['mac'], 'os' => $pc['os'], 'ad_domain' => 'ad.domain.local']),
+                    'mac_address_ethernet' => $pc['mac'] ?? null,
+                    'specification' => json_encode(['ip' => $pc['ip'], 'mac' => $pc['mac'], 'os' => $pc['os'], 'ad_domain' => 'ad.domain.local']),
                 ]
             );
             $syncedCount++;

@@ -37,7 +37,7 @@ class License extends Model
 
     public function availableSeats(): int
     {
-        return $this->seats - $this->seats()->count();
+        return max(0, (int) $this->attributes['seats'] - $this->seats()->count());
     }
 
     public function users(): MorphToMany

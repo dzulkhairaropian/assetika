@@ -2,39 +2,34 @@
 
 namespace App\Services;
 
+use App\Models\Asset;
 use App\Models\License;
 use App\Models\LicenseSeat;
+use App\Models\User;
+use InvalidArgumentException;
 
 class LicenseService
 {
     public function checkoutSeat(License $license, array $params): LicenseSeat
     {
-        $seat = $license->seatsRelation()->whereNull('assigned_to_user_id')->whereNull('asset_id')->first();
-
-        if (! $seat) {
-            $seat = LicenseSeat::create([
-                'license_id' => $license->id,
-                'seat_number' => $license->seatsRelation()->count() + 1,
-            ]);
+        // ponytail: basic seat checkout, add reservation lock if high concurrency needed
+        if ($license->availableSeats() <= 0) {
+            throw new InvalidArgumentException('No available seats for this license.');
         }
 
-        $seat->update([
-            'assigned_to_user_id' => $params['assigned_to_user_id'] ?? null,
-            'asset_id' => $params['asset_id'] ?? null,
+        $type = ($params['assigned_to_type'] ?? '') === 'asset' ? Asset::class : User::class;
+        $targetId = $params['assigned_to_id'] ?? $params['assigned_to_user_id'] ?? null;
+
+        return $license->seats()->create([
+            'assigned_to_type' => $type,
+            'assigned_to_id' => $targetId,
+            'checked_out_at' => now(),
             'notes' => $params['notes'] ?? null,
         ]);
-
-        return $seat;
     }
 
-    public function checkinSeat(LicenseSeat $seat): LicenseSeat
+    public function checkinSeat(LicenseSeat $seat): bool
     {
-        $seat->update([
-            'assigned_to_user_id' => null,
-            'asset_id' => null,
-            'notes' => null,
-        ]);
-
-        return $seat;
+        return (bool) $seat->delete();
     }
 }

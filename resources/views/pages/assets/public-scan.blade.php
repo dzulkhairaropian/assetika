@@ -4,9 +4,11 @@
     @php
         $statusName = $asset->status->name ?? 'Unknown';
         $color = $asset->status->color ?? 'gray';
-        $holderName = $asset->currentCheckout->checkedOutToUser->name ?? '-';
-        $holderEmail = $asset->currentCheckout->checkedOutToUser->email ?? '-';
-        $holderInitial = strtoupper(substr($holderName !== '-' ? $holderName : 'N', 0, 1));
+        $rawHolderName = $asset->currentCheckout->checkedOutToUser->name ?? '-';
+        $rawHolderEmail = $asset->currentCheckout->checkedOutToUser->email ?? '-';
+        $holderName = auth()->check() ? $rawHolderName : ($rawHolderName !== '-' ? Str::mask($rawHolderName, '*', 2, -1) : '-');
+        $holderEmail = auth()->check() ? $rawHolderEmail : ($rawHolderEmail !== '-' ? Str::mask($rawHolderEmail, '*', 2, 4) : '-');
+        $holderInitial = strtoupper(substr($rawHolderName !== '-' ? $rawHolderName : 'N', 0, 1));
         $activeRepair = $asset->status && $asset->status->name === 'In Repair' ? $asset->maintenances->where('completion_date', null)->first() : null;
         $scanTarget = url("/asset/{$asset->id}");
     @endphp
@@ -109,7 +111,7 @@
                                         <div class="flex flex-wrap gap-x-3 gap-y-1 pt-1.5 text-xs text-gray-400">
                                             <span>Dept: <strong class="text-gray-650 dark:text-gray-300">{{ $asset->currentCheckout->department->name ?? '-' }}</strong></span>
                                             <span>•</span>
-                                            <span>Checked out by: <strong class="text-gray-650 dark:text-gray-300">{{ $asset->currentCheckout->checkedOutByUser->name ?? '-' }}</strong></span>
+                                            <span>Checked out by: <strong class="text-gray-650 dark:text-gray-300">{{ auth()->check() ? ($asset->currentCheckout->checkedOutByUser->name ?? '-') : 'Authorized Staff' }}</strong></span>
                                         </div>
                                     </div>
                                 </div>

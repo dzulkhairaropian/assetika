@@ -13,6 +13,7 @@ class TicketHistory extends Model
     protected $fillable = [
         'ticket_id',
         'user_id',
+        'action',
         'field',
         'old_value',
         'new_value',

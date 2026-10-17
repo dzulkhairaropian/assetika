@@ -20,6 +20,7 @@ class TicketStatus extends Model
         'sort_order',
         'is_active',
         'is_closed',
+        'is_paused',
     ];
 
     protected function casts(): array
@@ -28,6 +29,7 @@ class TicketStatus extends Model
             'sort_order' => 'integer',
             'is_active' => 'boolean',
             'is_closed' => 'boolean',
+            'is_paused' => 'boolean',
         ];
     }
 
