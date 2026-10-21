@@ -67,6 +67,12 @@ class Asset extends Model
 
     public function scopeFilter($query, array $filters)
     {
+        $filterIds = function ($val): array {
+            $list = is_array($val) ? $val : explode(',', (string) $val);
+
+            return array_values(array_filter(array_map('trim', $list), fn ($v) => $v !== ''));
+        };
+
         if (! empty($filters['search'])) {
             $search = $filters['search'];
             $like = '%'.$search.'%';
@@ -88,42 +94,45 @@ class Asset extends Model
                     ->orWhereHas('department', fn ($d) => $d->where('name', 'like', $like))
                     ->orWhereHas('location', fn ($l) => $l->where('name', 'like', $like))
                     ->orWhereHas('vendor', fn ($v) => $v->where('name', 'like', $like))
-                    ->orWhereHas('assignedToUser', fn ($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like));
+                    ->orWhereHas('assignedToUser', fn ($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like))
+                    ->orWhereHas('currentCheckout.checkedOutToUser', fn ($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like));
             });
         }
 
-        if (! empty($filters['status_id'])) {
-            $query->where('status_id', $filters['status_id']);
+        if (! empty($filters['status_id']) && ($ids = $filterIds($filters['status_id']))) {
+            $query->whereIn('status_id', $ids);
         }
 
-        if (! empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
+        if (! empty($filters['department_id']) && ($ids = $filterIds($filters['department_id']))) {
+            $query->whereIn('department_id', $ids);
         }
 
-        if (! empty($filters['location_id'])) {
-            $query->where('location_id', $filters['location_id']);
+        if (! empty($filters['location_id']) && ($ids = $filterIds($filters['location_id']))) {
+            $query->whereIn('location_id', $ids);
         }
 
-        if (! empty($filters['product_id'])) {
-            $query->where('product_id', $filters['product_id']);
+        if (! empty($filters['product_id']) && ($ids = $filterIds($filters['product_id']))) {
+            $query->whereIn('product_id', $ids);
         }
 
-        if (! empty($filters['category_id'])) {
-            $query->whereHas('product', function ($q) use ($filters) {
-                $q->where('category_id', $filters['category_id']);
-            });
+        if (! empty($filters['vendor_id']) && ($ids = $filterIds($filters['vendor_id']))) {
+            $query->whereIn('vendor_id', $ids);
         }
 
-        if (! empty($filters['brand_id'])) {
-            $query->whereHas('product', function ($q) use ($filters) {
-                $q->where('brand_id', $filters['brand_id']);
-            });
+        if (! empty($filters['depreciation_id']) && ($ids = $filterIds($filters['depreciation_id']))) {
+            $query->whereIn('depreciation_id', $ids);
         }
 
-        if (! empty($filters['company_id'])) {
-            $query->whereHas('department', function ($q) use ($filters) {
-                $q->where('company_id', $filters['company_id']);
-            });
+        if (! empty($filters['category_id']) && ($ids = $filterIds($filters['category_id']))) {
+            $query->whereHas('product', fn ($q) => $q->whereIn('category_id', $ids));
+        }
+
+        if (! empty($filters['brand_id']) && ($ids = $filterIds($filters['brand_id']))) {
+            $query->whereHas('product', fn ($q) => $q->whereIn('brand_id', $ids));
+        }
+
+        if (! empty($filters['company_id']) && ($ids = $filterIds($filters['company_id']))) {
+            $query->whereHas('department', fn ($q) => $q->whereIn('company_id', $ids));
         }
 
         return $query;

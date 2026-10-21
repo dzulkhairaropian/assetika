@@ -225,6 +225,9 @@
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('assets.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
+                        @if(request('tab'))
+                            <input type="hidden" name="tab" value="{{ request('tab') }}">
+                        @endif
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
@@ -234,15 +237,16 @@
                         </div>
 
                         @php
+                            $hasFilter = fn($key) => !empty(array_filter((array) request($key)));
                             $activeCount = 0;
-                            if (request('company_id')) $activeCount++;
-                            if (request('status_id')) $activeCount++;
-                            if (request('category_id')) $activeCount++;
-                            if (request('product_id')) $activeCount++;
-                            if (request('department_id')) $activeCount++;
-                            if (request('location_id')) $activeCount++;
-                            if (request('year')) $activeCount++;
-                            if (request('aging')) $activeCount++;
+                            if ($hasFilter('company_id')) $activeCount++;
+                            if ($hasFilter('status_id')) $activeCount++;
+                            if ($hasFilter('category_id')) $activeCount++;
+                            if ($hasFilter('product_id')) $activeCount++;
+                            if ($hasFilter('department_id')) $activeCount++;
+                            if ($hasFilter('location_id')) $activeCount++;
+                            if ($hasFilter('year')) $activeCount++;
+                            if ($hasFilter('aging')) $activeCount++;
                             if (request('created_from')) $activeCount++;
                             if (request('created_to')) $activeCount++;
                         @endphp
@@ -321,7 +325,7 @@
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('assets.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                    <a href="{{ request('tab') ? route('assets.index', ['tab' => request('tab')]) : route('assets.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
                                         Clear All Filters
                                     </a>
                                     <button type="submit" @click="filterOpen = false"
