@@ -67,18 +67,35 @@ class Asset extends Model
 
     public function scopeFilter($query, array $filters)
     {
+        $normalize = function ($val) {
+            if ($val === null || $val === '') {
+                return [];
+            }
+            $arr = is_array($val) ? $val : [$val];
+
+            return array_values(array_filter($arr, fn ($v) => $v !== null && $v !== ''));
+        };
+
+        if (! empty($filters['ids'])) {
+            $ids = is_array($filters['ids']) ? $filters['ids'] : explode(',', (string) $filters['ids']);
+            $ids = array_values(array_filter(array_map('trim', $ids), fn ($v) => $v !== ''));
+            if (! empty($ids)) {
+                $query->whereIn('assets.id', $ids);
+            }
+        }
+
         if (! empty($filters['search'])) {
             $search = $filters['search'];
             $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('asset_tag', 'like', $like)
-                    ->orWhere('serial_number', 'like', $like)
-                    ->orWhere('product_number', 'like', $like)
-                    ->orWhere('device_name', 'like', $like)
-                    ->orWhere('user_name', 'like', $like)
-                    ->orWhere('invoice_number', 'like', $like)
-                    ->orWhere('notes', 'like', $like)
-                    ->orWhere('specification', 'like', $like)
+                $q->where('assets.asset_tag', 'like', $like)
+                    ->orWhere('assets.serial_number', 'like', $like)
+                    ->orWhere('assets.product_number', 'like', $like)
+                    ->orWhere('assets.device_name', 'like', $like)
+                    ->orWhere('assets.user_name', 'like', $like)
+                    ->orWhere('assets.invoice_number', 'like', $like)
+                    ->orWhere('assets.notes', 'like', $like)
+                    ->orWhere('assets.specification', 'like', $like)
                     ->orWhereHas('product', function ($p) use ($like) {
                         $p->where('name', 'like', $like)
                             ->orWhereHas('brand', fn ($b) => $b->where('name', 'like', $like))
@@ -92,38 +109,245 @@ class Asset extends Model
             });
         }
 
-        if (! empty($filters['status_id'])) {
-            $query->where('status_id', $filters['status_id']);
+        $statusIds = $normalize($filters['status_id'] ?? null);
+        if (! empty($statusIds)) {
+            $query->whereIn('assets.status_id', $statusIds);
         }
 
-        if (! empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
+        $deptIds = $normalize($filters['department_id'] ?? null);
+        if (! empty($deptIds)) {
+            $query->whereIn('assets.department_id', $deptIds);
         }
 
-        if (! empty($filters['location_id'])) {
-            $query->where('location_id', $filters['location_id']);
+        $locIds = $normalize($filters['location_id'] ?? null);
+        if (! empty($locIds)) {
+            $query->whereIn('assets.location_id', $locIds);
         }
 
-        if (! empty($filters['product_id'])) {
-            $query->where('product_id', $filters['product_id']);
+        $prodIds = $normalize($filters['product_id'] ?? null);
+        if (! empty($prodIds)) {
+            $query->whereIn('assets.product_id', $prodIds);
         }
 
-        if (! empty($filters['category_id'])) {
-            $query->whereHas('product', function ($q) use ($filters) {
-                $q->where('category_id', $filters['category_id']);
+        $vendorIds = $normalize($filters['vendor_id'] ?? null);
+        if (! empty($vendorIds)) {
+            $query->whereIn('assets.vendor_id', $vendorIds);
+        }
+
+        $deprIds = $normalize($filters['depreciation_id'] ?? null);
+        if (! empty($deprIds)) {
+            $query->whereIn('assets.depreciation_id', $deprIds);
+        }
+
+        $catIds = $normalize($filters['category_id'] ?? null);
+        if (! empty($catIds)) {
+            $query->whereHas('product', fn ($q) => $q->whereIn('category_id', $catIds));
+        }
+
+        $brandIds = $normalize($filters['brand_id'] ?? null);
+        if (! empty($brandIds)) {
+            $query->whereHas('product', fn ($q) => $q->whereIn('brand_id', $brandIds));
+        }
+
+        $compIds = $normalize($filters['company_id'] ?? null);
+        if (! empty($compIds)) {
+            $query->whereHas('department', fn ($q) => $q->whereIn('company_id', $compIds));
+        }
+
+        if (! empty($filters['created_from'])) {
+            $query->whereDate('assets.created_at', '>=', $filters['created_from']);
+        }
+        if (! empty($filters['created_to'])) {
+            $query->whereDate('assets.created_at', '<=', $filters['created_to']);
+        }
+
+        if (! empty($filters['purchase_from'])) {
+            $query->whereDate('assets.purchase_date', '>=', $filters['purchase_from']);
+        }
+        if (! empty($filters['purchase_to'])) {
+            $query->whereDate('assets.purchase_date', '<=', $filters['purchase_to']);
+        }
+
+        if (isset($filters['cost_min']) && $filters['cost_min'] !== '') {
+            $query->where('assets.purchase_cost', '>=', $filters['cost_min']);
+        }
+        if (isset($filters['cost_max']) && $filters['cost_max'] !== '') {
+            $query->where('assets.purchase_cost', '<=', $filters['cost_max']);
+        }
+
+        $years = array_filter(array_map('intval', (array) ($filters['year'] ?? [])));
+        if (! empty($years)) {
+            $query->where(function ($q) use ($years) {
+                foreach (array_values($years) as $idx => $year) {
+                    $subWhere = function ($sub) use ($year) {
+                        $sub->whereYear('assets.release_date', $year)
+                            ->orWhere(function ($s2) use ($year) {
+                                $s2->whereNull('assets.release_date')
+                                    ->whereYear('assets.purchase_date', $year);
+                            })
+                            ->orWhere(function ($s2) use ($year) {
+                                $s2->whereNull('assets.release_date')
+                                    ->whereNull('assets.purchase_date')
+                                    ->whereYear('assets.created_at', $year);
+                            });
+                    };
+
+                    if ($idx === 0) {
+                        $q->where($subWhere);
+                    } else {
+                        $q->orWhere($subWhere);
+                    }
+                }
             });
         }
 
-        if (! empty($filters['brand_id'])) {
-            $query->whereHas('product', function ($q) use ($filters) {
-                $q->where('brand_id', $filters['brand_id']);
+        $agings = array_filter((array) ($filters['aging'] ?? []));
+        if (! empty($agings)) {
+            $now = Carbon::now();
+            $query->where(function ($q) use ($agings, $now) {
+                foreach (array_values($agings) as $idx => $aging) {
+                    $agingClause = function ($sub) use ($aging, $now) {
+                        switch ($aging) {
+                            case '0-1':
+                            case 'new':
+                                $sub->where('assets.release_date', '>', $now->copy()->subYear())
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->where('assets.purchase_date', '>', $now->copy()->subYear());
+                                    })
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereNull('assets.purchase_date')
+                                            ->where('assets.created_at', '>', $now->copy()->subYear());
+                                    });
+                                break;
+                            case '1-2':
+                                $sub->whereBetween('assets.release_date', [$now->copy()->subYears(2), $now->copy()->subYear()])
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereBetween('assets.purchase_date', [$now->copy()->subYears(2), $now->copy()->subYear()]);
+                                    })
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereNull('assets.purchase_date')
+                                            ->whereBetween('assets.created_at', [$now->copy()->subYears(2), $now->copy()->subYear()]);
+                                    });
+                                break;
+                            case '2-3':
+                                $sub->whereBetween('assets.release_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)])
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereBetween('assets.purchase_date', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
+                                    })
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereNull('assets.purchase_date')
+                                            ->whereBetween('assets.created_at', [$now->copy()->subYears(3), $now->copy()->subYears(2)]);
+                                    });
+                                break;
+                            case '2years':
+                                $sub->whereBetween('assets.release_date', [$now->copy()->subYears(4), $now->copy()->subYears(2)])
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereBetween('assets.purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(2)]);
+                                    })
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereNull('assets.purchase_date')
+                                            ->whereBetween('assets.created_at', [$now->copy()->subYears(4), $now->copy()->subYears(2)]);
+                                    });
+                                break;
+                            case '3-4':
+                                $sub->whereBetween('assets.release_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)])
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereBetween('assets.purchase_date', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
+                                    })
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereNull('assets.purchase_date')
+                                            ->whereBetween('assets.created_at', [$now->copy()->subYears(4), $now->copy()->subYears(3)]);
+                                    });
+                                break;
+                            case '4+':
+                            case '4years':
+                            case 'aged':
+                                $sub->where('assets.release_date', '<=', $now->copy()->subYears(4))
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->where('assets.purchase_date', '<=', $now->copy()->subYears(4));
+                                    })
+                                    ->orWhere(function ($s2) use ($now) {
+                                        $s2->whereNull('assets.release_date')
+                                            ->whereNull('assets.purchase_date')
+                                            ->where('assets.created_at', '<=', $now->copy()->subYears(4));
+                                    });
+                                break;
+                            case 'fully_depreciated':
+                                $sub->whereHas('depreciation', function ($dep) use ($now) {
+                                    $dep->whereRaw('TIMESTAMPDIFF(MONTH, COALESCE(assets.release_date, assets.purchase_date, assets.created_at), ?) >= depreciations.months', [$now->format('Y-m-d')]);
+                                });
+                                break;
+                            case 'no_depreciation':
+                                $sub->whereNull('assets.depreciation_id');
+                                break;
+                            case 'warranty_expired':
+                                $sub->whereNotNull('assets.warranty_expiry_date')
+                                    ->where('assets.warranty_expiry_date', '<', $now->format('Y-m-d'));
+                                break;
+                            case 'warranty_30d':
+                                $sub->whereNotNull('assets.warranty_expiry_date')
+                                    ->whereBetween('assets.warranty_expiry_date', [$now->format('Y-m-d'), $now->copy()->addDays(30)->format('Y-m-d')]);
+                                break;
+                        }
+                    };
+
+                    if ($idx === 0) {
+                        $q->where($agingClause);
+                    } else {
+                        $q->orWhere($agingClause);
+                    }
+                }
             });
         }
 
-        if (! empty($filters['company_id'])) {
-            $query->whereHas('department', function ($q) use ($filters) {
-                $q->where('company_id', $filters['company_id']);
-            });
+        if (! empty($filters['tab'])) {
+            switch ($filters['tab']) {
+                case 'today':
+                    $query->whereDate('assets.created_at', Carbon::today());
+                    break;
+                case 'draft':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Draft']));
+                    break;
+                case 'ready':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Ready to Deploy']));
+                    break;
+                case 'deployed':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Deployed', 'Borrowed']));
+                    break;
+                case 'service':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Service', 'Maintenance', 'In Repair']));
+                    break;
+                case 'broken':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Broken']));
+                    break;
+                case 'retired':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Retired', 'Disposal']));
+                    break;
+                case 'sold':
+                    $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Sold', 'For Sale']));
+                    break;
+                case 'aged':
+                    $now4 = Carbon::now()->subYears(4);
+                    $query->where(function ($sub) use ($now4) {
+                        $sub->where('assets.release_date', '<=', $now4)
+                            ->orWhere(function ($s2) use ($now4) {
+                                $s2->whereNull('assets.release_date')
+                                    ->where('assets.purchase_date', '<=', $now4);
+                            });
+                    });
+                    break;
+            }
         }
 
         return $query;

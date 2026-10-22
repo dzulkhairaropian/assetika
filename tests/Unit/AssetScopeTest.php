@@ -16,6 +16,22 @@ class AssetScopeTest extends TestCase
         $this->assertStringContainsString('asset_tag', $query->toSql());
     }
 
+    public function test_asset_filter_scope_supports_arrays_and_tabs(): void
+    {
+        $asset = new Asset;
+        $sql = $asset->newQuery()->filter([
+            'status_id' => [1, 2],
+            'department_id' => [3],
+            'year' => [2023, 2024],
+            'aging' => ['0-1', '4+'],
+            'tab' => 'ready',
+        ])->toSql();
+
+        $this->assertStringContainsString('status_id', $sql);
+        $this->assertStringContainsString('department_id', $sql);
+        $this->assertStringContainsString('release_date', $sql);
+    }
+
     public function test_asset_service_instantiation(): void
     {
         $service = new AssetService;

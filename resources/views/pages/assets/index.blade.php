@@ -57,9 +57,28 @@
         exportSelectedAssets(assets = this.selectedAssets) {
             const selected = assets && assets.length ? assets : this.selectedAssets;
             if (!selected || !selected.length) return;
-            const url = new URL('{{ route("assets.export") }}', window.location.origin);
-            selected.forEach(asset => url.searchParams.append('ids[]', asset.id));
-            window.location.href = url.toString();
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("assets.export") }}';
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            selected.forEach(asset => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ids[]';
+                input.value = asset.id;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         }
     }">
         <x-common.page-breadcrumb pageTitle="Asset Management" />
@@ -225,6 +244,11 @@
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('assets.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
+                        @if(request('tab')) <input type="hidden" name="tab" value="{{ request('tab') }}"> @endif
+                        @if(request('sort_by')) <input type="hidden" name="sort_by" value="{{ request('sort_by') }}"> @endif
+                        @if(request('sort_dir')) <input type="hidden" name="sort_dir" value="{{ request('sort_dir') }}"> @endif
+                        @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
+
                         <div class="relative flex items-center">
                             <span class="absolute left-2.5 text-gray-400">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
@@ -235,16 +259,17 @@
 
                         @php
                             $activeCount = 0;
-                            if (request('company_id')) $activeCount++;
-                            if (request('status_id')) $activeCount++;
-                            if (request('category_id')) $activeCount++;
-                            if (request('product_id')) $activeCount++;
-                            if (request('department_id')) $activeCount++;
-                            if (request('location_id')) $activeCount++;
-                            if (request('year')) $activeCount++;
-                            if (request('aging')) $activeCount++;
-                            if (request('created_from')) $activeCount++;
-                            if (request('created_to')) $activeCount++;
+                            $countCheck = fn ($val) => ! empty(is_array($val) ? array_filter($val, fn ($v) => $v !== null && $v !== '') : $val);
+                            if ($countCheck(request('company_id'))) $activeCount++;
+                            if ($countCheck(request('status_id'))) $activeCount++;
+                            if ($countCheck(request('category_id'))) $activeCount++;
+                            if ($countCheck(request('product_id'))) $activeCount++;
+                            if ($countCheck(request('department_id'))) $activeCount++;
+                            if ($countCheck(request('location_id'))) $activeCount++;
+                            if ($countCheck(request('year'))) $activeCount++;
+                            if ($countCheck(request('aging'))) $activeCount++;
+                            if ($countCheck(request('created_from'))) $activeCount++;
+                            if ($countCheck(request('created_to'))) $activeCount++;
                         @endphp
 
                         <div class="relative" @click.away="filterOpen = false">
@@ -321,7 +346,7 @@
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('assets.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                    <a href="{{ route('assets.index', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
                                         Clear All Filters
                                     </a>
                                     <button type="submit" @click="filterOpen = false"

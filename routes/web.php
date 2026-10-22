@@ -150,7 +150,7 @@ Route::middleware('auth')->group(function () {
     Route::post('asset-transfers/{transfer}/approve', [AssetTransferController::class, 'approve'])->name('asset-transfers.approve');
     Route::post('asset-transfers/{transfer}/reject', [AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
 
-    Route::get('assets/export', [AssetController::class, 'export'])->name('assets.export');
+    Route::match(['get', 'post'], 'assets/export', [AssetController::class, 'export'])->name('assets.export');
     Route::get('my-assets', [AssetController::class, 'myAssets'])->name('assets.my-assets');
     Route::post('assets/bulk-delete', [AssetController::class, 'bulkDestroy'])->name('assets.bulk-delete');
     Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
