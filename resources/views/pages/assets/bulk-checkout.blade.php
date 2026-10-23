@@ -104,6 +104,15 @@
                 </div>
 
                 <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Expected Return Date
+                        <span class="text-[10px] text-gray-400 font-normal">(Optional for temporary loans)</span>
+                    </label>
+                    <input type="date" name="expected_return_date" value="{{ old('expected_return_date') }}"
+                        class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                </div>
+
+                <div>
                     <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Checkout Notes</label>
                     <input type="text" name="notes" value="{{ old('notes') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" placeholder="e.g. New joiner workstation bundle">
                 </div>

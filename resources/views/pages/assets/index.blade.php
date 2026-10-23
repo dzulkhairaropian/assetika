@@ -514,9 +514,20 @@
                                 <td class="px-4 py-2.5">
                                     @if($asset->isCurrentlyCheckedOut())
                                         <div class="flex flex-col">
-                                            <span class="font-medium text-gray-800 dark:text-gray-200">
-                                                {{ $asset->currentCheckout->checkedOutToUser->name ?? '-' }}
-                                            </span>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-medium text-gray-800 dark:text-gray-200">
+                                                    {{ $asset->currentCheckout->checkedOutToUser->name ?? '-' }}
+                                                </span>
+                                                @if($asset->isOverdue())
+                                                    <span class="inline-flex items-center rounded-md bg-red-50 px-1.5 py-0.5 text-[9px] font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/60 dark:border-red-800/40">
+                                                        Overdue ({{ $asset->currentCheckout->overdueDays() }}d)
+                                                    </span>
+                                                @elseif($asset->currentCheckout->expected_return_date)
+                                                    <span class="inline-flex items-center rounded-md bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/40">
+                                                        Due {{ $asset->currentCheckout->expected_return_date->format('d M') }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <span class="text-[10px] text-gray-400 uppercase tracking-wider">
                                                 {{ $asset->currentCheckout->checkedOutToUser->department->name ?? '-' }}
                                             </span>

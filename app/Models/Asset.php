@@ -460,6 +460,11 @@ class Asset extends Model
                $this->currentCheckout->isCurrentlyCheckedOut();
     }
 
+    public function isOverdue(): bool
+    {
+        return $this->currentCheckout?->isOverdue() ?? false;
+    }
+
     public function isAvailable(): bool
     {
         return ! $this->isCurrentlyCheckedOut();

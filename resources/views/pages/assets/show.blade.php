@@ -61,6 +61,15 @@
                                     {{ $ageDisplay }}
                                 </x-ui.badge>
                             @endif
+                            @if($asset->isOverdue())
+                                <x-ui.badge color="danger" variant="solid" size="sm" featherIcon="alert-circle">
+                                    Overdue ({{ $asset->currentCheckout->overdueDays() }} Days)
+                                </x-ui.badge>
+                            @elseif($asset->currentCheckout?->expected_return_date)
+                                <x-ui.badge color="info" variant="light" size="sm" featherIcon="calendar">
+                                    Due {{ $asset->currentCheckout->expected_return_date->format('d M Y') }}
+                                </x-ui.badge>
+                            @endif
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">{{ $asset->device_name }} • {{ optional($asset->product->brand)->name }} {{ optional($asset->product)->model }} • S/N: <span class="font-mono text-gray-700 dark:text-gray-300">{{ $asset->serial_number ?? '-' }}</span></p>
                     </div>
@@ -160,6 +169,24 @@
                                     <p class="text-[10px] font-medium uppercase text-gray-400">Checked out at</p>
                                     <p class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $asset->currentCheckout->checked_out_at?->format('d M Y, H:i') ?? '-' }}</p>
                                 </div>
+                                @if($asset->currentCheckout->expected_return_date)
+                                    <div class="col-span-2 flex items-center justify-between border-t border-gray-100 pt-2 dark:border-gray-800">
+                                        <div>
+                                            <p class="text-[10px] font-medium uppercase text-gray-400">Expected Return</p>
+                                            <p class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $asset->currentCheckout->expected_return_date->format('d M Y') }}</p>
+                                        </div>
+                                        @if($asset->currentCheckout->isOverdue())
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+                                                <i data-lucide="alert-circle" class="h-3 w-3"></i>
+                                                Overdue ({{ $asset->currentCheckout->overdueDays() }}d)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
+                                                Loan
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @else
@@ -582,6 +609,10 @@
                                                 <td class="px-4 py-2.5">
                                                     @if($history->checked_in_at)
                                                         <span class="text-gray-600 dark:text-gray-400">{{ $history->checked_in_at?->format('d M Y') ?? '-' }}</span>
+                                                    @elseif($history->isOverdue())
+                                                        <x-ui.badge color="danger" variant="solid" size="sm">Overdue ({{ $history->overdueDays() }}d)</x-ui.badge>
+                                                    @elseif($history->expected_return_date)
+                                                        <x-ui.badge color="info" variant="light" size="sm">Due {{ $history->expected_return_date->format('d M') }}</x-ui.badge>
                                                     @else
                                                         <x-ui.badge color="primary" variant="light" size="sm">Current</x-ui.badge>
                                                     @endif

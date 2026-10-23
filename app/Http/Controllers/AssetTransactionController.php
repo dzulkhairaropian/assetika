@@ -25,61 +25,6 @@ class AssetTransactionController extends Controller
             'checkedInByUser',
         ]);
 
-        $tab = $request->input('tab');
-        if ($tab === 'active') {
-            $query->whereNull('checked_in_at');
-        } elseif ($tab === 'returned') {
-            $query->whereNotNull('checked_in_at');
-        } elseif ($tab === 'today') {
-            $query->where(function ($q) {
-                $q->whereDate('checked_out_at', Carbon::today())
-                    ->orWhereDate('checked_in_at', Carbon::today());
-            });
-        }
-
-        if ($request->filled('type')) {
-            if ($request->type === 'active') {
-                $query->whereNull('checked_in_at');
-            } elseif ($request->type === 'returned') {
-                $query->whereNotNull('checked_in_at');
-            }
-        }
-
-        $dateType = $request->input('date_type', 'both');
-        $startDate = $request->input('start_date', $request->input('from_date'));
-        $endDate = $request->input('end_date', $request->input('to_date'));
-
-        if ($startDate) {
-            if ($dateType === 'out_date') {
-                $query->whereDate('checked_out_at', '>=', $startDate);
-            } elseif ($dateType === 'in_date') {
-                $query->whereDate('checked_in_at', '>=', $startDate);
-            } else {
-                $query->where(function ($q) use ($startDate) {
-                    $q->whereDate('checked_out_at', '>=', $startDate)
-                        ->orWhereDate('checked_in_at', '>=', $startDate);
-                });
-            }
-        }
-
-        if ($endDate) {
-            if ($dateType === 'out_date') {
-                $query->whereDate('checked_out_at', '<=', $endDate);
-            } elseif ($dateType === 'in_date') {
-                $query->whereDate('checked_in_at', '<=', $endDate);
-            } else {
-                $query->where(function ($q) use ($endDate) {
-                    $q->whereDate('checked_out_at', '<=', $endDate)
-                        ->orWhereDate('checked_in_at', '<=', $endDate);
-                });
-            }
-        }
-
-        if ($request->filled('department_id')) {
-            $ids = is_array($request->department_id) ? $request->department_id : explode(',', $request->department_id);
-            $query->whereIn('department_id', array_filter($ids));
-        }
-
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -101,12 +46,29 @@ class AssetTransactionController extends Controller
         $summary = [
             'total' => (clone $query)->count(),
             'active' => (clone $query)->whereNull('checked_in_at')->count(),
+            'overdue' => (clone $query)->whereNull('checked_in_at')->whereNotNull('expected_return_date')->whereDate('expected_return_date', '<', Carbon::today())->count(),
             'returned' => (clone $query)->whereNotNull('checked_in_at')->count(),
             'today' => (clone $query)->where(function ($q) {
                 $q->whereDate('checked_out_at', Carbon::today())
                     ->orWhereDate('checked_in_at', Carbon::today());
             })->count(),
         ];
+
+        $tab = $request->input('tab');
+        if ($tab === 'active') {
+            $query->whereNull('checked_in_at');
+        } elseif ($tab === 'returned') {
+            $query->whereNotNull('checked_in_at');
+        } elseif ($tab === 'overdue') {
+            $query->whereNull('checked_in_at')
+                ->whereNotNull('expected_return_date')
+                ->whereDate('expected_return_date', '<', Carbon::today());
+        } elseif ($tab === 'today') {
+            $query->where(function ($q) {
+                $q->whereDate('checked_out_at', Carbon::today())
+                    ->orWhereDate('checked_in_at', Carbon::today());
+            });
+        }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
         $transactions = $query->latest('checked_out_at')->paginate($perPage)->withQueryString();

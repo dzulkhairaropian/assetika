@@ -447,6 +447,7 @@ class AssetController extends Controller
             'department_id' => 'nullable|exists:departments,id',
             'supervisor_user_id' => 'nullable|exists:users,id',
             'checked_out_at' => 'nullable|date',
+            'expected_return_date' => 'nullable|date',
             'notes' => 'nullable|string',
         ]);
 
@@ -462,6 +463,7 @@ class AssetController extends Controller
                 'department_id' => $request->department_id,
                 'supervisor_user_id' => $request->supervisor_user_id,
                 'checkout_date' => $request->checked_out_at ?? now(),
+                'expected_return_date' => $request->expected_return_date,
                 'notes' => $request->notes,
             ]);
             $count++;

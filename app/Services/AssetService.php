@@ -74,6 +74,7 @@ class AssetService
                 'department_id' => $deptId,
                 'location_id' => $locId,
                 'checked_out_at' => $params['checkout_date'] ?? now(),
+                'expected_return_date' => $params['expected_return_date'] ?? null,
                 'checkout_notes' => $params['notes'] ?? $params['checkout_notes'] ?? null,
                 'checkout_evidence_file_path' => $evidencePath,
                 'checkout_evidence_file_name' => $evidenceName,

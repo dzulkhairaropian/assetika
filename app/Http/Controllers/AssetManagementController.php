@@ -55,6 +55,7 @@ class AssetManagementController extends Controller
             'department_id' => 'required|exists:departments,id',
             'supervisor_user_id' => 'nullable|exists:users,id',
             'checked_out_at' => 'required|date',
+            'expected_return_date' => 'nullable|date',
             'checkout_notes' => 'nullable|string',
             'checkout_evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
@@ -66,6 +67,7 @@ class AssetManagementController extends Controller
             'department_id' => $request->department_id,
             'supervisor_user_id' => $request->supervisor_user_id,
             'checkout_date' => $request->checked_out_at,
+            'expected_return_date' => $request->expected_return_date,
             'notes' => $request->checkout_notes,
         ], $request->file('checkout_evidence'));
 

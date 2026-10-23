@@ -20,6 +20,7 @@ class AssetCheckout extends Model
         'checkout_evidence_file_path',
         'checkout_evidence_file_name',
         'checked_out_at',
+        'expected_return_date',
         'checkout_notes',
         'checked_in_at',
         'checked_in_by_user_id',
@@ -32,6 +33,7 @@ class AssetCheckout extends Model
 
     protected $casts = [
         'checked_out_at' => 'datetime',
+        'expected_return_date' => 'date',
         'checked_in_at' => 'datetime',
     ];
 
@@ -90,10 +92,33 @@ class AssetCheckout extends Model
             ->whereNull('checked_in_at');
     }
 
+    public function scopeOverdue($query)
+    {
+        return $query->currentlyCheckedOut()
+            ->whereNotNull('expected_return_date')
+            ->whereDate('expected_return_date', '<', now()->toDateString());
+    }
+
     // Helper methods
     public function isCurrentlyCheckedOut(): bool
     {
         return $this->checked_out_at !== null && $this->checked_in_at === null;
+    }
+
+    public function isOverdue(): bool
+    {
+        return $this->isCurrentlyCheckedOut()
+            && $this->expected_return_date !== null
+            && $this->expected_return_date->endOfDay()->isPast();
+    }
+
+    public function overdueDays(): int
+    {
+        if (! $this->isOverdue()) {
+            return 0;
+        }
+
+        return max(1, (int) $this->expected_return_date->startOfDay()->diffInDays(now()->startOfDay()));
     }
 
     public function isCompleted(): bool

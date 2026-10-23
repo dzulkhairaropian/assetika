@@ -24,6 +24,7 @@
                     $tabs = [
                         ['key' => null,       'label' => 'All Transactions',  'count' => $summary['total'] ?? 0,    'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
                         ['key' => 'active',   'label' => 'Active Checkouts',  'count' => $summary['active'] ?? 0,   'icon' => 'log-out',       'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
+                        ['key' => 'overdue',  'label' => 'Overdue Loans',     'count' => $summary['overdue'] ?? 0,  'icon' => 'alert-triangle', 'badge' => 'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400'],
                         ['key' => 'returned', 'label' => 'Returned',          'count' => $summary['returned'] ?? 0, 'icon' => 'rotate-ccw',    'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
                         ['key' => 'today',    'label' => 'Today',             'count' => $summary['today'] ?? 0,    'icon' => 'calendar',      'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
                     ];
@@ -166,6 +167,10 @@
                                         <span>Out: <strong class="font-mono text-gray-900 dark:text-white">{{ $tx->checked_out_at?->format('d/m/Y H:i') ?? '-' }}</strong></span>
                                         @if($tx->checked_in_at)
                                             <span class="text-[11px] text-gray-400 font-mono">In: {{ $tx->checked_in_at->format('d/m/Y H:i') }}</span>
+                                        @elseif($tx->expected_return_date)
+                                            <span class="text-[11px] font-mono {{ $tx->isOverdue() ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-blue-600 dark:text-blue-400' }}">
+                                                Due: {{ $tx->expected_return_date->format('d/m/Y') }}
+                                            </span>
                                         @endif
                                     </div>
                                 </td>
@@ -187,6 +192,10 @@
                                 <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($tx->checked_in_at)
                                         <x-ui.badge color="success" variant="light" size="sm" featherIcon="rotate-ccw">Returned</x-ui.badge>
+                                    @elseif($tx->isOverdue())
+                                        <x-ui.badge color="danger" variant="solid" size="sm" featherIcon="alert-circle">Overdue ({{ $tx->overdueDays() }}d)</x-ui.badge>
+                                    @elseif($tx->expected_return_date)
+                                        <x-ui.badge color="info" variant="light" size="sm" featherIcon="calendar">Due {{ $tx->expected_return_date->format('d/m/Y') }}</x-ui.badge>
                                     @else
                                         <x-ui.badge color="brand" variant="light" size="sm" featherIcon="log-out">Active Checkout</x-ui.badge>
                                     @endif
