@@ -159,6 +159,7 @@ Route::middleware('auth')->group(function () {
     Route::post('labels/generate', [AssetLabelController::class, 'generate'])->name('labels.generate');
     Route::get('labels/{asset}/print', [AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
     Route::get('assets/{asset}/print-label', [AssetController::class, 'printLabel'])->name('assets.print-label');
+    Route::get('assets/{asset}/clone', [AssetController::class, 'clone'])->name('assets.clone');
     Route::resource('assets', AssetController::class);
     Route::get('asset-transactions/export', [AssetTransactionController::class, 'export'])->name('asset-transactions.export');
     Route::get('asset-transactions', [AssetTransactionController::class, 'index'])->name('asset-transactions.index');

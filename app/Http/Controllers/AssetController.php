@@ -120,8 +120,18 @@ class AssetController extends Controller
         return view('pages.assets.index', compact('assets', 'statuses', 'departments', 'companies', 'locations', 'products', 'categories', 'depreciations', 'inventorySummary', 'availableYears'));
     }
 
-    public function create()
+    public function clone(Asset $asset)
     {
+        return redirect()->route('assets.create', ['clone_from' => $asset->id]);
+    }
+
+    public function create(Request $request)
+    {
+        $clonedAsset = null;
+        if ($request->filled('clone_from')) {
+            $clonedAsset = Asset::with(['product.brand', 'product.category', 'department.company'])->find($request->clone_from);
+        }
+
         $products = Product::with(['category', 'brand'])
             ->whereHas('masterCategory', function ($q) {
                 $q->where('name', 'IT Asset');
@@ -144,7 +154,7 @@ class AssetController extends Controller
 
         return view('pages.assets.create', compact(
             'products', 'statuses', 'vendors', 'operatingSystems', 'departments', 'locations', 'depreciations',
-            'productOpts', 'statusOpts', 'vendorOpts', 'deptOpts', 'locationOpts', 'osOpts'
+            'productOpts', 'statusOpts', 'vendorOpts', 'deptOpts', 'locationOpts', 'osOpts', 'clonedAsset'
         ));
     }
 

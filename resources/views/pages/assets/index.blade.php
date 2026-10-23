@@ -599,6 +599,11 @@
                                                 Edit
                                             </a>
 
+                                            <a href="{{ route('assets.clone', $asset) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-lucide="copy" class="w-3.5 h-3.5 text-gray-400"></i>
+                                                Clone
+                                            </a>
+
                                             @if($asset->isCurrentlyCheckedOut())
                                                 <a href="{{ route('assets.checkin', $asset) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-500/10 transition-colors">
                                                     <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
