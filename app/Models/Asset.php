@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class Asset extends Model
 {
@@ -483,6 +484,55 @@ class Asset extends Model
             'checked_out_at' => $this->currentCheckout->checked_out_at,
             'checked_out_by' => $this->currentCheckout->checkedOutByUser,
             'notes' => $this->currentCheckout->checkout_notes,
+        ];
+    }
+
+    public function getUtilizationSummaryAttribute(): array
+    {
+        $totalMinutes = 0;
+        $userDurations = [];
+
+        foreach ($this->checkoutHistory as $h) {
+            $start = $h->checked_out_at;
+            $end = $h->checked_in_at ?? now();
+            if ($start) {
+                $diff = $start->diffInMinutes($end);
+                $totalMinutes += $diff;
+                $uName = $h->checkedOutToUser?->name ?? 'Unknown';
+                $userDurations[$uName] = ($userDurations[$uName] ?? 0) + $diff;
+            }
+        }
+
+        arsort($userDurations);
+        $topUser = ! empty($userDurations) ? key($userDurations) : null;
+        $topMinutes = ! empty($userDurations) ? current($userDurations) : 0;
+
+        $totalDays = (int) floor($totalMinutes / 1440);
+        $totalMonths = (int) floor($totalDays / 30);
+        $remainingDays = $totalDays % 30;
+
+        if ($totalMonths >= 12) {
+            $totalY = (int) floor($totalMonths / 12);
+            $totalM = $totalMonths % 12;
+            $totalDisplay = $totalY.'y '.($totalM > 0 ? $totalM.'m' : '');
+        } elseif ($totalMonths >= 1) {
+            $totalDisplay = $totalMonths.'m '.($remainingDays > 0 ? $remainingDays.'d' : '');
+        } else {
+            $totalDisplay = $totalDays > 0 ? $totalDays.' days' : '< 1 day';
+        }
+
+        $topDays = (int) floor($topMinutes / 1440);
+        $topMonths = (int) floor($topDays / 30);
+        if ($topMonths >= 1) {
+            $topDisplay = $topMonths.' '.Str::plural('month', $topMonths);
+        } else {
+            $topDisplay = $topDays > 0 ? $topDays.' '.Str::plural('day', $topDays) : '< 1 day';
+        }
+
+        return [
+            'total_display' => $totalDisplay,
+            'top_user' => $topUser,
+            'top_display' => $topDisplay,
         ];
     }
 

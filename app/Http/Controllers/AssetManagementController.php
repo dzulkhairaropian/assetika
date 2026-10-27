@@ -84,7 +84,9 @@ class AssetManagementController extends Controller
             return redirect()->back()->with('error', 'Asset is not checked out.');
         }
 
-        $statuses = Status::all();
+        $statuses = Status::whereHas('masterCategory', function ($q) {
+            $q->where('name', 'IT Asset');
+        })->get();
         $supervisors = User::with('department')->orderBy('name')->get();
 
         return view('pages.assets.management.checkin', compact('asset', 'statuses', 'supervisors'));

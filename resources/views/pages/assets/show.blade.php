@@ -508,45 +508,7 @@
                         <!-- History Tab -->
                         <div x-show="activeTab === 'history'" class="space-y-4" x-transition>
                             @php
-                                $totalMinutes = 0;
-                                $userDurations = [];
-                                foreach ($asset->checkoutHistory as $h) {
-                                    $start = $h->checked_out_at;
-                                    $end = $h->checked_in_at ?? now();
-                                    if ($start) {
-                                        $diff = $start->diffInMinutes($end);
-                                        $totalMinutes += $diff;
-                                        $uName = $h->checkedOutToUser?->name ?? 'Unknown';
-                                        $userDurations[$uName] = ($userDurations[$uName] ?? 0) + $diff;
-                                    }
-                                }
-                                arsort($userDurations);
-                                $topUser = !empty($userDurations) ? key($userDurations) : null;
-                                $topMinutes = !empty($userDurations) ? current($userDurations) : 0;
-
-                                // Format Total Duration
-                                $totalDays = (int) floor($totalMinutes / 1440);
-                                $totalMonths = (int) floor($totalDays / 30);
-                                $remainingDays = $totalDays % 30;
-
-                                if ($totalMonths >= 12) {
-                                    $totalY = (int) floor($totalMonths / 12);
-                                    $totalM = $totalMonths % 12;
-                                    $totalDisplay = $totalY . 'y ' . ($totalM > 0 ? $totalM . 'm' : '');
-                                } elseif ($totalMonths >= 1) {
-                                    $totalDisplay = $totalMonths . 'm ' . ($remainingDays > 0 ? $remainingDays . 'd' : '');
-                                } else {
-                                    $totalDisplay = $totalDays > 0 ? $totalDays . ' days' : '< 1 day';
-                                }
-
-                                // Format Top User Duration
-                                $topDays = (int) floor($topMinutes / 1440);
-                                $topMonths = (int) floor($topDays / 30);
-                                if ($topMonths >= 1) {
-                                    $topDisplay = $topMonths . ' ' . Str::plural('month', $topMonths);
-                                } else {
-                                    $topDisplay = $topDays > 0 ? $topDays . ' ' . Str::plural('day', $topDays) : '< 1 day';
-                                }
+                                $utilization = $asset->utilization_summary;
                             @endphp
 
                             @if($asset->checkoutHistory->count() > 0)
@@ -558,7 +520,7 @@
                                         <div>
                                             <p class="text-[10px] font-medium uppercase text-gray-400">Total Utilization Time</p>
                                             <p class="text-xs font-bold text-gray-900 dark:text-white">
-                                                {{ $totalDisplay }}
+                                                {{ $utilization['total_display'] }}
                                                 <span class="text-[11px] font-normal text-gray-500">({{ $asset->checkoutHistory->count() }} {{ Str::plural('assignment', $asset->checkoutHistory->count()) }})</span>
                                             </p>
                                         </div>
@@ -571,9 +533,9 @@
                                         <div>
                                             <p class="text-[10px] font-medium uppercase text-gray-400">Top Holder</p>
                                             <p class="text-xs font-bold text-gray-900 dark:text-white">
-                                                {{ $topUser ?? '-' }}
-                                                @if($topUser)
-                                                    <span class="text-[11px] font-normal text-gray-500">({{ $topDisplay }} total)</span>
+                                                {{ $utilization['top_user'] ?? '-' }}
+                                                @if($utilization['top_user'])
+                                                    <span class="text-[11px] font-normal text-gray-500">({{ $utilization['top_display'] }} total)</span>
                                                 @endif
                                             </p>
                                         </div>

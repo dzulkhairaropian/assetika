@@ -424,6 +424,7 @@ class AssetController extends Controller
         $ids = is_array($rawIds) ? $rawIds : array_filter(explode(',', (string) $rawIds));
         $assets = Asset::whereIn('id', $ids)
             ->whereNull('current_checkout_id')
+            ->whereHas('status', fn ($q) => $q->where('name', 'Ready to Deploy'))
             ->get();
 
         if ($assets->isEmpty()) {
@@ -454,6 +455,7 @@ class AssetController extends Controller
         $toUser = User::findOrFail($request->checked_out_to_user_id);
         $assets = Asset::whereIn('id', $request->ids)
             ->whereNull('current_checkout_id')
+            ->whereHas('status', fn ($q) => $q->where('name', 'Ready to Deploy'))
             ->get();
 
         $count = 0;
@@ -471,7 +473,7 @@ class AssetController extends Controller
 
         $skipped = count($request->ids) - $count;
 
-        return redirect()->route('assets.index')->with('success', "{$count} assets checked out successfully.".($skipped > 0 ? " {$skipped} skipped (already checked out)." : ''));
+        return redirect()->route('assets.index')->with('success', "{$count} assets checked out successfully.".($skipped > 0 ? " {$skipped} skipped (already checked out or not ready)." : ''));
     }
 
     public function publicScan($assetId)
