@@ -21,6 +21,7 @@
         ];
     })->values()->toArray();
 
+    $isStaff = (bool) auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
     $selTypeId = old('ticket_type_id', $ticket?->ticket_type_id ?? ($ticketTypes->where('name', 'Incident')->first()?->id ?? ''));
     $selRequesterId = old('requester_user_id', $ticket?->requester_user_id);
     $selAssignedId = old('assigned_to_id', $ticket?->assigned_to_id ?? ($isStaff ? auth()->id() : ''));
@@ -29,8 +30,6 @@
     $selStatusId = old('status_id', $ticket?->status_id ?? ($ticketStatuses->where('name', 'New')->first()?->id ?? ''));
     $selLabelId = old('label_id', $ticket?->label_id);
     $selSourceId = old('source_id', $ticket?->source_id ?? ($sources->first()?->id ?? ''));
-
-    $isStaff = auth()->user()?->hasAnyRole(['it_admin', 'super_admin']);
     $initialRequesterId = old('requester_user_id', $ticket?->requester_user_id ?? ($isStaff ? '' : auth()->id()));
 @endphp
 <div class="space-y-4" x-data="{
