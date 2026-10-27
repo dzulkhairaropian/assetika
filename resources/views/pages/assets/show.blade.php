@@ -39,10 +39,10 @@
         @endif
 
         <!-- TailAdmin Pro Hero Entity Header Card -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/3 lg:p-6">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:p-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex items-start gap-4">
-                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 border border-brand-100 dark:border-brand-500/20 dark:bg-brand-500/10">
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-md shadow-brand-500/20">
                         <i data-lucide="monitor" class="h-8 w-8"></i>
                     </div>
                     <div>
@@ -76,29 +76,29 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 dark:border-gray-800 lg:border-t-0 lg:pt-0">
-                    <a href="{{ route('assets.clone', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                    <a href="{{ route('assets.clone', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                         <i data-lucide="copy" class="h-3.5 w-3.5"></i>
                         Clone
                     </a>
-                    <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                    <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                         <i data-lucide="printer" class="h-3.5 w-3.5"></i>
                         Print Sticker
                     </a>
-                    <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                    <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                         <i data-lucide="edit-3" class="h-3.5 w-3.5"></i>
                         Edit
                     </a>
                     @if($asset->isCurrentlyCheckedOut())
-                        <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
+                        <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 active:scale-[0.98] transition-all">
                             <i data-lucide="log-in" class="h-3.5 w-3.5"></i>
                             Check-in
                         </a>
-                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 transition">
+                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 active:scale-[0.98] transition-all">
                             <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                             Maintenance
                         </a>
                     @else
-                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition-all">
                             <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
                             Check-out
                         </a>
@@ -108,13 +108,13 @@
                                 $activeMaintenance = $asset->maintenances->where('completion_date', null)->first() ?? $asset->maintenances->first();
                             @endphp
                             @if($activeMaintenance)
-                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
+                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 active:scale-[0.98] transition-all">
                                     <i data-lucide="circle-check" class="h-3.5 w-3.5"></i>
                                     Complete Maintenance
                                 </a>
                             @endif
                         @else
-                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 transition">
+                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 active:scale-[0.98] transition-all">
                                 <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                                 Maintenance
                             </a>
@@ -122,7 +122,7 @@
                     @endif
 
                     @if(optional($asset->status)->name !== 'Retired')
-                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-error-600 transition">
+                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-error-600 active:scale-[0.98] transition-all">
                             <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
                             Retire Asset
                         </button>
@@ -307,16 +307,16 @@
                 <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <!-- Tabs Navigation -->
                     <div class="border-b border-gray-100 p-3 dark:border-gray-800 sm:p-4">
-                        <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
+                        <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-track]:bg-transparent">
                             <button @click="activeTab = 'details'"
-                                :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                                 Details
                             </button>
                             <button @click="activeTab = 'components'"
-                                :class="activeTab === 'components' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'components' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
                                 Installed Components
                                 @if($asset->installedComponents->count() > 0)
@@ -326,26 +326,26 @@
                                 @endif
                             </button>
                             <button @click="activeTab = 'history'"
-                                :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="activity" class="w-3.5 h-3.5"></i>
                                 Movement History
                             </button>
                             <button @click="activeTab = 'audit_logs'"
-                                :class="activeTab === 'audit_logs' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'audit_logs' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="list" class="w-3.5 h-3.5"></i>
                                 Audit Logs
                             </button>
                             <button @click="activeTab = 'maintenance'"
-                                :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
                                 Maintenance History
                             </button>
                             <button @click="activeTab = 'tickets'"
-                                :class="activeTab === 'tickets' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'tickets' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="life-buoy" class="w-3.5 h-3.5"></i>
                                 Support Tickets
                                 @if($asset->tickets->count() > 0)

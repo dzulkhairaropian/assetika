@@ -104,8 +104,13 @@
 
         <!-- Bulk Action Bar -->
         <div x-show="selectedAssets.length > 0"
-            x-transition
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-2"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200/80 bg-gradient-to-r from-brand-50/90 via-blue-50/40 to-indigo-50/70 p-3 shadow-sm dark:border-brand-900/40 dark:from-brand-950/40 dark:via-gray-900 dark:to-gray-900"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
@@ -113,11 +118,11 @@
                     <span x-text="selectedAssets.length"></span> assets selected.
                 </span>
             </div>
-            <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2.5 flex-wrap">
                 <div class="flex items-center gap-1.5">
-                    <label class="text-[11px] text-gray-500 dark:text-gray-400">Copies per asset:</label>
+                    <label class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Copies:</label>
                     <input type="number" id="labelCopies" min="1" max="10" value="1"
-                        class="w-14 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1 text-center text-xs font-semibold text-gray-800 dark:text-white">
+                        class="w-12 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1 text-center text-xs font-semibold text-gray-800 dark:text-white focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
                 </div>
                 <button type="button" @click="
                     const form = document.createElement('form');
@@ -132,27 +137,27 @@
                     });
                     document.body.appendChild(form);
                     form.submit();
-                " class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700">
+                " class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.98]">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     Bulk Checkout
                 </button>
                 <button type="button" @click="bulkStatusModalOpen = true"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-800 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600">
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 active:scale-[0.98]">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     Change Status
                 </button>
                 <button type="button" @click="submitBulkLabels()"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600 active:scale-[0.98]">
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                     Print Labels
                 </button>
                 <button type="button" @click="exportSelectedAssets(selectedAssets)"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600">
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600 active:scale-[0.98]">
                     <i data-lucide="download" class="w-3.5 h-3.5"></i>
                     Export Selected
                 </button>
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-error-600">
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-error-600 active:scale-[0.98]">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
@@ -208,8 +213,8 @@
             </div>
         </div>
 
-		        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/3">
-		            {{-- Card Header: Tabs + Toolbar --}}
+        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            {{-- Card Header: Tabs + Toolbar --}}
             <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
                 @php
                     $currentTab = request('tab');
@@ -227,14 +232,14 @@
                         ['key' => 'aged',     'label' => 'Aged (≥4y)',      'count' => $inventorySummary['aged'],       'icon' => 'clock',        'badge' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'],
                     ];
                 @endphp
-                <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
+                <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-track]:bg-transparent">
                     @foreach($tabs as $tab)
                         @php
                             $isActive = $currentTab === $tab['key'];
                             $tabUrl = route('assets.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
                         @endphp
                         <a href="{{ $tabUrl }}"
-                           class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors duration-200 ease-in-out {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
+                           class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-150 {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
                             <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
                             {{ $tab['label'] }}
                             <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
@@ -250,11 +255,11 @@
                         @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
 
                         <div class="relative flex items-center">
-                            <span class="absolute left-2.5 text-gray-400">
+                            <span class="absolute left-2.5 text-gray-400 pointer-events-none">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search assets..."
-                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50/70 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:focus:bg-gray-900 transition-all">
                         </div>
 
                         @php
@@ -358,24 +363,24 @@
                         </div>
                     </form>
 
-	                    <div class="flex items-center gap-2">
-	                        <a href="{{ route('assets.export', request()->query()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-	                            <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
-	                            Export Excel
-	                        </a>
-	                        <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-	                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-	                            Add Asset
-	                        </a>
-	                    </div>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('assets.export', request()->query()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
+                                Export Excel
+                            </a>
+                            <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.97] transition-all duration-150">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                Add Asset
+                            </a>
+                        </div>
                 </div>
             </div>
 
-            <div class="max-w-full overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800">
+            <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/90 backdrop-blur dark:border-gray-800 dark:bg-gray-800/90">
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
+                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -390,20 +395,20 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start">
+                            <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="asset_tag" label="Asset Tag / Name" />
                             </th>
-                            <th class="px-4 py-2.5 text-start">
+                            <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="serial_number" label="Product / Serial" />
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Depreciation / Value</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Holder</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Age</th>
-                            <th class="px-4 py-2.5 text-start">
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Depreciation / Value</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Holder</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Age</th>
+                            <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="warranty_expiry_date" label="Warranty" />
                             </th>
-                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -415,18 +420,18 @@
                                 $isAged = $ageYears !== null && $ageYears >= 4;
 
                                 if (in_array($statusName, ['broken'])) {
-                                    $rowBg = 'bg-red-50/50 dark:bg-red-500/10 hover:bg-red-100/50';
+                                    $rowBg = 'bg-red-50/40 dark:bg-red-500/5 hover:bg-red-100/40 dark:hover:bg-red-500/10';
                                 } elseif (in_array($statusName, ['service', 'maintenance', 'in repair'])) {
-                                    $rowBg = 'bg-orange-50/50 dark:bg-orange-500/10 hover:bg-orange-100/50';
+                                    $rowBg = 'bg-amber-50/40 dark:bg-amber-500/5 hover:bg-amber-100/40 dark:hover:bg-amber-500/10';
                                 } elseif (in_array($statusName, ['retired', 'disposal'])) {
-                                    $rowBg = 'bg-gray-50 dark:bg-white/[0.02] hover:bg-gray-100/50';
+                                    $rowBg = 'bg-gray-50/60 dark:bg-gray-800/20 hover:bg-gray-100/50 dark:hover:bg-gray-800/40';
                                 } elseif ($isAged) {
-                                    $rowBg = 'bg-amber-50/50 dark:bg-amber-500/10 hover:bg-amber-100/50';
+                                    $rowBg = 'bg-amber-50/30 dark:bg-amber-500/5 hover:bg-amber-100/30 dark:hover:bg-amber-500/10';
                                 } else {
-                                    $rowBg = 'hover:bg-gray-50/50 dark:hover:bg-white/[0.02]';
+                                    $rowBg = 'hover:bg-gray-50/80 dark:hover:bg-white/[0.02]';
                                 }
                             @endphp
-                            <tr class="transition {{ $rowBg }}">
+                            <tr class="transition-colors duration-150 {{ $rowBg }}">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
