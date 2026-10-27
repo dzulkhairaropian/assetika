@@ -508,7 +508,11 @@
                         <!-- History Tab -->
                         <div x-show="activeTab === 'history'" class="space-y-4" x-transition>
                             @php
-                                $utilization = $asset->utilization_summary;
+                                $utilization = $asset->utilization_summary ?? [
+                                    'total_display' => '< 1 day',
+                                    'top_user' => null,
+                                    'top_display' => '< 1 day',
+                                ];
                             @endphp
 
                             @if($asset->checkoutHistory->count() > 0)
@@ -520,7 +524,7 @@
                                         <div>
                                             <p class="text-[10px] font-medium uppercase text-gray-400">Total Utilization Time</p>
                                             <p class="text-xs font-bold text-gray-900 dark:text-white">
-                                                {{ $utilization['total_display'] }}
+                                                {{ $utilization['total_display'] ?? '< 1 day' }}
                                                 <span class="text-[11px] font-normal text-gray-500">({{ $asset->checkoutHistory->count() }} {{ Str::plural('assignment', $asset->checkoutHistory->count()) }})</span>
                                             </p>
                                         </div>
@@ -534,8 +538,8 @@
                                             <p class="text-[10px] font-medium uppercase text-gray-400">Top Holder</p>
                                             <p class="text-xs font-bold text-gray-900 dark:text-white">
                                                 {{ $utilization['top_user'] ?? '-' }}
-                                                @if($utilization['top_user'])
-                                                    <span class="text-[11px] font-normal text-gray-500">({{ $utilization['top_display'] }} total)</span>
+                                                @if(!empty($utilization['top_user']))
+                                                    <span class="text-[11px] font-normal text-gray-500">({{ $utilization['top_display'] ?? '< 1 day' }} total)</span>
                                                 @endif
                                             </p>
                                         </div>
