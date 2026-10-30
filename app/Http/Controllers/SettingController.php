@@ -44,9 +44,9 @@ class SettingController extends Controller
             'app_slogan' => 'nullable|string|max:255',
             'company_name' => 'nullable|string|max:255',
             'footer_text' => 'nullable|string|max:255',
-            'logo_light' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'logo_dark' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'favicon' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp,ico|max:1024',
+            'logo_light' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'logo_dark' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'favicon' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,ico|max:1024',
         ]);
 
         $settings = [

@@ -48,7 +48,7 @@ class GroupController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:20|unique:groups,code',
             'description' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'company_ids' => 'nullable|array',
             'company_ids.*' => 'exists:companies,id',
         ]);
@@ -87,7 +87,7 @@ class GroupController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:20|unique:groups,code,'.$group->id,
             'description' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'company_ids' => 'nullable|array',
             'company_ids.*' => 'exists:companies,id',
         ]);

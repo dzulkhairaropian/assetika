@@ -61,15 +61,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('signin', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('signin', [LoginController::class, 'login']);
+    Route::post('signin', [LoginController::class, 'login'])->middleware('throttle:5,1');
 
     Route::get('signup', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('signup', [RegisterController::class, 'register']);
+    Route::post('signup', [RegisterController::class, 'register'])->middleware('throttle:3,1');
 
     Route::get('forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
-    Route::post('forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::post('forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:5,1')->name('password.email');
     Route::get('reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-    Route::post('reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+    Route::post('reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:5,1')->name('password.update');
 });
 
 Route::get('scan/asset/{asset}', [AssetController::class, 'publicScan'])->name('assets.public-scan');
@@ -90,127 +90,143 @@ Route::middleware('auth')->group(function () {
     Route::resource('tickets', TicketController::class);
 
     // Master Data Routes
-    Route::post('groups/bulk-delete', [GroupController::class, 'bulkDestroy'])->name('groups.bulk-delete');
-    Route::resource('groups', GroupController::class);
+    Route::middleware('role:super_admin|group_admin|it_admin|ga_admin')->group(function () {
+        Route::post('groups/bulk-delete', [GroupController::class, 'bulkDestroy'])->name('groups.bulk-delete');
+        Route::resource('groups', GroupController::class);
 
-    Route::post('companies/bulk-delete', [CompanyController::class, 'bulkDestroy'])->name('companies.bulk-delete');
-    Route::post('departments/bulk-delete', [DepartmentController::class, 'bulkDestroy'])->name('departments.bulk-delete');
-    Route::post('positions/bulk-delete', [PositionController::class, 'bulkDestroy'])->name('positions.bulk-delete');
-    Route::post('locations/bulk-delete', [LocationController::class, 'bulkDestroy'])->name('locations.bulk-delete');
-    Route::post('brands/bulk-delete', [BrandController::class, 'bulkDestroy'])->name('brands.bulk-delete');
-    Route::post('master-categories/bulk-delete', [MasterCategoryController::class, 'bulkDestroy'])->name('master-categories.bulk-delete');
-    Route::post('categories/bulk-delete', [CategoryController::class, 'bulkDestroy'])->name('categories.bulk-delete');
-    Route::post('statuses/bulk-delete', [StatusController::class, 'bulkDestroy'])->name('statuses.bulk-delete');
-    Route::post('statuses/bulk-edit', [StatusController::class, 'bulkEdit'])->name('statuses.bulk-edit');
-    Route::post('vendors/bulk-delete', [VendorController::class, 'bulkDestroy'])->name('vendors.bulk-delete');
-    Route::post('operating-systems/bulk-delete', [OperatingSystemController::class, 'bulkDestroy'])->name('operating-systems.bulk-delete');
-    Route::post('products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
-    Route::post('components/bulk-delete', [ComponentController::class, 'bulkDestroy'])->name('components.bulk-delete');
-    Route::post('consumables/bulk-delete', [ConsumableController::class, 'bulkDestroy'])->name('consumables.bulk-delete');
-    Route::post('stock-counts/bulk-delete', [StockCountController::class, 'bulkDestroy'])->name('stock-counts.bulk-delete');
-    Route::post('kb/bulk-delete', [KbController::class, 'bulkDestroy'])->name('kb.bulk-delete');
-    Route::post('licenses/bulk-delete', [LicenseController::class, 'bulkDestroy'])->name('licenses.bulk-delete');
-    Route::post('kits/bulk-delete', [KitController::class, 'bulkDestroy'])->name('kits.bulk-delete');
-    Route::post('depreciations/bulk-delete', [DepreciationController::class, 'bulkDestroy'])->name('depreciations.bulk-delete');
-    Route::post('maintenance-types/bulk-delete', [MaintenanceTypeController::class, 'bulkDestroy'])->name('maintenance-types.bulk-delete');
+        Route::post('companies/bulk-delete', [CompanyController::class, 'bulkDestroy'])->name('companies.bulk-delete');
+        Route::post('departments/bulk-delete', [DepartmentController::class, 'bulkDestroy'])->name('departments.bulk-delete');
+        Route::post('positions/bulk-delete', [PositionController::class, 'bulkDestroy'])->name('positions.bulk-delete');
+        Route::post('locations/bulk-delete', [LocationController::class, 'bulkDestroy'])->name('locations.bulk-delete');
+        Route::post('brands/bulk-delete', [BrandController::class, 'bulkDestroy'])->name('brands.bulk-delete');
+        Route::post('master-categories/bulk-delete', [MasterCategoryController::class, 'bulkDestroy'])->name('master-categories.bulk-delete');
+        Route::post('categories/bulk-delete', [CategoryController::class, 'bulkDestroy'])->name('categories.bulk-delete');
+        Route::post('statuses/bulk-delete', [StatusController::class, 'bulkDestroy'])->name('statuses.bulk-delete');
+        Route::post('statuses/bulk-edit', [StatusController::class, 'bulkEdit'])->name('statuses.bulk-edit');
+        Route::post('vendors/bulk-delete', [VendorController::class, 'bulkDestroy'])->name('vendors.bulk-delete');
+        Route::post('operating-systems/bulk-delete', [OperatingSystemController::class, 'bulkDestroy'])->name('operating-systems.bulk-delete');
+        Route::post('products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulk-delete');
+        Route::post('depreciations/bulk-delete', [DepreciationController::class, 'bulkDestroy'])->name('depreciations.bulk-delete');
+        Route::post('maintenance-types/bulk-delete', [MaintenanceTypeController::class, 'bulkDestroy'])->name('maintenance-types.bulk-delete');
 
-    Route::resource('companies', CompanyController::class);
-    Route::resource('departments', DepartmentController::class);
-    Route::resource('positions', PositionController::class);
-    Route::resource('locations', LocationController::class);
-    Route::resource('brands', BrandController::class);
-    Route::resource('master-categories', MasterCategoryController::class);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('statuses', StatusController::class);
-    Route::resource('vendors', VendorController::class);
-    Route::resource('operating-systems', OperatingSystemController::class);
-    Route::resource('products', ProductController::class);
-    Route::resource('depreciations', DepreciationController::class);
-    Route::resource('maintenance-types', MaintenanceTypeController::class);
-
-    // Consumable Management Routes
-    Route::get('consumables/bulk-checkout', [ConsumableController::class, 'bulkCheckoutForm'])->name('consumables.bulk-checkout');
-    Route::post('consumables/bulk-checkout', [ConsumableController::class, 'processBulkCheckout'])->name('consumables.process-bulk-checkout');
-    Route::resource('consumables', ConsumableController::class);
-    Route::get('consumables/{consumable}/restock', [ConsumableController::class, 'restock'])->name('consumables.restock');
-    Route::post('consumables/{consumable}/restock', [ConsumableController::class, 'processRestock']);
-    Route::get('consumables/{consumable}/checkout', [ConsumableController::class, 'checkout'])->name('consumables.checkout');
-    Route::post('consumables/{consumable}/checkout', [ConsumableController::class, 'processCheckout']);
-
-    Route::resource('consumable-requests', ConsumableRequestController::class);
-    Route::post('consumable-requests/{consumable_request}/process', [ConsumableRequestController::class, 'process'])->name('consumable-requests.process');
-
-    Route::get('consumable-transactions/export', [ConsumableTransactionController::class, 'export'])->name('consumable-transactions.export');
-    Route::get('consumable-transactions', [ConsumableTransactionController::class, 'index'])->name('consumable-transactions.index');
-
-    // IT Asset Management
-    Route::get('asset-transfers', [AssetTransferController::class, 'index'])->name('asset-transfers.index');
-    Route::get('asset-transfers/create', [AssetTransferController::class, 'create'])->name('asset-transfers.create');
-    Route::post('asset-transfers', [AssetTransferController::class, 'store'])->name('asset-transfers.store');
-    Route::post('asset-transfers/{transfer}/approve', [AssetTransferController::class, 'approve'])->name('asset-transfers.approve');
-    Route::post('asset-transfers/{transfer}/reject', [AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
-
-    Route::match(['get', 'post'], 'assets/export', [AssetController::class, 'export'])->name('assets.export');
-    Route::get('my-assets', [AssetController::class, 'myAssets'])->name('assets.my-assets');
-    Route::post('assets/bulk-delete', [AssetController::class, 'bulkDestroy'])->name('assets.bulk-delete');
-    Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
-    Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');
-    Route::post('assets/bulk-checkout', [AssetController::class, 'bulkCheckout'])->name('assets.bulk-checkout.process');
-    Route::post('labels/generate', [AssetLabelController::class, 'generate'])->name('labels.generate');
-    Route::get('labels/{asset}/print', [AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
-    Route::get('assets/{asset}/print-label', [AssetController::class, 'printLabel'])->name('assets.print-label');
-    Route::get('assets/{asset}/clone', [AssetController::class, 'clone'])->name('assets.clone');
-    Route::resource('assets', AssetController::class);
-    Route::get('asset-transactions/export', [AssetTransactionController::class, 'export'])->name('asset-transactions.export');
-    Route::get('asset-transactions', [AssetTransactionController::class, 'index'])->name('asset-transactions.index');
-    Route::prefix('assets/{asset}')->group(function () {
-        Route::get('checkout', [AssetManagementController::class, 'showCheckout'])->name('assets.checkout');
-        Route::post('checkout', [AssetManagementController::class, 'processCheckout'])->name('assets.checkout.process');
-        Route::get('checkin', [AssetManagementController::class, 'showCheckin'])->name('assets.checkin');
-        Route::post('checkin', [AssetManagementController::class, 'processCheckin'])->name('assets.checkin.process');
-        Route::get('bast/{checkout}', [AssetManagementController::class, 'showBAST'])->name('assets.bast');
-        Route::get('bast/{checkout}/edit', [AssetManagementController::class, 'editBAST'])->name('assets.bast.edit');
-        Route::put('bast/{checkout}', [AssetManagementController::class, 'updateBAST'])->name('assets.bast.update');
-        Route::get('maintenance', [AssetManagementController::class, 'showMaintenance'])->name('assets.maintenance');
-        Route::post('maintenance', [AssetManagementController::class, 'processMaintenance'])->name('assets.maintenance.process');
-        Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
-        Route::post('maintenance/{maintenance}/complete', [AssetManagementController::class, 'processCompleteMaintenance'])->name('assets.maintenance.complete.process');
-        Route::post('retire', [AssetManagementController::class, 'processRetire'])->name('assets.retire.process');
+        Route::resource('companies', CompanyController::class);
+        Route::resource('departments', DepartmentController::class);
+        Route::resource('positions', PositionController::class);
+        Route::resource('locations', LocationController::class);
+        Route::resource('brands', BrandController::class);
+        Route::resource('master-categories', MasterCategoryController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('statuses', StatusController::class);
+        Route::resource('vendors', VendorController::class);
+        Route::resource('operating-systems', OperatingSystemController::class);
+        Route::resource('products', ProductController::class);
+        Route::resource('depreciations', DepreciationController::class);
+        Route::resource('maintenance-types', MaintenanceTypeController::class);
     });
 
-    // Component Management
-    Route::resource('components', ComponentController::class);
-    Route::post('components/{component}/checkout', [ComponentController::class, 'checkout'])->name('components.checkout');
-    Route::post('components/{component}/checkin', [ComponentController::class, 'checkin'])->name('components.checkin');
+    // Consumable, Component, License & Kit Management
+    Route::middleware('role:super_admin|it_admin')->group(function () {
+        Route::get('consumables/bulk-checkout', [ConsumableController::class, 'bulkCheckoutForm'])->name('consumables.bulk-checkout');
+        Route::post('consumables/bulk-checkout', [ConsumableController::class, 'processBulkCheckout'])->name('consumables.process-bulk-checkout');
+        Route::post('consumables/bulk-delete', [ConsumableController::class, 'bulkDestroy'])->name('consumables.bulk-delete');
+        Route::resource('consumables', ConsumableController::class);
+        Route::get('consumables/{consumable}/restock', [ConsumableController::class, 'restock'])->name('consumables.restock');
+        Route::post('consumables/{consumable}/restock', [ConsumableController::class, 'processRestock']);
+        Route::get('consumables/{consumable}/checkout', [ConsumableController::class, 'checkout'])->name('consumables.checkout');
+        Route::post('consumables/{consumable}/checkout', [ConsumableController::class, 'processCheckout']);
 
-    // License Management
-    Route::resource('licenses', LicenseController::class);
-    Route::post('licenses/{license}/checkout', [LicenseController::class, 'checkout'])->name('licenses.checkout');
-    Route::post('licenses/{license}/checkin/{seat}', [LicenseController::class, 'checkin'])->name('licenses.checkin');
+        Route::post('consumable-requests/{consumable_request}/process', [ConsumableRequestController::class, 'process'])->name('consumable-requests.process');
+        Route::get('consumable-transactions/export', [ConsumableTransactionController::class, 'export'])->name('consumable-transactions.export');
+        Route::get('consumable-transactions', [ConsumableTransactionController::class, 'index'])->name('consumable-transactions.index');
 
-    // Kit Management
-    Route::resource('kits', KitController::class);
-    Route::get('kits/{kit}/checkout-form', [KitController::class, 'checkoutForm'])->name('kits.checkout-form');
-    Route::post('kits/{kit}/checkout', [KitController::class, 'checkout'])->name('kits.checkout');
+        // Component Management
+        Route::post('components/bulk-delete', [ComponentController::class, 'bulkDestroy'])->name('components.bulk-delete');
+        Route::resource('components', ComponentController::class);
+        Route::post('components/{component}/checkout', [ComponentController::class, 'checkout'])->name('components.checkout');
+        Route::post('components/{component}/checkin', [ComponentController::class, 'checkin'])->name('components.checkin');
 
-    // Import
-    Route::get('import', [ImportController::class, 'index'])->name('import.index');
-    Route::post('import/preview', [ImportController::class, 'preview'])->name('import.preview');
-    Route::post('import/process', [ImportController::class, 'process'])->name('import.process');
-    Route::get('import/template/{type}', [ImportController::class, 'downloadTemplate'])->name('import.template');
+        // License Management
+        Route::post('licenses/bulk-delete', [LicenseController::class, 'bulkDestroy'])->name('licenses.bulk-delete');
+        Route::resource('licenses', LicenseController::class);
+        Route::post('licenses/{license}/checkout', [LicenseController::class, 'checkout'])->name('licenses.checkout');
+        Route::post('licenses/{license}/checkin/{seat}', [LicenseController::class, 'checkin'])->name('licenses.checkin');
 
-    // Stock Count / Audit
-    Route::resource('stock-counts', StockCountController::class);
-    Route::get('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'addAssets'])->name('stock-counts.add-assets');
-    Route::post('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'processAddAssets'])->name('stock-counts.process-add-assets');
-    Route::post('stock-counts/{stockCount}/complete', [StockCountController::class, 'markComplete'])->name('stock-counts.complete');
-    Route::post('stock-counts/{stockCount}/items/{item}/verify', [StockCountController::class, 'verifyItem'])->name('stock-counts.items.verify');
+        // Kit Management
+        Route::post('kits/bulk-delete', [KitController::class, 'bulkDestroy'])->name('kits.bulk-delete');
+        Route::resource('kits', KitController::class);
+        Route::get('kits/{kit}/checkout-form', [KitController::class, 'checkoutForm'])->name('kits.checkout-form');
+        Route::post('kits/{kit}/checkout', [KitController::class, 'checkout'])->name('kits.checkout');
+
+        // Stock Count / Audit
+        Route::post('stock-counts/bulk-delete', [StockCountController::class, 'bulkDestroy'])->name('stock-counts.bulk-delete');
+        Route::resource('stock-counts', StockCountController::class);
+        Route::get('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'addAssets'])->name('stock-counts.add-assets');
+        Route::post('stock-counts/{stockCount}/add-assets', [StockCountController::class, 'processAddAssets'])->name('stock-counts.process-add-assets');
+        Route::post('stock-counts/{stockCount}/complete', [StockCountController::class, 'markComplete'])->name('stock-counts.complete');
+        Route::post('stock-counts/{stockCount}/items/{item}/verify', [StockCountController::class, 'verifyItem'])->name('stock-counts.items.verify');
+    });
+
+    Route::resource('consumable-requests', ConsumableRequestController::class);
+
+    // IT Asset Management
+    Route::middleware('role:super_admin|group_admin|it_admin')->group(function () {
+        Route::get('asset-transfers', [AssetTransferController::class, 'index'])->name('asset-transfers.index');
+        Route::get('asset-transfers/create', [AssetTransferController::class, 'create'])->name('asset-transfers.create');
+        Route::post('asset-transfers', [AssetTransferController::class, 'store'])->name('asset-transfers.store');
+        Route::post('asset-transfers/{transfer}/approve', [AssetTransferController::class, 'approve'])->name('asset-transfers.approve');
+        Route::post('asset-transfers/{transfer}/reject', [AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
+
+        Route::match(['get', 'post'], 'assets/export', [AssetController::class, 'export'])->name('assets.export');
+        Route::post('assets/bulk-delete', [AssetController::class, 'bulkDestroy'])->name('assets.bulk-delete');
+        Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
+        Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');
+        Route::post('assets/bulk-checkout', [AssetController::class, 'bulkCheckout'])->name('assets.bulk-checkout.process');
+        Route::post('labels/generate', [AssetLabelController::class, 'generate'])->name('labels.generate');
+        Route::get('labels/{asset}/print', [AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
+        Route::get('assets/{asset}/print-label', [AssetController::class, 'printLabel'])->name('assets.print-label');
+        Route::get('assets/{asset}/clone', [AssetController::class, 'clone'])->name('assets.clone');
+
+        Route::get('assets/create', [AssetController::class, 'create'])->name('assets.create');
+        Route::post('assets', [AssetController::class, 'store'])->name('assets.store');
+        Route::get('assets/{asset}/edit', [AssetController::class, 'edit'])->name('assets.edit');
+        Route::put('assets/{asset}', [AssetController::class, 'update'])->name('assets.update');
+        Route::delete('assets/{asset}', [AssetController::class, 'destroy'])->name('assets.destroy');
+
+        Route::get('asset-transactions/export', [AssetTransactionController::class, 'export'])->name('asset-transactions.export');
+        Route::get('asset-transactions', [AssetTransactionController::class, 'index'])->name('asset-transactions.index');
+
+        Route::prefix('assets/{asset}')->group(function () {
+            Route::get('checkout', [AssetManagementController::class, 'showCheckout'])->name('assets.checkout');
+            Route::post('checkout', [AssetManagementController::class, 'processCheckout'])->name('assets.checkout.process');
+            Route::get('checkin', [AssetManagementController::class, 'showCheckin'])->name('assets.checkin');
+            Route::post('checkin', [AssetManagementController::class, 'processCheckin'])->name('assets.checkin.process');
+            Route::get('bast/{checkout}', [AssetManagementController::class, 'showBAST'])->name('assets.bast');
+            Route::get('bast/{checkout}/edit', [AssetManagementController::class, 'editBAST'])->name('assets.bast.edit');
+            Route::put('bast/{checkout}', [AssetManagementController::class, 'updateBAST'])->name('assets.bast.update');
+            Route::get('maintenance', [AssetManagementController::class, 'showMaintenance'])->name('assets.maintenance');
+            Route::post('maintenance', [AssetManagementController::class, 'processMaintenance'])->name('assets.maintenance.process');
+            Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
+            Route::post('maintenance/{maintenance}/complete', [AssetManagementController::class, 'processCompleteMaintenance'])->name('assets.maintenance.complete.process');
+            Route::post('retire', [AssetManagementController::class, 'processRetire'])->name('assets.retire.process');
+        });
+
+        // Import
+        Route::get('import', [ImportController::class, 'index'])->name('import.index');
+        Route::post('import/preview', [ImportController::class, 'preview'])->name('import.preview');
+        Route::post('import/process', [ImportController::class, 'process'])->name('import.process');
+        Route::get('import/template/{type}', [ImportController::class, 'downloadTemplate'])->name('import.template');
+
+        Route::post('asset-requests/{assetRequest}/process', [AssetRequestController::class, 'process'])->name('asset-requests.process');
+    });
+
+    Route::get('assets', [AssetController::class, 'index'])->name('assets.index');
+    Route::get('assets/{asset}', [AssetController::class, 'show'])->name('assets.show');
+    Route::get('my-assets', [AssetController::class, 'myAssets'])->name('assets.my-assets');
 
     // Self-Service Requests
     Route::get('requestable-assets', [AssetRequestController::class, 'catalog'])->name('requestable-assets.catalog');
     Route::post('requestable-assets', [AssetRequestController::class, 'store'])->name('asset-requests.store');
     Route::get('asset-requests', [AssetRequestController::class, 'index'])->name('asset-requests.index');
-    Route::post('asset-requests/{assetRequest}/process', [AssetRequestController::class, 'process'])->name('asset-requests.process');
 
     // Profile Routes
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
@@ -221,16 +237,18 @@ Route::middleware('auth')->group(function () {
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     // GA Asset Management Routes
-    Route::resource('ga-categories', GaAssetCategoryController::class);
-    Route::resource('ga-subcategories', GaAssetSubcategoryController::class);
-    Route::get('ga-assets/subcategories-ajax', [GaAssetController::class, 'getSubcategoriesAjax'])->name('ga-assets.subcategories-ajax');
-    Route::post('ga-assets/bulk-delete', [GaAssetController::class, 'bulkDestroy'])->name('ga-assets.bulk-delete');
-    Route::resource('ga-assets', GaAssetController::class);
-    Route::get('ga-assets/{asset}/bast/{assignment}', [GaAssetController::class, 'showBAST'])->name('ga-assets.bast');
-    Route::post('ga-assets/{asset}/renew-tax', [GaAssetController::class, 'renewVehicleTax'])->name('ga-assets.renew-tax');
-    Route::post('ga-assets/{asset}/checkout', [GaAssetController::class, 'checkout'])->name('ga-assets.checkout');
-    Route::post('ga-assets/{asset}/checkin', [GaAssetController::class, 'checkin'])->name('ga-assets.checkin');
-    Route::post('ga-assets/{asset}/maintenance', [GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');
+    Route::middleware('role:super_admin|ga_admin')->group(function () {
+        Route::resource('ga-categories', GaAssetCategoryController::class);
+        Route::resource('ga-subcategories', GaAssetSubcategoryController::class);
+        Route::get('ga-assets/subcategories-ajax', [GaAssetController::class, 'getSubcategoriesAjax'])->name('ga-assets.subcategories-ajax');
+        Route::post('ga-assets/bulk-delete', [GaAssetController::class, 'bulkDestroy'])->name('ga-assets.bulk-delete');
+        Route::resource('ga-assets', GaAssetController::class);
+        Route::get('ga-assets/{asset}/bast/{assignment}', [GaAssetController::class, 'showBAST'])->name('ga-assets.bast');
+        Route::post('ga-assets/{asset}/renew-tax', [GaAssetController::class, 'renewVehicleTax'])->name('ga-assets.renew-tax');
+        Route::post('ga-assets/{asset}/checkout', [GaAssetController::class, 'checkout'])->name('ga-assets.checkout');
+        Route::post('ga-assets/{asset}/checkin', [GaAssetController::class, 'checkin'])->name('ga-assets.checkin');
+        Route::post('ga-assets/{asset}/maintenance', [GaAssetController::class, 'maintenance'])->name('ga-assets.maintenance');
+    });
 
     // User & Role Management
     Route::middleware('role:super_admin')->group(function () {
@@ -291,16 +309,30 @@ Route::middleware('auth')->group(function () {
     Route::put('api/calendar/events/{id}', [CalendarController::class, 'update'])->name('api.calendar.update');
     Route::delete('api/calendar/events/{id}', [CalendarController::class, 'destroy'])->name('api.calendar.destroy');
     Route::get('kb/suggestions', [KbController::class, 'suggestions'])->name('kb.suggestions');
-    // Projects & Operations
-    Route::post('projects/bulk-delete', [ProjectController::class, 'bulkDestroy'])->name('projects.bulk-delete');
-    Route::resource('projects', ProjectController::class);
-    Route::post('projects/{project}/tasks', [ProjectController::class, 'storeTask'])->name('projects.store-task');
-    Route::patch('project-tasks/{task}/status', [ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
-    Route::delete('project-tasks/{task}', [ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
+    Route::get('kb', [KbController::class, 'index'])->name('kb.index');
+    Route::get('kb/{kb}', [KbController::class, 'show'])->name('kb.show');
 
-    Route::resource('kb', KbController::class);
-    Route::resource('sla-policies', SlaPolicyController::class)->only(['index', 'store']);
-    Route::resource('renewals', RenewalController::class);
+    Route::middleware('role:super_admin|it_admin')->group(function () {
+        Route::post('kb/bulk-delete', [KbController::class, 'bulkDestroy'])->name('kb.bulk-delete');
+        Route::get('kb/create', [KbController::class, 'create'])->name('kb.create');
+        Route::post('kb', [KbController::class, 'store'])->name('kb.store');
+        Route::get('kb/{kb}/edit', [KbController::class, 'edit'])->name('kb.edit');
+        Route::put('kb/{kb}', [KbController::class, 'update'])->name('kb.update');
+        Route::delete('kb/{kb}', [KbController::class, 'destroy'])->name('kb.destroy');
+
+        Route::resource('sla-policies', SlaPolicyController::class)->only(['index', 'store']);
+    });
+
+    // Projects & Operations
+    Route::middleware('role:super_admin|group_admin|it_admin|ga_admin')->group(function () {
+        Route::post('projects/bulk-delete', [ProjectController::class, 'bulkDestroy'])->name('projects.bulk-delete');
+        Route::resource('projects', ProjectController::class);
+        Route::post('projects/{project}/tasks', [ProjectController::class, 'storeTask'])->name('projects.store-task');
+        Route::patch('project-tasks/{task}/status', [ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
+        Route::delete('project-tasks/{task}', [ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
+
+        Route::resource('renewals', RenewalController::class);
+    });
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });

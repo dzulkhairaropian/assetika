@@ -261,7 +261,7 @@ class TicketController extends Controller
             'resolution_time_hours' => ['nullable', 'numeric'],
             'estimated_hours' => ['nullable', 'numeric', 'min:0'],
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
-            'attachment' => ['nullable', 'file', 'max:10240'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,zip,txt', 'max:10240'],
         ]);
 
         // Security & workflow enforcement for non-staff users (requesters)
@@ -651,7 +651,7 @@ class TicketController extends Controller
             'resolution_time_hours' => ['nullable', 'numeric'],
             'estimated_hours' => ['nullable', 'numeric', 'min:0'],
             'actual_hours' => ['nullable', 'numeric', 'min:0'],
-            'attachment' => ['nullable', 'file', 'max:10240'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,zip,txt', 'max:10240'],
         ]);
 
         if (! $isStaff) {
@@ -811,7 +811,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'comment' => 'required|string',
             'is_internal' => 'nullable|boolean',
-            'attachment' => 'nullable|file|max:10240',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,zip,txt|max:10240',
         ]);
 
         $comment = TicketComment::create([
