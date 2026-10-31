@@ -27,15 +27,9 @@
         <!-- Hero Card (Spans 2 columns on lg) -->
         <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Hardware Fleet</span>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Fleet Inventory & Deployment</h2>
-                    </div>
-                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
-                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-                        <span class="tabular-nums">{{ $deploymentRate }}%</span> Deployed
-                    </span>
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Hardware Fleet</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Fleet Inventory & Deployment</h2>
                 </div>
 
                 <div class="mt-4 flex flex-wrap items-baseline gap-3">
@@ -55,7 +49,11 @@
                     $servicePct = $totalAssets > 0 ? round(($service / $totalAssets) * 100) : 0;
                     $brokenPct = $totalAssets > 0 ? round(($brokenDisposal / $totalAssets) * 100) : 0;
                 @endphp
-                <div class="mt-4">
+                <div class="mt-5">
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                        <span class="font-medium text-gray-500 dark:text-gray-400">Deployment Ratio</span>
+                        <span class="font-semibold text-brand-600 dark:text-brand-400 tabular-nums">{{ $deploymentRate }}% Allocated</span>
+                    </div>
                     <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                         <div style="width: {{ $deployedPct }}%" class="bg-brand-500 transition-all duration-300" title="Deployed: {{ $deployed }} ({{ $deployedPct }}%)"></div>
                         <div style="width: {{ $readyPct }}%" class="bg-emerald-500 transition-all duration-300" title="Ready: {{ $readyToDeploy }} ({{ $readyPct }}%)"></div>
