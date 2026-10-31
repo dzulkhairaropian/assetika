@@ -2,24 +2,18 @@
 
 @section('content')
     @php
-        $yearsOld = null;
+        $startDate = $asset->release_date ?? $asset->purchase_date ?? $asset->created_at;
+        $yearsOld = $startDate ? (int) $startDate->diffInYears(now()) : null;
         $ageDisplay = '-';
-        $isAged = false;
-        if ($asset->release_date) {
-            $yearsOld = (int) $asset->release_date->diffInYears(now());
-            $monthsOld = (int) $asset->release_date->diffInMonths(now());
-            $daysOld = (int) $asset->release_date->diffInDays(now());
-
-            $isAged = $yearsOld >= 4;
-
+        if ($startDate) {
             if ($yearsOld >= 1) {
                 $ageDisplay = $yearsOld . ' ' . Str::plural('year', $yearsOld) . ' old';
-            } elseif ($monthsOld >= 1) {
-                $ageDisplay = $monthsOld . ' ' . Str::plural('month', $monthsOld) . ' old';
             } else {
-                $ageDisplay = $daysOld . ' ' . Str::plural('day', $daysOld) . ' old';
+                $monthsOld = (int) $startDate->diffInMonths(now());
+                $ageDisplay = $monthsOld >= 1 ? $monthsOld . ' ' . Str::plural('month', $monthsOld) . ' old' : (int) $startDate->diffInDays(now()) . ' days old';
             }
         }
+        $isAged = $asset->isDueForReplacement();
     @endphp
 
     <div class="space-y-4" x-data="{ activeTab: 'details', retireModalOpen: false }">
@@ -30,11 +24,16 @@
         </p>
 
         @if($isAged)
-            <div class="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-red-800 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400">
-                <i data-lucide="triangle-alert" class="h-4 w-4 shrink-0"></i>
-                <div class="text-xs">
-                    <strong>Aging Alert:</strong> This asset is {{ $ageDisplay }} (Released on {{ $asset->release_date?->format('d M Y') ?? '-' }}). It has reached or exceeded its 4-year lifecycle since release and may require replacement or retirement.
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-900 dark:border-amber-900/30 dark:bg-amber-500/10 dark:text-amber-300">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="refresh-cw" class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"></i>
+                    <div class="text-xs">
+                        <strong>Replacement Due ({{ $asset->replacement_priority }} Priority):</strong> This asset is {{ $ageDisplay }} (Acquisition: {{ $startDate?->format('d M Y') ?? '-' }}). It has reached the 4-year hardware lifecycle and is recommended for replacement.
+                    </div>
                 </div>
+                <a href="{{ route('assets.replacements') }}" class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-amber-700 transition">
+                    View Planner
+                </a>
             </div>
         @endif
 

@@ -33,6 +33,114 @@ class AssetController extends Controller
         return (new AssetsExport($request->all()))->download('assets-'.now()->format('Y-m-d').'.xlsx');
     }
 
+    public function replacements(Request $request)
+    {
+        $deviceType = $request->input('type', 'laptop');
+        $priorityFilter = $request->input('priority');
+        $isLaptop = $deviceType === 'laptop';
+
+        $query = Asset::with([
+            'product.category',
+            'product.brand',
+            'status',
+            'department.company',
+            'location',
+            'currentCheckout.checkedOutToUser.department',
+            'assignedToUser',
+        ])->dueForReplacement($isLaptop);
+
+        if (! $isLaptop && $request->filled('category_id')) {
+            $query->whereHas('product', fn ($q) => $q->where('category_id', $request->category_id));
+        }
+
+        if ($request->filled('company_id')) {
+            $query->whereHas('department', fn ($q) => $q->where('company_id', $request->company_id));
+        }
+
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('search')) {
+            $like = '%'.$request->search.'%';
+            $query->where(function ($q) use ($like) {
+                $q->where('asset_tag', 'like', $like)
+                    ->orWhere('serial_number', 'like', $like)
+                    ->orWhere('device_name', 'like', $like)
+                    ->orWhereHas('assignedToUser', fn ($u) => $u->where('name', 'like', $like))
+                    ->orWhereHas('currentCheckout.checkedOutToUser', fn ($u) => $u->where('name', 'like', $like));
+            });
+        }
+
+        $allAged = (clone $query)->get();
+        $totalUnits = $allAged->count();
+        $criticalUnits = $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->count();
+        $highUnits = $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->count();
+        $totalReplacementBudget = $allAged->sum(fn ($a) => (float) ($a->purchase_cost ?: 15000000));
+
+        if ($priorityFilter === 'critical') {
+            $query->where(function ($q) {
+                $now5 = Carbon::now()->subYears(5);
+                $q->where(function ($sub) use ($now5) {
+                    $sub->where('assets.release_date', '<=', $now5)
+                        ->orWhere(function ($s2) use ($now5) {
+                            $s2->whereNull('assets.release_date')->where('assets.purchase_date', '<=', $now5);
+                        });
+                })->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Broken', 'Service', 'Maintenance', 'In Repair']));
+            });
+        } elseif ($priorityFilter === 'high') {
+            $query->where(function ($q) {
+                $now5 = Carbon::now()->subYears(5);
+                $q->where(function ($sub) use ($now5) {
+                    $sub->where('assets.release_date', '>', $now5)
+                        ->orWhere(function ($s2) use ($now5) {
+                            $s2->whereNull('assets.release_date')->where('assets.purchase_date', '>', $now5);
+                        });
+                })->whereDoesntHave('status', fn ($s) => $s->whereIn('name', ['Broken', 'Service', 'Maintenance', 'In Repair']));
+            });
+        }
+
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
+        $assets = $query->latest('release_date')->paginate($perPage)->withQueryString();
+
+        $companies = Company::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
+        $categories = Category::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))->get();
+
+        return view('pages.assets.replacements', compact(
+            'assets',
+            'totalUnits',
+            'criticalUnits',
+            'highUnits',
+            'totalReplacementBudget',
+            'companies',
+            'departments',
+            'categories',
+            'deviceType',
+            'priorityFilter'
+        ));
+    }
+
+    public function exportReplacements(Request $request)
+    {
+        $filters = $request->all();
+        if (($filters['type'] ?? 'laptop') === 'laptop') {
+            $laptopCatIds = Category::where(function ($q) {
+                $q->where('name', 'like', '%laptop%')
+                    ->orWhere('name', 'like', '%notebook%')
+                    ->orWhere('code', 'NB')
+                    ->orWhere('code', 'LP');
+            })->pluck('id')->toArray();
+
+            if (! empty($laptopCatIds)) {
+                $filters['category_id'] = $laptopCatIds;
+            }
+        }
+        $filters['aging'] = ['4+'];
+
+        return (new AssetsExport($filters))->download('replacement-recommendations-'.now()->format('Y-m-d').'.xlsx');
+    }
+
     public function index(Request $request)
     {
         $baseQuery = Asset::with([

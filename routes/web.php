@@ -177,6 +177,8 @@ Route::middleware('auth')->group(function () {
         Route::post('asset-transfers/{transfer}/reject', [AssetTransferController::class, 'reject'])->name('asset-transfers.reject');
 
         Route::match(['get', 'post'], 'assets/export', [AssetController::class, 'export'])->name('assets.export');
+        Route::get('assets/replacements', [AssetController::class, 'replacements'])->name('assets.replacements');
+        Route::get('assets/replacements/export', [AssetController::class, 'exportReplacements'])->name('assets.replacements.export');
         Route::post('assets/bulk-delete', [AssetController::class, 'bulkDestroy'])->name('assets.bulk-delete');
         Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
         Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');

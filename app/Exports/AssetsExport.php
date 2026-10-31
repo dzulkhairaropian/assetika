@@ -92,6 +92,7 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
             'Specification',
             'Notes',
             'Aging',
+            'Replacement Recommendation',
         ];
     }
 
@@ -122,6 +123,13 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
             ?? $asset->assignedToUser?->name
             ?? '-';
 
+        $replacement = 'Optimal Lifecycle';
+        if ($asset->isDueForReplacement()) {
+            $replacement = 'DUE FOR REPLACEMENT ('.$asset->replacement_priority.' Priority)';
+        } elseif (($asset->age_years ?? 0) >= 3.0) {
+            $replacement = 'Approaching Lifecycle (≥3y)';
+        }
+
         return [
             $asset->asset_tag,
             $asset->device_name ?? '-',
@@ -149,6 +157,7 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
             $asset->specification ?? '-',
             $asset->notes ?? '-',
             $aging,
+            $replacement,
         ];
     }
 }

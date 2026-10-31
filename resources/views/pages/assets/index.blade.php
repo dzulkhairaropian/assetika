@@ -459,7 +459,15 @@
                                 </td>
                                 <td class="px-4 py-2.5">
                                     <div class="flex flex-col">
-                                        <a href="{{ route('assets.show', $asset) }}" class="block font-mono font-medium tracking-tight text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <a href="{{ route('assets.show', $asset) }}" class="font-mono font-medium tracking-tight text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
+                                            @if($isAged)
+                                                <span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40" title="Lifecycle ≥4 Years ({{ $ageYears }}y) - Replacement Recommended">
+                                                    <i data-lucide="refresh-cw" class="w-2.5 h-2.5 text-amber-600 dark:text-amber-400"></i>
+                                                    {{ $ageYears }}y • Replace
+                                                </span>
+                                            @endif
+                                        </div>
                                         <span class="text-[11px] text-gray-400 dark:text-gray-500">{{ $asset->device_name ?? 'Unnamed Device' }}</span>
                                     </div>
                                 </td>

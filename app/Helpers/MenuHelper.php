@@ -82,6 +82,7 @@ class MenuHelper
                 'icon' => 'assets',
                 'subItems' => [
                     ['name' => 'Inventory', 'path' => '/assets'],
+                    ['name' => 'Replacements Planner', 'path' => '/assets/replacements'],
                     ['name' => 'Transactions', 'path' => '/asset-transactions'],
                     ['name' => 'Transfers', 'path' => '/asset-transfers'],
                 ],

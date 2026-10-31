@@ -53,6 +53,12 @@
                             <span>{{ $lowStockConsumables->count() }} Low Stock Consumable{{ $lowStockConsumables->count() > 1 ? 's' : '' }}</span>
                         </a>
                     @endif
+                    @if($assetsOlderThan4Years->count() > 0)
+                        <a href="{{ route('assets.replacements') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                            <span>{{ $assetsOlderThan4Years->count() }} Unit{{ $assetsOlderThan4Years->count() > 1 ? 's' : '' }} Due Refresh</span>
+                        </a>
+                    @endif
                     @if(($expiringWarrantiesCount ?? 0) > 0)
                         <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-100/80 px-3 py-1.5 text-xs font-semibold text-orange-800 shadow-xs hover:bg-orange-200 dark:border-orange-900/60 dark:bg-orange-950/70 dark:text-orange-300 transition">
                             <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-orange-600 dark:text-orange-400"></i>
@@ -214,7 +220,7 @@
             :trendColor="$agingTrendColor"
             description="Reaching replacement lifecycle"
             color="warning"
-            :url="route('assets.index')"
+            :url="route('assets.replacements')"
         />
 
         @php $readyForSaleTrendColor = $readyForSaleTrend >= 0 ? 'emerald' : 'red'; @endphp
@@ -594,8 +600,8 @@
                 title="Aging Assets (4+ Years)"
                 description="Hardware reaching end-of-life cycle"
                 :headers="['Item', 'Status', 'User', 'Acquisition']"
-                :footerLink="$assetsOlderThan4Years->isNotEmpty() ? route('assets.index') : null"
-                footerText="View All Assets"
+                :footerLink="$assetsOlderThan4Years->isNotEmpty() ? route('assets.replacements') : null"
+                footerText="View Replacement Planner"
             >
                 @forelse($assetsOlderThan4Years as $asset)
                     <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
