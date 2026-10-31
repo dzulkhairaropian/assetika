@@ -2,162 +2,174 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Edit User" :items="[['label' => 'Users', 'url' => route('users.index')]]" />
-
-        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Update user account for {{ $user->name }}.
-        </p>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <x-common.page-breadcrumb pageTitle="Edit User" :items="[['label' => 'Users', 'url' => route('users.index')], ['label' => 'Edit']]" />
+                <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    Update user account details, role assignments, or credentials for <strong class="text-gray-900 dark:text-white">{{ $user->name }}</strong>.
+                </p>
+            </div>
+            <a href="{{ route('users.index') }}"
+               class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                Back to Users
+            </a>
+        </div>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
+        @if(session('error'))
+            <x-ui.alert variant="error" message="{{ session('error') }}" />
+        @endif
 
-        <form action="{{ route('users.update', $user) }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
+        @php
+            $posOpts = array_merge([['id' => '', 'text' => 'Select Position']], $positions->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray());
+            $locOpts = array_merge([['id' => '', 'text' => 'Select Location']], $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray());
+            $userRoleIds = old('roles', $user->roles->pluck('id')->toArray());
+        @endphp
+
+        <form action="{{ route('users.update', $user) }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_360px]">
             @csrf
             @method('PUT')
 
+            {{-- Main Form Column --}}
             <div class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
-                    <div>
-                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-lucide="user" class="w-5 h-5 text-brand-500"></i>
-                            General Information
-                        </h3>
-
-                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                            <!-- Name -->
-                            <div class="sm:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Full Name <span class="text-error-500">*</span>
-                                </label>
-                                <input type="text" name="name" value="{{ old('name', $user->name) }}" required placeholder="e.g. John Doe"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                {{-- Card 1: User Profile --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 md:p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                <i data-lucide="user" class="w-4 h-4"></i>
                             </div>
-
-                            <!-- Email -->
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Email Address <span class="text-error-500">*</span>
-                                </label>
-                                <input type="email" name="email" value="{{ old('email', $user->email) }}" required placeholder="john@example.com"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                @error('email') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <!-- Phone -->
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Phone Number
-                                </label>
-                                <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="+62 812 3456 7890"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                @error('phone') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <!-- Password -->
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">New Password (Optional)</label>
-                                <input type="password" name="password"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
-                                @error('password') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <!-- Confirm Password -->
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Confirm New Password</label>
-                                <input type="password" name="password_confirmation"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Account Information</h3>
+                                <p class="text-[11px] text-gray-400">Employee legal name, login email credentials, and phone</p>
                             </div>
                         </div>
                     </div>
 
-                    <hr class="border-gray-100 dark:border-gray-800">
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Full Name <span class="text-error-500">*</span>
+                            </label>
+                            <input type="text" name="name" value="{{ old('name', $user->name) }}" required placeholder="e.g. John Doe"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        </div>
 
-                    <div class="pt-2">
-                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-lucide="briefcase" class="w-5 h-5 text-brand-500"></i>
-                            Role & Organization
-                        </h3>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Email Address <span class="text-error-500">*</span>
+                            </label>
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" required placeholder="john@company.com"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            @error('email') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        </div>
 
-                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                            <!-- Roles -->
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400 font-semibold">
-                                    Role <span class="text-error-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <select name="roles[]" required
-                                        class="dark:bg-gray-950 h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:placeholder:text-white/30 dark:focus:border-brand-800 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                        <option value="">Select Role</option>
-                                        @foreach($roles as $role)
-                                            <option value="{{ $role->id }}" {{ in_array($role->id, old('roles', $userRoles)) ? 'selected' : '' }}>
-                                                {{ $role->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @error('roles') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Phone Number
+                            </label>
+                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="+62 812 3456 7890"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            @error('phone') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                New Password (Leave blank to keep current)
+                            </label>
+                            <input type="password" name="password" placeholder="••••••••"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            @error('password') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Confirm New Password
+                            </label>
+                            <input type="password" name="password_confirmation" placeholder="••••••••"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 2: Role & Organizational Assignment --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 md:p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                <i data-lucide="briefcase" class="w-4 h-4"></i>
                             </div>
-
-                            <!-- Company -->
                             <div>
-                                @php
-                                    $companyOpts = array_merge([['id' => '', 'text' => 'Select Company']], $companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray());
-                                @endphp
-                                <x-form.searchable-select name="company_id" label="Company" :options="$companyOpts" :selected="old('company_id', $user->company_id)" placeholder="Select Company" />
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Organization & Permissions</h3>
+                                <p class="text-[11px] text-gray-400">Role level, company entity, department, and work location</p>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Department -->
-                            <div>
-                                @php
-                                    $deptOpts = array_merge([['id' => '', 'text' => 'Select Department']], $departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray());
-                                @endphp
-                                <x-form.searchable-select name="department_id" label="Department" :options="$deptOpts" :selected="old('department_id', $user->department_id)" placeholder="Select Department" />
-                            </div>
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                        <div>
+                            <x-form.searchable-select
+                                name="roles[]"
+                                label="System Role"
+                                :options="$roles->map(fn($r) => ['id' => $r->id, 'text' => $r->name])->toArray()"
+                                :selected="is_array($userRoleIds) ? ($userRoleIds[0] ?? null) : $userRoleIds"
+                                placeholder="Select Role"
+                                required="true"
+                            />
+                            @error('roles') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        </div>
 
-                            <!-- Position -->
-                            <div>
-                                @php
-                                    $posOpts = array_merge([['id' => '', 'text' => 'Select Position']], $positions->map(fn($p) => ['id' => $p->id, 'text' => $p->name])->toArray());
-                                @endphp
-                                <x-form.searchable-select name="position_id" label="Position" :options="$posOpts" :selected="old('position_id', $user->position_id)" placeholder="Select Position" />
-                            </div>
+                        <div>
+                            <x-form.searchable-select name="company_id" label="Company" :options="$companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="old('company_id', $user->company_id)" placeholder="Select Company" />
+                        </div>
 
-                            <!-- Location -->
-                            <div>
-                                @php
-                                    $locOpts = array_merge([['id' => '', 'text' => 'Select Location']], $locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray());
-                                @endphp
-                                <x-form.searchable-select name="location_id" label="Location" :options="$locOpts" :selected="old('location_id', $user->location_id)" placeholder="Select Location" />
-                            </div>
+                        <div>
+                            <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name . ($d->company ? ' - ' . $d->company->name : '')])->toArray()" :selected="old('department_id', $user->department_id)" placeholder="Select Department" />
+                        </div>
 
-                            <!-- Account Status -->
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Account Status</label>
-                                <div class="relative">
-                                    <select name="is_active" class="dark:bg-gray-950 h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:bg-white dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:placeholder:text-white/30 dark:focus:border-brand-800 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236B7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[size:1.5em_1.5em] bg-no-repeat">
-                                        <option value="1" {{ old('is_active', $user->is_active ?? true) ? 'selected' : '' }}>Active</option>
-                                        <option value="0" {{ !old('is_active', $user->is_active ?? true) ? 'selected' : '' }}>Inactive</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <div>
+                            <x-form.searchable-select name="position_id" label="Job Position" :options="$posOpts" :selected="old('position_id', $user->position_id)" placeholder="Select Position" />
+                        </div>
+
+                        <div>
+                            <x-form.searchable-select name="location_id" label="Primary Office Location" :options="$locOpts" :selected="old('location_id', $user->location_id)" placeholder="Select Location" />
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Account Access Status</label>
+                            <select name="is_active" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                                <option value="1" {{ old('is_active', $user->is_active ? '1' : '0') == '1' ? 'selected' : '' }}>Active Account</option>
+                                <option value="0" {{ old('is_active', $user->is_active ? '1' : '0') == '0' ? 'selected' : '' }}>Inactive / Suspended</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-lucide="save" class="w-5 h-5 text-brand-500"></i>
-                        Actions
-                    </h3>
-                    <div class="space-y-3">
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                            Update User
+            {{-- Right Column: Actions --}}
+            <div class="space-y-6 xl:sticky xl:top-20">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
+                    <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4 text-brand-500"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Actions</h3>
+                        </div>
+                        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                            Editing
+                        </span>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            Update User Account
                         </button>
-                        <a href="{{ route('users.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+
+                        <a href="{{ route('users.index') }}" class="inline-flex w-full items-center justify-center rounded-lg border border-transparent px-4 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">
                             Cancel
                         </a>
                     </div>
@@ -166,4 +178,3 @@
         </form>
     </div>
 @endsection
-

@@ -12,8 +12,34 @@ class AssetTransferController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AssetTransfer::with([
-            'asset',
+        $baseQuery = AssetTransfer::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $baseQuery->whereHas('asset', function ($q) use ($search) {
+                $q->where('asset_tag', 'like', "%{$search}%")
+                    ->orWhere('device_name', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('company_id')) {
+            $companyId = $request->company_id;
+            $baseQuery->where(function ($q) use ($companyId) {
+                $q->where('from_company_id', $companyId)
+                    ->orWhere('to_company_id', $companyId);
+            });
+        }
+
+        $summary = [
+            'total' => (clone $baseQuery)->count(),
+            'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
+            'approved' => (clone $baseQuery)->where('status', 'approved')->count(),
+            'rejected' => (clone $baseQuery)->where('status', 'rejected')->count(),
+        ];
+
+        $query = (clone $baseQuery)->with([
+            'asset.product.brand',
             'fromCompany',
             'fromDepartment',
             'fromLocation',
@@ -24,21 +50,16 @@ class AssetTransferController extends Controller
             'approvedBy',
         ]);
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        $status = $request->input('status') ?: $request->input('tab');
+        if (in_array($status, ['pending', 'approved', 'rejected'])) {
+            $query->where('status', $status);
         }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('asset', function ($q) use ($search) {
-                $q->where('asset_tag', 'like', "%{$search}%")
-                    ->orWhere('device_name', 'like', "%{$search}%");
-            });
-        }
+        $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
+        $transfers = $query->latest()->paginate($perPage)->withQueryString();
+        $companies = Company::orderBy('name')->get();
 
-        $transfers = $query->latest()->paginate(50)->withQueryString();
-
-        return view('pages.assets.transfers.index', compact('transfers'));
+        return view('pages.assets.transfers.index', compact('transfers', 'summary', 'companies'));
     }
 
     public function create(Request $request)

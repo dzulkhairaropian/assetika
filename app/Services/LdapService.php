@@ -203,7 +203,6 @@ class LdapService
                     'device_name' => $pc['name'],
                     'product_id' => $product->id,
                     'status_id' => $readyStatus->id,
-                    'mac_address_ethernet' => $pc['mac'] ?? null,
                     'specification' => json_encode(['ip' => $pc['ip'], 'mac' => $pc['mac'], 'os' => $pc['os'], 'ad_domain' => 'ad.domain.local']),
                 ]
             );

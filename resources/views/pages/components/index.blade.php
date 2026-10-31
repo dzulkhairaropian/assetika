@@ -4,16 +4,6 @@
     <div class="space-y-4" x-data="{
         selectedItems: [],
         selectAll: false,
-        checkoutModalOpen: false,
-        checkoutComponentId: null,
-        checkoutComponentTag: '',
-        checkoutActionUrl: '',
-        openCheckout(id, tag) {
-            this.checkoutComponentId = id;
-            this.checkoutComponentTag = tag;
-            this.checkoutActionUrl = '/components/' + id + '/checkout';
-            this.checkoutModalOpen = true;
-        },
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -31,7 +21,7 @@
             this.selectAll = this.selectedItems.length === document.querySelectorAll('.row-checkbox').length;
         }
     }">
-        <x-common.page-breadcrumb pageTitle="Components" />
+        <x-common.page-breadcrumb pageTitle="Hardware Components" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
             Manage individual hardware component units (RAM, SSD, GPU), serial tags, and asset installations.
@@ -44,7 +34,7 @@
             <x-ui.alert variant="error" message="{{ session('error') }}" />
         @endif
 
-        <!-- Bulk Delete Form -->
+        {{-- Bulk Delete Form --}}
         <form id="bulkDeleteForm" action="{{ route('components.bulk-delete') }}" method="POST" class="hidden">
             @csrf
             <template x-for="id in selectedItems" :key="id">
@@ -52,49 +42,50 @@
             </template>
         </form>
 
-        <!-- Bulk Action Bar -->
+        {{-- Bulk Action Bar --}}
         <div x-show="selectedItems.length > 0"
             x-transition
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 shadow-xs dark:border-brand-900/50 dark:bg-brand-950/40"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
                 <span class="text-xs font-semibold text-brand-700 dark:text-brand-400">
-                    <span x-text="selectedItems.length"></span> items selected.
+                    <span x-text="selectedItems.length"></span> components selected.
                 </span>
             </div>
-            <div class="flex items-center gap-3">
-                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
+            <div class="flex items-center gap-2">
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected components?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-rose-700 active:scale-[0.98] transition">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
         </div>
 
-        <div class="overflow-hidden xl:overflow-visible rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        {{-- Main Table Container (Exact Asset Index Layout) --}}
+        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             {{-- Card Header: Tabs + Toolbar --}}
             <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
                 @php
                     $currentTab = request('tab');
                     $tabFilters = array_filter(request()->except(['page', 'tab']));
                     $tabs = [
-                        ['key' => null,        'label' => 'All Components',  'count' => $summary['total'],     'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
-                        ['key' => 'today',     'label' => 'Added Today',     'count' => $summary['today'] ?? 0,'icon' => 'calendar',      'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
-                        ['key' => 'ready',     'label' => 'Ready (In Stock)','count' => $summary['ready'],     'icon' => 'circle-check',  'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
-                        ['key' => 'installed', 'label' => 'Installed',       'count' => $summary['installed'], 'icon' => 'cpu',           'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
-                        ['key' => 'service',   'label' => 'In Repair',       'count' => $summary['service'],   'icon' => 'wrench',        'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
-                        ['key' => 'scrapped',  'label' => 'Scrapped / Broken','count' => $summary['scrapped'],  'icon' => 'trash-2',       'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                        ['key' => null,        'label' => 'All Components',  'count' => $summary['total'],     'icon' => 'layers',       'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'today',     'label' => 'Added Today',     'count' => $summary['today'] ?? 0,'icon' => 'calendar',     'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                        ['key' => 'ready',     'label' => 'Ready (In Stock)','count' => $summary['ready'],     'icon' => 'circle-check', 'badge' => 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500'],
+                        ['key' => 'installed', 'label' => 'Installed',       'count' => $summary['installed'], 'icon' => 'cpu',          'badge' => 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'],
+                        ['key' => 'service',   'label' => 'In Repair',       'count' => $summary['service'],   'icon' => 'wrench',       'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
+                        ['key' => 'scrapped',  'label' => 'Scrapped / Broken','count' => $summary['scrapped'],  'icon' => 'trash-2',      'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
                     ];
                 @endphp
-                <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
+                <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-track]:bg-transparent">
                     @foreach($tabs as $tab)
                         @php
                             $isActive = $currentTab === $tab['key'];
                             $tabUrl = route('components.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
                         @endphp
                         <a href="{{ $tabUrl }}"
-                           class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors duration-200 ease-in-out {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
+                           class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-150 {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
                             <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
                             {{ $tab['label'] }}
                             <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
@@ -104,15 +95,17 @@
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('components.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
-                        @if(request('tab'))
-                            <input type="hidden" name="tab" value="{{ request('tab') }}">
-                        @endif
+                        @if(request('tab')) <input type="hidden" name="tab" value="{{ request('tab') }}"> @endif
+                        @if(request('sort_by')) <input type="hidden" name="sort_by" value="{{ request('sort_by') }}"> @endif
+                        @if(request('sort_dir')) <input type="hidden" name="sort_dir" value="{{ request('sort_dir') }}"> @endif
+                        @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
+
                         <div class="relative flex items-center">
-                            <span class="absolute left-2.5 text-gray-400">
+                            <span class="absolute left-2.5 text-gray-400 pointer-events-none">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components..."
-                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search components, tag, serial..."
+                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50/70 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:focus:bg-gray-900 transition-all">
                         </div>
 
                         @php
@@ -135,8 +128,7 @@
                                 @endif
                             </button>
 
-                            <div x-show="filterOpen"
-                                x-transition
+                            <div x-show="filterOpen" x-transition
                                 class="absolute left-0 top-full z-50 mt-2 w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                 style="display: none;">
                                 <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
@@ -177,7 +169,7 @@
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('components.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                    <a href="{{ route('components.index', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
                                         Clear All Filters
                                     </a>
                                     <button type="submit" @click="filterOpen = false"
@@ -187,10 +179,16 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if(request()->filled('search') || $activeCount > 0)
+                            <a href="{{ route('components.index', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                Clear
+                            </a>
+                        @endif
                     </form>
 
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('components.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <a href="{{ route('components.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Add Component
                         </a>
@@ -202,8 +200,8 @@
             <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
+                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -218,19 +216,19 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start">
+                            <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="component_tag" label="Tag / Component" />
                             </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category & Model</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Asset</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Location</th>
-                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Category & Model</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Host Asset</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Location</th>
+                            <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($components as $component)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
+                            <tr class="hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors duration-150">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
@@ -247,20 +245,24 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="px-4 py-2.5">
-                                    <span class="block font-mono text-[11px] font-bold text-gray-900 dark:text-white">{{ $component->component_tag ?? '-' }}</span>
-                                    <a href="{{ route('components.show', $component) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
-                                        {{ $component->name }}
-                                    </a>
-                                    @if($component->serial)
-                                        <span class="block text-[10px] text-gray-400 font-mono">SN: {{ $component->serial }}</span>
-                                    @endif
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex flex-col">
+                                        <a href="{{ route('components.show', $component) }}" class="font-bold font-mono text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400">
+                                            {{ $component->component_tag ?? '-' }}
+                                        </a>
+                                        <span class="text-[11px] font-medium text-gray-800 dark:text-gray-200">{{ $component->name }}</span>
+                                        @if($component->serial)
+                                            <span class="text-[10px] text-gray-400 font-mono">SN: {{ $component->serial }}</span>
+                                        @endif
+                                    </div>
                                 </td>
-                                <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300">
-                                    {{ $component->category?->name ?? '-' }}
-                                    <span class="block text-[11px] text-gray-400">{{ $component->model_number ?? $component->manufacturer }}</span>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900 dark:text-white">{{ $component->category?->name ?? '-' }}</span>
+                                        <span class="text-[10px] text-gray-400">{{ $component->model_number ?? $component->manufacturer ?? '-' }}</span>
+                                    </div>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     @php
                                         $statusObj = $component->status;
                                         $stRaw = strtolower($statusObj->name ?? $component->status ?? '');
@@ -285,101 +287,51 @@
                                     @endphp
                                     <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="$icon">{{ $name }}</x-ui.badge>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($component->assignedAsset)
-                                        <div>
+                                        <div class="flex flex-col">
                                             <a href="{{ route('assets.show', $component->assignedAsset) }}" class="font-bold font-mono text-xs text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400">
                                                 {{ $component->assignedAsset->asset_tag }}
                                             </a>
-                                            <div class="text-[11px] text-gray-700 dark:text-gray-300 font-medium leading-tight">
+                                            <span class="text-[11px] text-gray-700 dark:text-gray-300 font-medium">
                                                 {{ $component->assignedAsset->product?->name ?? $component->assignedAsset->device_name }}
-                                            </div>
+                                            </span>
                                             @if($component->assignedAsset->assignedToUser)
-                                                <div class="text-[10px] text-gray-400 leading-tight">User: {{ $component->assignedAsset->assignedToUser->name }}</div>
+                                                <span class="text-[10px] text-gray-400">User: {{ $component->assignedAsset->assignedToUser->name }}</span>
                                             @endif
                                         </div>
                                     @else
-                                        <span class="text-gray-400 text-[11px] italic">Unassigned (In Stock)</span>
+                                        <span class="text-gray-400 text-[11px] italic">In Stock</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
+                                <td class="px-4 py-2.5 whitespace-nowrap text-gray-600 dark:text-gray-400">
                                     {{ $component->location?->name ?? '-' }}
                                 </td>
-                                <td class="px-4 py-2.5 text-end">
-                                    <div x-data="{
-                                        open: false,
-                                        dropdownStyle: '',
-                                        toggle(e) {
-                                            this.open = !this.open;
-                                            if (this.open) {
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                const menuHeight = 160;
-                                                const spaceBelow = window.innerHeight - rect.bottom;
-                                                const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
-                                                const left = Math.max(10, rect.right - 144);
-                                                this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999; display: block;`;
-                                            }
-                                        }
-                                    }" @click.away="open = false" @scroll.window="open = false" class="inline-block text-left">
-                                        <button type="button" @click="toggle($event)" class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
-                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
-                                        </button>
-
-                                        <div x-show="open"
-                                            x-transition
-                                            :style="open ? dropdownStyle : 'display: none;'"
-                                            class="w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
-                                            style="display: none;">
-                                            
-                                            <a href="{{ route('components.show', $component) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-lucide="eye" class="w-3.5 h-3.5 text-gray-400"></i>
-                                                View Details
-                                            </a>
-
-                                            @if($component->assigned_asset_id)
-                                                <form action="{{ route('components.checkin', $component) }}" method="POST" onsubmit="return confirm('Detach component unit from asset?')">
-                                                    @csrf
-                                                    <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-500/10 transition-colors">
-                                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                                                        Check-in / Detach
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <button type="button" @click="openCheckout({{ $component->id }}, '{{ $component->component_tag }}')" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
-                                                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                                                    Check-out / Install
-                                                </button>
-                                            @endif
-
-                                            <a href="{{ route('components.edit', $component) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
-                                                Edit
-                                            </a>
-
-                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
-
-                                            <form action="{{ route('components.destroy', $component) }}" method="POST" onsubmit="return confirm('Are you sure?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
-                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        </div>
+                                <td class="px-4 py-2.5 text-end whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <a href="{{ route('components.show', $component) }}"
+                                           class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-200 bg-white text-gray-500 shadow-xs hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 transition"
+                                           title="View Details">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                        </a>
+                                        <a href="{{ route('components.edit', $component) }}"
+                                           class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-200 bg-white text-gray-500 shadow-xs hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 transition"
+                                           title="Edit Component">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-4 py-8 text-center">
-                                    <div class="flex flex-col items-center justify-center space-y-1.5">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-lucide="cpu" class="w-5 h-5"></i>
-                                        </div>
-                                        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No components found</p>
-                                        <p class="text-[11px] text-gray-400 dark:text-gray-500">Add hardware components like RAM, SSD, GPU to track stock and assignments.</p>
+                                <td colspan="7" class="px-4 py-12 text-center">
+                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                        <i data-lucide="cpu" class="h-6 w-6"></i>
                                     </div>
+                                    <h4 class="mt-3 text-sm font-semibold text-gray-900 dark:text-white">No Components Found</h4>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                                        No hardware component units found matching current filter criteria.
+                                    </p>
                                 </td>
                             </tr>
                         @endforelse
@@ -398,57 +350,11 @@
                         <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
                         <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                         <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
-                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
                     </select>
                 </div>
                 <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
                     {{ $components->links() }}
                 </div>
-            </div>
-        </div>
-
-        <!-- Checkout / Install Modal -->
-        <div x-show="checkoutModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak style="display: none;">
-            <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i data-lucide="cpu" class="w-4 h-4 text-brand-500"></i>
-                        Checkout / Install Component
-                    </h3>
-                    <button type="button" @click="checkoutModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <form :action="checkoutActionUrl" method="POST" class="space-y-4 text-left">
-                    @csrf
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Component Unit</label>
-                        <input type="text" :value="checkoutComponentTag" readonly class="h-9 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 text-xs font-mono font-bold text-gray-700 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300" />
-                    </div>
-
-                    <div>
-                        <x-form.searchable-select name="asset_id" label="Target IT Asset (Laptop/Server)" :options="$assetOpts ?? []" placeholder="Select Target Asset" required="true" />
-                    </div>
-
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Installation Date</label>
-                        <input type="date" name="release_date" value="{{ date('Y-m-d') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
-                    </div>
-
-                    <div>
-                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Notes (Optional)</label>
-                        <textarea name="notes" rows="2" placeholder="e.g. Upgrade RAM for graphic design work" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white"></textarea>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                        <button type="button" @click="checkoutModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">Cancel</button>
-                        <button type="submit" class="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition flex items-center gap-1.5">
-                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                            Confirm Checkout
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

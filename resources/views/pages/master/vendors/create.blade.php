@@ -2,197 +2,197 @@
 
 @section('content')
     <div class="space-y-6">
-        <x-common.page-breadcrumb pageTitle="Create Vendor" :items="[['label' => 'Vendors', 'url' => route('vendors.index')]]" />
-
-        <p class="-mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Add a new supplier or service provider.
-        </p>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <x-common.page-breadcrumb pageTitle="Create Vendor" :items="[['label' => 'Vendors', 'url' => route('vendors.index')], ['label' => 'Create']]" />
+                <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    Register a new hardware vendor, maintenance workshop, or authorized equipment supplier.
+                </p>
+            </div>
+            <a href="{{ route('vendors.index') }}"
+               class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                Back to Vendors
+            </a>
+        </div>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
+        @if(session('error'))
+            <x-ui.alert variant="error" message="{{ session('error') }}" />
+        @endif
 
-        <form action="{{ route('vendors.store') }}" method="POST" enctype="multipart/form-data" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_380px]">
+        <form action="{{ route('vendors.store') }}" method="POST" enctype="multipart/form-data" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_360px]">
             @csrf
 
+            {{-- Main Form Column --}}
             <div class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 space-y-6">
-                    {{-- General Information --}}
-                    <div>
-                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-lucide="info" class="w-5 h-5 text-brand-500"></i>
-                            General Information
-                        </h3>
-
-                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Vendor Name <span class="text-error-500">*</span>
-                                </label>
-                                <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g., PT. Jaya" required
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                {{-- Card 1: Vendor Profile --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 md:p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                <i data-lucide="building-2" class="w-4 h-4"></i>
                             </div>
-
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Contact Person
-                                </label>
-                                <input type="text" name="contact_person" value="{{ old('contact_person') }}" placeholder="e.g., John Doe"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('contact_person') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Email
-                                </label>
-                                <input type="email" name="email" value="{{ old('email') }}" placeholder="vendor@example.com"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('email') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Phone
-                                </label>
-                                <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+62..."
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('phone') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Website
-                                </label>
-                                <input type="url" name="website" value="{{ old('website') }}" placeholder="https://..."
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('website') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Address
-                                </label>
-                                <textarea name="address" rows="3" placeholder="Enter full address"
-                                    class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('address') }}</textarea>
-                                @error('address') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Vendor Company Profile</h3>
+                                <p class="text-[11px] text-gray-400">Legal entity title, account manager, and communication channels</p>
                             </div>
                         </div>
                     </div>
 
-                    <hr class="border-gray-100 dark:border-gray-800">
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Vendor Company Name <span class="text-error-500">*</span>
+                            </label>
+                            <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. PT Synnex Metrodata Indonesia" required
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                            @error('name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        </div>
 
-                    {{-- Tax & Legal Information --}}
-                    <div class="pt-2">
-                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-lucide="file-text" class="w-5 h-5 text-brand-500"></i>
-                            Tax & Legal Information
-                        </h3>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Contact Person (PIC / Sales)
+                            </label>
+                            <input type="text" name="contact_person" value="{{ old('contact_person') }}" placeholder="e.g. Budi Santoso"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
 
-                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    NPWP Number
-                                </label>
-                                <input type="text" name="npwp_number" value="{{ old('npwp_number') }}" placeholder="00.000.000.0-000.000"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('npwp_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Official Email
+                            </label>
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="sales@vendor.com"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Phone / Hotline
+                            </label>
+                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+62 21 5551234"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Website Portal
+                            </label>
+                            <input type="url" name="website" value="{{ old('website') }}" placeholder="https://www.vendor.com"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Office / Workshop Address
+                            </label>
+                            <textarea name="address" rows="3" placeholder="Full street address, district, and postal code..."
+                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('address') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 2: Tax & Banking Credentials --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 md:p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                <i data-lucide="receipt" class="w-4 h-4"></i>
                             </div>
-
                             <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    NPWP Name (Tax Registered Name)
-                                </label>
-                                <input type="text" name="npwp_name" value="{{ old('npwp_name') }}" placeholder="Name as registered on NPWP"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('npwp_name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    NIB (Nomor Induk Berusaha)
-                                </label>
-                                <input type="text" name="nib" value="{{ old('nib') }}" placeholder="e.g., 812xxxxxxx"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('nib') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    NPWP Document / Photo
-                                </label>
-                                <input type="file" name="npwp_photo" accept=".jpg,.jpeg,.png,.pdf"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 shadow-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-600 hover:file:bg-brand-100 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:file:bg-brand-500/10 dark:file:text-brand-400" />
-                                <p class="mt-1 text-xs text-gray-400 italic">JPG, PNG, or PDF up to 4MB</p>
-                                @error('npwp_photo') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Tax & Banking Information</h3>
+                                <p class="text-[11px] text-gray-400">NPWP compliance, NIB licensing, and settlement bank accounts</p>
                             </div>
                         </div>
                     </div>
 
-                    <hr class="border-gray-100 dark:border-gray-800">
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                NPWP Number
+                            </label>
+                            <input type="text" name="npwp_number" value="{{ old('npwp_number') }}" placeholder="00.000.000.0-000.000"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-mono text-gray-800 placeholder:font-sans focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
 
-                    {{-- Bank Information --}}
-                    <div class="pt-2">
-                        <h3 class="text-base font-medium text-gray-800 dark:text-white/90 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
-                            <i data-lucide="credit-card" class="w-5 h-5 text-brand-500"></i>
-                            Bank Information
-                        </h3>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                NPWP Registered Name
+                            </label>
+                            <input type="text" name="npwp_name" value="{{ old('npwp_name') }}" placeholder="Name as registered on tax document"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
 
-                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Bank Name
-                                </label>
-                                <input type="text" name="bank_name" value="{{ old('bank_name') }}" placeholder="e.g., BCA, Mandiri, BNI"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('bank_name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                NIB (Nomor Induk Berusaha)
+                            </label>
+                            <input type="text" name="nib" value="{{ old('nib') }}" placeholder="e.g. 812000000000"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-mono text-gray-800 placeholder:font-sans focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
 
-                            <div>
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Account Number
-                                </label>
-                                <input type="text" name="bank_account_number" value="{{ old('bank_account_number') }}" placeholder="e.g., 1234567890"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('bank_account_number') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                NPWP Document (PDF / Image)
+                            </label>
+                            <input type="file" name="npwp_photo" accept=".jpg,.jpeg,.png,.pdf"
+                                class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-950/30 dark:file:text-brand-400" />
+                        </div>
 
-                            <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Account Name
-                                </label>
-                                <input type="text" name="bank_account_name" value="{{ old('bank_account_name') }}" placeholder="Name on bank account"
-                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                                @error('bank_account_name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
-                            </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Bank Name
+                            </label>
+                            <input type="text" name="bank_name" value="{{ old('bank_name') }}" placeholder="e.g. Bank Central Asia (BCA)"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
 
-                            <div class="lg:col-span-2">
-                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
-                                    Notes
-                                </label>
-                                <textarea name="notes" rows="3" placeholder="Additional notes about this vendor"
-                                    class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('notes') }}</textarea>
-                            </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Bank Account Number
+                            </label>
+                            <input type="text" name="bank_account_number" value="{{ old('bank_account_number') }}" placeholder="e.g. 1234567890"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-mono text-gray-800 placeholder:font-sans focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Bank Account Holder Name
+                            </label>
+                            <input type="text" name="bank_account_holder" value="{{ old('bank_account_holder') }}" placeholder="Name matching bank passbook"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <h3 class="mb-4 flex items-center gap-2 text-base font-medium text-gray-800 dark:text-white/90">
-                        <i data-lucide="save" class="w-5 h-5 text-brand-500"></i>
-                        Actions
-                    </h3>
-                    <div class="space-y-3">
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600">
-                            Create Vendor
+            {{-- Right Column: Actions --}}
+            <div class="space-y-6 xl:sticky xl:top-20">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
+                    <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4 text-brand-500"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Actions</h3>
+                        </div>
+                        <span class="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                            New Record
+                        </span>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            Save Vendor
                         </button>
-                        <button type="submit" name="create_another" value="1" class="inline-flex w-full justify-center rounded-lg border border-brand-500 bg-white px-4 py-2.5 text-sm font-medium text-brand-500 transition hover:bg-brand-50">
-                            Create & Create New
+
+                        <button type="submit" name="create_another" value="1" class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-brand-50/50 px-4 py-2 text-xs font-semibold text-brand-600 hover:bg-brand-100/60 active:scale-[0.98] dark:bg-brand-950/20 dark:text-brand-400 transition">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            Save & Add Another
                         </button>
-                        <a href="{{ route('vendors.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+
+                        <a href="{{ route('vendors.index') }}" class="inline-flex w-full items-center justify-center rounded-lg border border-transparent px-4 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">
                             Cancel
                         </a>
                     </div>

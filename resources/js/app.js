@@ -50,12 +50,12 @@ const centerTextPlugin = {
         ctx.textBaseline = 'middle';
 
         // Draw top label (subtle uppercase)
-        ctx.font = '500 11px Outfit, sans-serif';
+        ctx.font = "500 11px 'Plus Jakarta Sans', system-ui, sans-serif";
         ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
         ctx.fillText(String(displayLabel).toUpperCase(), centerX, centerY - 12);
 
         // Draw main value (large bold)
-        ctx.font = '700 24px Outfit, sans-serif';
+        ctx.font = "700 24px 'Plus Jakarta Sans', system-ui, sans-serif";
         ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
         ctx.fillText(Number(displayValue).toLocaleString('id-ID'), centerX, centerY + 12);
 
@@ -66,7 +66,7 @@ const centerTextPlugin = {
 Chart.register(centerTextPlugin);
 
 // Chart.js default font & color settings
-Chart.defaults.font.family = "Outfit, sans-serif";
+Chart.defaults.font.family = "'Plus Jakarta Sans', system-ui, sans-serif";
 Chart.defaults.color = "#64748b";
 
 window.Alpine = Alpine;

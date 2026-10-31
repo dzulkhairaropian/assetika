@@ -21,10 +21,10 @@
             this.selectAll = this.selectedItems.length === document.querySelectorAll('.row-checkbox').length;
         }
     }">
-        <x-common.page-breadcrumb pageTitle="Licenses" />
+        <x-common.page-breadcrumb pageTitle="Software Licenses" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Manage software licenses, keys, seat allocations, and expiration dates.
+            Manage software licenses, subscription keys, seat allocations, and validity periods.
         </p>
 
         @if(session('success'))
@@ -34,7 +34,7 @@
             <x-ui.alert variant="error" message="{{ session('error') }}" />
         @endif
 
-        <!-- Bulk Delete Form -->
+        {{-- Bulk Delete Form --}}
         <form id="bulkDeleteForm" action="{{ route('licenses.bulk-delete') }}" method="POST" class="hidden">
             @csrf
             <template x-for="id in selectedItems" :key="id">
@@ -42,47 +42,48 @@
             </template>
         </form>
 
-        <!-- Bulk Action Bar -->
+        {{-- Bulk Action Bar --}}
         <div x-show="selectedItems.length > 0"
             x-transition
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 shadow-xs dark:border-brand-900/50 dark:bg-brand-950/40"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
                 <span class="text-xs font-semibold text-brand-700 dark:text-brand-400">
-                    <span x-text="selectedItems.length"></span> items selected.
+                    <span x-text="selectedItems.length"></span> licenses selected.
                 </span>
             </div>
-            <div class="flex items-center gap-3">
-                <button type="button" @click="if (confirm('Are you sure you want to delete the selected items?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600">
+            <div class="flex items-center gap-2">
+                <button type="button" @click="if (confirm('Are you sure you want to delete the selected licenses?')) { document.getElementById('bulkDeleteForm').submit(); }"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-rose-700 transition">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        {{-- Main Table Container (Exact Asset Index Layout) --}}
+        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             {{-- Card Header: Tabs + Toolbar --}}
             <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
                 @php
                     $currentTab = request('tab');
                     $tabFilters = array_filter(request()->except(['page', 'tab']));
                     $tabs = [
-                        ['key' => null,       'label' => 'All Licenses',  'count' => $summary['total'] ?? 0,   'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
-                        ['key' => 'today',    'label' => 'Added Today',   'count' => $summary['today'] ?? 0,   'icon' => 'calendar',      'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
-                        ['key' => 'expiring', 'label' => 'Expiring Soon', 'count' => $summary['expiring'] ?? 0,'icon' => 'shield-off',    'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
-                        ['key' => 'expired',  'label' => 'Expired',       'count' => $summary['expired'] ?? 0, 'icon' => 'shield-alert',  'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
+                        ['key' => null,       'label' => 'All Licenses',  'count' => $summary['total'] ?? 0,    'icon' => 'layers',        'badge' => 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'],
+                        ['key' => 'today',    'label' => 'Added Today',   'count' => $summary['today'] ?? 0,    'icon' => 'calendar',      'badge' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'],
+                        ['key' => 'expiring', 'label' => 'Expiring Soon', 'count' => $summary['expiring'] ?? 0, 'icon' => 'shield-off',    'badge' => 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500'],
+                        ['key' => 'expired',  'label' => 'Expired',       'count' => $summary['expired'] ?? 0,  'icon' => 'shield-alert',  'badge' => 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500'],
                     ];
                 @endphp
-                <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
+                <nav class="inline-flex max-w-full overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-track]:bg-transparent">
                     @foreach($tabs as $tab)
                         @php
                             $isActive = $currentTab === $tab['key'];
                             $tabUrl = route('licenses.index', $tab['key'] ? array_merge($tabFilters, ['tab' => $tab['key']]) : $tabFilters);
                         @endphp
                         <a href="{{ $tabUrl }}"
-                           class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors duration-200 ease-in-out {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
+                           class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-150 {{ $isActive ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
                             <i data-lucide="{{ $tab['icon'] }}" class="w-3.5 h-3.5"></i>
                             {{ $tab['label'] }}
                             <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $tab['badge'] }}">{{ number_format($tab['count']) }}</span>
@@ -91,79 +92,27 @@
                 </nav>
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <form action="{{ route('licenses.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
-                        @if(request('tab'))
-                            <input type="hidden" name="tab" value="{{ request('tab') }}">
-                        @endif
+                    <form action="{{ route('licenses.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                        @if(request('tab')) <input type="hidden" name="tab" value="{{ request('tab') }}"> @endif
+                        @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
+
                         <div class="relative flex items-center">
-                            <span class="absolute left-2.5 text-gray-400">
+                            <span class="absolute left-2.5 text-gray-400 pointer-events-none">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search licenses, keys..."
-                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search licenses, keys, brand..."
+                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50/70 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:focus:bg-gray-900 transition-all">
                         </div>
 
-                        @php
-                            $activeCount = 0;
-                            if (request('manufacturer')) $activeCount++;
-                            if (request('created_from')) $activeCount++;
-                            if (request('created_to')) $activeCount++;
-                        @endphp
-
-                        <div class="relative" @click.away="filterOpen = false">
-                            <button type="button" @click="filterOpen = !filterOpen"
-                                class="relative inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
-                                <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
-                                Filters
-                                @if($activeCount > 0)
-                                    <span class="inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-bold text-white bg-brand-500 rounded-full leading-none">{{ $activeCount }}</span>
-                                @endif
-                            </button>
-
-                            <div x-show="filterOpen"
-                                x-transition
-                                class="absolute left-0 top-full z-50 mt-2 w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
-                                style="display: none;">
-                                <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
-                                    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-white">Filter Options</h4>
-                                    <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                        <i data-lucide="x" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-2.5 text-left">
-                                    <div class="col-span-2">
-                                        <x-form.searchable-select name="manufacturer" label="Manufacturer / Vendor" :options="isset($manufacturers) ? $manufacturers->map(fn($m) => ['id' => $m, 'text' => $m])->toArray() : []" :selected="request('manufacturer')" placeholder="All Manufacturers" :multiple="true" />
-                                    </div>
-
-                                    <div class="col-span-2 sm:col-span-1">
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Created From</label>
-                                        <input type="date" name="created_from" value="{{ request('created_from') }}"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                    </div>
-
-                                    <div class="col-span-2 sm:col-span-1">
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Created To</label>
-                                        <input type="date" name="created_to" value="{{ request('created_to') }}"
-                                            class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('licenses.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
-                                        Clear All Filters
-                                    </a>
-                                    <button type="submit" @click="filterOpen = false"
-                                        class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
-                                        Apply Filters
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        @if(request()->filled('search'))
+                            <a href="{{ route('licenses.index', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                Clear
+                            </a>
+                        @endif
                     </form>
 
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('licenses.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <a href="{{ route('licenses.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Add License
                         </a>
@@ -175,8 +124,8 @@
             <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">
+                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -191,23 +140,21 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start">
-                                <x-common.sortable-header column="name" label="Software Name" />
-                            </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Product Key</th>
-                            <th class="px-4 py-2.5 text-start">
-                                <x-common.sortable-header column="seats" label="Seats Utilization" />
-                            </th>
-                            <th class="px-4 py-2.5 text-start">
-                                <x-common.sortable-header column="expiration_date" label="Expiration Status" />
-                            </th>
-                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Software & License Name</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Product Key & Account</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Seat Allocation</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Manufacturer</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Expiration Date</th>
+                            <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($licenses as $license)
-                            @php $avail = $license->availableSeats(); @endphp
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
+                            @php
+                                $isExpired = $license->expiration_date && $license->expiration_date->isPast();
+                                $availSeats = $license->availableSeats();
+                            @endphp
+                            <tr class="hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors duration-150">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
@@ -224,99 +171,71 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     <div class="flex flex-col">
-                                        <a href="{{ route('licenses.show', $license) }}" class="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                                        <a href="{{ route('licenses.show', $license) }}" class="font-bold text-gray-900 hover:text-brand-600 dark:text-white dark:hover:text-brand-400">
                                             {{ $license->name }}
                                         </a>
-                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ $license->manufacturer ?? 'Vendor N/A' }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-2.5 font-mono text-xs text-gray-700 dark:text-gray-300">
-                                    {{ $license->product_key ?? '-' }}
-                                </td>
-                                <td class="px-4 py-2.5">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-gray-900 dark:text-white">{{ $license->seats }} total</span>
-                                        <span class="text-gray-400">/ {{ $avail }} free</span>
-                                        @if($avail <= 0)
-                                            <x-ui.badge color="danger" variant="light" size="sm" featherIcon="slash">Full</x-ui.badge>
+                                        @if($license->purchase_cost)
+                                            <span class="text-[10px] font-mono text-gray-400">Cost: Rp {{ number_format($license->purchase_cost, 0, ',', '.') }}</span>
                                         @endif
                                     </div>
                                 </td>
                                 <td class="px-4 py-2.5 whitespace-nowrap">
-                                    @if($license->expiration_date)
-                                        @if($license->expiration_date->isPast())
-                                            <x-ui.badge color="danger" variant="light" size="sm" featherIcon="shield-alert">Expired</x-ui.badge>
-                                        @elseif(($daysLeft = (int) ceil(now()->diffInDays($license->expiration_date, false))) <= 30)
-                                            <x-ui.badge color="warning" variant="light" size="sm" featherIcon="shield-off">Expiring in {{ max(0, $daysLeft) }}d</x-ui.badge>
-                                        @else
-                                            <x-ui.badge color="success" variant="light" size="sm" featherIcon="shield-check">Active ({{ $license->expiration_date->format('d/m/Y') }})</x-ui.badge>
+                                    <div class="flex flex-col font-mono text-xs">
+                                        <span class="text-gray-700 dark:text-gray-300">{{ $license->product_key ?: '—' }}</span>
+                                        @if($license->license_email)
+                                            <span class="text-[10px] text-gray-400 font-sans">{{ $license->license_email }}</span>
                                         @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold tabular-nums text-gray-900 dark:text-white">{{ $availSeats }} / {{ $license->seats }}</span>
+                                        @if($availSeats <= 0)
+                                            <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">Full</span>
+                                        @else
+                                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">Available</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                    {{ $license->manufacturer ?: '—' }}
+                                </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap font-mono">
+                                    @if($license->expiration_date)
+                                        <span class="{{ $isExpired ? 'text-rose-600 font-bold' : 'text-gray-700 dark:text-gray-300' }}">
+                                            {{ $license->expiration_date->format('d/m/Y') }}
+                                        </span>
                                     @else
-                                        <span class="text-gray-400 italic text-[11px]">-</span>
+                                        <span class="text-gray-400 italic font-sans text-[11px]">Perpetual</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2.5 text-end">
-                                    <div x-data="{
-                                        open: false,
-                                        dropdownStyle: '',
-                                        toggle(e) {
-                                            this.open = !this.open;
-                                            if (this.open) {
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                const menuHeight = 160;
-                                                const spaceBelow = window.innerHeight - rect.bottom;
-                                                const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
-                                                const left = Math.max(10, rect.right - 144);
-                                                this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999; display: block;`;
-                                            }
-                                        }
-                                    }" @click.away="open = false" @scroll.window="open = false" class="inline-block text-left">
-                                        <button type="button" @click="toggle($event)" class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
-                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
-                                        </button>
-
-                                        <div x-show="open"
-                                            x-transition
-                                            :style="open ? dropdownStyle : 'display: none;'"
-                                            class="w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
-                                            style="display: none;">
-                                            
-                                            <a href="{{ route('licenses.show', $license) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-lucide="eye" class="w-3.5 h-3.5 text-gray-400"></i>
-                                                View Details
-                                            </a>
-
-                                            <a href="{{ route('licenses.edit', $license) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
-                                                Edit
-                                            </a>
-
-                                            <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
-
-                                            <form action="{{ route('licenses.destroy', $license) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this license?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
-                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                                    Delete License
-                                                </button>
-                                            </form>
-                                        </div>
+                                <td class="px-4 py-2.5 text-end whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <a href="{{ route('licenses.show', $license) }}"
+                                           class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-200 bg-white text-gray-500 shadow-xs hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 transition"
+                                           title="View Details">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                        </a>
+                                        <a href="{{ route('licenses.edit', $license) }}"
+                                           class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-200 bg-white text-gray-500 shadow-xs hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 transition"
+                                           title="Edit License">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-4 py-8 text-center">
-                                    <div class="flex flex-col items-center justify-center space-y-1.5">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-lucide="key" class="w-5 h-5"></i>
-                                        </div>
-                                        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No licenses found</p>
-                                        <p class="text-[11px] text-gray-400 dark:text-gray-500">Add software licenses to track seats and expirations.</p>
+                                <td colspan="7" class="px-4 py-12 text-center">
+                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                        <i data-lucide="key" class="h-6 w-6"></i>
                                     </div>
+                                    <h4 class="mt-3 text-sm font-semibold text-gray-900 dark:text-white">No Licenses Found</h4>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                                        No software licenses found matching current search or filter criteria.
+                                    </p>
                                 </td>
                             </tr>
                         @endforelse
@@ -335,7 +254,6 @@
                         <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
                         <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                         <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
-                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
                     </select>
                 </div>
                 <div class="flex-1 max-w-full overflow-x-auto flex justify-end">

@@ -78,10 +78,6 @@
                                 <span class="select-all font-bold text-gray-800 dark:text-white/90">{{ $asset->serial_number ?? '-' }}</span>
                             </div>
                             <div class="space-y-0.5">
-                                <span class="block text-[10px] font-semibold uppercase text-gray-400">Product Number</span>
-                                <span class="font-bold text-gray-800 dark:text-white/90">{{ $asset->product_number ?? '-' }}</span>
-                            </div>
-                            <div class="space-y-0.5">
                                 <span class="block text-[10px] font-semibold uppercase text-gray-400">Purchase Date</span>
                                 <span class="font-bold text-gray-800 dark:text-white/90">{{ $asset->purchase_date ? \Carbon\Carbon::parse($asset->purchase_date)->format('d M Y') : '-' }}</span>
                             </div>

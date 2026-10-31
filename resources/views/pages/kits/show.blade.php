@@ -1,44 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-4" x-data="{ activeTab: 'items' }">
-    <x-common.page-breadcrumb pageTitle="Kit Detail" :items="[['label' => 'Kits', 'url' => route('kits.index')], ['label' => $kit->name]]" />
+<div class="space-y-5" x-data="{ activeTab: 'items' }">
+    <x-common.page-breadcrumb pageTitle="Kit Details" :items="[['label' => 'Kits', 'url' => route('kits.index')], ['label' => $kit->name]]" />
 
     <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-        View equipment kit details, bundled hardware components, software licenses, and deployment actions for {{ $kit->name }}.
+        Pre-packaged onboarding bundle specifications, bundled hardware, software seats, and deployment actions.
     </p>
 
     @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
     @if(session('error')) <x-ui.alert variant="error" message="{{ session('error') }}" /> @endif
 
-    <!-- Header Hero Card -->
-    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:p-5">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex items-center gap-3.5">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10">
-                    <i data-lucide="box" class="h-6 w-6"></i>
+    @php
+        $totalItems = $kit->assets->count() + $kit->components->count() + $kit->licenses->count() + $kit->consumables->count();
+    @endphp
+
+    {{-- Entity Header Hero Card --}}
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900 lg:p-6">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-xs">
+                    <i data-lucide="box" class="h-7 w-7"></i>
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $kit->name }}</h2>
-                        <x-ui.badge color="primary" variant="light" size="sm">Equipment Kit</x-ui.badge>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ $kit->name }}</h2>
+                        <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
+                            {{ $totalItems }} Bundled Items
+                        </span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {{ $kit->description ?: 'No detailed description provided for this pre-defined kit.' }}
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 font-medium">
+                        {{ $kit->description ?: 'Pre-defined equipment kit package for rapid employee onboarding.' }}
                     </p>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('kits.checkout-form', $kit) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
-                    <i data-lucide="share" class="h-3.5 w-3.5"></i>
+            {{-- Action Toolbar --}}
+            <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 dark:border-gray-800 lg:border-t-0 lg:pt-0">
+                <a href="{{ route('kits.checkout-form', $kit) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition">
+                    <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
                     Checkout Kit
                 </a>
-                <a href="{{ route('kits.edit', $kit) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 active:scale-[0.97] transition-all duration-150 ease-out">
+                <a href="{{ route('kits.edit', $kit) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
                     <i data-lucide="edit-3" class="h-3.5 w-3.5"></i>
                     Edit
                 </a>
-                <a href="{{ route('kits.index') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 active:scale-[0.97] transition-all duration-150 ease-out">
+                <a href="{{ route('kits.index') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
                     <i data-lucide="arrow-left" class="h-3.5 w-3.5"></i>
                     Back to Kits
                 </a>
@@ -46,118 +53,97 @@
         </div>
     </div>
 
-    <!-- Navigation Tabs (Pill style) -->
-    <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
-        <button @click="activeTab = 'items'"
-            :class="activeTab === 'items' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-            class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
-            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-            Bundled Equipment & Items
-        </button>
-        <button @click="activeTab = 'info'"
-            :class="activeTab === 'info' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-            class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
-            <i data-lucide="info" class="w-3.5 h-3.5"></i>
-            Kit Overview & Specs
-        </button>
-    </nav>
-
-    <!-- Tab 1: Bundled Items -->
-    <div x-show="activeTab === 'items'" class="space-y-4">
-        @php
-            $groups = [
-                ['label' => 'Assets', 'items' => $kit->assets, 'color' => 'blue', 'icon' => 'hard-drive', 'show_tag' => true],
-                ['label' => 'Components', 'items' => $kit->components, 'color' => 'purple', 'icon' => 'cpu', 'show_tag' => false],
-                ['label' => 'Licenses', 'items' => $kit->licenses, 'color' => 'green', 'icon' => 'key-round', 'show_tag' => false],
-                ['label' => 'Consumables', 'items' => $kit->consumables, 'color' => 'orange', 'icon' => 'package', 'show_tag' => false],
-            ];
-            $totalCount = $kit->assets->count() + $kit->components->count() + $kit->licenses->count() + $kit->consumables->count();
-        @endphp
-
-        @if($totalCount > 0)
-            @foreach($groups as $group)
-                @if($group['items']->isNotEmpty())
-                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-5">
-                        <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                            <i data-lucide="{{ $group['icon'] }}" class="w-4 h-4 text-brand-500"></i>
-                            Bundled {{ $group['label'] }} ({{ $group['items']->count() }})
-                        </h3>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            @foreach($group['items'] as $item)
-                                <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-xs dark:bg-gray-900 text-gray-700 dark:text-gray-300">
-                                            <i data-lucide="{{ $group['icon'] }}" class="w-4 h-4 text-brand-500"></i>
-                                        </div>
-                                        <div class="min-w-0">
-                                            <p class="text-xs font-semibold text-gray-900 dark:text-white truncate">{{ $item->name }}</p>
-                                            @if($group['show_tag'] && $item->asset_tag)
-                                                <p class="text-[11px] font-mono font-medium text-brand-600 dark:text-brand-400">{{ $item->asset_tag }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <span class="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
-                                        x{{ $item->pivot->qty }}
-                                    </span>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            @endforeach
-        @else
-            <div class="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div class="flex flex-col items-center justify-center space-y-2">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 text-gray-400 dark:bg-gray-800/50">
-                        <i data-lucide="box" class="w-6 h-6"></i>
-                    </div>
-                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">No equipment items attached</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">Edit this kit to assign hardware assets, licenses, components, or consumables.</p>
+    {{-- 3-Column Layout: Left (1 Col Context Sidebar) vs Right (2 Col Content Hub) --}}
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {{-- Left Column: Kit Specification & Package Summary --}}
+        <div class="space-y-4 lg:col-span-1">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Package Breakdown</h3>
                 </div>
+
+                <dl class="mt-4 space-y-2.5 text-xs">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-400">Hardware Assets:</dt>
+                        <dd class="font-bold text-gray-900 dark:text-white tabular-nums">{{ $kit->assets->count() }} items</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-400">Components / Parts:</dt>
+                        <dd class="font-bold text-gray-900 dark:text-white tabular-nums">{{ $kit->components->count() }} items</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-400">Software Licenses:</dt>
+                        <dd class="font-bold text-gray-900 dark:text-white tabular-nums">{{ $kit->licenses->count() }} seats</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-400">Consumable Supplies:</dt>
+                        <dd class="font-bold text-gray-900 dark:text-white tabular-nums">{{ $kit->consumables->count() }} packs</dd>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-gray-100 pt-2.5 dark:border-gray-800">
+                        <dt class="text-gray-400">Created At:</dt>
+                        <dd class="font-mono text-gray-800 dark:text-gray-200">{{ $kit->created_at?->format('d M Y') ?? '—' }}</dd>
+                    </div>
+                </dl>
             </div>
-        @endif
-    </div>
+        </div>
 
-    <!-- Tab 2: Kit Overview & Specs -->
-    <div x-show="activeTab === 'info'" class="space-y-4" style="display: none;">
-        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-5">
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
-                Kit General Specification
-            </h3>
+        {{-- Right Column: Bundled Items Hub --}}
+        <div class="lg:col-span-2">
+            <div class="rounded-2xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
+                <div class="border-b border-gray-100 p-4 dark:border-gray-800">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Bundled Items in this Kit</h3>
+                    <p class="text-[11px] text-gray-400">Equipment packaged for combined single-click dispatch</p>
+                </div>
 
-            <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                    <dt class="text-[11px] font-medium text-gray-400">Kit Name</dt>
-                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $kit->name }}</dd>
+                @php
+                    $groups = [
+                        ['label' => 'Hardware Assets', 'items' => $kit->assets, 'icon' => 'monitor', 'show_tag' => true],
+                        ['label' => 'Components / Upgrades', 'items' => $kit->components, 'icon' => 'cpu', 'show_tag' => false],
+                        ['label' => 'Software Licenses', 'items' => $kit->licenses, 'icon' => 'key', 'show_tag' => false],
+                        ['label' => 'Consumable Supplies', 'items' => $kit->consumables, 'icon' => 'package', 'show_tag' => false],
+                    ];
+                @endphp
+
+                <div class="p-5 sm:p-6 space-y-6">
+                    @if($totalItems > 0)
+                        @foreach($groups as $group)
+                            @if($group['items']->isNotEmpty())
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-2">
+                                        <i data-lucide="{{ $group['icon'] }}" class="w-4 h-4 text-brand-500"></i>
+                                        {{ $group['label'] }} ({{ $group['items']->count() }})
+                                    </h4>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        @foreach($group['items'] as $item)
+                                            <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-xs dark:bg-gray-900 text-brand-500">
+                                                        <i data-lucide="{{ $group['icon'] }}" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <p class="text-xs font-semibold text-gray-900 dark:text-white truncate">{{ $item->name }}</p>
+                                                        @if($group['show_tag'] && $item->asset_tag)
+                                                            <p class="text-[11px] font-mono font-medium text-brand-600 dark:text-brand-400">{{ $item->asset_tag }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <span class="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-400 tabular-nums">
+                                                    x{{ $item->pivot->qty }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
+                    @else
+                        <div class="text-center py-12 text-gray-400 text-xs">
+                            <i data-lucide="box" class="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600"></i>
+                            No bundled hardware or software assigned to this kit yet.
+                        </div>
+                    @endif
                 </div>
-                <div>
-                    <dt class="text-[11px] font-medium text-gray-400">Total Asset Categories</dt>
-                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $kit->assets->count() }} Assets</dd>
-                </div>
-                <div>
-                    <dt class="text-[11px] font-medium text-gray-400">Total Component Types</dt>
-                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $kit->components->count() }} Components</dd>
-                </div>
-                <div>
-                    <dt class="text-[11px] font-medium text-gray-400">Total Licenses Included</dt>
-                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $kit->licenses->count() }} Software Licenses</dd>
-                </div>
-                <div>
-                    <dt class="text-[11px] font-medium text-gray-400">Total Consumables Included</dt>
-                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $kit->consumables->count() }} Consumables</dd>
-                </div>
-                <div>
-                    <dt class="text-[11px] font-medium text-gray-400">Created Date</dt>
-                    <dd class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $kit->created_at ? $kit->created_at->format('d M Y, H:i') : '-' }}</dd>
-                </div>
-                @if($kit->description)
-                <div class="sm:col-span-2 lg:col-span-3">
-                    <dt class="text-[11px] font-medium text-gray-400">Full Kit Description</dt>
-                    <dd class="text-xs text-gray-600 dark:text-gray-400 italic mt-0.5">{{ $kit->description }}</dd>
-                </div>
-                @endif
             </div>
         </div>
     </div>

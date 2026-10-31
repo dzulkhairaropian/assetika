@@ -28,13 +28,12 @@
         <x-common.page-breadcrumb pageTitle="User Management" />
 
         <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Manage user accounts, roles, and department assignments.
+            Manage user employee accounts, system authorization roles, and department assignments.
         </p>
 
         @if(session('success'))
             <x-ui.alert variant="success" message="{{ session('success') }}" />
         @endif
-
         @if(session('error'))
             <x-ui.alert variant="error" message="{{ session('error') }}" />
         @endif
@@ -58,7 +57,7 @@
         {{-- Bulk Action Bar --}}
         <div x-show="selectedItems.length > 0"
             x-transition
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-3 dark:border-brand-900/30 dark:bg-brand-500/10"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 shadow-xs dark:border-brand-900/50 dark:bg-brand-950/40"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
@@ -68,39 +67,43 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <button type="button" @click="submitBulkStatus(1)"
-                    class="inline-flex items-center justify-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700">
+                    class="inline-flex items-center justify-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 transition">
                     <i data-lucide="circle-check" class="w-3.5 h-3.5"></i>
                     Set Active
                 </button>
                 <button type="button" @click="submitBulkStatus(0)"
-                    class="inline-flex items-center justify-center gap-1 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-600">
+                    class="inline-flex items-center justify-center gap-1 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-amber-600 transition">
                     <i data-lucide="circle-x" class="w-3.5 h-3.5"></i>
                     Set Inactive
                 </button>
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected users?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700">
+                    class="inline-flex items-center justify-center gap-1 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-rose-700 transition">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     Delete Selected
                 </button>
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        {{-- Main Table Container (Exact Asset Index Layout) --}}
+        <div class="overflow-hidden xl:overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             {{-- Card Header: Toolbar --}}
-            <div class="border-b border-gray-100 p-3.5 dark:border-gray-800 sm:p-4">
+            <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800 sm:p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form action="{{ route('users.index') }}" method="GET" class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
+                        @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
+
                         <div class="relative flex items-center">
-                            <span class="absolute left-2.5 text-gray-400">
+                            <span class="absolute left-2.5 text-gray-400 pointer-events-none">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search users..."
-                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, email, role..."
+                                class="h-9 w-60 sm:w-64 rounded-lg border border-gray-200 bg-gray-50/70 pl-8 pr-3 text-xs text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/15 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:focus:bg-gray-900 transition-all">
                         </div>
 
                         @php
                             $activeCount = 0;
                             if (request('role')) $activeCount++;
+                            if (request('company_id')) $activeCount++;
                             if (request('department_id')) $activeCount++;
                             if (request('is_active') !== null && request('is_active') !== '') $activeCount++;
                         @endphp
@@ -115,8 +118,7 @@
                                 @endif
                             </button>
 
-                            <div x-show="filterOpen"
-                                x-transition
+                            <div x-show="filterOpen" x-transition
                                 class="absolute left-0 top-full z-50 mt-2 w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                 style="display: none;">
                                 <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
@@ -127,18 +129,18 @@
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-2.5 text-left">
-                                    <div>
-                                        <x-form.searchable-select name="role" label="Role" :options="$roles->map(fn($r) => ['id' => $r->name, 'text' => $r->name])->toArray()" :selected="request('role')" placeholder="All Roles" :multiple="true" />
-                                    </div>
-
-                                    <div>
-                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($dept) => ['id' => $dept->id, 'text' => $dept->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" :multiple="true" />
-                                    </div>
-
                                     <div class="col-span-2">
-                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Status</label>
-                                        <select name="is_active"
-                                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                        <x-form.searchable-select name="role" label="Role" :options="$roles->map(fn($r) => ['id' => $r->name, 'text' => $r->name])->toArray()" :selected="request('role')" placeholder="All Roles" />
+                                    </div>
+                                    <div>
+                                        <x-form.searchable-select name="company_id" label="Company" :options="$companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('company_id')" placeholder="All Companies" />
+                                    </div>
+                                    <div>
+                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" />
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Account Status</label>
+                                        <select name="is_active" class="h-8 w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
                                             <option value="">All Statuses</option>
                                             <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Active</option>
                                             <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Inactive</option>
@@ -157,11 +159,17 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if(request()->filled('search') || $activeCount > 0)
+                            <a href="{{ route('users.index') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                Clear
+                            </a>
+                        @endif
                     </form>
 
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                        <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Add User
                         </a>
                     </div>
@@ -172,8 +180,8 @@
             <div class="max-w-full overflow-x-auto">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="border-y border-gray-100 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-800/30">
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400 w-10">
+                        <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">
                                 <label class="flex cursor-pointer items-center select-none">
                                     <div class="relative">
                                         <input type="checkbox" :checked="selectAll" @click="toggleAll()" class="sr-only">
@@ -188,20 +196,16 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-2.5 text-start">
-                                <x-common.sortable-header column="name" label="User" />
-                            </th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Organization</th>
-                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Roles</th>
-                            <th class="px-4 py-2.5 text-start">
-                                <x-common.sortable-header column="is_active" label="Status" />
-                            </th>
-                            <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Employee User</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Role</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Company & Department</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($users as $user)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition">
+                            <tr class="hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors duration-150">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
@@ -218,108 +222,67 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-950 shrink-0">
-                                            @if($user->avatar)
-                                                <img src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}" class="w-full h-full object-cover" />
-                                            @else
-                                                <div class="w-full h-full flex items-center justify-center font-bold text-xs text-brand-600 bg-brand-50 dark:bg-brand-500/10">
-                                                    {{ strtoupper(substr($user->name, 0, 2)) }}
-                                                </div>
-                                            @endif
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-[11px] font-bold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
-                                        <div>
-                                            <span class="block font-semibold text-gray-900 dark:text-white">{{ $user->name }}</span>
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-gray-900 dark:text-white">{{ $user->name }}</span>
                                             <span class="text-[11px] text-gray-400">{{ $user->email }}</span>
-                                            @if($user->phone)
-                                                <span class="block text-[10px] text-gray-400">{{ $user->phone }}</span>
-                                            @endif
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5">
-                                    <div class="flex flex-col">
-                                        <span class="font-medium text-gray-800 dark:text-gray-200">{{ $user->department->name ?? '-' }}</span>
-                                        @if($user->position || $user->location)
-                                            <span class="text-[11px] text-gray-400">{{ $user->position->name ?? '-' }} @if($user->location) • {{ $user->location->name }} @endif</span>
-                                        @endif
-                                        @if($user->company)
-                                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ $user->company->name }}</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     <div class="flex flex-wrap gap-1">
                                         @foreach($user->roles as $role)
-                                            <x-ui.badge color="primary" variant="light" size="sm">{{ $role->name }}</x-ui.badge>
+                                            <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                                                {{ $role->name }}
+                                            </span>
                                         @endforeach
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-800 dark:text-gray-200">
+                                            {{ optional($user->company)->name ?? 'General Company' }}
+                                        </span>
+                                        <span class="text-[11px] text-gray-400">
+                                            {{ optional($user->department)->name ?? 'No Department' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($user->is_active ?? true)
-                                        <x-ui.badge color="success" variant="light" size="sm">Active</x-ui.badge>
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Active
+                                        </span>
                                     @else
-                                        <x-ui.badge color="danger" variant="light" size="sm">Inactive</x-ui.badge>
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Inactive
+                                        </span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2.5 text-end">
-                                    <div x-data="{
-                                        open: false,
-                                        dropdownStyle: '',
-                                        toggle(e) {
-                                            this.open = !this.open;
-                                            if (this.open) {
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                const menuHeight = 100;
-                                                const spaceBelow = window.innerHeight - rect.bottom;
-                                                const top = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : (rect.bottom + 4);
-                                                const left = Math.max(10, rect.right - 144);
-                                                this.dropdownStyle = `position: fixed; top: ${top}px; left: ${left}px; z-index: 9999; display: block;`;
-                                            }
-                                        }
-                                    }" @click.away="open = false" @scroll.window="open = false" class="inline-block text-left">
-                                        <button type="button" @click="toggle($event)" class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white transition-colors">
-                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
-                                        </button>
-
-                                        <div x-show="open"
-                                            x-transition
-                                            :style="open ? dropdownStyle : 'display: none;'"
-                                            class="w-36 rounded-xl border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-800 dark:bg-gray-900"
-                                            style="display: none;">
-                                            
-                                            <a href="{{ route('users.edit', $user) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
-                                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-400"></i>
-                                                Edit
-                                            </a>
-
-                                            @if($user->id !== auth()->id())
-                                                <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
-
-                                                <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('Are you sure?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
-                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
+                                <td class="px-4 py-2.5 text-end whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <a href="{{ route('users.edit', $user) }}"
+                                           class="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-200 bg-white text-gray-500 shadow-xs hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400 transition"
+                                           title="Edit User">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-4 py-8 text-center">
-                                    <div class="flex flex-col items-center justify-center space-y-1.5">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800/50 text-gray-400">
-                                            <i data-lucide="users" class="w-5 h-5"></i>
-                                        </div>
-                                        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">No users found</p>
-                                        <p class="text-[11px] text-gray-400 dark:text-gray-500">Invite or register users to access this asset management platform.</p>
+                                <td colspan="6" class="px-4 py-12 text-center">
+                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                        <i data-lucide="users" class="h-6 w-6"></i>
                                     </div>
+                                    <h4 class="mt-3 text-sm font-semibold text-gray-900 dark:text-white">No Users Found</h4>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                                        No employee or administrator accounts match current filter criteria.
+                                    </p>
                                 </td>
                             </tr>
                         @endforelse
@@ -337,8 +300,6 @@
                         <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
                         <option value="50" {{ request('per_page', 50) == 50 ? 'selected' : '' }}>50</option>
                         <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
-                        <option value="250" {{ request('per_page') == 250 ? 'selected' : '' }}>250</option>
-                        <option value="500" {{ request('per_page') == 500 ? 'selected' : '' }}>500</option>
                     </select>
                 </div>
                 <div class="flex-1 max-w-full overflow-x-auto flex justify-end">

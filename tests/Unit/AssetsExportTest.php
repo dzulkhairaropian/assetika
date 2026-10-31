@@ -15,28 +15,26 @@ class AssetsExportTest extends TestCase
         $headings = $export->headings();
 
         $this->assertContains('Release Date', $headings);
-        $this->assertContains('Invoice Number', $headings);
         $this->assertContains('Windows License', $headings);
         $this->assertContains('Office License', $headings);
-        $this->assertContains('Wireless MAC', $headings);
-        $this->assertContains('Ethernet MAC', $headings);
         $this->assertContains('Specification', $headings);
         $this->assertContains('Notes', $headings);
+        $this->assertNotContains('Product Number', $headings);
+        $this->assertNotContains('Invoice Number', $headings);
+        $this->assertNotContains('Wireless MAC', $headings);
+        $this->assertNotContains('Ethernet MAC', $headings);
+        $this->assertNotContains('Book Value', $headings);
 
         $asset = new Asset([
             'asset_tag' => 'DB/NB/250101/001',
             'device_name' => 'DBNBIT-001',
             'serial_number' => 'SN12345',
-            'product_number' => 'PN12345',
             'release_date' => Carbon::parse('2023-05-15'),
             'purchase_date' => Carbon::parse('2023-06-01'),
             'warranty_expiry_date' => Carbon::parse('2026-06-01'),
             'purchase_cost' => 20000000,
-            'invoice_number' => 'INV-123',
             'license_windows' => 'WIN-KEY-1',
             'license_office' => 'OFF-KEY-1',
-            'mac_address_wireless' => 'AA:BB:CC:DD:EE:FF',
-            'mac_address_ethernet' => '11:22:33:44:55:66',
             'specification' => 'M2 Max',
             'notes' => 'Test note',
         ]);
@@ -44,11 +42,11 @@ class AssetsExportTest extends TestCase
         $mapped = $export->map($asset);
 
         $releaseDateIndex = array_search('Release Date', $headings);
-        $invoiceIndex = array_search('Invoice Number', $headings);
+        $costIndex = array_search('Purchase Cost', $headings);
         $winIndex = array_search('Windows License', $headings);
 
         $this->assertEquals('2023-05-15', $mapped[$releaseDateIndex]);
-        $this->assertEquals('INV-123', $mapped[$invoiceIndex]);
+        $this->assertEquals('Rp 20.000.000', $mapped[$costIndex]);
         $this->assertEquals('WIN-KEY-1', $mapped[$winIndex]);
     }
 }

@@ -199,7 +199,6 @@ class ImportService
             'vendor_id' => $vendor?->id,
             'asset_tag' => ! empty($data['asset_tag']) ? trim($data['asset_tag']) : null,
             'serial_number' => $data['serial_number'] ?? null,
-            'product_number' => $data['product_number'] ?? null,
             'device_name' => $data['device_name'] ?? null,
             'user_name' => $data['user_name'] ?? null,
             'purchase_date' => ! empty($data['purchase_date']) ? $data['purchase_date'] : null,

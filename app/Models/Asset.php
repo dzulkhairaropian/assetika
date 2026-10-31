@@ -27,13 +27,10 @@ class Asset extends Model
         'vendor_id',
         'asset_tag',
         'serial_number',
-        'product_number',
         'device_name',
         'user_name',
         'license_windows',
         'license_office',
-        'mac_address_wireless',
-        'mac_address_ethernet',
         'specification',
         'accessories',
         'is_components_stripped',
@@ -41,7 +38,6 @@ class Asset extends Model
         'release_date',
         'warranty_expiry_date',
         'purchase_cost',
-        'invoice_number',
         'sale_price',
         'buyer_name',
         'sale_date',
@@ -91,10 +87,8 @@ class Asset extends Model
             $query->where(function ($q) use ($like) {
                 $q->where('assets.asset_tag', 'like', $like)
                     ->orWhere('assets.serial_number', 'like', $like)
-                    ->orWhere('assets.product_number', 'like', $like)
                     ->orWhere('assets.device_name', 'like', $like)
                     ->orWhere('assets.user_name', 'like', $like)
-                    ->orWhere('assets.invoice_number', 'like', $like)
                     ->orWhere('assets.notes', 'like', $like)
                     ->orWhere('assets.specification', 'like', $like)
                     ->orWhereHas('product', function ($p) use ($like) {

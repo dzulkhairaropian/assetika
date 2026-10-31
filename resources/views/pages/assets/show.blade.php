@@ -423,12 +423,6 @@
                                             {{ $asset->serial_number ?? '—' }}
                                         </dd>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <dt class="text-gray-400">Product Number (P/N)</dt>
-                                        <dd class="mt-0.5 font-mono font-semibold text-gray-900 dark:text-white">
-                                            {{ $asset->product_number ?? '—' }}
-                                        </dd>
-                                    </div>
                                     <div class="flex flex-col sm:col-span-2">
                                         <dt class="text-gray-400">Procurement Vendor</dt>
                                         <dd class="mt-0.5 font-medium text-gray-900 dark:text-white">
@@ -470,18 +464,6 @@
                                             {{ $asset->license_office ?: '—' }}
                                         </dd>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <dt class="text-gray-400">Wireless MAC Address (Wi-Fi)</dt>
-                                        <dd class="mt-0.5 font-mono text-gray-900 dark:text-white">
-                                            {{ $asset->mac_address_wireless ?: '—' }}
-                                        </dd>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <dt class="text-gray-400">Ethernet MAC Address (LAN)</dt>
-                                        <dd class="mt-0.5 font-mono text-gray-900 dark:text-white">
-                                            {{ $asset->mac_address_ethernet ?: '—' }}
-                                        </dd>
-                                    </div>
                                 </dl>
                             </div>
 
@@ -502,12 +484,6 @@
                                         <dt class="text-gray-400">Acquisition Cost</dt>
                                         <dd class="mt-0.5 font-mono font-semibold text-gray-900 dark:text-white tabular-nums">
                                             {{ $asset->purchase_cost ? 'Rp ' . number_format($asset->purchase_cost, 0, ',', '.') : '—' }}
-                                        </dd>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <dt class="text-gray-400">Invoice Number</dt>
-                                        <dd class="mt-0.5 font-mono text-gray-900 dark:text-white">
-                                            {{ $asset->invoice_number ?: '—' }}
                                         </dd>
                                     </div>
                                 </dl>

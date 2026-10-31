@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap') layer(base);
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400..700&display=swap') layer(base);
 @import 'prismjs/themes/prism.min.css';
 @import 'tailwindcss';
 
@@ -13,9 +13,9 @@
 
 @theme {
   --font-*: initial;
-  --font-outfit: Outfit, sans-serif;
-  --font-sans: Outfit, sans-serif;
-  --font-mono: Outfit, sans-serif;
+  --font-outfit: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --breakpoint-*: initial;
   --breakpoint-2xsm: 375px;
@@ -191,7 +191,8 @@
     cursor: pointer;
   }
   body {
-    @apply relative font-normal font-outfit z-1 bg-gray-50;
+    @apply relative font-normal font-sans z-1 bg-gray-50 text-gray-800 antialiased;
+    letter-spacing: -0.011em;
   }
 }
 

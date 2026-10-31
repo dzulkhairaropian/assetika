@@ -190,15 +190,15 @@
                     </template>
 
                     <div>
-                        <x-form.searchable-select name="status_id" label="New Status (Optional)" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" placeholder="-- Keep Current Status --" />
+                        <x-form.searchable-select name="status_id" label="New Status (Optional)" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" placeholder="Keep Current Status" />
                     </div>
 
                     <div>
-                        <x-form.searchable-select name="department_id" label="New Department (Optional)" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" placeholder="-- Keep Current Department --" />
+                        <x-form.searchable-select name="department_id" label="New Department (Optional)" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" placeholder="Keep Current Department" />
                     </div>
 
                     <div>
-                        <x-form.searchable-select name="location_id" label="New Location (Optional)" :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()" placeholder="-- Keep Current Location --" />
+                        <x-form.searchable-select name="location_id" label="New Location (Optional)" :options="$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()" placeholder="Keep Current Location" />
                     </div>
 
                     <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
