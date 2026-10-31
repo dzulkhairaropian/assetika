@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-6">
@@ -93,7 +93,7 @@
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 User Name
                             </label>
-                            <input type="text" name="user_name" value="{{ old('user_name') }}" placeholder="e.g. John Doe"
+                            <input type="text" name="user_name" value="{{ old('user_name') }}" placeholder="e.g. Dzul Khair / IT Staff"
                                 class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200" />
                             @error('user_name') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>

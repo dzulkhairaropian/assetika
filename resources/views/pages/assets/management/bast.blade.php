@@ -1,4 +1,4 @@
-﻿@extends('layouts.fullscreen-layout')
+@extends('layouts.fullscreen-layout')
 
 @section('content')
 <div class="bg-white min-h-screen p-8 sm:p-12 text-gray-900">

@@ -38,22 +38,22 @@
         @endif
 
         <!-- TailAdmin Pro Hero Entity Header Card -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:p-6">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900 lg:p-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex items-start gap-4">
-                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-md shadow-brand-500/20">
-                        <i data-lucide="monitor" class="h-8 w-8"></i>
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-xs">
+                        <i data-lucide="monitor" class="h-7 w-7"></i>
                     </div>
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ $asset->asset_tag }}</h2>
+                            <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white font-mono">{{ $asset->asset_tag }}</h2>
                             @php
                                 $statusName = optional($asset->status)->name;
                                 $color = optional($asset->status)->color ?? 'gray';
                             @endphp
-                            <x-ui.badge :color="$color" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
+                            <x-ui.badge :color="$color" variant="light" size="sm">{{ $statusName }}</x-ui.badge>
                             @if($asset->is_components_stripped)
-                                <x-ui.badge color="warning" variant="light" size="sm" featherIcon="cpu">Components Stripped</x-ui.badge>
+                                <x-ui.badge color="warning" variant="light" size="sm">Components Stripped</x-ui.badge>
                             @endif
                             @if($yearsOld !== null)
                                 <x-ui.badge :color="$isAged ? 'danger' : 'secondary'" variant="light" size="sm">
@@ -61,11 +61,11 @@
                                 </x-ui.badge>
                             @endif
                             @if($asset->isOverdue())
-                                <x-ui.badge color="danger" variant="solid" size="sm" featherIcon="alert-circle">
+                                <x-ui.badge color="danger" variant="solid" size="sm">
                                     Overdue ({{ $asset->currentCheckout->overdueDays() }} Days)
                                 </x-ui.badge>
                             @elseif($asset->currentCheckout?->expected_return_date)
-                                <x-ui.badge color="info" variant="light" size="sm" featherIcon="calendar">
+                                <x-ui.badge color="info" variant="light" size="sm">
                                     Due {{ $asset->currentCheckout->expected_return_date->format('d M Y') }}
                                 </x-ui.badge>
                             @endif
@@ -75,29 +75,29 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 dark:border-gray-800 lg:border-t-0 lg:pt-0">
-                    <a href="{{ route('assets.clone', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                    <a href="{{ route('assets.clone', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors duration-150">
                         <i data-lucide="copy" class="h-3.5 w-3.5"></i>
                         Clone
                     </a>
-                    <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                    <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors duration-150">
                         <i data-lucide="printer" class="h-3.5 w-3.5"></i>
                         Print Sticker
                     </a>
-                    <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                    <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors duration-150">
                         <i data-lucide="edit-3" class="h-3.5 w-3.5"></i>
                         Edit
                     </a>
                     @if($asset->isCurrentlyCheckedOut())
-                        <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 active:scale-[0.98] transition-all">
+                        <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition-colors duration-150">
                             <i data-lucide="log-in" class="h-3.5 w-3.5"></i>
                             Check-in
                         </a>
-                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 active:scale-[0.98] transition-all">
+                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-colors duration-150">
                             <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                             Maintenance
                         </a>
                     @else
-                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition-all">
+                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
                             <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
                             Check-out
                         </a>
@@ -107,13 +107,13 @@
                                 $activeMaintenance = $asset->maintenances->where('completion_date', null)->first() ?? $asset->maintenances->first();
                             @endphp
                             @if($activeMaintenance)
-                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 active:scale-[0.98] transition-all">
+                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition-colors duration-150">
                                     <i data-lucide="circle-check" class="h-3.5 w-3.5"></i>
                                     Complete Maintenance
                                 </a>
                             @endif
                         @else
-                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 active:scale-[0.98] transition-all">
+                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-colors duration-150">
                                 <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                                 Maintenance
                             </a>
@@ -121,7 +121,7 @@
                     @endif
 
                     @if(optional($asset->status)->name !== 'Retired')
-                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-error-600 active:scale-[0.98] transition-all">
+                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-red-700 active:scale-[0.98] transition-colors duration-150">
                             <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
                             Retire Asset
                         </button>

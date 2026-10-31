@@ -110,7 +110,7 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 translate-y-0"
             x-transition:leave-end="opacity-0 -translate-y-2"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200/80 bg-gradient-to-r from-brand-50/90 via-blue-50/40 to-indigo-50/70 p-3 shadow-sm dark:border-brand-900/40 dark:from-brand-950/40 dark:via-gray-900 dark:to-gray-900"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 shadow-xs dark:border-brand-900/50 dark:bg-brand-950/40"
             style="display: none;">
             <div class="flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
@@ -415,23 +415,10 @@
                         @forelse($assets as $asset)
                             @php
                                 $statusName = strtolower(optional($asset->status)->name ?? '');
-                                $startDate = $asset->release_date ?? $asset->purchase_date;
-                                $ageYears = $startDate ? (int) floor($startDate->diffInDays(now()) / 365.25) : null;
-                                $isAged = $ageYears !== null && $ageYears >= 4;
-
-                                if (in_array($statusName, ['broken'])) {
-                                    $rowBg = 'bg-red-50/40 dark:bg-red-500/5 hover:bg-red-100/40 dark:hover:bg-red-500/10';
-                                } elseif (in_array($statusName, ['service', 'maintenance', 'in repair'])) {
-                                    $rowBg = 'bg-amber-50/40 dark:bg-amber-500/5 hover:bg-amber-100/40 dark:hover:bg-amber-500/10';
-                                } elseif (in_array($statusName, ['retired', 'disposal'])) {
-                                    $rowBg = 'bg-gray-50/60 dark:bg-gray-800/20 hover:bg-gray-100/50 dark:hover:bg-gray-800/40';
-                                } elseif ($isAged) {
-                                    $rowBg = 'bg-amber-50/30 dark:bg-amber-500/5 hover:bg-amber-100/30 dark:hover:bg-amber-500/10';
-                                } else {
-                                    $rowBg = 'hover:bg-gray-50/80 dark:hover:bg-white/[0.02]';
-                                }
+                                $isAged = $asset->isDueForReplacement();
+                                $ageYears = $asset->age_years;
                             @endphp
-                            <tr class="transition-colors duration-150 {{ $rowBg }}">
+                            <tr class="transition-colors duration-150 hover:bg-gray-50/80 dark:hover:bg-white/[0.02]">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">
@@ -462,7 +449,7 @@
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <a href="{{ route('assets.show', $asset) }}" class="font-mono font-medium tracking-tight text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
                                             @if($isAged)
-                                                <span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40" title="Lifecycle ≥4 Years ({{ $ageYears }}y) - Replacement Recommended">
+                                                <span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40" title="Lifecycle Exceeded ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y) - Replacement Recommended">
                                                     <i data-lucide="refresh-cw" class="w-2.5 h-2.5 text-amber-600 dark:text-amber-400"></i>
                                                     {{ $ageYears }}y • Replace
                                                 </span>
@@ -484,22 +471,22 @@
                                         $statusName = optional($asset->status)->name;
                                         $statusColor = optional($asset->status)->color;
                                     @endphp
-                                    <x-ui.badge :color="$statusColor" variant="light" size="sm" :featherIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
+                                    <x-ui.badge :color="$statusColor" variant="light" size="sm">{{ $statusName }}</x-ui.badge>
                                     @if($asset->is_components_stripped)
                                         <div class="mt-1">
-                                            <x-ui.badge color="warning" variant="light" size="sm" featherIcon="cpu">Components Stripped</x-ui.badge>
+                                            <x-ui.badge color="warning" variant="light" size="sm">Components Stripped</x-ui.badge>
                                         </div>
                                     @endif
                                     @if(in_array($statusName, ['Sold', 'For Sale']))
                                         <div class="mt-1 flex flex-col text-[11px] text-gray-500 dark:text-gray-400">
                                             @if($asset->sale_price)
-                                                <span class="font-medium text-emerald-600 dark:text-emerald-400">Sale: Rp {{ number_format($asset->sale_price, 0, ',', '.') }}</span>
+                                                <span class="font-medium text-emerald-600 dark:text-emerald-400 tabular-nums">Sale: Rp {{ number_format($asset->sale_price, 0, ',', '.') }}</span>
                                             @endif
                                             @if($asset->buyer_name)
                                                 <span>Buyer: {{ $asset->buyer_name }}</span>
                                             @endif
                                             @if($asset->sale_date)
-                                                <span>Date: {{ $asset->sale_date->format('d/m/Y') }}</span>
+                                                <span class="tabular-nums">Date: {{ $asset->sale_date->format('d/m/Y') }}</span>
                                             @endif
                                         </div>
                                     @endif

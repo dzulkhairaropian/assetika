@@ -17,12 +17,15 @@
             <a href="{{ route('assets.index') }}" class="text-xs text-brand-600 hover:underline">Change Selection</a>
         </div>
 
-        <div class="flex flex-wrap gap-1.5 mb-5">
+        <div class="flex flex-wrap gap-2 mb-5">
             @foreach($assets as $a)
-                <span class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 font-medium">
+                <span class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 font-medium">
                     <i data-lucide="monitor" class="w-3.5 h-3.5 text-brand-500"></i>
                     <strong class="font-mono text-gray-900 dark:text-white">{{ $a->asset_tag }}</strong>
-                    <span>({{ optional($a->product)->name ?? $a->device_name }})</span>
+                    <span class="text-gray-500 dark:text-gray-400">({{ optional(optional($a->product)->brand)->name }} {{ optional($a->product)->model ?? $a->device_name }})</span>
+                    @if($a->serial_number)
+                        <span class="font-mono text-[10px] text-gray-400">S/N: {{ $a->serial_number }}</span>
+                    @endif
                 </span>
             @endforeach
         </div>
