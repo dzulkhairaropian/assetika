@@ -86,19 +86,103 @@
 	        </div>
     </div>
 
-    <!-- 1. Key Metrics Cards Grid -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @php $totalTicketsTrendColor = $totalTicketsTrend >= 0 ? 'emerald' : 'red'; @endphp
-        <x-common.small-box
-            title="Total Tickets"
-            icon="ticket"
-            :value="$totalTickets"
-            :trend="$totalTicketsTrend"
-            :trendColor="$totalTicketsTrendColor"
-            description="All support tickets ever created"
-            color="brand"
-            :url="route('tickets.index')"
-        />
+    <!-- Critical Attention Center -->
+    @php
+        $ticketHasAlerts = ($unassigned > 0) || ($openTickets > 0);
+    @endphp
+
+    @if($ticketHasAlerts)
+        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring service desk operational attention</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if($unassigned > 0)
+                        <a href="{{ route('tickets.index', ['status' => 'unassigned']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
+                            <i data-lucide="user-x" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                            <span>{{ $unassigned }} Unassigned Ticket{{ $unassigned > 1 ? 's' : '' }}</span>
+                        </a>
+                    @endif
+                    @if($openTickets > 0)
+                        <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
+                            <span>{{ $openTickets }} Active Open Ticket{{ $openTickets > 1 ? 's' : '' }}</span>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <!-- Hero Card (Spans 2 columns on lg) -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Support Operations</span>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Ticket Resolution & SLA Velocity</h2>
+                    </div>
+                    @php
+                        $ticketResolutionRate = $totalTickets > 0 ? (int) round(($resolved / $totalTickets) * 100) : 0;
+                    @endphp
+                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                        {{ $ticketResolutionRate }}% Resolved
+                    </span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap items-baseline gap-3">
+                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ number_format($totalTickets) }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">total support cases</span>
+                    <span class="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
+                        MTTR: <strong class="text-gray-900 dark:text-white">{{ round($avgResolution, 1) }} hrs</strong>
+                    </span>
+                </div>
+
+                <!-- Multi-segment Distribution Bar -->
+                @php
+                    $resolvedPct = $totalTickets > 0 ? round(($resolved / $totalTickets) * 100) : 0;
+                    $openPct = $totalTickets > 0 ? round(($openTickets / $totalTickets) * 100) : 0;
+                    $unassignedPct = $totalTickets > 0 ? round(($unassigned / $totalTickets) * 100) : 0;
+                @endphp
+                <div class="mt-4">
+                    <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                        <div style="width: {{ $resolvedPct }}%" class="bg-emerald-500 transition-all duration-500" title="Resolved: {{ $resolved }} ({{ $resolvedPct }}%)"></div>
+                        <div style="width: {{ $openPct }}%" class="bg-brand-500 transition-all duration-500" title="Open: {{ $openTickets }} ({{ $openPct }}%)"></div>
+                        <div style="width: {{ $unassignedPct }}%" class="bg-amber-500 transition-all duration-500" title="Unassigned: {{ $unassigned }} ({{ $unassignedPct }}%)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segmented Indicators Legend -->
+            <div class="mt-4 grid grid-cols-3 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
+                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Resolved</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $resolved }}</strong>
+                </a>
+                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Open</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $openTickets }}</strong>
+                </a>
+                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Unassigned</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $unassigned }}</strong>
+                </a>
+            </div>
+        </div>
 
         @php $openTicketsTrendColor = $openTicketsTrend <= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
@@ -123,7 +207,10 @@
             color="success"
             :url="route('tickets.index')"
         />
+    </div>
 
+    <!-- Secondary Operational KPI Row (Clean 4-column symmetry) -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @php $unassignedTrendColor = $unassignedTrend <= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="Unassigned Tickets"
@@ -135,10 +222,7 @@
             color="warning"
             :url="route('tickets.index')"
         />
-    </div>
 
-    <!-- 2. Performance Metric Cards Grid -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <x-common.small-box
             title="My Assigned Tickets"
             icon="user"
@@ -147,6 +231,7 @@
             color="info"
             :url="route('tickets.index')"
         />
+
         @php
             $avgRespFormatted = $avgResponse >= 60 ? round($avgResponse / 60, 1).' hrs' : round($avgResponse).' mins';
         @endphp
@@ -158,20 +243,11 @@
             color="info"
             :url="route('tickets.index')"
         />
-        @php $avgResolution = round($avgResolution, 1); @endphp
-        <x-common.small-box
-            title="Avg Resolution Time"
-            icon="clock"
-            value="{{ $avgResolution }} hrs"
-            description="Mean Time to Resolve (MTTR)"
-            color="brand"
-            :url="route('tickets.index')"
-        />
-        @php $rate = $totalTickets > 0 ? round(($resolved / $totalTickets) * 100, 1) : 0; @endphp
+
         <x-common.small-box
             title="SLA Resolution Rate"
             icon="activity"
-            value="{{ $rate }}%"
+            value="{{ $ticketResolutionRate }}%"
             description="Overall ticket completion efficiency"
             color="success"
             :url="route('tickets.index')"

@@ -55,6 +55,7 @@ class AssetManagementController extends Controller
             'department_id' => 'required|exists:departments,id',
             'supervisor_user_id' => 'nullable|exists:users,id',
             'checked_out_at' => 'required|date',
+            'expected_return_date' => 'nullable|date',
             'checkout_notes' => 'nullable|string',
             'checkout_evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
@@ -66,6 +67,7 @@ class AssetManagementController extends Controller
             'department_id' => $request->department_id,
             'supervisor_user_id' => $request->supervisor_user_id,
             'checkout_date' => $request->checked_out_at,
+            'expected_return_date' => $request->expected_return_date,
             'notes' => $request->checkout_notes,
         ], $request->file('checkout_evidence'));
 
@@ -82,7 +84,9 @@ class AssetManagementController extends Controller
             return redirect()->back()->with('error', 'Asset is not checked out.');
         }
 
-        $statuses = Status::all();
+        $statuses = Status::whereHas('masterCategory', function ($q) {
+            $q->where('name', 'IT Asset');
+        })->get();
         $supervisors = User::with('department')->orderBy('name')->get();
 
         return view('pages.assets.management.checkin', compact('asset', 'statuses', 'supervisors'));

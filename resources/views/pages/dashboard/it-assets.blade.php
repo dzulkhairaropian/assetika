@@ -22,19 +22,127 @@
         </div>
     </div>
 
-    <!-- Main Grid of KPI Cards -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @php $totalAssetsTrendColor = $totalAssetsTrend >= 0 ? 'emerald' : 'red'; @endphp
-        <x-common.small-box
-            title="Total Registered Assets"
-            icon="hard-drive"
-            :value="$totalAssets"
-            :trend="$totalAssetsTrend"
-            :trendColor="$totalAssetsTrendColor"
-            description="Total IT hardware inventory"
-            color="brand"
-            :url="route('assets.index')"
-        />
+    <!-- Critical Attention Center -->
+    @php
+        $hasAlerts = ($overdueLoansCount ?? 0) > 0 || $lowStockConsumables->count() > 0 || $brokenDisposal > 0 || ($expiringWarrantiesCount ?? 0) > 0 || ($expiringLicenses ?? collect())->count() > 0;
+    @endphp
+
+    @if($hasAlerts)
+        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring IT operational attention</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if(($overdueLoansCount ?? 0) > 0)
+                        <a href="{{ route('asset-transactions.index', ['tab' => 'overdue']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
+                            <span>{{ $overdueLoansCount }} Overdue Loan{{ $overdueLoansCount > 1 ? 's' : '' }}</span>
+                        </a>
+                    @endif
+                    @if($lowStockConsumables->count() > 0)
+                        <a href="{{ route('consumables.index', ['status' => 'low_stock']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
+                            <i data-lucide="package" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                            <span>{{ $lowStockConsumables->count() }} Low Stock Consumable{{ $lowStockConsumables->count() > 1 ? 's' : '' }}</span>
+                        </a>
+                    @endif
+                    @if(($expiringWarrantiesCount ?? 0) > 0)
+                        <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-100/80 px-3 py-1.5 text-xs font-semibold text-orange-800 shadow-xs hover:bg-orange-200 dark:border-orange-900/60 dark:bg-orange-950/70 dark:text-orange-300 transition">
+                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-orange-600 dark:text-orange-400"></i>
+                            <span>{{ $expiringWarrantiesCount }} Warranty Expiring</span>
+                        </a>
+                    @endif
+                    @if(($expiringLicenses ?? collect())->count() > 0)
+                        <a href="{{ route('licenses.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-100/80 px-3 py-1.5 text-xs font-semibold text-purple-800 shadow-xs hover:bg-purple-200 dark:border-purple-900/60 dark:bg-purple-950/70 dark:text-purple-300 transition">
+                            <i data-lucide="key" class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400"></i>
+                            <span>{{ $expiringLicenses->count() }} Expiring License{{ $expiringLicenses->count() > 1 ? 's' : '' }}</span>
+                        </a>
+                    @endif
+                    @if($brokenDisposal > 0)
+                        <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-100/80 px-3 py-1.5 text-xs font-semibold text-rose-800 shadow-xs hover:bg-rose-200 dark:border-rose-900/60 dark:bg-rose-950/70 dark:text-rose-300 transition">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400"></i>
+                            <span>{{ $brokenDisposal }} Decommission Alert</span>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <!-- Hero Card (Spans 2 columns on lg) -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Hardware Fleet</span>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Fleet Inventory & Deployment</h2>
+                    </div>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                        {{ $deploymentRate }}% Deployed
+                    </span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap items-baseline gap-3">
+                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ number_format($totalAssets) }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">total units cataloged</span>
+                    @if($totalBookValue > 0)
+                        <span class="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Book Value: <strong class="text-gray-900 dark:text-white">Rp {{ number_format($totalBookValue, 0, ',', '.') }}</strong>
+                        </span>
+                    @endif
+                </div>
+
+                <!-- Multi-segment Fleet Distribution Bar -->
+                @php
+                    $readyPct = $totalAssets > 0 ? round(($readyToDeploy / $totalAssets) * 100) : 0;
+                    $deployedPct = $totalAssets > 0 ? round(($deployed / $totalAssets) * 100) : 0;
+                    $servicePct = $totalAssets > 0 ? round(($service / $totalAssets) * 100) : 0;
+                    $brokenPct = $totalAssets > 0 ? round(($brokenDisposal / $totalAssets) * 100) : 0;
+                @endphp
+                <div class="mt-4">
+                    <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                        <div style="width: {{ $deployedPct }}%" class="bg-brand-500 transition-all duration-500" title="Deployed: {{ $deployed }} ({{ $deployedPct }}%)"></div>
+                        <div style="width: {{ $readyPct }}%" class="bg-emerald-500 transition-all duration-500" title="Ready: {{ $readyToDeploy }} ({{ $readyPct }}%)"></div>
+                        <div style="width: {{ $servicePct }}%" class="bg-amber-500 transition-all duration-500" title="In Service: {{ $service }} ({{ $servicePct }}%)"></div>
+                        <div style="width: {{ $brokenPct }}%" class="bg-red-500 transition-all duration-500" title="Broken / Scrap: {{ $brokenDisposal }} ({{ $brokenPct }}%)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segmented Indicators Legend -->
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
+                <a href="{{ route('assets.index', ['status_id' => $deployedStatusId]) }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Deployed</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $deployed }}</strong>
+                </a>
+                <a href="{{ route('assets.index', ['status_id' => $readyStatusId]) }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Ready</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $readyToDeploy }}</strong>
+                </a>
+                <a href="{{ route('assets.index', ['status_id' => $serviceStatusId]) }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Service</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $service }}</strong>
+                </a>
+                <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="group flex items-center gap-1.5 hover:text-red-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Broken</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $brokenDisposal }}</strong>
+                </a>
+            </div>
+        </div>
 
         @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
@@ -48,32 +156,25 @@
             :url="route('assets.index', ['status_id' => $readyStatusId])"
         />
 
-        @php $deployedTrendColor = $deployedTrend >= 0 ? 'emerald' : 'red'; @endphp
+        @php
+            $loanDesc = ($overdueLoansCount ?? 0) > 0
+                ? "{$overdueLoansCount} overdue loan" . ($overdueLoansCount > 1 ? 's' : '')
+                : 'All loans on schedule';
+            $loanTrendColor = ($overdueLoansCount ?? 0) > 0 ? 'red' : 'emerald';
+        @endphp
         <x-common.small-box
-            title="Active Deployed"
-            icon="user-check"
-            :value="$deployed"
-            :trend="$deployedTrend"
-            :trendColor="$deployedTrendColor"
-            description="Assigned to employees & offices"
-            color="info"
-            :url="route('assets.index', ['status_id' => $deployedStatusId])"
-        />
-
-        @php $serviceTrendColor = $serviceTrend >= 0 ? 'emerald' : 'red'; @endphp
-        <x-common.small-box
-            title="In Repair / Service"
-            icon="wrench"
-            :value="$service"
-            :trend="$serviceTrend"
-            :trendColor="$serviceTrendColor"
-            description="Undergoing maintenance"
-            color="warning"
-            :url="route('assets.index', ['status_id' => $serviceStatusId])"
+            title="Active Loans"
+            icon="calendar-clock"
+            :value="$activeLoansCount ?? 0"
+            :trend="($overdueLoansCount ?? 0) > 0 ? $overdueLoansCount : 0"
+            :trendColor="$loanTrendColor"
+            :description="$loanDesc"
+            :color="($overdueLoansCount ?? 0) > 0 ? 'danger' : 'info'"
+            :url="route('asset-transactions.index', ['tab' => ($overdueLoansCount ?? 0) > 0 ? 'overdue' : 'active'])"
         />
     </div>
 
-    <!-- Secondary Alert & Operational KPI Row -->
+    <!-- Secondary Operational KPI Row (Clean 4-column symmetry) -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-common.small-box
             title="Hardware Components"
@@ -91,29 +192,14 @@
             $lowStockTrendColor = $lowStockTrend <= 0 ? 'emerald' : 'red';
         @endphp
         <x-common.small-box
-            title="Low Stock Consumables"
+            title="Consumables Stock"
             icon="package"
-            :value="$lowStockConsumables->count()"
+            :value="$totalConsumables"
             :trend="$lowStockTrend"
             :trendColor="$lowStockTrendColor"
-            description="Items below minimum threshold"
+            description="{{ $lowStockConsumables->count() }} low stock item{{ $lowStockConsumables->count() > 1 ? 's' : '' }}"
             color="danger"
-            :url="route('consumables.index', ['status' => 'low_stock'])"
-        />
-
-        @php
-            $brokenTrend = $brokenDisposal > 0 ? 1 : -1;
-            $brokenTrendColor = $brokenTrend <= 0 ? 'emerald' : 'red';
-        @endphp
-        <x-common.small-box
-            title="Broken / Disposal Alerts"
-            icon="alert-triangle"
-            :value="$brokenDisposal"
-            :trend="$brokenTrend"
-            :trendColor="$brokenTrendColor"
-            description="Assets marked for decommissioning"
-            color="danger"
-            :url="route('assets.index', ['status_id' => $brokenStatusId])"
+            :url="route('consumables.index')"
         />
 
         @php
@@ -121,12 +207,12 @@
             $agingTrendColor = $agingTrend <= 0 ? 'emerald' : 'red';
         @endphp
         <x-common.small-box
-            title="Aging Assets (4+ Yrs)"
+            title="Aging Hardware (4+ Yrs)"
             icon="clock"
             :value="$assetsOlderThan4Years->count()"
             :trend="$agingTrend"
             :trendColor="$agingTrendColor"
-            description="Hardware nearing end of lifecycle"
+            description="Reaching replacement lifecycle"
             color="warning"
             :url="route('assets.index')"
         />
@@ -315,100 +401,135 @@
         </div>
     </div>
 
-    <!-- Timeline & Purchases Section: Row 1 -->
+    <!-- Unified Operations & Flow Trends Hub -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         
-        <!-- Timeline Chart: Consumable Usage -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
-            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+        <!-- Hub 1: Fleet Operations & Service Hub (Checkouts vs Maintenance) -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+             x-data="{
+                activeTab: 'checkouts',
+                timeframe: '30days',
+                switchTab(tab) {
+                    this.activeTab = tab;
+                    this.$nextTick(() => {
+                        window.dispatchEvent(new Event('resize'));
+                        if (tab === 'checkouts' && window.checkoutCheckinTLChartInstance) window.checkoutCheckinTLChartInstance.resize();
+                        if (tab === 'maintenance' && window.maintenanceTimelineChartInstance) window.maintenanceTimelineChartInstance.resize();
+                    });
+                },
+                setTimeframe(tf) {
+                    this.timeframe = tf;
+                    if (this.activeTab === 'checkouts' && window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe(tf);
+                    if (this.activeTab === 'maintenance' && window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe(tf);
+                }
+             }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Consumable Usage Timeline</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Distribution trend by timeframe</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Activity Hub</span>
+                    </div>
+                    <div class="flex items-center gap-1 mt-1">
+                        <button type="button" @click="switchTab('checkouts')"
+                            :class="activeTab === 'checkouts' ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            Checkouts & Returns
+                        </button>
+                        <span class="text-gray-300 dark:text-gray-700">|</span>
+                        <button type="button" @click="switchTab('maintenance')"
+                            :class="activeTab === 'maintenance' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            Maintenance & Service
+                        </button>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'; if(window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-950 border border-gray-200/50 dark:border-gray-800">
+                    <button type="button" @click="setTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">12m</button>
+                    <button type="button" @click="setTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">30d</button>
+                    <button type="button" @click="setTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">7d</button>
+                    <button type="button" @click="setTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">24h</button>
                 </div>
             </div>
-            @if(count($consumableTimelineChartData['data']) > 0)
-                <div id="consumableTimelineChart" class="h-64"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No consumable timeline data available</div>
-            @endif
+
+            <div x-show="activeTab === 'checkouts'" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                @if(isset($checkoutCheckinTimelineChartData['labels']) && count($checkoutCheckinTimelineChartData['labels']) > 0)
+                    <div id="checkoutCheckinTimelineChart" class="h-64"></div>
+                @else
+                    <div class="flex items-center justify-center h-64 text-xs text-gray-400">No checkout/checkin timeline data available</div>
+                @endif
+            </div>
+
+            <div x-show="activeTab === 'maintenance'" style="display: none;" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                @if(isset($maintenanceTimelineChartData['data']) && count($maintenanceTimelineChartData['data']) > 0)
+                    <div id="maintenanceTimelineChart" class="h-64"></div>
+                @else
+                    <div class="flex items-center justify-center h-64 text-xs text-gray-400">No maintenance timeline data available</div>
+                @endif
+            </div>
         </div>
 
-        <!-- Timeline Chart: Asset Purchases -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
-            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+        <!-- Hub 2: Resources & Acquisition Hub (Purchases vs Consumables) -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+             x-data="{
+                activeTab: 'purchases',
+                timeframe: '30days',
+                switchTab(tab) {
+                    this.activeTab = tab;
+                    this.$nextTick(() => {
+                        window.dispatchEvent(new Event('resize'));
+                        if (tab === 'purchases' && window.purchaseTimelineChartInstance) window.purchaseTimelineChartInstance.resize();
+                        if (tab === 'consumables' && window.consumableTLChartInstance) window.consumableTLChartInstance.resize();
+                    });
+                },
+                setTimeframe(tf) {
+                    this.timeframe = tf;
+                    if (this.activeTab === 'purchases' && window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe(tf);
+                    if (this.activeTab === 'consumables' && window.updateConsumableTimelineTimeframe) window.updateConsumableTimelineTimeframe(tf);
+                }
+             }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Acquisition Timeline</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Historical acquisition volume</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Inflow & Usage</span>
+                    </div>
+                    <div class="flex items-center gap-1 mt-1">
+                        <button type="button" @click="switchTab('purchases')"
+                            :class="activeTab === 'purchases' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            Asset Acquisitions
+                        </button>
+                        <span class="text-gray-300 dark:text-gray-700">|</span>
+                        <button type="button" @click="switchTab('consumables')"
+                            :class="activeTab === 'consumables' ? 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            Consumable Distribution
+                        </button>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'; if(window.updatePurchaseTimelineTimeframe) window.updatePurchaseTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-950 border border-gray-200/50 dark:border-gray-800">
+                    <button type="button" @click="setTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">12m</button>
+                    <button type="button" @click="setTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">30d</button>
+                    <button type="button" @click="setTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">7d</button>
+                    <button type="button" @click="setTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">24h</button>
                 </div>
             </div>
-            @if(count($purchaseChartData['data']) > 0)
-                <div id="purchaseTimelineChart" class="h-64"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No purchase timeline data available</div>
-            @endif
-        </div>
 
-    </div>
-
-    <!-- Timeline & Purchases Section: Row 2 -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-6">
-
-        <!-- Timeline Chart: Asset Checkout/Checkin -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
-            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Checkout / Checkin Timeline</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Historical checkout and checkin activity</span>
-                </div>
-
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'; if(window.updateCheckoutCheckinTimelineTimeframe) window.updateCheckoutCheckinTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
-                </div>
+            <div x-show="activeTab === 'purchases'" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                @if(count($purchaseChartData['data']) > 0)
+                    <div id="purchaseTimelineChart" class="h-64"></div>
+                @else
+                    <div class="flex items-center justify-center h-64 text-xs text-gray-400">No purchase timeline data available</div>
+                @endif
             </div>
-            @if(isset($checkoutCheckinTimelineChartData['labels']) && count($checkoutCheckinTimelineChartData['labels']) > 0)
-                <div id="checkoutCheckinTimelineChart" class="h-64"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No checkout/checkin timeline data available</div>
-            @endif
-        </div>
 
-        <!-- Timeline Chart: Asset Maintenance -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
-            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Asset Maintenance Timeline</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Historical maintenance and service volume</span>
-                </div>
-
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'; if(window.updateMaintenanceTimelineTimeframe) window.updateMaintenanceTimelineTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
-                </div>
+            <div x-show="activeTab === 'consumables'" style="display: none;" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                @if(count($consumableTimelineChartData['data']) > 0)
+                    <div id="consumableTimelineChart" class="h-64"></div>
+                @else
+                    <div class="flex items-center justify-center h-64 text-xs text-gray-400">No consumable timeline data available</div>
+                @endif
             </div>
-            @if(isset($maintenanceTimelineChartData['data']) && count($maintenanceTimelineChartData['data']) > 0)
-                <div id="maintenanceTimelineChart" class="h-64"></div>
-            @else
-                <div class="flex items-center justify-center h-64 text-xs text-gray-400">No maintenance timeline data available</div>
-            @endif
         </div>
 
     </div>
@@ -441,7 +562,19 @@
                                 $stColor = optional(optional($checkout->asset)->status)->color ?? 'primary';
                                 $stIcon = optional(optional($checkout->asset)->status)->icon ?? 'user-check';
                             @endphp
-                            <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
+                            <div class="flex flex-col gap-1 items-start">
+                                <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
+                                @if($checkout->isOverdue())
+                                    <span class="inline-flex items-center gap-1 rounded-md bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+                                        <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
+                                        Overdue ({{ $checkout->overdueDays() }}d)
+                                    </span>
+                                @elseif($checkout->expected_return_date)
+                                    <span class="inline-flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400">
+                                        Due {{ $checkout->expected_return_date->format('d M') }}
+                                    </span>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-4 py-2.5">
                             <span class="block text-gray-700 dark:text-gray-300 font-medium">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</span>

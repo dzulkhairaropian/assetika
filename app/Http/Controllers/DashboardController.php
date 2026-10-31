@@ -220,10 +220,14 @@ class DashboardController extends Controller
         }
 
         // Chart Data 4: Monthly Purchases by Release Date / Purchase Date
+        $isSqlite = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite';
+        $yearRawExpr = $isSqlite ? "strftime('%Y', COALESCE(release_date, purchase_date)) as year" : 'YEAR(COALESCE(release_date, purchase_date)) as year';
+        $yearCondition = $isSqlite ? "strftime('%Y', COALESCE(release_date, purchase_date)) = ?" : 'YEAR(COALESCE(release_date, purchase_date)) = ?';
+
         $purchaseYears = Asset::where(function ($q) {
             $q->whereNotNull('release_date')->orWhereNotNull('purchase_date');
         })
-            ->selectRaw('YEAR(COALESCE(release_date, purchase_date)) as year')
+            ->selectRaw($yearRawExpr)
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
@@ -240,7 +244,7 @@ class DashboardController extends Controller
         $baseTimelineQuery = Asset::where(function ($q) {
             $q->whereNotNull('release_date')->orWhereNotNull('purchase_date');
         })
-            ->whereRaw('YEAR(COALESCE(release_date, purchase_date)) = ?', [$purchaseYear]);
+            ->whereRaw($yearCondition, [$purchaseYear]);
 
         if ($purchaseCategoryId && $purchaseCategoryId !== 'all') {
             $baseTimelineQuery->whereHas('product', function ($q) use ($purchaseCategoryId) {
@@ -277,7 +281,7 @@ class DashboardController extends Controller
             ->where(function ($q) {
                 $q->whereNotNull('release_date')->orWhereNotNull('purchase_date');
             })
-            ->whereRaw('YEAR(COALESCE(release_date, purchase_date)) = ?', [$purchaseYear])
+            ->whereRaw($yearCondition, [$purchaseYear])
             ->get();
 
         $monthlyAll = $allYearAssets
@@ -361,8 +365,11 @@ class DashboardController extends Controller
         $consumableChartData = $consumableDataByCategory['all'];
 
         // Chart Data 6: Consumable Distribution Timeline (Line Chart)
+        $txYearRaw = $isSqlite ? "strftime('%Y', transaction_date) as year" : 'YEAR(transaction_date) as year';
+        $txYearCondition = $isSqlite ? "strftime('%Y', transaction_date) = ?" : 'YEAR(transaction_date) = ?';
+
         $consumableTxYears = ConsumableTransaction::whereNotNull('transaction_date')
-            ->selectRaw('YEAR(transaction_date) as year')
+            ->selectRaw($txYearRaw)
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
@@ -377,7 +384,7 @@ class DashboardController extends Controller
         $allYearConsumableTx = ConsumableTransaction::with(['consumable.product'])
             ->where('type', 'checkout')
             ->whereNotNull('transaction_date')
-            ->whereRaw('YEAR(transaction_date) = ?', [$consumableTxYear])
+            ->whereRaw($txYearCondition, [$consumableTxYear])
             ->get();
 
         $consumableTimelineByCategory = [];
@@ -716,22 +723,24 @@ class DashboardController extends Controller
                 $query->join('assets', 'assets.product_id', '=', 'products.id')
                     ->whereNull('assets.deleted_at');
             }])
-            ->having('total_assets', '>', 0)
-            ->orderByDesc('total_assets')
-            ->limit(5)
-            ->get();
+            ->get()
+            ->filter(fn ($b) => $b->total_assets > 0)
+            ->sortByDesc('total_assets')
+            ->take(5)
+            ->values();
 
         if ($topVendorsRaw->isEmpty()) {
             $topVendorsRaw = Brand::withCount('products')
-                ->having('products_count', '>', 0)
-                ->orderByDesc('products_count')
-                ->limit(5)
                 ->get()
+                ->filter(fn ($b) => $b->products_count > 0)
+                ->sortByDesc('products_count')
+                ->take(5)
                 ->map(function ($b) {
                     $b->total_assets = $b->products_count;
 
                     return $b;
-                });
+                })
+                ->values();
         }
 
         $vendorChartData = [
@@ -778,9 +787,20 @@ class DashboardController extends Controller
             ->where('expiration_date', '<=', now()->addDays(30))
             ->get();
 
+        $overdueLoansCount = AssetCheckout::overdue()->count();
+        $activeLoansCount = AssetCheckout::currentlyCheckedOut()->whereNotNull('expected_return_date')->count();
+        $expiringWarrantiesCount = Asset::whereNotNull('warranty_expiry_date')
+            ->whereBetween('warranty_expiry_date', [now()->toDateString(), now()->addDays(30)->toDateString()])
+            ->count();
+        $deploymentRate = $totalAssets > 0 ? (int) round(($deployed / $totalAssets) * 100) : 0;
+
         return view('pages.dashboard.it-assets', compact(
             'totalAssets',
             'totalAssetsTrend',
+            'deploymentRate',
+            'overdueLoansCount',
+            'activeLoansCount',
+            'expiringWarrantiesCount',
             'totalConsumables',
             'consumablesBreakdown',
             'totalComponents',

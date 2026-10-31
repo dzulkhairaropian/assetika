@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">General Affair & Facilities Dashboard</h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Management of GA physical assets, vehicle fleet, room reservations, and facility maintenance.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live monitoring of physical assets, vehicle fleet, room reservations, and facility maintenance for {{ $userName }}.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
@@ -19,25 +19,105 @@
         </div>
     </div>
 
-    <!-- 1. Core GA KPI Cards Grid -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-common.small-box
-            title="Total GA Assets"
-            icon="hard-drive"
-            :value="number_format($totalAssets)"
-            description="Total physical GA assets"
-            color="brand"
-            :url="route('ga-assets.index')"
-        />
+    <!-- Critical Attention Center -->
+    @php
+        $gaHasAlerts = ($upcomingVehicleTaxes ?? 0) > 0 || ($pendingMaintenance ?? 0) > 0;
+    @endphp
 
-        <x-common.small-box
-            title="Total Capital Value"
-            icon="dollar-sign"
-            value="Rp {{ number_format($totalAssetValue, 0, ',', '.') }}"
-            description="Capitalized valuation"
-            color="success"
-            :url="route('ga-assets.index')"
-        />
+    @if($gaHasAlerts)
+        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    </span>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring GA operational attention</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if(($upcomingVehicleTaxes ?? 0) > 0)
+                        <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                            <span>{{ $upcomingVehicleTaxes }} Vehicle Tax Due Soon</span>
+                        </a>
+                    @endif
+                    @if(($pendingMaintenance ?? 0) > 0)
+                        <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
+                            <i data-lucide="wrench" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
+                            <span>{{ $pendingMaintenance }} Pending Maintenance</span>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <!-- Hero Card (Spans 2 columns on lg) -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">GA Physical Fleet</span>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Facilities & Asset Inventory</h2>
+                    </div>
+                    @php
+                        $gaDeploymentRate = $totalAssets > 0 ? (int) round(($activeAssignments / $totalAssets) * 100) : 0;
+                    @endphp
+                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                        {{ $gaDeploymentRate }}% Assigned
+                    </span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap items-baseline gap-3">
+                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ number_format($totalAssets) }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">total physical items</span>
+                    @if($totalAssetValue > 0)
+                        <span class="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Capital Value: <strong class="text-gray-900 dark:text-white">Rp {{ number_format($totalAssetValue, 0, ',', '.') }}</strong>
+                        </span>
+                    @endif
+                </div>
+
+                <!-- Multi-segment Distribution Bar -->
+                @php
+                    $gaAssignedPct = $totalAssets > 0 ? round(($activeAssignments / $totalAssets) * 100) : 0;
+                    $gaMaintPct = $totalAssets > 0 ? round(($pendingMaintenance / $totalAssets) * 100) : 0;
+                    $gaAvailPct = max(0, 100 - $gaAssignedPct - $gaMaintPct);
+                @endphp
+                <div class="mt-4">
+                    <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                        <div style="width: {{ $gaAssignedPct }}%" class="bg-brand-500 transition-all duration-500" title="Assigned: {{ $activeAssignments }} ({{ $gaAssignedPct }}%)"></div>
+                        <div style="width: {{ $gaAvailPct }}%" class="bg-emerald-500 transition-all duration-500" title="Available: {{ max(0, $totalAssets - $activeAssignments - $pendingMaintenance) }} ({{ $gaAvailPct }}%)"></div>
+                        <div style="width: {{ $gaMaintPct }}%" class="bg-amber-500 transition-all duration-500" title="Maintenance: {{ $pendingMaintenance }} ({{ $gaMaintPct }}%)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segmented Indicators Legend -->
+            <div class="mt-4 grid grid-cols-3 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
+                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Assigned</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $activeAssignments }}</strong>
+                </a>
+                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Available</span>
+                    <strong class="text-gray-900 dark:text-white">{{ max(0, $totalAssets - $activeAssignments - $pendingMaintenance) }}</strong>
+                </a>
+                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition">
+                    <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                    <span class="text-gray-500 dark:text-gray-400">Maintenance</span>
+                    <strong class="text-gray-900 dark:text-white">{{ $pendingMaintenance }}</strong>
+                </a>
+            </div>
+        </div>
 
         <x-common.small-box
             title="Active Assignments"
@@ -52,13 +132,15 @@
             title="Pending Maintenance"
             icon="wrench"
             :value="number_format($pendingMaintenance)"
-            description="Scheduled repairs"
+            :trend="($pendingMaintenance > 0) ? 1 : 0"
+            :trendColor="($pendingMaintenance > 0) ? 'red' : 'emerald'"
+            description="Scheduled repairs & servicing"
             color="warning"
             :url="route('ga-assets.index')"
         />
     </div>
 
-    <!-- 2. Fleet & Facilities KPI Grid -->
+    <!-- Secondary Operational KPI Row (4-column symmetry) -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-common.small-box
             title="Vehicles Fleet"
@@ -73,8 +155,8 @@
             title="Tax Due Alerts"
             icon="alert-triangle"
             :value="number_format($upcomingVehicleTaxes)"
-            :trend="1"
-            trendColor="amber"
+            :trend="$upcomingVehicleTaxes > 0 ? 1 : 0"
+            :trendColor="$upcomingVehicleTaxes > 0 ? 'red' : 'emerald'"
             description="Vehicle taxes expiring in 30 days"
             color="danger"
             :url="route('ga-assets.index')"
@@ -294,6 +376,38 @@
 
         const formatRupiah = (val) => 'Rp ' + Number(val).toLocaleString('id-ID');
 
+        // Custom plugin to render center text in Doughnut charts (shadcn style)
+        const centerTextPlugin = {
+            id: 'centerText',
+            beforeDraw(chart) {
+                const { ctx, chartArea } = chart;
+                const centerConfig = chart.config.options.plugins?.centerText;
+                if (!centerConfig || centerConfig.value === undefined) return;
+
+                const { left, top, width, height } = chartArea;
+                const centerX = left + width / 2;
+                const centerY = top + height / 2;
+
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                ctx.font = 'bold 22px Outfit, sans-serif';
+                ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a';
+                ctx.fillText(Number(centerConfig.value).toLocaleString(), centerX, centerY - 8);
+
+                ctx.font = '500 12px Outfit, sans-serif';
+                ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
+                ctx.fillText(centerConfig.label || 'Total', centerX, centerY + 14);
+
+                ctx.restore();
+            }
+        };
+
+        if (typeof Chart !== 'undefined') {
+            Chart.register(centerTextPlugin);
+        }
+
         const createDoughnutConfig = (labels, data, colors, centerLabel = 'Total') => ({
             type: 'doughnut',
             data: {
@@ -303,6 +417,7 @@
                     backgroundColor: colors,
                     borderWidth: 2,
                     borderColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+                    hoverOffset: 6,
                     borderRadius: 4
                 }]
             },
@@ -310,21 +425,26 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: '60%',
+                onHover: (event, activeElements, chart) => {
+                    chart.draw();
+                },
                 plugins: {
                     centerText: {
                         label: centerLabel,
                         value: data.reduce((a, b) => Number(a) + Number(b), 0)
                     },
                     legend: {
-                        position: 'bottom',
-                        labels: { usePointStyle: true, pointStyle: 'circle', font: { family: 'Outfit, sans-serif', size: 11 } }
+                        display: false
                     },
                     tooltip: {
                         backgroundColor: '#0f172a',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
                         titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
                         bodyFont: { family: 'Outfit, sans-serif', size: 12 },
                         padding: { top: 8, bottom: 8, left: 12, right: 12 },
-                        cornerRadius: 8
+                        cornerRadius: 8,
+                        boxPadding: 4
                     }
                 }
             }

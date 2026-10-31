@@ -53,7 +53,7 @@ class CompanyController extends Controller
             'phone' => 'nullable|string|max:20',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -87,7 +87,7 @@ class CompanyController extends Controller
             'phone' => 'nullable|string|max:20',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('logo')) {

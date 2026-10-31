@@ -127,6 +127,16 @@
                             @error('checked_out_at') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                Expected Return Date
+                                <span class="text-[10px] text-gray-400 font-normal">(Optional for temporary loans)</span>
+                            </label>
+                            <input type="date" name="expected_return_date" value="{{ old('expected_return_date') }}"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                            @error('expected_return_date') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                        </div>
+
                         <div class="lg:col-span-2">
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                 Notes

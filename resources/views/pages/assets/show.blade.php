@@ -39,10 +39,10 @@
         @endif
 
         <!-- TailAdmin Pro Hero Entity Header Card -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/3 lg:p-6">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:p-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex items-start gap-4">
-                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 border border-brand-100 dark:border-brand-500/20 dark:bg-brand-500/10">
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-md shadow-brand-500/20">
                         <i data-lucide="monitor" class="h-8 w-8"></i>
                     </div>
                     <div>
@@ -61,31 +61,44 @@
                                     {{ $ageDisplay }}
                                 </x-ui.badge>
                             @endif
+                            @if($asset->isOverdue())
+                                <x-ui.badge color="danger" variant="solid" size="sm" featherIcon="alert-circle">
+                                    Overdue ({{ $asset->currentCheckout->overdueDays() }} Days)
+                                </x-ui.badge>
+                            @elseif($asset->currentCheckout?->expected_return_date)
+                                <x-ui.badge color="info" variant="light" size="sm" featherIcon="calendar">
+                                    Due {{ $asset->currentCheckout->expected_return_date->format('d M Y') }}
+                                </x-ui.badge>
+                            @endif
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">{{ $asset->device_name }} • {{ optional($asset->product->brand)->name }} {{ optional($asset->product)->model }} • S/N: <span class="font-mono text-gray-700 dark:text-gray-300">{{ $asset->serial_number ?? '-' }}</span></p>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 dark:border-gray-800 lg:border-t-0 lg:pt-0">
-                    <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                    <a href="{{ route('assets.clone', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                        <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+                        Clone
+                    </a>
+                    <a href="{{ route('assets.print-label', $asset) }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                         <i data-lucide="printer" class="h-3.5 w-3.5"></i>
                         Print Sticker
                     </a>
-                    <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                    <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                         <i data-lucide="edit-3" class="h-3.5 w-3.5"></i>
                         Edit
                     </a>
                     @if($asset->isCurrentlyCheckedOut())
-                        <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
+                        <a href="{{ route('assets.checkin', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 active:scale-[0.98] transition-all">
                             <i data-lucide="log-in" class="h-3.5 w-3.5"></i>
                             Check-in
                         </a>
-                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 transition">
+                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 active:scale-[0.98] transition-all">
                             <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                             Maintenance
                         </a>
                     @else
-                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
+                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.98] transition-all">
                             <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
                             Check-out
                         </a>
@@ -95,13 +108,13 @@
                                 $activeMaintenance = $asset->maintenances->where('completion_date', null)->first() ?? $asset->maintenances->first();
                             @endphp
                             @if($activeMaintenance)
-                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 transition">
+                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-success-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-success-600 active:scale-[0.98] transition-all">
                                     <i data-lucide="circle-check" class="h-3.5 w-3.5"></i>
                                     Complete Maintenance
                                 </a>
                             @endif
                         @else
-                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 transition">
+                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-warning-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-warning-600 active:scale-[0.98] transition-all">
                                 <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                                 Maintenance
                             </a>
@@ -109,7 +122,7 @@
                     @endif
 
                     @if(optional($asset->status)->name !== 'Retired')
-                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-error-600 transition">
+                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-error-600 active:scale-[0.98] transition-all">
                             <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
                             Retire Asset
                         </button>
@@ -156,6 +169,24 @@
                                     <p class="text-[10px] font-medium uppercase text-gray-400">Checked out at</p>
                                     <p class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $asset->currentCheckout->checked_out_at?->format('d M Y, H:i') ?? '-' }}</p>
                                 </div>
+                                @if($asset->currentCheckout->expected_return_date)
+                                    <div class="col-span-2 flex items-center justify-between border-t border-gray-100 pt-2 dark:border-gray-800">
+                                        <div>
+                                            <p class="text-[10px] font-medium uppercase text-gray-400">Expected Return</p>
+                                            <p class="text-xs font-medium text-gray-800 dark:text-gray-200">{{ $asset->currentCheckout->expected_return_date->format('d M Y') }}</p>
+                                        </div>
+                                        @if($asset->currentCheckout->isOverdue())
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+                                                <i data-lucide="alert-circle" class="h-3 w-3"></i>
+                                                Overdue ({{ $asset->currentCheckout->overdueDays() }}d)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
+                                                Loan
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @else
@@ -276,16 +307,16 @@
                 <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <!-- Tabs Navigation -->
                     <div class="border-b border-gray-100 p-3 dark:border-gray-800 sm:p-4">
-                        <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent">
+                        <nav class="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-950 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-track]:bg-transparent">
                             <button @click="activeTab = 'details'"
-                                :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'details' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                                 Details
                             </button>
                             <button @click="activeTab = 'components'"
-                                :class="activeTab === 'components' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'components' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
                                 Installed Components
                                 @if($asset->installedComponents->count() > 0)
@@ -295,26 +326,26 @@
                                 @endif
                             </button>
                             <button @click="activeTab = 'history'"
-                                :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'history' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="activity" class="w-3.5 h-3.5"></i>
                                 Movement History
                             </button>
                             <button @click="activeTab = 'audit_logs'"
-                                :class="activeTab === 'audit_logs' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'audit_logs' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="list" class="w-3.5 h-3.5"></i>
                                 Audit Logs
                             </button>
                             <button @click="activeTab = 'maintenance'"
-                                :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
                                 Maintenance History
                             </button>
                             <button @click="activeTab = 'tickets'"
-                                :class="activeTab === 'tickets' ? 'bg-white text-gray-900 shadow-sm dark:bg-white/5 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
-                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200 ease-in-out">
+                                :class="activeTab === 'tickets' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150">
                                 <i data-lucide="life-buoy" class="w-3.5 h-3.5"></i>
                                 Support Tickets
                                 @if($asset->tickets->count() > 0)
@@ -477,45 +508,11 @@
                         <!-- History Tab -->
                         <div x-show="activeTab === 'history'" class="space-y-4" x-transition>
                             @php
-                                $totalMinutes = 0;
-                                $userDurations = [];
-                                foreach ($asset->checkoutHistory as $h) {
-                                    $start = $h->checked_out_at;
-                                    $end = $h->checked_in_at ?? now();
-                                    if ($start) {
-                                        $diff = $start->diffInMinutes($end);
-                                        $totalMinutes += $diff;
-                                        $uName = $h->checkedOutToUser?->name ?? 'Unknown';
-                                        $userDurations[$uName] = ($userDurations[$uName] ?? 0) + $diff;
-                                    }
-                                }
-                                arsort($userDurations);
-                                $topUser = !empty($userDurations) ? key($userDurations) : null;
-                                $topMinutes = !empty($userDurations) ? current($userDurations) : 0;
-
-                                // Format Total Duration
-                                $totalDays = (int) floor($totalMinutes / 1440);
-                                $totalMonths = (int) floor($totalDays / 30);
-                                $remainingDays = $totalDays % 30;
-
-                                if ($totalMonths >= 12) {
-                                    $totalY = (int) floor($totalMonths / 12);
-                                    $totalM = $totalMonths % 12;
-                                    $totalDisplay = $totalY . 'y ' . ($totalM > 0 ? $totalM . 'm' : '');
-                                } elseif ($totalMonths >= 1) {
-                                    $totalDisplay = $totalMonths . 'm ' . ($remainingDays > 0 ? $remainingDays . 'd' : '');
-                                } else {
-                                    $totalDisplay = $totalDays > 0 ? $totalDays . ' days' : '< 1 day';
-                                }
-
-                                // Format Top User Duration
-                                $topDays = (int) floor($topMinutes / 1440);
-                                $topMonths = (int) floor($topDays / 30);
-                                if ($topMonths >= 1) {
-                                    $topDisplay = $topMonths . ' ' . Str::plural('month', $topMonths);
-                                } else {
-                                    $topDisplay = $topDays > 0 ? $topDays . ' ' . Str::plural('day', $topDays) : '< 1 day';
-                                }
+                                $utilization = $asset->utilization_summary ?? [
+                                    'total_display' => '< 1 day',
+                                    'top_user' => null,
+                                    'top_display' => '< 1 day',
+                                ];
                             @endphp
 
                             @if($asset->checkoutHistory->count() > 0)
@@ -527,7 +524,7 @@
                                         <div>
                                             <p class="text-[10px] font-medium uppercase text-gray-400">Total Utilization Time</p>
                                             <p class="text-xs font-bold text-gray-900 dark:text-white">
-                                                {{ $totalDisplay }}
+                                                {{ $utilization['total_display'] ?? '< 1 day' }}
                                                 <span class="text-[11px] font-normal text-gray-500">({{ $asset->checkoutHistory->count() }} {{ Str::plural('assignment', $asset->checkoutHistory->count()) }})</span>
                                             </p>
                                         </div>
@@ -540,9 +537,9 @@
                                         <div>
                                             <p class="text-[10px] font-medium uppercase text-gray-400">Top Holder</p>
                                             <p class="text-xs font-bold text-gray-900 dark:text-white">
-                                                {{ $topUser ?? '-' }}
-                                                @if($topUser)
-                                                    <span class="text-[11px] font-normal text-gray-500">({{ $topDisplay }} total)</span>
+                                                {{ $utilization['top_user'] ?? '-' }}
+                                                @if(!empty($utilization['top_user']))
+                                                    <span class="text-[11px] font-normal text-gray-500">({{ $utilization['top_display'] ?? '< 1 day' }} total)</span>
                                                 @endif
                                             </p>
                                         </div>
@@ -578,6 +575,10 @@
                                                 <td class="px-4 py-2.5">
                                                     @if($history->checked_in_at)
                                                         <span class="text-gray-600 dark:text-gray-400">{{ $history->checked_in_at?->format('d M Y') ?? '-' }}</span>
+                                                    @elseif($history->isOverdue())
+                                                        <x-ui.badge color="danger" variant="solid" size="sm">Overdue ({{ $history->overdueDays() }}d)</x-ui.badge>
+                                                    @elseif($history->expected_return_date)
+                                                        <x-ui.badge color="info" variant="light" size="sm">Due {{ $history->expected_return_date->format('d M') }}</x-ui.badge>
                                                     @else
                                                         <x-ui.badge color="primary" variant="light" size="sm">Current</x-ui.badge>
                                                     @endif
