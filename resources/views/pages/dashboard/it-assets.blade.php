@@ -10,13 +10,13 @@
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live monitoring of IT hardware, equipment allocation, and system alerts for {{ $userName }}.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
+            <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
                 <i data-lucide="plus" class="w-4 h-4"></i> Add IT Asset
             </a>
-            <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
+            <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-colors duration-150">
                 <i data-lucide="download" class="w-4 h-4"></i> Export Data
             </a>
-            <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
+            <a href="{{ route('assets.bulk-checkout') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-colors duration-150">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Bulk Checkout
             </a>
         </div>
@@ -28,7 +28,7 @@
     @endphp
 
     @if($hasAlerts)
-        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
+        <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs dark:border-gray-800 dark:bg-gray-900">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
                     <span class="relative flex h-2.5 w-2.5">
@@ -37,44 +37,44 @@
                     </span>
                     <div>
                         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring IT operational attention</p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring operational attention</p>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     @if(($overdueLoansCount ?? 0) > 0)
-                        <a href="{{ route('asset-transactions.index', ['tab' => 'overdue']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
+                        <a href="{{ route('asset-transactions.index', ['tab' => 'overdue']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300 transition-colors">
                             <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
                             <span>{{ $overdueLoansCount }} Overdue Loan{{ $overdueLoansCount > 1 ? 's' : '' }}</span>
                         </a>
                     @endif
+                    @if($brokenDisposal > 0)
+                        <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300 transition-colors">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
+                            <span>{{ $brokenDisposal }} Decommission Alert</span>
+                        </a>
+                    @endif
                     @if($lowStockConsumables->count() > 0)
-                        <a href="{{ route('consumables.index', ['status' => 'low_stock']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
+                        <a href="{{ route('consumables.index', ['status' => 'low_stock']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300 transition-colors">
                             <i data-lucide="package" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
                             <span>{{ $lowStockConsumables->count() }} Low Stock Consumable{{ $lowStockConsumables->count() > 1 ? 's' : '' }}</span>
                         </a>
                     @endif
                     @if($assetsOlderThan4Years->count() > 0)
-                        <a href="{{ route('assets.replacements') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
+                        <a href="{{ route('assets.replacements') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300 transition-colors">
                             <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
                             <span>{{ $assetsOlderThan4Years->count() }} Unit{{ $assetsOlderThan4Years->count() > 1 ? 's' : '' }} Due Refresh</span>
                         </a>
                     @endif
                     @if(($expiringWarrantiesCount ?? 0) > 0)
-                        <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-100/80 px-3 py-1.5 text-xs font-semibold text-orange-800 shadow-xs hover:bg-orange-200 dark:border-orange-900/60 dark:bg-orange-950/70 dark:text-orange-300 transition">
-                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-orange-600 dark:text-orange-400"></i>
+                        <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 transition-colors">
+                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-gray-500"></i>
                             <span>{{ $expiringWarrantiesCount }} Warranty Expiring</span>
                         </a>
                     @endif
                     @if(($expiringLicenses ?? collect())->count() > 0)
-                        <a href="{{ route('licenses.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-100/80 px-3 py-1.5 text-xs font-semibold text-purple-800 shadow-xs hover:bg-purple-200 dark:border-purple-900/60 dark:bg-purple-950/70 dark:text-purple-300 transition">
-                            <i data-lucide="key" class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400"></i>
+                        <a href="{{ route('licenses.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 transition-colors">
+                            <i data-lucide="key" class="w-3.5 h-3.5 text-gray-500"></i>
                             <span>{{ $expiringLicenses->count() }} Expiring License{{ $expiringLicenses->count() > 1 ? 's' : '' }}</span>
-                        </a>
-                    @endif
-                    @if($brokenDisposal > 0)
-                        <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-100/80 px-3 py-1.5 text-xs font-semibold text-rose-800 shadow-xs hover:bg-rose-200 dark:border-rose-900/60 dark:bg-rose-950/70 dark:text-rose-300 transition">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400"></i>
-                            <span>{{ $brokenDisposal }} Decommission Alert</span>
                         </a>
                     @endif
                 </div>
@@ -85,7 +85,7 @@
     <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <!-- Hero Card (Spans 2 columns on lg) -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between">
                     <div>
@@ -94,16 +94,16 @@
                     </div>
                     <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
                         <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-                        {{ $deploymentRate }}% Deployed
+                        <span class="tabular-nums">{{ $deploymentRate }}%</span> Deployed
                     </span>
                 </div>
 
                 <div class="mt-4 flex flex-wrap items-baseline gap-3">
-                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ number_format($totalAssets) }}</span>
+                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl tabular-nums">{{ number_format($totalAssets) }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">total units cataloged</span>
                     @if($totalBookValue > 0)
                         <span class="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
-                            Book Value: <strong class="text-gray-900 dark:text-white">Rp {{ number_format($totalBookValue, 0, ',', '.') }}</strong>
+                            Book Value: <strong class="text-gray-900 dark:text-white font-mono tabular-nums">Rp {{ number_format($totalBookValue, 0, ',', '.') }}</strong>
                         </span>
                     @endif
                 </div>
@@ -117,35 +117,35 @@
                 @endphp
                 <div class="mt-4">
                     <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                        <div style="width: {{ $deployedPct }}%" class="bg-brand-500 transition-all duration-500" title="Deployed: {{ $deployed }} ({{ $deployedPct }}%)"></div>
-                        <div style="width: {{ $readyPct }}%" class="bg-emerald-500 transition-all duration-500" title="Ready: {{ $readyToDeploy }} ({{ $readyPct }}%)"></div>
-                        <div style="width: {{ $servicePct }}%" class="bg-amber-500 transition-all duration-500" title="In Service: {{ $service }} ({{ $servicePct }}%)"></div>
-                        <div style="width: {{ $brokenPct }}%" class="bg-red-500 transition-all duration-500" title="Broken / Scrap: {{ $brokenDisposal }} ({{ $brokenPct }}%)"></div>
+                        <div style="width: {{ $deployedPct }}%" class="bg-brand-500 transition-all duration-300" title="Deployed: {{ $deployed }} ({{ $deployedPct }}%)"></div>
+                        <div style="width: {{ $readyPct }}%" class="bg-emerald-500 transition-all duration-300" title="Ready: {{ $readyToDeploy }} ({{ $readyPct }}%)"></div>
+                        <div style="width: {{ $servicePct }}%" class="bg-amber-500 transition-all duration-300" title="In Service: {{ $service }} ({{ $servicePct }}%)"></div>
+                        <div style="width: {{ $brokenPct }}%" class="bg-red-500 transition-all duration-300" title="Broken / Scrap: {{ $brokenDisposal }} ({{ $brokenPct }}%)"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Segmented Indicators Legend -->
             <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
-                <a href="{{ route('assets.index', ['status_id' => $deployedStatusId]) }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition">
+                <a href="{{ route('assets.index', ['status_id' => $deployedStatusId]) }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-brand-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Deployed</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $deployed }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $deployed }}</strong>
                 </a>
-                <a href="{{ route('assets.index', ['status_id' => $readyStatusId]) }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition">
+                <a href="{{ route('assets.index', ['status_id' => $readyStatusId]) }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Ready</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $readyToDeploy }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $readyToDeploy }}</strong>
                 </a>
-                <a href="{{ route('assets.index', ['status_id' => $serviceStatusId]) }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition">
+                <a href="{{ route('assets.index', ['status_id' => $serviceStatusId]) }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Service</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $service }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $service }}</strong>
                 </a>
-                <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="group flex items-center gap-1.5 hover:text-red-600 transition">
+                <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="group flex items-center gap-1.5 hover:text-red-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-red-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Broken</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $brokenDisposal }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $brokenDisposal }}</strong>
                 </a>
             </div>
         </div>
@@ -240,7 +240,7 @@
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
         <!-- Chart 1: Status Distribution (ChartPieLegend Style) -->
-        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between"
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between h-full"
              x-data="{ activeStatusCat: 'all', categoryLabel: 'All Categories', updateStatusChart(catId, label) { this.activeStatusCat = catId; this.categoryLabel = label; if (window.updateStatusChartJS) { window.updateStatusChartJS(catId); } } }">
             <div class="flex items-center justify-between gap-3 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
@@ -248,7 +248,7 @@
                     <p class="text-xs text-gray-400">Availability ratio</p>
                 </div>
                 <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
-                    <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-all duration-150 ease-out">
+                    <button @click="dropdownOpen = !dropdownOpen" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-colors">
                         <span x-text="categoryLabel">All Categories</span>
                         <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
                     </button>
@@ -269,7 +269,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-4 p-5">
+            <div class="flex flex-col gap-4 p-5 flex-1 justify-between">
                 <div class="flex justify-center">
                     @if($totalAssets > 0)
                         <div id="assetStatusChart" class="h-48 w-full flex items-center justify-center"></div>
@@ -278,7 +278,7 @@
                     @endif
                 </div>
 
-                <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs max-h-24 overflow-y-auto">
                     @foreach($chartData['labels'] as $index => $label)
                         @php
                             $count = $chartData['data'][$index] ?? 0;
@@ -287,7 +287,7 @@
                         <div class="flex items-center gap-1.5 shrink-0">
                             <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
                             <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
-                            <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                            <span class="font-bold text-gray-900 dark:text-white tabular-nums">({{ number_format($count) }})</span>
                         </div>
                     @endforeach
                 </div>
@@ -295,7 +295,7 @@
         </div>
 
         <!-- Chart 2: Department Distribution (ChartPieLegend Style) -->
-        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between"
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between h-full"
              x-data="{ activeDeptCat: 'all', categoryLabel: 'All Categories', updateDeptChart(catId, label) { this.activeDeptCat = catId; this.categoryLabel = label; if (window.updateDeptChartJS) { window.updateDeptChartJS(catId); } } }">
             <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
@@ -305,7 +305,7 @@
                 <a href="{{ route('departments.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
 
-            <div class="flex flex-col gap-4 p-5">
+            <div class="flex flex-col gap-4 p-5 flex-1 justify-between">
                 <div class="flex justify-center">
                     @if(count($deptChartData['data']) > 0)
                         <div id="deptAssetChart" class="h-48 w-full flex items-center justify-center"></div>
@@ -318,7 +318,7 @@
                     @php
                         $deptColorsList = $deptChartData['colors'] ?? ['#465fff', '#12b76a', '#f79009', '#8b5cf6', '#06b6d4', '#ec4899', '#f43f5e', '#14b8a6', '#6366f1', '#d97706'];
                     @endphp
-                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs max-h-24 overflow-y-auto">
                         @foreach($deptChartData['labels'] as $index => $label)
                             @php
                                 $count = $deptChartData['data'][$index] ?? 0;
@@ -327,7 +327,7 @@
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
                                 <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
-                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                                <span class="font-bold text-gray-900 dark:text-white tabular-nums">({{ number_format($count) }})</span>
                             </div>
                         @endforeach
                     </div>
@@ -336,7 +336,7 @@
         </div>
 
         <!-- Chart 3: Component Allocation Doughnut Chart (ChartPieLegend Style) -->
-        <div class="rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between">
+        <div class="rounded-xl border border-gray-200/80 bg-white shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800/80 dark:bg-gray-900 flex flex-col justify-between h-full">
             <div class="flex items-center justify-between gap-5 p-5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Components Allocation</h3>
@@ -345,7 +345,7 @@
                 <a href="{{ route('components.index') }}" class="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400">View All</a>
             </div>
 
-            <div class="flex flex-col gap-4 p-5">
+            <div class="flex flex-col gap-4 p-5 flex-1 justify-between">
                 <div class="flex justify-center">
                     @if(($totalComponentUnits ?? 0) > 0)
                         <div id="componentPieChart" class="h-48 w-full flex items-center justify-center"></div>
@@ -355,7 +355,7 @@
                 </div>
 
                 @if(isset($componentChartData['labels']) && count($componentChartData['labels']) > 0)
-                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs">
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs max-h-24 overflow-y-auto">
                         @foreach($componentChartData['labels'] as $index => $label)
                             @php
                                 $count = $componentChartData['data'][$index] ?? 0;
@@ -364,7 +364,7 @@
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
                                 <span class="font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
-                                <span class="font-bold text-gray-900 dark:text-white">({{ number_format($count) }})</span>
+                                <span class="font-bold text-gray-900 dark:text-white tabular-nums">({{ number_format($count) }})</span>
                             </div>
                         @endforeach
                     </div>
@@ -374,10 +374,10 @@
 
     </div>
 
-    <!-- Main Grid: Row 2 - Dedicated Bar Chart Row (Same dimension & width as Status Breakdown) -->
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <!-- Main Grid: Row 2 - Dedicated Bar Chart Row (Clean Balanced 2-Column Grid) -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Chart 1: Hardware Lifecycle & Age -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hardware Lifecycle & Age</h3>
@@ -392,7 +392,7 @@
         </div>
 
         <!-- Chart 2: Top Hardware Vendors by Volume -->
-        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all duration-200 ease-out hover:border-brand-500/30 hover:shadow-md dark:border-gray-800/80 dark:bg-gray-900">
+        <div class="rounded-xl border border-gray-200/80 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800/80 dark:bg-gray-900">
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Top Hardware Vendors</h3>
@@ -411,7 +411,7 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         
         <!-- Hub 1: Fleet Operations & Service Hub (Checkouts vs Maintenance) -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-xs dark:border-gray-800 dark:bg-gray-900"
              x-data="{
                 activeTab: 'checkouts',
                 timeframe: '30days',
@@ -434,26 +434,25 @@
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Activity Hub</span>
                     </div>
-                    <div class="flex items-center gap-1 mt-1">
+                    <nav class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-950 mt-1">
                         <button type="button" @click="switchTab('checkouts')"
-                            :class="activeTab === 'checkouts' ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
-                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            :class="activeTab === 'checkouts' ? 'bg-white text-gray-900 shadow-xs dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-md px-3 py-1.5 text-xs transition-colors">
                             Checkouts & Returns
                         </button>
-                        <span class="text-gray-300 dark:text-gray-700">|</span>
                         <button type="button" @click="switchTab('maintenance')"
-                            :class="activeTab === 'maintenance' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
-                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            :class="activeTab === 'maintenance' ? 'bg-white text-gray-900 shadow-xs dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-md px-3 py-1.5 text-xs transition-colors">
                             Maintenance & Service
                         </button>
-                    </div>
+                    </nav>
                 </div>
 
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-950 border border-gray-200/50 dark:border-gray-800">
-                    <button type="button" @click="setTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">12m</button>
-                    <button type="button" @click="setTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">30d</button>
-                    <button type="button" @click="setTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">7d</button>
-                    <button type="button" @click="setTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">24h</button>
+                <div class="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-950 border border-gray-200/60 dark:border-gray-800">
+                    <button type="button" @click="setTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">12m</button>
+                    <button type="button" @click="setTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">30d</button>
+                    <button type="button" @click="setTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">7d</button>
+                    <button type="button" @click="setTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">24h</button>
                 </div>
             </div>
 
@@ -475,7 +474,7 @@
         </div>
 
         <!-- Hub 2: Resources & Acquisition Hub (Purchases vs Consumables) -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-xs dark:border-gray-800 dark:bg-gray-900"
              x-data="{
                 activeTab: 'purchases',
                 timeframe: '30days',
@@ -498,26 +497,25 @@
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Inflow & Usage</span>
                     </div>
-                    <div class="flex items-center gap-1 mt-1">
+                    <nav class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-950 mt-1">
                         <button type="button" @click="switchTab('purchases')"
-                            :class="activeTab === 'purchases' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
-                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            :class="activeTab === 'purchases' ? 'bg-white text-gray-900 shadow-xs dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-md px-3 py-1.5 text-xs transition-colors">
                             Asset Acquisitions
                         </button>
-                        <span class="text-gray-300 dark:text-gray-700">|</span>
                         <button type="button" @click="switchTab('consumables')"
-                            :class="activeTab === 'consumables' ? 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300 font-bold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
-                            class="rounded-lg px-2.5 py-1 text-sm font-semibold transition">
+                            :class="activeTab === 'consumables' ? 'bg-white text-gray-900 shadow-xs dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'"
+                            class="rounded-md px-3 py-1.5 text-xs transition-colors">
                             Consumable Distribution
                         </button>
-                    </div>
+                    </nav>
                 </div>
 
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-950 border border-gray-200/50 dark:border-gray-800">
-                    <button type="button" @click="setTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">12m</button>
-                    <button type="button" @click="setTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">30d</button>
-                    <button type="button" @click="setTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">7d</button>
-                    <button type="button" @click="setTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2 py-1 transition-all">24h</button>
+                <div class="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-950 border border-gray-200/60 dark:border-gray-800">
+                    <button type="button" @click="setTimeframe('12months')" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">12m</button>
+                    <button type="button" @click="setTimeframe('30days')" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">30d</button>
+                    <button type="button" @click="setTimeframe('7days')" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">7d</button>
+                    <button type="button" @click="setTimeframe('24hours')" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">24h</button>
                 </div>
             </div>
 
@@ -566,17 +564,16 @@
                             @php
                                 $stName = optional(optional($checkout->asset)->status)->name ?? 'Deployed';
                                 $stColor = optional(optional($checkout->asset)->status)->color ?? 'primary';
-                                $stIcon = optional(optional($checkout->asset)->status)->icon ?? 'user-check';
                             @endphp
-                            <div class="flex flex-col gap-1 items-start">
-                                <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <x-ui.badge :color="$stColor" variant="light" size="sm">{{ $stName }}</x-ui.badge>
                                 @if($checkout->isOverdue())
-                                    <span class="inline-flex items-center gap-1 rounded-md bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+                                    <span class="inline-flex items-center gap-1 rounded-md bg-red-50 border border-red-200/80 px-1.5 py-0.5 text-[9px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50">
                                         <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
                                         Overdue ({{ $checkout->overdueDays() }}d)
                                     </span>
                                 @elseif($checkout->expected_return_date)
-                                    <span class="inline-flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400">
+                                    <span class="inline-flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400 font-medium">
                                         Due {{ $checkout->expected_return_date->format('d M') }}
                                     </span>
                                 @endif
@@ -586,7 +583,7 @@
                             <span class="block text-gray-700 dark:text-gray-300 font-medium">{{ $checkout->checkedOutToUser->name ?? 'N/A' }}</span>
                             <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($checkout->checkedOutToUser)->department)->name ?? '-' }}</span>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $checkout->checked_out_at->format('M d, H:i') }}</td>
+                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">{{ $checkout->checked_out_at->format('M d, H:i') }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No recent asset checkouts</td></tr>
@@ -595,7 +592,7 @@
         </div>
 
         <!-- Aging Assets Table -->
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div class="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Aging Assets (4+ Years)"
                 description="Hardware reaching end-of-life cycle"
@@ -618,9 +615,8 @@
                             @php
                                 $stName = optional($asset->status)->name ?? 'Aged';
                                 $stColor = optional($asset->status)->color ?? 'warning';
-                                $stIcon = optional($asset->status)->icon ?? 'clock';
                             @endphp
-                            <x-ui.badge :color="$stColor" variant="light" size="sm" :featherIcon="$stIcon">{{ $stName }}</x-ui.badge>
+                            <x-ui.badge :color="$stColor" variant="light" size="sm">{{ $stName }}</x-ui.badge>
                         </td>
                         <td class="px-4 py-2.5">
                             @php
