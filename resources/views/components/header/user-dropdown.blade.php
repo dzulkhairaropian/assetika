@@ -9,26 +9,20 @@
 }" @click.away="closeDropdown()">
     <!-- User Button -->
     <button
-        class="flex items-center text-gray-700 dark:text-gray-400 active:scale-[0.98] transition-all"
+        class="flex items-center gap-2 rounded-full p-0.5 sm:p-1 sm:pr-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 active:scale-[0.98] transition-colors"
         @click.prevent="toggleDropdown()"
         type="button"
     >
-        <span class="mr-3 overflow-hidden rounded-full h-11 w-11 shrink-0">
+        <span class="overflow-hidden rounded-full h-9 w-9 shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
             <img src="{{ auth()->user()->avatar ?? '/images/avatars/avatar-boy.jpg' }}" alt="User" class="h-full w-full object-cover" />
         </span>
 
-        <span class="block mr-1 font-medium text-theme-sm text-gray-800 dark:text-gray-200 truncate max-w-[140px]">{{ auth()->user()->name }}</span>
+        <div class="hidden md:flex flex-col text-left">
+            <span class="text-xs font-semibold text-gray-900 dark:text-white truncate max-w-[130px] leading-tight">{{ auth()->user()->name }}</span>
+            <span class="text-[10px] text-gray-400 truncate max-w-[130px] capitalize">{{ str_replace('_', ' ', auth()->user()->roles->first()?->name ?? 'User') }}</span>
+        </div>
 
-        <!-- Chevron Icon -->
-        <svg
-            class="w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-200"
-            :class="{ 'rotate-180': dropdownOpen }"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
+        <i data-lucide="chevron-down" class="hidden md:block w-3.5 h-3.5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }"></i>
     </button>
 
     <!-- Dropdown Start -->

@@ -419,8 +419,21 @@
                                 $isAged = $asset->isDueForReplacement();
                                 $ageYears = $asset->age_years;
                                 $startDate = $asset->release_date ?? $asset->purchase_date;
+
+                                $statusSlug = strtolower($statusName);
+                                if (in_array($statusSlug, ['broken'])) {
+                                    $rowBg = 'bg-red-50/40 dark:bg-red-500/5 hover:bg-red-100/40 dark:hover:bg-red-500/10';
+                                } elseif (in_array($statusSlug, ['service', 'maintenance', 'in repair'])) {
+                                    $rowBg = 'bg-amber-50/40 dark:bg-amber-500/5 hover:bg-amber-100/40 dark:hover:bg-amber-500/10';
+                                } elseif (in_array($statusSlug, ['ready to deploy', 'ready'])) {
+                                    $rowBg = 'bg-emerald-50/30 dark:bg-emerald-500/5 hover:bg-emerald-100/30 dark:hover:bg-emerald-500/10';
+                                } elseif (in_array($statusSlug, ['retired', 'disposal'])) {
+                                    $rowBg = 'bg-gray-50/60 dark:bg-gray-800/20 hover:bg-gray-100/50 dark:hover:bg-gray-800/40';
+                                } else {
+                                    $rowBg = 'hover:bg-gray-50/80 dark:hover:bg-white/[0.02]';
+                                }
                             @endphp
-                            <tr class="transition-colors duration-150 hover:bg-gray-50/80 dark:hover:bg-white/[0.02]">
+                            <tr class="transition-colors duration-150 {{ $rowBg }}">
                                 <td class="px-4 py-2.5">
                                     <label class="flex cursor-pointer items-center select-none">
                                         <div class="relative">

@@ -17,23 +17,24 @@
 }" @click.away="closeDropdown()">
     <!-- Notification Button -->
     <button
-        class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white h-11 w-11 transition-colors active:scale-95 shrink-0"
+        class="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white h-10 w-10 transition-colors active:scale-95 shrink-0"
         @click="toggleDropdown()"
         type="button"
         aria-label="Notifications"
     >
-        <!-- Notification Badge -->
-        <span
-            x-show="notifying"
-            class="absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-brand-500"
-        >
+        @if($unreadCount > 0)
+            <span class="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-500 px-1 text-[9px] font-bold text-white shadow-xs">
+                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+            </span>
+        @elseif($unreadCount === 0)
             <span
-                class="absolute inline-flex w-full h-full bg-brand-500 rounded-full opacity-75 -z-1 animate-ping"
+                x-show="notifying"
+                class="absolute top-0.5 right-0.5 z-1 h-2 w-2 rounded-full bg-brand-500"
             ></span>
-        </span>
+        @endif
 
         <!-- Bell Icon -->
-        <i data-lucide="bell" class="w-5 h-5"></i>
+        <i data-lucide="bell" class="w-4.5 h-4.5"></i>
     </button>
 
     <!-- Dropdown Start -->
@@ -45,7 +46,7 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
-        class="absolute -right-[240px] sm:right-0 mt-2 flex h-[420px] w-[340px] sm:w-[360px] origin-top-right flex-col rounded-xl border border-gray-200/90 bg-white p-3 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50"
+        class="absolute right-0 mt-2 flex h-[420px] w-[320px] sm:w-[360px] origin-top-right flex-col rounded-xl border border-gray-200/90 bg-white p-3 shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50"
         style="display: none;"
     >
         <!-- Dropdown Header -->
