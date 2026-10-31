@@ -481,7 +481,7 @@ class Asset extends Model
             $deviceType = null;
         }
 
-        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $isSqlite = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite';
 
         $query->where(function ($q) use ($isSqlite, $deviceType) {
             $q->whereHas('product.category', function ($catQuery) use ($isSqlite, $deviceType) {
