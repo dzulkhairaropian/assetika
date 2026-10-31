@@ -61,8 +61,8 @@ test('dashboard_loads_with_bento_fleet_metrics_and_action_center', function () {
 
     $response->assertOk();
     $response->assertSee('Fleet Inventory & Deployment', false);
-    $response->assertSee('Action Required');
-    $response->assertSee('Overdue Loan');
+    $response->assertSee('Active Loans');
+    $response->assertSee('overdue loan');
     $response->assertSee('Checkouts & Returns', false);
     $response->assertSee('Maintenance & Service', false);
 });

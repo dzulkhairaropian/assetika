@@ -22,66 +22,6 @@
         </div>
     </div>
 
-    <!-- Critical Attention Center -->
-    @php
-        $hasAlerts = ($overdueLoansCount ?? 0) > 0 || $lowStockConsumables->count() > 0 || $brokenDisposal > 0 || ($expiringWarrantiesCount ?? 0) > 0 || ($expiringLicenses ?? collect())->count() > 0;
-    @endphp
-
-    @if($hasAlerts)
-        <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs dark:border-gray-800 dark:bg-gray-900">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-                    </span>
-                    <div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring operational attention</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    @if(($overdueLoansCount ?? 0) > 0)
-                        <a href="{{ route('asset-transactions.index', ['tab' => 'overdue']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300 transition-colors">
-                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
-                            <span>{{ $overdueLoansCount }} Overdue Loan{{ $overdueLoansCount > 1 ? 's' : '' }}</span>
-                        </a>
-                    @endif
-                    @if($brokenDisposal > 0)
-                        <a href="{{ route('assets.index', ['status_id' => $brokenStatusId]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300 transition-colors">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
-                            <span>{{ $brokenDisposal }} Decommission Alert</span>
-                        </a>
-                    @endif
-                    @if($lowStockConsumables->count() > 0)
-                        <a href="{{ route('consumables.index', ['status' => 'low_stock']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300 transition-colors">
-                            <i data-lucide="package" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
-                            <span>{{ $lowStockConsumables->count() }} Low Stock Consumable{{ $lowStockConsumables->count() > 1 ? 's' : '' }}</span>
-                        </a>
-                    @endif
-                    @if($assetsOlderThan4Years->count() > 0)
-                        <a href="{{ route('assets.replacements') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300 transition-colors">
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
-                            <span>{{ $assetsOlderThan4Years->count() }} Unit{{ $assetsOlderThan4Years->count() > 1 ? 's' : '' }} Due Refresh</span>
-                        </a>
-                    @endif
-                    @if(($expiringWarrantiesCount ?? 0) > 0)
-                        <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 transition-colors">
-                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-gray-500"></i>
-                            <span>{{ $expiringWarrantiesCount }} Warranty Expiring</span>
-                        </a>
-                    @endif
-                    @if(($expiringLicenses ?? collect())->count() > 0)
-                        <a href="{{ route('licenses.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-300 transition-colors">
-                            <i data-lucide="key" class="w-3.5 h-3.5 text-gray-500"></i>
-                            <span>{{ $expiringLicenses->count() }} Expiring License{{ $expiringLicenses->count() > 1 ? 's' : '' }}</span>
-                        </a>
-                    @endif
-                </div>
-            </div>
-        </div>
-    @endif
-
     <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <!-- Hero Card (Spans 2 columns on lg) -->
