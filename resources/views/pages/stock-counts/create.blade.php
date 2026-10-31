@@ -1,68 +1,106 @@
 @extends('layouts.app')
+
 @section('content')
-<div class="space-y-4">
-    <x-common.page-breadcrumb pageTitle="Create Stock Count" :items="[['label' => 'Stock Audits', 'url' => route('stock-counts.index')]]" />
+    <div class="space-y-6">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <x-common.page-breadcrumb pageTitle="Create Stock Count" :items="[['label' => 'Stock Audits', 'url' => route('stock-counts.index')], ['label' => 'Create']]" />
+                <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    Initialize a physical inventory stock-taking audit session across target warehouses or sites.
+                </p>
+            </div>
+            <a href="{{ route('stock-counts.index') }}"
+               class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                Back to Stock Audits
+            </a>
+        </div>
 
-    <p class="-mt-3 text-xs text-gray-500 dark:text-gray-400">
-        Start a new stock count audit session.
-    </p>
+        @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
+        @if(session('error')) <x-ui.alert variant="error" message="{{ session('error') }}" /> @endif
 
-    @if(session('success')) <x-ui.alert variant="success" message="{{ session('success') }}" /> @endif
+        <form action="{{ route('stock-counts.store') }}" method="POST" class="grid gap-6 xl:grid-cols-[minmax(0,1.75fr)_360px]">
+            @csrf
 
-    <form action="{{ route('stock-counts.store') }}" method="POST" class="grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_340px]">
-        @csrf
-
-        <div class="space-y-4">
-            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-4">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b border-gray-100 pb-2.5 dark:border-gray-800">
-                        <i data-lucide="clipboard" class="w-4 h-4 text-brand-500"></i> Stock Count Information
-                    </h3>
-                    <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-2">
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Session Name <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" value="{{ old('name', 'Stock Count ' . date('F Y')) }}" required
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
+            {{-- Main Form Column --}}
+            <div class="space-y-6">
+                {{-- Card: Stock Count Information --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 md:p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Audit Session Parameters</h3>
+                                <p class="text-[11px] text-gray-400">Session title, audit scope location, and kickoff timeline</p>
+                            </div>
                         </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Target Location</label>
-                            <select name="location_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                                <option value="">All Locations</option>
-                                @foreach($locations as $l)
-                                    <option value="{{ $l->id }}">{{ $l->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Start Date <span class="text-red-500">*</span></label>
-                            <input type="date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}" required
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">
-                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2">
                         <div class="lg:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                            <textarea name="notes" rows="3" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white">{{ old('notes') }}</textarea>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                Audit Session Name <span class="text-error-500">*</span>
+                            </label>
+                            <input type="text" name="name" value="{{ old('name', 'Stock Count ' . date('F Y')) }}" required
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                        </div>
+
+                        <div>
+                            <x-form.searchable-select
+                                name="location_id"
+                                label="Target Location Scope"
+                                :options="[['id' => '', 'text' => 'All Locations / Enterprise-wide'], ...$locations->map(fn($l) => ['id' => $l->id, 'text' => $l->name])->toArray()]"
+                                :selected="old('location_id')"
+                                placeholder="Select Location"
+                            />
+                        </div>
+
+                        <div>
+                            <x-form.date-picker
+                                id="start_date"
+                                name="start_date"
+                                label="Audit Start Date"
+                                placeholder="Select audit date"
+                                defaultDate="{{ old('start_date', date('Y-m-d')) }}"
+                            />
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Scope Notes & Guidelines</label>
+                            <textarea name="notes" rows="3" placeholder="Stock counting instructions, audit teams assigned, or inventory exclusions..."
+                                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">{{ old('notes') }}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="space-y-4">
-            <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    <i data-lucide="save" class="w-4 h-4 text-brand-500"></i>
-                    Actions
-                </h3>
-                <div class="space-y-2.5">
-                    <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">
-                        Start Session
-                    </button>
-                    <a href="{{ route('stock-counts.index') }}" class="inline-flex w-full justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
-                        Cancel
-                    </a>
+            {{-- Right Column: Actions --}}
+            <div class="space-y-6 xl:sticky xl:top-20">
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
+                    <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4 text-brand-500"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Actions</h3>
+                        </div>
+                        <span class="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                            New Audit
+                        </span>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            Start Audit Session
+                        </button>
+
+                        <a href="{{ route('stock-counts.index') }}" class="inline-flex w-full items-center justify-center rounded-lg border border-transparent px-4 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">
+                            Cancel
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 @endsection
