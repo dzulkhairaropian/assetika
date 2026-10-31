@@ -462,30 +462,37 @@
                                 </td>
                                 <td class="px-4 py-2.5 whitespace-nowrap">
                                     <div class="flex flex-col gap-1 items-start">
-                                        <x-ui.badge :color="$statusColor" variant="light" size="sm">{{ $statusName }}</x-ui.badge>
+                                        <x-ui.badge :color="$statusColor" variant="light" size="sm" :lucideIcon="optional($asset->status)->icon">
+                                            {{ $statusName }}
+                                        </x-ui.badge>
                                         @if($isAged)
-                                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 dark:text-amber-400" title="Lifecycle target reached ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y)">
-                                                <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i>
+                                            <x-ui.badge color="warning" variant="light" size="xs" lucideIcon="refresh-cw" title="Lifecycle target reached ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y)">
                                                 Replace ({{ $ageYears }}y)
-                                            </span>
+                                            </x-ui.badge>
                                         @endif
                                         @if($asset->is_components_stripped)
-                                            <span class="text-[10px] text-amber-600 font-medium">Stripped</span>
+                                            <x-ui.badge color="warning" variant="light" size="xs" lucideIcon="cpu">
+                                                Stripped
+                                            </x-ui.badge>
                                         @endif
                                     </div>
                                 </td>
                                 <td class="px-4 py-2.5 whitespace-nowrap">
                                     <div class="flex flex-col font-mono">
-                                        <span class="font-semibold text-gray-900 dark:text-white tabular-nums">
-                                            {{ $asset->purchase_cost ? 'Rp ' . number_format($asset->purchase_cost, 0, ',', '.') : '—' }}
-                                        </span>
-                                        <span class="text-[10px] text-gray-400 tabular-nums">
-                                            @if($asset->depreciation)
-                                                Book: Rp {{ number_format($asset->bookValue, 0, ',', '.') }}
-                                            @else
-                                                Cost only
-                                            @endif
-                                        </span>
+                                        @if($asset->purchase_cost)
+                                            <span class="font-semibold text-gray-900 dark:text-white tabular-nums">
+                                                Rp {{ number_format($asset->purchase_cost, 0, ',', '.') }}
+                                            </span>
+                                            <span class="text-[10px] text-gray-400 tabular-nums">
+                                                @if($asset->depreciation)
+                                                    Book: Rp {{ number_format($asset->bookValue, 0, ',', '.') }}
+                                                @else
+                                                    Cost only
+                                                @endif
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400 font-sans italic">—</span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-4 py-2.5 whitespace-nowrap">

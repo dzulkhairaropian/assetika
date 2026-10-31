@@ -51,21 +51,21 @@
                                 $statusName = optional($asset->status)->name;
                                 $color = optional($asset->status)->color ?? 'gray';
                             @endphp
-                            <x-ui.badge :color="$color" variant="light" size="sm">{{ $statusName }}</x-ui.badge>
+                            <x-ui.badge :color="$color" variant="light" size="sm" :lucideIcon="optional($asset->status)->icon">{{ $statusName }}</x-ui.badge>
                             @if($asset->is_components_stripped)
-                                <x-ui.badge color="warning" variant="light" size="sm">Components Stripped</x-ui.badge>
+                                <x-ui.badge color="warning" variant="light" size="sm" lucideIcon="cpu">Components Stripped</x-ui.badge>
                             @endif
                             @if($yearsOld !== null)
-                                <x-ui.badge :color="$isAged ? 'danger' : 'secondary'" variant="light" size="sm">
+                                <x-ui.badge :color="$isAged ? 'danger' : 'secondary'" variant="light" size="sm" :lucideIcon="$isAged ? 'refresh-cw' : null">
                                     {{ $ageDisplay }}
                                 </x-ui.badge>
                             @endif
                             @if($asset->isOverdue())
-                                <x-ui.badge color="danger" variant="solid" size="sm">
+                                <x-ui.badge color="danger" variant="solid" size="sm" lucideIcon="alert-circle">
                                     Overdue ({{ $asset->currentCheckout->overdueDays() }} Days)
                                 </x-ui.badge>
                             @elseif($asset->currentCheckout?->expected_return_date)
-                                <x-ui.badge color="info" variant="light" size="sm">
+                                <x-ui.badge color="info" variant="light" size="sm" lucideIcon="calendar">
                                     Due {{ $asset->currentCheckout->expected_return_date->format('d M Y') }}
                                 </x-ui.badge>
                             @endif
