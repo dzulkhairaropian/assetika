@@ -396,15 +396,15 @@
                                 </label>
                             </th>
                             <th class="px-4 py-3 text-start">
-                                <x-common.sortable-header column="asset_tag" label="Asset Tag / Name" />
+                                <x-common.sortable-header column="asset_tag" label="Asset Tag / Device" />
                             </th>
                             <th class="px-4 py-3 text-start">
-                                <x-common.sortable-header column="serial_number" label="Product / Serial" />
+                                <x-common.sortable-header column="serial_number" label="Hardware & Serial" />
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Depreciation / Value</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Holder</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Age</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status & Lifecycle</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Purchase & Valuation</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Holder</th>
+                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Age & Acquisition</th>
                             <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="warranty_expiry_date" label="Warranty" />
                             </th>
@@ -414,9 +414,11 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($assets as $asset)
                             @php
-                                $statusName = strtolower(optional($asset->status)->name ?? '');
+                                $statusName = optional($asset->status)->name ?? 'Unknown';
+                                $statusColor = optional($asset->status)->color ?? 'gray';
                                 $isAged = $asset->isDueForReplacement();
                                 $ageYears = $asset->age_years;
+                                $startDate = $asset->release_date ?? $asset->purchase_date;
                             @endphp
                             <tr class="transition-colors duration-150 hover:bg-gray-50/80 dark:hover:bg-white/[0.02]">
                                 <td class="px-4 py-2.5">
@@ -444,18 +446,10 @@
                                         </div>
                                     </label>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     <div class="flex flex-col">
-                                        <div class="flex items-center gap-1.5 flex-wrap">
-                                            <a href="{{ route('assets.show', $asset) }}" class="font-mono font-medium tracking-tight text-brand-500 hover:text-brand-600 hover:underline">{{ $asset->asset_tag }}</a>
-                                            @if($isAged)
-                                                <span class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40" title="Lifecycle Exceeded ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y) - Replacement Recommended">
-                                                    <i data-lucide="refresh-cw" class="w-2.5 h-2.5 text-amber-600 dark:text-amber-400"></i>
-                                                    {{ $ageYears }}y • Replace
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <span class="text-[11px] text-gray-400 dark:text-gray-500">{{ $asset->device_name ?? 'Unnamed Device' }}</span>
+                                        <a href="{{ route('assets.show', $asset) }}" class="font-mono font-semibold tracking-tight text-brand-600 hover:text-brand-700 hover:underline dark:text-brand-400">{{ $asset->asset_tag }}</a>
+                                        <span class="text-[11px] font-mono text-gray-400 dark:text-gray-500">{{ $asset->device_name ?? 'Unnamed Device' }}</span>
                                     </div>
                                 </td>
                                 <td class="px-4 py-2.5">
@@ -466,91 +460,78 @@
                                         <span class="font-mono text-[11px] tracking-tight text-gray-400">S/N: {{ $asset->serial_number ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5">
-                                    @php
-                                        $statusName = optional($asset->status)->name;
-                                        $statusColor = optional($asset->status)->color;
-                                    @endphp
-                                    <x-ui.badge :color="$statusColor" variant="light" size="sm">{{ $statusName }}</x-ui.badge>
-                                    @if($asset->is_components_stripped)
-                                        <div class="mt-1">
-                                            <x-ui.badge color="warning" variant="light" size="sm">Components Stripped</x-ui.badge>
-                                        </div>
-                                    @endif
-                                    @if(in_array($statusName, ['Sold', 'For Sale']))
-                                        <div class="mt-1 flex flex-col text-[11px] text-gray-500 dark:text-gray-400">
-                                            @if($asset->sale_price)
-                                                <span class="font-medium text-emerald-600 dark:text-emerald-400 tabular-nums">Sale: Rp {{ number_format($asset->sale_price, 0, ',', '.') }}</span>
-                                            @endif
-                                            @if($asset->buyer_name)
-                                                <span>Buyer: {{ $asset->buyer_name }}</span>
-                                            @endif
-                                            @if($asset->sale_date)
-                                                <span class="tabular-nums">Date: {{ $asset->sale_date->format('d/m/Y') }}</span>
-                                            @endif
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2.5">
-                                    <div class="flex flex-col">
-                                        @if($asset->depreciation)
-                                            <span class="font-medium {{ $asset->bookValue == 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
-                                                Rp {{ number_format($asset->bookValue, 0, ',', '.') }}
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex flex-col gap-1 items-start">
+                                        <x-ui.badge :color="$statusColor" variant="light" size="sm">{{ $statusName }}</x-ui.badge>
+                                        @if($isAged)
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 dark:text-amber-400" title="Lifecycle target reached ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y)">
+                                                <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i>
+                                                Replace ({{ $ageYears }}y)
                                             </span>
-                                            @if($asset->bookValue == 0)
-                                                <span class="inline-flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
-                                                    Fully Depreciated
-                                                </span>
-                                            @else
-                                                <span class="text-[10px] text-gray-400">
-                                                    {{ $asset->depreciation->name }}
-                                                </span>
-                                            @endif
-                                        @else
-                                            <span class="text-[11px] text-gray-400 italic">No Depr. Profile</span>
+                                        @endif
+                                        @if($asset->is_components_stripped)
+                                            <span class="text-[10px] text-amber-600 font-medium">Stripped</span>
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5">
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex flex-col font-mono">
+                                        <span class="font-semibold text-gray-900 dark:text-white tabular-nums">
+                                            {{ $asset->purchase_cost ? 'Rp ' . number_format($asset->purchase_cost, 0, ',', '.') : '—' }}
+                                        </span>
+                                        <span class="text-[10px] text-gray-400 tabular-nums">
+                                            @if($asset->depreciation)
+                                                Book: Rp {{ number_format($asset->bookValue, 0, ',', '.') }}
+                                            @else
+                                                Cost only
+                                            @endif
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($asset->isCurrentlyCheckedOut())
-                                        <div class="flex flex-col">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="font-medium text-gray-800 dark:text-gray-200">
-                                                    {{ $asset->currentCheckout->checkedOutToUser->name ?? '-' }}
-                                                </span>
-                                                @if($asset->isOverdue())
-                                                    <span class="inline-flex items-center rounded-md bg-red-50 px-1.5 py-0.5 text-[9px] font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/60 dark:border-red-800/40">
-                                                        Overdue ({{ $asset->currentCheckout->overdueDays() }}d)
-                                                    </span>
-                                                @elseif($asset->currentCheckout->expected_return_date)
-                                                    <span class="inline-flex items-center rounded-md bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/40">
-                                                        Due {{ $asset->currentCheckout->expected_return_date->format('d M') }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">
-                                                {{ $asset->currentCheckout->checkedOutToUser->department->name ?? '-' }}
+                                        @php $holderName = $asset->currentCheckout->checkedOutToUser->name ?? '-'; @endphp
+                                        <div class="flex items-center gap-2">
+                                            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                                {{ strtoupper(substr($holderName, 0, 1)) }}
                                             </span>
+                                            <div class="flex flex-col min-w-0">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="font-medium text-gray-900 dark:text-white truncate max-w-[140px]">{{ $holderName }}</span>
+                                                    @if($asset->isOverdue())
+                                                        <span class="inline-flex items-center rounded bg-red-100 px-1 py-0.2 text-[9px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+                                                            Overdue
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <span class="text-[10px] text-gray-400 truncate max-w-[140px]">
+                                                    {{ $asset->currentCheckout->checkedOutToUser->department->name ?? '-' }}
+                                                </span>
+                                            </div>
                                         </div>
                                     @else
-                                        <div class="flex flex-col">
-                                            <span class="text-gray-400 italic">Not Assigned</span>
-                                            @if($asset->lastCheckout && $asset->lastCheckout->checkedOutToUser)
-                                                <span class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                                                    Prev: {{ $asset->lastCheckout->checkedOutToUser->name }}
-                                                </span>
-                                            @endif
+                                        <div class="flex items-center gap-2">
+                                            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-50 text-[10px] text-gray-400 dark:bg-gray-800/40">
+                                                —
+                                            </span>
+                                            <div class="flex flex-col">
+                                                <span class="text-xs text-gray-400 italic">Not Assigned</span>
+                                                @if($asset->lastCheckout && $asset->lastCheckout->checkedOutToUser)
+                                                    <span class="text-[10px] text-gray-400">Prev: {{ $asset->lastCheckout->checkedOutToUser->name }}</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2.5">
-                                    @if($ageYears !== null)
-                                        <span class="font-semibold {{ $ageYears >= 4 ? 'text-red-600 dark:text-red-400' : ($ageYears >= 2 ? 'text-orange-600 dark:text-orange-400' : 'text-emerald-600 dark:text-emerald-400') }}">
-                                            {{ $ageYears >= 1 ? $ageYears.'y' : '<1y' }} old {{ $ageYears >= 4 ? '(Review)' : '' }}
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900 dark:text-white tabular-nums">
+                                            {{ $ageYears !== null ? $ageYears . ' Years' : '—' }}
                                         </span>
-                                    @else
-                                        <span class="text-gray-400 italic">-</span>
-                                    @endif
+                                        <span class="text-[10px] text-gray-400 tabular-nums">
+                                            {{ $startDate ? $startDate->format('M Y') : 'Unknown' }}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($asset->warranty_expiry_date)
