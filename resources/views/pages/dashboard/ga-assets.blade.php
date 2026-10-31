@@ -4,82 +4,41 @@
 <div class="space-y-6">
 
     <!-- Top Action & Title Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">General Affair & Facilities Dashboard</h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live monitoring of physical assets, vehicle fleet, room reservations, and facility maintenance for {{ $userName }}.</p>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Facilities & Physical Assets</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live monitoring of physical assets, vehicle fleet, room reservations, and facility maintenance.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
+            <a href="{{ route('ga-assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
                 <i data-lucide="plus" class="w-4 h-4"></i> Add GA Asset
             </a>
-            <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
+            <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-colors duration-150">
                 <i data-lucide="briefcase" class="w-4 h-4"></i> Inventory List
             </a>
         </div>
     </div>
 
-    <!-- Critical Attention Center -->
-    @php
-        $gaHasAlerts = ($upcomingVehicleTaxes ?? 0) > 0 || ($pendingMaintenance ?? 0) > 0;
-    @endphp
-
-    @if($gaHasAlerts)
-        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-                    </span>
-                    <div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring GA operational attention</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    @if(($upcomingVehicleTaxes ?? 0) > 0)
-                        <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
-                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
-                            <span>{{ $upcomingVehicleTaxes }} Vehicle Tax Due Soon</span>
-                        </a>
-                    @endif
-                    @if(($pendingMaintenance ?? 0) > 0)
-                        <a href="{{ route('ga-assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
-                            <i data-lucide="wrench" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
-                            <span>{{ $pendingMaintenance }} Pending Maintenance</span>
-                        </a>
-                    @endif
-                </div>
-            </div>
-        </div>
-    @endif
-
     <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <!-- Hero Card (Spans 2 columns on lg) -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">GA Physical Fleet</span>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Facilities & Asset Inventory</h2>
-                    </div>
-                    @php
-                        $gaDeploymentRate = $totalAssets > 0 ? (int) round(($activeAssignments / $totalAssets) * 100) : 0;
-                    @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
-                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-                        {{ $gaDeploymentRate }}% Assigned
-                    </span>
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">GA Physical Fleet</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Facilities & Asset Inventory</h2>
                 </div>
 
+                @php
+                    $gaDeploymentRate = $totalAssets > 0 ? (int) round(($activeAssignments / $totalAssets) * 100) : 0;
+                @endphp
+
                 <div class="mt-4 flex flex-wrap items-baseline gap-3">
-                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ number_format($totalAssets) }}</span>
+                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl tabular-nums">{{ number_format($totalAssets) }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">total physical items</span>
                     @if($totalAssetValue > 0)
                         <span class="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
-                            Capital Value: <strong class="text-gray-900 dark:text-white">Rp {{ number_format($totalAssetValue, 0, ',', '.') }}</strong>
+                            Capital Value: <strong class="text-gray-900 dark:text-white font-mono tabular-nums">Rp {{ number_format($totalAssetValue, 0, ',', '.') }}</strong>
                         </span>
                     @endif
                 </div>
@@ -90,31 +49,35 @@
                     $gaMaintPct = $totalAssets > 0 ? round(($pendingMaintenance / $totalAssets) * 100) : 0;
                     $gaAvailPct = max(0, 100 - $gaAssignedPct - $gaMaintPct);
                 @endphp
-                <div class="mt-4">
+                <div class="mt-5">
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                        <span class="font-medium text-gray-500 dark:text-gray-400">Assignment Rate</span>
+                        <span class="font-semibold text-brand-600 dark:text-brand-400 tabular-nums">{{ $gaDeploymentRate }}% Assigned</span>
+                    </div>
                     <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                        <div style="width: {{ $gaAssignedPct }}%" class="bg-brand-500 transition-all duration-500" title="Assigned: {{ $activeAssignments }} ({{ $gaAssignedPct }}%)"></div>
-                        <div style="width: {{ $gaAvailPct }}%" class="bg-emerald-500 transition-all duration-500" title="Available: {{ max(0, $totalAssets - $activeAssignments - $pendingMaintenance) }} ({{ $gaAvailPct }}%)"></div>
-                        <div style="width: {{ $gaMaintPct }}%" class="bg-amber-500 transition-all duration-500" title="Maintenance: {{ $pendingMaintenance }} ({{ $gaMaintPct }}%)"></div>
+                        <div style="width: {{ $gaAssignedPct }}%" class="bg-brand-500 transition-all duration-300" title="Assigned: {{ $activeAssignments }} ({{ $gaAssignedPct }}%)"></div>
+                        <div style="width: {{ $gaAvailPct }}%" class="bg-emerald-500 transition-all duration-300" title="Available: {{ max(0, $totalAssets - $activeAssignments - $pendingMaintenance) }} ({{ $gaAvailPct }}%)"></div>
+                        <div style="width: {{ $gaMaintPct }}%" class="bg-amber-500 transition-all duration-300" title="Maintenance: {{ $pendingMaintenance }} ({{ $gaMaintPct }}%)"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Segmented Indicators Legend -->
             <div class="mt-4 grid grid-cols-3 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
-                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition">
+                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-brand-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Assigned</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $activeAssignments }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $activeAssignments }}</strong>
                 </a>
-                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition">
+                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Available</span>
-                    <strong class="text-gray-900 dark:text-white">{{ max(0, $totalAssets - $activeAssignments - $pendingMaintenance) }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ max(0, $totalAssets - $activeAssignments - $pendingMaintenance) }}</strong>
                 </a>
-                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition">
+                <a href="{{ route('ga-assets.index') }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Maintenance</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $pendingMaintenance }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $pendingMaintenance }}</strong>
                 </a>
             </div>
         </div>
@@ -132,8 +95,6 @@
             title="Pending Maintenance"
             icon="wrench"
             :value="number_format($pendingMaintenance)"
-            :trend="($pendingMaintenance > 0) ? 1 : 0"
-            :trendColor="($pendingMaintenance > 0) ? 'red' : 'emerald'"
             description="Scheduled repairs & servicing"
             color="warning"
             :url="route('ga-assets.index')"
@@ -155,8 +116,6 @@
             title="Tax Due Alerts"
             icon="alert-triangle"
             :value="number_format($upcomingVehicleTaxes)"
-            :trend="$upcomingVehicleTaxes > 0 ? 1 : 0"
-            :trendColor="$upcomingVehicleTaxes > 0 ? 'red' : 'emerald'"
             description="Vehicle taxes expiring in 30 days"
             color="danger"
             :url="route('ga-assets.index')"
@@ -306,22 +265,30 @@
                         <td class="px-4 py-2.5 font-medium text-gray-700 dark:text-gray-300">
                             {{ $assignment->user->name ?? 'N/A' }}
                         </td>
-                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $assignment->assigned_at ? $assignment->assigned_at->format('M d, Y') : 'N/A' }}</td>
+                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">{{ $assignment->assigned_at ? $assignment->assigned_at->format('M d, Y') : 'N/A' }}</td>
                         <td class="px-4 py-2.5">
                             @if($assignment->returned_at)
-                                <x-ui.badge color="success" variant="light" size="sm" featherIcon="rotate-ccw">Returned</x-ui.badge>
+                                <x-ui.badge color="success" variant="light" size="sm">Returned</x-ui.badge>
                             @else
-                                <x-ui.badge color="primary" variant="light" size="sm" featherIcon="user-check">Active</x-ui.badge>
+                                <x-ui.badge color="primary" variant="light" size="sm">Active</x-ui.badge>
                             @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No recent assignments found</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                <i data-lucide="user-check" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-400">No recent assignments found</p>
+                            <p class="text-[11px] text-gray-400">Physical equipment checkouts will appear here.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div class="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Recent Maintenance Logs"
                 description="Latest scheduled repairs & servicing"
@@ -333,20 +300,28 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition">
                         <td class="px-4 py-2.5">
                             <span class="block font-medium text-gray-900 dark:text-white">{{ $log->asset->name ?? 'Unknown' }}</span>
-                            <span class="block text-[11px] text-gray-400">{{ $log->asset->asset_code ?? 'N/A' }}</span>
+                            <span class="block text-[11px] text-gray-400 font-mono">{{ $log->asset->asset_code ?? 'N/A' }}</span>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $log->scheduled_date ? $log->scheduled_date->format('M d, Y') : 'N/A' }}</td>
-                        <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap">Rp {{ number_format($log->cost, 0, ',', '.') }}</td>
+                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">{{ $log->scheduled_date ? $log->scheduled_date->format('M d, Y') : 'N/A' }}</td>
+                        <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap font-mono tabular-nums">Rp {{ number_format($log->cost, 0, ',', '.') }}</td>
                         <td class="px-4 py-2.5">
                             @if($log->completed_date)
-                                <x-ui.badge color="success" variant="light" size="sm" featherIcon="circle-check">Completed</x-ui.badge>
+                                <x-ui.badge color="success" variant="light" size="sm">Completed</x-ui.badge>
                             @else
-                                <x-ui.badge color="warning" variant="light" size="sm" featherIcon="clock">Scheduled</x-ui.badge>
+                                <x-ui.badge color="warning" variant="light" size="sm">Scheduled</x-ui.badge>
                             @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No maintenance logs found</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                <i data-lucide="wrench" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-800 dark:text-gray-200">No maintenance logs found</p>
+                            <p class="text-[11px] text-gray-400">Scheduled facility and vehicle servicing will be logged here.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>

@@ -4,148 +4,107 @@
 <div class="space-y-6">
 
     <!-- Top Action & Title Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Support & Ticket Operations Center</h1>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Support Operations</h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live tracking of service desk tickets, SLA response times, and staff workload.</p>
         </div>
-	        <div class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
-	            <!-- Filter Options Toggle Button -->
-	            <div class="relative">
-	                <button type="button" @click="filterOpen = !filterOpen"
-	                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-	                    <i data-lucide="filter" class="w-4 h-4 text-gray-500"></i>
-	                    <span>Filter Options</span>
-	                    @if($activeFiltersCount > 0)
-	                        <span class="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white ml-0.5">{{ $activeFiltersCount }}</span>
-	                    @endif
-	                </button>
-
-	                <!-- Filter Options Dropdown Panel -->
-	                <div x-show="filterOpen" @click.away="filterOpen = false"
-                         x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-	                    class="absolute right-0 top-full z-50 mt-2 origin-top-right w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
-	                    style="display: none;">
-	                    <form action="{{ route('ticket-dashboard') }}" method="GET">
-	                        <div class="mb-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2.5">
-	                            <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-white">Filter Options</h4>
-	                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-	                                <i data-lucide="x" class="w-4 h-4"></i>
-	                            </button>
-	                        </div>
-
-	                        <div class="space-y-3 text-left">
-	                            <div>
-	                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
-	                                <select name="status_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-	                                    <option value="">All Statuses</option>
-	                                    @foreach($statuses as $status)
-	                                        <option value="{{ $status->id }}" {{ (string) $filterStatusId === (string) $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-	                                    @endforeach
-	                                </select>
-	                            </div>
-		                            <div>
-		                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
-		                                <select name="priority_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-		                                    <option value="">All Priorities</option>
-		                                    @foreach($priorities as $priority)
-		                                        <option value="{{ $priority->id }}" {{ (string) $filterPriorityId === (string) $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
-		                                    @endforeach
-		                                </select>
-		                            </div>
-		                            <div>
-		                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">ITSM Category</label>
-		                                <select name="category_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
-		                                    <option value="">All Categories</option>
-		                                    @foreach($categories as $category)
-		                                        <option value="{{ $category->id }}" {{ (string) $filterCategoryId === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-		                                    @endforeach
-		                                </select>
-		                            </div>
-		                        </div>
-
-	                        <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-	                            <a href="{{ route('ticket-dashboard') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear All</a>
-	                            <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 active:scale-[0.97] transition-all duration-150">Apply</button>
-	                        </div>
-	                    </form>
-	                </div>
-	            </div>
-
-	            <a href="{{ route('tickets.export', request()->all()) }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
-	                <i data-lucide="download" class="w-4 h-4 text-gray-500"></i> Export
-	            </a>
-	            <a href="{{ route('tickets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
-	                <i data-lucide="plus" class="w-4 h-4"></i> New Ticket
-	            </a>
-	        </div>
-    </div>
-
-    <!-- Critical Attention Center -->
-    @php
-        $ticketHasAlerts = ($unassigned > 0) || ($openTickets > 0);
-    @endphp
-
-    @if($ticketHasAlerts)
-        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-                    </span>
-                    <div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring service desk operational attention</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    @if($unassigned > 0)
-                        <a href="{{ route('tickets.index', ['status' => 'unassigned']) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-100/80 px-3 py-1.5 text-xs font-semibold text-amber-800 shadow-xs hover:bg-amber-200 dark:border-amber-900/60 dark:bg-amber-950/70 dark:text-amber-300 transition">
-                            <i data-lucide="user-x" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
-                            <span>{{ $unassigned }} Unassigned Ticket{{ $unassigned > 1 ? 's' : '' }}</span>
-                        </a>
+        <div class="flex flex-wrap items-center gap-2" x-data="{ filterOpen: false }">
+            <!-- Filter Options Toggle Button -->
+            <div class="relative">
+                <button type="button" @click="filterOpen = !filterOpen"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-colors duration-150">
+                    <i data-lucide="filter" class="w-4 h-4 text-gray-500"></i>
+                    <span>Filter Options</span>
+                    @if($activeFiltersCount > 0)
+                        <span class="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white ml-0.5">{{ $activeFiltersCount }}</span>
                     @endif
-                    @if($openTickets > 0)
-                        <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
-                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
-                            <span>{{ $openTickets }} Active Open Ticket{{ $openTickets > 1 ? 's' : '' }}</span>
-                        </a>
-                    @endif
+                </button>
+
+                <!-- Filter Options Dropdown Panel -->
+                <div x-show="filterOpen" @click.away="filterOpen = false"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute right-0 top-full z-50 mt-2 origin-top-right w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+                    style="display: none;">
+                    <form action="{{ route('ticket-dashboard') }}" method="GET">
+                        <div class="mb-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2.5">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-white">Filter Options</h4>
+                            <button type="button" @click="filterOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-3 text-left">
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
+                                <select name="status_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                    <option value="">All Statuses</option>
+                                    @foreach($statuses as $status)
+                                        <option value="{{ $status->id }}" {{ (string) $filterStatusId === (string) $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Priority</label>
+                                <select name="priority_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                    <option value="">All Priorities</option>
+                                    @foreach($priorities as $priority)
+                                        <option value="{{ $priority->id }}" {{ (string) $filterPriorityId === (string) $priority->id ? 'selected' : '' }}>{{ $priority->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">ITSM Category</label>
+                                <select name="category_id" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ (string) $filterCategoryId === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
+                            <a href="{{ route('ticket-dashboard') }}" class="text-xs font-medium text-gray-500 hover:text-brand-600">Clear All</a>
+                            <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 active:scale-[0.98] transition-colors">Apply</button>
+                        </div>
+                    </form>
                 </div>
             </div>
+
+            <a href="{{ route('tickets.export', request()->all()) }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-colors duration-150">
+                <i data-lucide="download" class="w-4 h-4 text-gray-500"></i> Export
+            </a>
+            <a href="{{ route('tickets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
+                <i data-lucide="plus" class="w-4 h-4"></i> New Ticket
+            </a>
         </div>
-    @endif
+    </div>
 
     <!-- Bento Primary Row: Hero + High Priority Operational KPIs -->
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <!-- Hero Card (Spans 2 columns on lg) -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Support Operations</span>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Ticket Resolution & SLA Velocity</h2>
-                    </div>
-                    @php
-                        $ticketResolutionRate = $totalTickets > 0 ? (int) round(($resolved / $totalTickets) * 100) : 0;
-                    @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
-                        <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-                        {{ $ticketResolutionRate }}% Resolved
-                    </span>
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Support Operations</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Ticket Resolution & SLA Velocity</h2>
                 </div>
 
+                @php
+                    $ticketResolutionRate = $totalTickets > 0 ? (int) round(($resolved / $totalTickets) * 100) : 0;
+                @endphp
+
                 <div class="mt-4 flex flex-wrap items-baseline gap-3">
-                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">{{ number_format($totalTickets) }}</span>
+                    <span class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl tabular-nums">{{ number_format($totalTickets) }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">total support cases</span>
                     <span class="ml-auto text-xs font-medium text-gray-500 dark:text-gray-400">
-                        MTTR: <strong class="text-gray-900 dark:text-white">{{ round($avgResolution, 1) }} hrs</strong>
+                        MTTR: <strong class="text-gray-900 dark:text-white tabular-nums">{{ round($avgResolution, 1) }} hrs</strong>
                     </span>
                 </div>
 
@@ -155,54 +114,52 @@
                     $openPct = $totalTickets > 0 ? round(($openTickets / $totalTickets) * 100) : 0;
                     $unassignedPct = $totalTickets > 0 ? round(($unassigned / $totalTickets) * 100) : 0;
                 @endphp
-                <div class="mt-4">
+                <div class="mt-5">
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                        <span class="font-medium text-gray-500 dark:text-gray-400">Resolution Rate</span>
+                        <span class="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{{ $ticketResolutionRate }}% Resolved</span>
+                    </div>
                     <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                        <div style="width: {{ $resolvedPct }}%" class="bg-emerald-500 transition-all duration-500" title="Resolved: {{ $resolved }} ({{ $resolvedPct }}%)"></div>
-                        <div style="width: {{ $openPct }}%" class="bg-brand-500 transition-all duration-500" title="Open: {{ $openTickets }} ({{ $openPct }}%)"></div>
-                        <div style="width: {{ $unassignedPct }}%" class="bg-amber-500 transition-all duration-500" title="Unassigned: {{ $unassigned }} ({{ $unassignedPct }}%)"></div>
+                        <div style="width: {{ $resolvedPct }}%" class="bg-emerald-500 transition-all duration-300" title="Resolved: {{ $resolved }} ({{ $resolvedPct }}%)"></div>
+                        <div style="width: {{ $openPct }}%" class="bg-brand-500 transition-all duration-300" title="Open: {{ $openTickets }} ({{ $openPct }}%)"></div>
+                        <div style="width: {{ $unassignedPct }}%" class="bg-amber-500 transition-all duration-300" title="Unassigned: {{ $unassigned }} ({{ $unassignedPct }}%)"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Segmented Indicators Legend -->
             <div class="mt-4 grid grid-cols-3 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
-                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition">
+                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-emerald-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Resolved</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $resolved }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $resolved }}</strong>
                 </a>
-                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition">
+                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-brand-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-brand-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Open</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $openTickets }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $openTickets }}</strong>
                 </a>
-                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition">
+                <a href="{{ route('tickets.index') }}" class="group flex items-center gap-1.5 hover:text-amber-600 transition-colors">
                     <span class="h-2 w-2 rounded-full bg-amber-500"></span>
                     <span class="text-gray-500 dark:text-gray-400">Unassigned</span>
-                    <strong class="text-gray-900 dark:text-white">{{ $unassigned }}</strong>
+                    <strong class="text-gray-900 dark:text-white tabular-nums">{{ $unassigned }}</strong>
                 </a>
             </div>
         </div>
 
-        @php $openTicketsTrendColor = $openTicketsTrend <= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="Open Tickets"
             icon="alert-circle"
             :value="$openTickets"
-            :trend="$openTicketsTrend"
-            :trendColor="$openTicketsTrendColor"
             description="Active tickets needing resolution"
             color="danger"
             :url="route('tickets.index')"
         />
 
-        @php $resolvedTrendColor = $resolvedTrend >= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="Resolved Tickets"
             icon="circle-check"
             :value="$resolved"
-            :trend="$resolvedTrend"
-            :trendColor="$resolvedTrendColor"
             description="Closed tickets this period"
             color="success"
             :url="route('tickets.index')"
@@ -211,13 +168,10 @@
 
     <!-- Secondary Operational KPI Row (Clean 4-column symmetry) -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @php $unassignedTrendColor = $unassignedTrend <= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="Unassigned Tickets"
             icon="user-x"
             :value="$unassigned"
-            :trend="$unassignedTrend"
-            :trendColor="$unassignedTrendColor"
             description="Awaiting staff allocation"
             color="warning"
             :url="route('tickets.index')"
@@ -256,17 +210,17 @@
 
     <!-- 3. Ticket Analytics & Conversion Funnel Grid -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-xs dark:border-gray-800 dark:bg-gray-900" x-data="{ timeframe: '30days' }">
             <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Ticket Volume Trend</h3>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Visitor analytics of last 30 days</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">Tickets created and resolved over time</span>
                 </div>
-                <div class="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800">
-                    <button @click="timeframe = '12months'" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">12 months</button>
-                    <button @click="timeframe = '30days'" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">30 days</button>
-                    <button @click="timeframe = '7days'" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">7 days</button>
-                    <button @click="timeframe = '24hours'" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-medium' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md px-2.5 py-1.5 font-normal transition-all">24 hours</button>
+                <div class="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-950 border border-gray-200/60 dark:border-gray-800">
+                    <button @click="timeframe = '12months'" :class="timeframe === '12months' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">12m</button>
+                    <button @click="timeframe = '30days'" :class="timeframe === '30days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">30d</button>
+                    <button @click="timeframe = '7days'" :class="timeframe === '7days' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">7d</button>
+                    <button @click="timeframe = '24hours'" :class="timeframe === '24hours' ? 'shadow-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-semibold' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'" class="text-xs rounded-md h-7 px-2.5 transition-colors">24h</button>
                 </div>
             </div>
             <div id="ticketTrendChart" class="h-64"></div>
@@ -505,7 +459,6 @@
                         <x-ui.badge 
                             size="sm" 
                             :color="$ticket->priority?->color ?? 'secondary'"
-                            :featherIcon="$ticket->priority?->icon ?: 'alert-circle'"
                         >
                             {{ $ticket->priority?->name ?? '-' }}
                         </x-ui.badge>
@@ -514,7 +467,6 @@
                         <x-ui.badge 
                             size="sm" 
                             :color="$ticket->status?->color ?? 'primary'"
-                            :featherIcon="$ticket->status?->icon ?: 'disc'"
                         >
                             {{ $ticket->status?->name ?? '-' }}
                         </x-ui.badge>
@@ -531,12 +483,20 @@
                             @endif
                         </div>
                     </td>
-                    <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                    <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">
                         {{ $ticket->created_at->format('M d, H:i') }}
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="8" class="px-4 py-6 text-center text-xs text-gray-400">No support tickets found</td></tr>
+                <tr>
+                    <td colspan="8" class="px-4 py-8 text-center">
+                        <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                            <i data-lucide="ticket" class="h-4 w-4"></i>
+                        </div>
+                        <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-400">No support tickets found</p>
+                        <p class="text-[11px] text-gray-400">New support requests and incidents will appear here.</p>
+                    </td>
+                </tr>
             @endforelse
         </x-common.dashboard-table>
     </div>

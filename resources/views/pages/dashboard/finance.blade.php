@@ -4,99 +4,69 @@
 <div class="space-y-6">
 
     <!-- Top Action & Title Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Financial & Valuation Control Panel</h1>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Financial & Capital Valuation</h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Real-time asset valuation, capital spend trends, and straight-line depreciation metrics.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-all duration-150 ease-out">
+            <a href="{{ route('assets.export') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-xs hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 transition-colors duration-150">
                 <i data-lucide="download" class="w-4 h-4"></i> Export Valuation
             </a>
-            <a href="{{ route('depreciations.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 active:scale-[0.97] transition-all duration-150 ease-out">
+            <a href="{{ route('depreciations.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
                 <i data-lucide="settings" class="w-4 h-4"></i> Depreciation Config
             </a>
         </div>
     </div>
 
-    <!-- Critical Attention Center -->
-    @php
-        $fullyDepreciatedCount = $fullyDepreciatedAssets->count();
-        $finHasAlerts = $fullyDepreciatedCount > 0;
-    @endphp
-
-    @if($finHasAlerts)
-        <div class="rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/80 via-white to-red-50/60 p-4 shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-gray-900 dark:to-red-950/20">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-                    </span>
-                    <div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white">Action Required</h4>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Items requiring financial & valuation audit</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100/80 px-3 py-1.5 text-xs font-bold text-red-800 shadow-xs hover:bg-red-200 dark:border-red-900/60 dark:bg-red-950/70 dark:text-red-300 transition">
-                        <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-red-600 dark:text-red-400"></i>
-                        <span>{{ $fullyDepreciatedCount }} Fully Depreciated Asset{{ $fullyDepreciatedCount > 1 ? 's' : '' }}</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    @endif
-
     <!-- Bento Primary Row: Hero + High Priority Financial KPIs -->
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <!-- Hero Card (Spans 2 columns on lg) -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-colors duration-200 hover:border-brand-500/30 dark:border-gray-800 dark:bg-gray-900 lg:col-span-2 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Financial Valuation</span>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Capital Fleet & Book Value</h2>
-                    </div>
-                    @php
-                        $bookValueRatio = $totalPurchaseCost > 0 ? (int) round(($totalBookValue / $totalPurchaseCost) * 100) : 0;
-                        $depreciatedRatio = max(0, 100 - $bookValueRatio);
-                    @endphp
-                    <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
-                        <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
-                        {{ $bookValueRatio }}% Retained Value
-                    </span>
+                <div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Financial Valuation</span>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Capital Fleet & Book Value</h2>
                 </div>
 
+                @php
+                    $bookValueRatio = $totalPurchaseCost > 0 ? (int) round(($totalBookValue / $totalPurchaseCost) * 100) : 0;
+                    $depreciatedRatio = max(0, 100 - $bookValueRatio);
+                @endphp
+
                 <div class="mt-4 flex flex-wrap items-baseline gap-3">
-                    <span class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-3xl">Rp {{ number_format($totalPurchaseCost, 0, ',', '.') }}</span>
+                    <span class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-3xl font-mono tabular-nums">Rp {{ number_format($totalPurchaseCost, 0, ',', '.') }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">total historical acquisition cost</span>
                 </div>
 
                 <!-- Multi-segment Financial Distribution Bar -->
-                <div class="mt-4">
+                <div class="mt-5">
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                        <span class="font-medium text-gray-500 dark:text-gray-400">Valuation Retained</span>
+                        <span class="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{{ $bookValueRatio }}% Book Value</span>
+                    </div>
                     <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                        <div style="width: {{ $bookValueRatio }}%" class="bg-emerald-500 transition-all duration-500" title="Book Value: Rp {{ number_format($totalBookValue, 0, ',', '.') }} ({{ $bookValueRatio }}%)"></div>
-                        <div style="width: {{ $depreciatedRatio }}%" class="bg-red-500 transition-all duration-500" title="Depreciated: Rp {{ number_format($totalDepreciated, 0, ',', '.') }} ({{ $depreciatedRatio }}%)"></div>
+                        <div style="width: {{ $bookValueRatio }}%" class="bg-emerald-500 transition-all duration-300" title="Book Value: Rp {{ number_format($totalBookValue, 0, ',', '.') }} ({{ $bookValueRatio }}%)"></div>
+                        <div style="width: {{ $depreciatedRatio }}%" class="bg-red-500 transition-all duration-300" title="Depreciated: Rp {{ number_format($totalDepreciated, 0, ',', '.') }} ({{ $depreciatedRatio }}%)"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Segmented Indicators Legend -->
             <div class="mt-4 grid grid-cols-2 gap-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-[11px]">
-                <a href="{{ route('depreciations.index') }}" class="group flex items-center justify-between hover:text-emerald-600 transition">
+                <a href="{{ route('depreciations.index') }}" class="group flex items-center justify-between hover:text-emerald-600 transition-colors">
                     <div class="flex items-center gap-1.5">
                         <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                         <span class="text-gray-500 dark:text-gray-400">Current Book Value</span>
                     </div>
-                    <strong class="text-gray-900 dark:text-white">Rp {{ number_format($totalBookValue, 0, ',', '.') }}</strong>
+                    <strong class="text-gray-900 dark:text-white font-mono tabular-nums">Rp {{ number_format($totalBookValue, 0, ',', '.') }}</strong>
                 </a>
-                <a href="{{ route('depreciations.index') }}" class="group flex items-center justify-between hover:text-red-600 transition">
+                <a href="{{ route('depreciations.index') }}" class="group flex items-center justify-between hover:text-red-600 transition-colors">
                     <div class="flex items-center gap-1.5">
                         <span class="h-2 w-2 rounded-full bg-red-500"></span>
                         <span class="text-gray-500 dark:text-gray-400">Total Depreciated</span>
                     </div>
-                    <strong class="text-gray-900 dark:text-white">Rp {{ number_format($totalDepreciated, 0, ',', '.') }}</strong>
+                    <strong class="text-gray-900 dark:text-white font-mono tabular-nums">Rp {{ number_format($totalDepreciated, 0, ',', '.') }}</strong>
                 </a>
             </div>
         </div>
@@ -144,8 +114,6 @@
             title="Fully Depreciated"
             icon="clock"
             :value="$fullyDepreciatedCount"
-            :trend="$fullyDepreciatedCount > 0 ? 1 : 0"
-            :trendColor="$fullyDepreciatedCount > 0 ? 'red' : 'emerald'"
             description="Units with zero remaining book value"
             color="warning"
             :url="route('assets.index')"
@@ -159,6 +127,7 @@
             color="info"
             :url="route('depreciations.index')"
         />
+    </div>
     </div>
 
     <!-- 2. Financial Analytics Charts Grid -->
@@ -284,20 +253,28 @@
                         <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
                             {{ optional(optional($asset->product)->category)->name ?? 'Uncategorized' }}
                         </td>
-                        <td class="px-4 py-2.5 font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                        <td class="px-4 py-2.5 font-semibold text-gray-900 dark:text-white whitespace-nowrap font-mono tabular-nums">
                             Rp {{ number_format($asset->purchase_cost, 0, ',', '.') }}
                         </td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap font-mono tabular-nums">
                             Rp {{ number_format($asset->book_value ?? $asset->purchase_cost, 0, ',', '.') }}
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No asset cost data available</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                <i data-lucide="dollar-sign" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-400">No asset cost data available</p>
+                            <p class="text-[11px] text-gray-400">High-value acquisitions will be listed here.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div class="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Fully Depreciated Assets"
                 description="Assets with zero remaining book value"
@@ -311,18 +288,26 @@
                             <span class="block font-medium text-gray-900 dark:text-white">{{ $asset->asset_code ?? $asset->asset_tag ?? $asset->name }}</span>
                             <span class="block text-[11px] text-gray-400">{{ optional(optional($asset->product)->brand)->name ?? '-' }}</span>
                         </td>
-                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400 whitespace-nowrap tabular-nums">
                             {{ $asset->purchase_date ? $asset->purchase_date->format('M d, Y') : '-' }}
                         </td>
-                        <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                        <td class="px-4 py-2.5 font-medium text-gray-900 dark:text-white whitespace-nowrap font-mono tabular-nums">
                             Rp {{ number_format($asset->purchase_cost, 0, ',', '.') }}
                         </td>
                         <td class="px-4 py-2.5">
-                            <x-ui.badge color="danger" variant="light" size="sm" featherIcon="alert-circle">Fully Depreciated</x-ui.badge>
+                            <x-ui.badge color="danger" variant="light" size="sm">Fully Depreciated</x-ui.badge>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No fully depreciated assets found</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                <i data-lucide="check-circle" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-800 dark:text-gray-200">No fully depreciated assets</p>
+                            <p class="text-[11px] text-gray-400">All registered assets currently hold active book valuation.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>
