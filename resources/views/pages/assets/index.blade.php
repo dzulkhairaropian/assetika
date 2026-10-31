@@ -479,12 +479,12 @@
                                             {{ $statusName }}
                                         </x-ui.badge>
                                         @if($isAged)
-                                            <x-ui.badge color="warning" variant="light" size="xs" lucideIcon="refresh-cw" title="Lifecycle target reached ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y)">
+                                            <x-ui.badge color="warning" variant="light" size="sm" lucideIcon="refresh-cw" title="Lifecycle target reached ({{ $ageYears }}y / Target: {{ $asset->useful_life_years }}y)">
                                                 Replace ({{ $ageYears }}y)
                                             </x-ui.badge>
                                         @endif
                                         @if($asset->is_components_stripped)
-                                            <x-ui.badge color="warning" variant="light" size="xs" lucideIcon="cpu">
+                                            <x-ui.badge color="warning" variant="light" size="sm" lucideIcon="cpu">
                                                 Stripped
                                             </x-ui.badge>
                                         @endif
