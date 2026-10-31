@@ -37,7 +37,6 @@ class AssetController extends Controller
     {
         $deviceType = $request->input('type', 'laptop');
         $priorityFilter = $request->input('priority');
-        $isLaptop = $deviceType === 'laptop';
 
         $query = Asset::with([
             'product.category',
@@ -47,9 +46,9 @@ class AssetController extends Controller
             'location',
             'currentCheckout.checkedOutToUser.department',
             'assignedToUser',
-        ])->dueForReplacement($isLaptop);
+        ])->dueForReplacement($deviceType);
 
-        if (! $isLaptop && $request->filled('category_id')) {
+        if ($request->filled('category_id')) {
             $query->whereHas('product', fn ($q) => $q->where('category_id', $request->category_id));
         }
 
@@ -79,25 +78,11 @@ class AssetController extends Controller
         $totalReplacementBudget = $allAged->sum(fn ($a) => (float) ($a->purchase_cost ?: 15000000));
 
         if ($priorityFilter === 'critical') {
-            $query->where(function ($q) {
-                $now5 = Carbon::now()->subYears(5);
-                $q->where(function ($sub) use ($now5) {
-                    $sub->where('assets.release_date', '<=', $now5)
-                        ->orWhere(function ($s2) use ($now5) {
-                            $s2->whereNull('assets.release_date')->where('assets.purchase_date', '<=', $now5);
-                        });
-                })->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Broken', 'Service', 'Maintenance', 'In Repair']));
-            });
+            $criticalIds = $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->pluck('id')->toArray();
+            $query->whereIn('assets.id', $criticalIds);
         } elseif ($priorityFilter === 'high') {
-            $query->where(function ($q) {
-                $now5 = Carbon::now()->subYears(5);
-                $q->where(function ($sub) use ($now5) {
-                    $sub->where('assets.release_date', '>', $now5)
-                        ->orWhere(function ($s2) use ($now5) {
-                            $s2->whereNull('assets.release_date')->where('assets.purchase_date', '>', $now5);
-                        });
-                })->whereDoesntHave('status', fn ($s) => $s->whereIn('name', ['Broken', 'Service', 'Maintenance', 'In Repair']));
-            });
+            $highIds = $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->pluck('id')->toArray();
+            $query->whereIn('assets.id', $highIds);
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
@@ -123,22 +108,39 @@ class AssetController extends Controller
 
     public function exportReplacements(Request $request)
     {
-        $filters = $request->all();
-        if (($filters['type'] ?? 'laptop') === 'laptop') {
-            $laptopCatIds = Category::where(function ($q) {
-                $q->where('name', 'like', '%laptop%')
-                    ->orWhere('name', 'like', '%notebook%')
-                    ->orWhere('code', 'NB')
-                    ->orWhere('code', 'LP');
-            })->pluck('id')->toArray();
+        $deviceType = $request->input('type', 'laptop');
+        $priorityFilter = $request->input('priority');
 
-            if (! empty($laptopCatIds)) {
-                $filters['category_id'] = $laptopCatIds;
-            }
+        $query = Asset::with([
+            'product.brand',
+            'product.category',
+            'status',
+            'assignedToUser',
+            'department.company',
+            'location',
+            'vendor',
+            'depreciation',
+            'currentCheckout.checkedOutToUser.department',
+        ])->dueForReplacement($deviceType);
+
+        if ($request->filled('company_id')) {
+            $query->whereHas('department', fn ($q) => $q->where('company_id', $request->company_id));
         }
-        $filters['aging'] = ['4+'];
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+        if ($request->filled('category_id')) {
+            $query->whereHas('product', fn ($q) => $q->where('category_id', $request->category_id));
+        }
 
-        return (new AssetsExport($filters))->download('replacement-recommendations-'.now()->format('Y-m-d').'.xlsx');
+        $matchingAssets = $query->get();
+        if ($priorityFilter) {
+            $matchingAssets = $matchingAssets->filter(fn ($a) => strtolower($a->replacement_priority) === strtolower($priorityFilter));
+        }
+
+        $assetIds = $matchingAssets->pluck('id')->toArray();
+
+        return (new AssetsExport(['ids' => $assetIds]))->download('hardware-replacement-plan-'.now()->format('Y-m-d').'.xlsx');
     }
 
     public function index(Request $request)

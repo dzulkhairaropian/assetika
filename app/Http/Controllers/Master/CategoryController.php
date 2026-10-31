@@ -54,6 +54,8 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:categories,code',
             'master_category_id' => 'required|exists:master_categories,id',
+            'device_type' => 'nullable|string|in:laptop,desktop,display,infrastructure,mobile,peripheral,other',
+            'useful_life_years' => 'nullable|integer|min:1|max:30',
             'description' => 'nullable|string',
         ]);
 
@@ -79,6 +81,8 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:categories,code,'.$category->id,
             'master_category_id' => 'required|exists:master_categories,id',
+            'device_type' => 'nullable|string|in:laptop,desktop,display,infrastructure,mobile,peripheral,other',
+            'useful_life_years' => 'nullable|integer|min:1|max:30',
             'description' => 'nullable|string',
         ]);
 

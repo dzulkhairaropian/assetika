@@ -87,16 +87,26 @@
             <div class="space-y-3 border-b border-gray-100 p-4 dark:border-gray-800">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     {{-- Device Scope Tabs --}}
-                    <nav class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-950">
+                    <nav class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-gray-950 flex-wrap">
                         <a href="{{ route('assets.replacements', array_merge(request()->except(['page', 'type']), ['type' => 'laptop'])) }}"
                            class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition {{ $deviceType === 'laptop' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200' }}">
                             <i data-lucide="laptop" class="w-3.5 h-3.5"></i>
-                            Laptops & Notebooks
+                            Laptops
+                        </a>
+                        <a href="{{ route('assets.replacements', array_merge(request()->except(['page', 'type']), ['type' => 'desktop'])) }}"
+                           class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition {{ $deviceType === 'desktop' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200' }}">
+                            <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+                            Desktops
+                        </a>
+                        <a href="{{ route('assets.replacements', array_merge(request()->except(['page', 'type']), ['type' => 'display'])) }}"
+                           class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition {{ $deviceType === 'display' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200' }}">
+                            <i data-lucide="tv" class="w-3.5 h-3.5"></i>
+                            Displays
                         </a>
                         <a href="{{ route('assets.replacements', array_merge(request()->except(['page', 'type']), ['type' => 'all'])) }}"
                            class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition {{ $deviceType === 'all' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white font-semibold' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200' }}">
-                            <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
-                            All IT Hardware
+                            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                            All Hardware
                         </a>
                     </nav>
 
@@ -241,18 +251,18 @@
                                     @if($isCritical)
                                         <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-0.5 text-[11px] font-semibold text-red-700 dark:bg-red-500/10 dark:text-red-400">
                                             <i data-lucide="alert-circle" class="w-3 h-3 text-red-600 dark:text-red-400"></i>
-                                            Critical (≥5y / Service)
+                                            Critical (≥{{ ($asset->useful_life_years ?? 4) + 1 }}y / Service)
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-0.5 text-[11px] font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
                                             <i data-lucide="clock" class="w-3 h-3 text-orange-600 dark:text-orange-400"></i>
-                                            High (4-5y)
+                                            High (≥{{ $asset->useful_life_years ?? 4 }}y)
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-gray-900 dark:text-white">{{ $ageYears }} Years Old</span>
+                                        <span class="font-semibold text-gray-900 dark:text-white">{{ $ageYears }}y (Target: {{ $asset->useful_life_years ?? 4 }}y)</span>
                                         <span class="text-[11px] text-gray-400">
                                             {{ $acquisitionDate ? $acquisitionDate->format('d M Y') : 'Unknown Date' }}
                                         </span>

@@ -12,8 +12,27 @@ class Category extends Model
         'name',
         'code',
         'master_category_id',
+        'device_type',
+        'useful_life_years',
         'description',
     ];
+
+    protected $casts = [
+        'useful_life_years' => 'integer',
+    ];
+
+    public function getDeviceTypeLabelAttribute(): string
+    {
+        return match ($this->device_type) {
+            'laptop' => 'Laptop / Notebook',
+            'desktop' => 'Desktop / Workstation',
+            'display' => 'Display / Monitor',
+            'infrastructure' => 'Server & Network',
+            'mobile' => 'Mobile & Tablet',
+            'peripheral' => 'Peripheral',
+            default => 'General Hardware',
+        };
+    }
 
     public function masterCategory()
     {

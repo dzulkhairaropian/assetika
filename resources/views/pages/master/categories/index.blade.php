@@ -155,6 +155,8 @@
                                 <x-common.sortable-header column="name" label="Name" />
                             </th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Master Category</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Device Type</th>
+                            <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Useful Life</th>
                             <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Products Count</th>
                             <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
@@ -186,6 +188,14 @@
                                 </td>
                                 <td class="px-4 py-2.5 text-gray-600 dark:text-gray-400">
                                     {{ $category->masterCategory?->name ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                        {{ $category->device_type_label }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2.5 text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap">
+                                    {{ $category->useful_life_years ?? 4 }} Years
                                 </td>
                                 <td class="px-4 py-2.5 font-semibold text-gray-800 dark:text-gray-200">
                                     {{ $category->products_count ?? 0 }} products

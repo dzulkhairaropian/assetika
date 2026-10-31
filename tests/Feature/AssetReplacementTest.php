@@ -19,8 +19,20 @@ test('asset_replacement_helpers_and_scopes_identify_aged_laptops', function () {
     $company = Company::create(['name' => 'Acme Corp', 'code' => 'ACM']);
     $department = Department::create(['company_id' => $company->id, 'name' => 'Engineering', 'code' => 'ENG']);
     $masterCat = MasterCategory::firstOrCreate(['name' => 'IT Asset', 'code' => 'IT']);
-    $laptopCategory = Category::create(['master_category_id' => $masterCat->id, 'name' => 'Notebook/Laptop', 'code' => 'NB']);
-    $monitorCategory = Category::create(['master_category_id' => $masterCat->id, 'name' => 'Display Monitor', 'code' => 'MN']);
+    $laptopCategory = Category::create([
+        'master_category_id' => $masterCat->id,
+        'name' => 'Notebook/Laptop',
+        'code' => 'NB',
+        'device_type' => 'laptop',
+        'useful_life_years' => 4,
+    ]);
+    $monitorCategory = Category::create([
+        'master_category_id' => $masterCat->id,
+        'name' => 'Display Monitor',
+        'code' => 'MN',
+        'device_type' => 'display',
+        'useful_life_years' => 5,
+    ]);
 
     $brand = Brand::create(['name' => 'Dell']);
     $laptopProduct = Product::create([
@@ -74,14 +86,14 @@ test('asset_replacement_helpers_and_scopes_identify_aged_laptops', function () {
         'purchase_cost' => 20000000,
     ]);
 
-    // Aged Monitor: released 4.5 years ago
+    // Aged Monitor: released 5.5 years ago (threshold is 5 years)
     $agedMonitor = Asset::create([
         'product_id' => $monitorProduct->id,
         'department_id' => $department->id,
         'status_id' => $statusReady->id,
         'asset_tag' => 'ACM/MN/210101/004',
         'device_name' => 'ACME-MONITOR-01',
-        'release_date' => Carbon::now()->subYears(4)->subMonths(6),
+        'release_date' => Carbon::now()->subYears(5)->subMonths(6),
         'purchase_cost' => 6000000,
     ]);
 
@@ -185,4 +197,30 @@ test('asset_index_and_show_views_render_replacement_due_badges', function () {
     $showResponse->assertOk();
     $showResponse->assertSee('Replacement Due');
     $showResponse->assertSee('View Planner');
+});
+
+test('category_crud_supports_useful_life_and_device_type', function () {
+    $company = Company::create(['name' => 'Acme Corp', 'code' => 'ACM']);
+    $user = User::factory()->create(['company_id' => $company->id]);
+    Role::firstOrCreate(['name' => 'super_admin']);
+    $user->assignRole('super_admin');
+    $this->actingAs($user);
+
+    $masterCat = MasterCategory::firstOrCreate(['name' => 'IT Asset', 'code' => 'IT']);
+
+    $response = $this->post(route('categories.store'), [
+        'name' => 'MacBook Fleet',
+        'code' => 'MBP',
+        'master_category_id' => $masterCat->id,
+        'device_type' => 'laptop',
+        'useful_life_years' => 5,
+        'description' => 'High performance creative laptops',
+    ]);
+
+    $response->assertRedirect(route('categories.index'));
+    $this->assertDatabaseHas('categories', [
+        'code' => 'MBP',
+        'device_type' => 'laptop',
+        'useful_life_years' => 5,
+    ]);
 });

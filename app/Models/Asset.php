@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Asset extends Model
@@ -422,6 +423,16 @@ class Asset extends Model
         return 1;
     }
 
+    public function getUsefulLifeYearsAttribute(): int
+    {
+        return (int) ($this->product?->category?->useful_life_years ?: 4);
+    }
+
+    public function getDeviceTypeAttribute(): string
+    {
+        return $this->product?->category?->device_type ?: 'other';
+    }
+
     public function getAgeYearsAttribute(): ?float
     {
         $date = $this->release_date ?? $this->purchase_date ?? $this->created_at;
@@ -436,55 +447,82 @@ class Asset extends Model
     {
         $age = $this->age_years;
 
-        return $age !== null && $age >= 4.0;
+        return $age !== null && $age >= (float) $this->useful_life_years;
     }
 
     public function getReplacementPriorityAttribute(): ?string
     {
         $age = $this->age_years;
-        if ($age === null || $age < 3.0) {
+        $threshold = (float) $this->useful_life_years;
+
+        if ($age === null || $age < ($threshold - 1.0)) {
             return 'Normal';
         }
 
         $statusName = strtolower($this->status->name ?? '');
         $isTroubled = in_array($statusName, ['broken', 'service', 'maintenance', 'in repair']);
 
-        if ($age >= 5.0 || ($age >= 4.0 && $isTroubled)) {
+        if ($age >= ($threshold + 1.0) || ($age >= $threshold && $isTroubled)) {
             return 'Critical';
         }
 
-        if ($age >= 4.0) {
+        if ($age >= $threshold) {
             return 'High';
         }
 
         return 'Medium';
     }
 
-    public function scopeDueForReplacement($query, bool $laptopOnly = false)
+    public function scopeDueForReplacement($query, string|bool|null $deviceType = null)
     {
-        $now4 = Carbon::now()->subYears(4);
-
-        $query->where(function ($sub) use ($now4) {
-            $sub->where('assets.release_date', '<=', $now4)
-                ->orWhere(function ($s2) use ($now4) {
-                    $s2->whereNull('assets.release_date')
-                        ->where('assets.purchase_date', '<=', $now4);
-                })
-                ->orWhere(function ($s2) use ($now4) {
-                    $s2->whereNull('assets.release_date')
-                        ->whereNull('assets.purchase_date')
-                        ->where('assets.created_at', '<=', $now4);
-                });
-        });
-
-        if ($laptopOnly) {
-            $query->whereHas('product.category', function ($q) {
-                $q->where('name', 'like', '%laptop%')
-                    ->orWhere('name', 'like', '%notebook%')
-                    ->orWhere('code', 'NB')
-                    ->orWhere('code', 'LP');
-            });
+        if ($deviceType === true) {
+            $deviceType = 'laptop';
+        } elseif ($deviceType === false || $deviceType === 'all') {
+            $deviceType = null;
         }
+
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+
+        $query->where(function ($q) use ($isSqlite, $deviceType) {
+            $q->whereHas('product.category', function ($catQuery) use ($isSqlite, $deviceType) {
+                if ($deviceType) {
+                    $catQuery->where(function ($dtQ) use ($deviceType) {
+                        $dtQ->where('device_type', $deviceType);
+                        if ($deviceType === 'laptop') {
+                            $dtQ->orWhere('name', 'like', '%laptop%')
+                                ->orWhere('name', 'like', '%notebook%')
+                                ->orWhere('code', 'NB')
+                                ->orWhere('code', 'LP');
+                        }
+                    });
+                }
+
+                if ($isSqlite) {
+                    $catQuery->whereRaw("(julianday('now') - julianday(COALESCE(assets.release_date, assets.purchase_date, assets.created_at))) >= (COALESCE(categories.useful_life_years, 4) * 365.25)");
+                } else {
+                    $catQuery->whereRaw('TIMESTAMPDIFF(MONTH, COALESCE(assets.release_date, assets.purchase_date, assets.created_at), NOW()) >= (COALESCE(categories.useful_life_years, 4) * 12)');
+                }
+            });
+
+            if (! $deviceType) {
+                $now4 = Carbon::now()->subYears(4);
+                $q->orWhere(function ($fallback) use ($now4) {
+                    $fallback->whereDoesntHave('product.category')
+                        ->where(function ($sub) use ($now4) {
+                            $sub->where('assets.release_date', '<=', $now4)
+                                ->orWhere(function ($s2) use ($now4) {
+                                    $s2->whereNull('assets.release_date')
+                                        ->where('assets.purchase_date', '<=', $now4);
+                                })
+                                ->orWhere(function ($s2) use ($now4) {
+                                    $s2->whereNull('assets.release_date')
+                                        ->whereNull('assets.purchase_date')
+                                        ->where('assets.created_at', '<=', $now4);
+                                });
+                        });
+                });
+            }
+        });
 
         return $query;
     }

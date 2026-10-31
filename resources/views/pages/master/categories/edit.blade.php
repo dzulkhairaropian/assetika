@@ -62,6 +62,34 @@
                                 @error('master_category_id') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                             </div>
 
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                    Device Type Classification
+                                </label>
+                                <select name="device_type"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                                    <option value="other" {{ old('device_type', $category->device_type ?? 'other') === 'other' ? 'selected' : '' }}>General Hardware / Other</option>
+                                    <option value="laptop" {{ old('device_type', $category->device_type) === 'laptop' ? 'selected' : '' }}>Laptop / Notebook</option>
+                                    <option value="desktop" {{ old('device_type', $category->device_type) === 'desktop' ? 'selected' : '' }}>Desktop / Workstation</option>
+                                    <option value="display" {{ old('device_type', $category->device_type) === 'display' ? 'selected' : '' }}>Display / Monitor</option>
+                                    <option value="infrastructure" {{ old('device_type', $category->device_type) === 'infrastructure' ? 'selected' : '' }}>Server & Network Equipment</option>
+                                    <option value="mobile" {{ old('device_type', $category->device_type) === 'mobile' ? 'selected' : '' }}>Mobile & Tablet</option>
+                                    <option value="peripheral" {{ old('device_type', $category->device_type) === 'peripheral' ? 'selected' : '' }}>Peripheral / Accessory</option>
+                                </select>
+                                <p class="mt-1 text-[11px] text-gray-400">Controls hardware refresh planning classification</p>
+                                @error('device_type') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
+                                    Useful Life / Replacement Cycle (Years)
+                                </label>
+                                <input type="number" name="useful_life_years" value="{{ old('useful_life_years', $category->useful_life_years ?? 4) }}" min="1" max="30"
+                                    class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
+                                <p class="mt-1 text-[11px] text-gray-400">Target hardware lifecycle before replacement is recommended</p>
+                                @error('useful_life_years') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
+                            </div>
+
                             <div class="lg:col-span-2">
                                 <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                     Description
