@@ -4,10 +4,10 @@
 <div class="space-y-6">
 
     <!-- Top Title & Search Action Bar -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">IT Assets Analytics & Control Panel</h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Live monitoring of IT hardware, equipment allocation, and system alerts for {{ $userName }}.</p>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">IT Fleet Operations</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Real-time deployment status, hardware lifecycle monitoring, and equipment inventory allocation.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('assets.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
@@ -150,14 +150,11 @@
             </div>
         </div>
 
-        @php $readyToDeployTrendColor = $readyToDeployTrend >= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="Ready to Deploy"
             icon="circle-check"
             :value="$readyToDeploy"
-            :trend="$readyToDeployTrend"
-            :trendColor="$readyToDeployTrendColor"
-            description="Available for immediate setup"
+            description="Available for immediate allocation"
             color="success"
             :url="route('assets.index', ['status_id' => $readyStatusId])"
         />
@@ -166,14 +163,11 @@
             $loanDesc = ($overdueLoansCount ?? 0) > 0
                 ? "{$overdueLoansCount} overdue loan" . ($overdueLoansCount > 1 ? 's' : '')
                 : 'All loans on schedule';
-            $loanTrendColor = ($overdueLoansCount ?? 0) > 0 ? 'red' : 'emerald';
         @endphp
         <x-common.small-box
             title="Active Loans"
             icon="calendar-clock"
             :value="$activeLoansCount ?? 0"
-            :trend="($overdueLoansCount ?? 0) > 0 ? $overdueLoansCount : 0"
-            :trendColor="$loanTrendColor"
             :description="$loanDesc"
             :color="($overdueLoansCount ?? 0) > 0 ? 'danger' : 'info'"
             :url="route('asset-transactions.index', ['tab' => ($overdueLoansCount ?? 0) > 0 ? 'overdue' : 'active'])"
@@ -186,50 +180,33 @@
             title="Hardware Components"
             icon="cpu"
             :value="$totalComponentUnits"
-            :trend="0"
-            trendColor="emerald"
             description="{{ $installedComponents }} installed • {{ $readyComponents }} in stock"
             color="brand"
             :url="route('components.index')"
         />
 
-        @php
-            $lowStockTrend = $lowStockConsumables->count() > 0 ? 1 : -1;
-            $lowStockTrendColor = $lowStockTrend <= 0 ? 'emerald' : 'red';
-        @endphp
         <x-common.small-box
             title="Consumables Stock"
             icon="package"
             :value="$totalConsumables"
-            :trend="$lowStockTrend"
-            :trendColor="$lowStockTrendColor"
             description="{{ $lowStockConsumables->count() }} low stock item{{ $lowStockConsumables->count() > 1 ? 's' : '' }}"
-            color="danger"
+            :color="$lowStockConsumables->count() > 0 ? 'danger' : 'brand'"
             :url="route('consumables.index')"
         />
 
-        @php
-            $agingTrend = $assetsOlderThan4Years->count() > 0 ? 1 : -1;
-            $agingTrendColor = $agingTrend <= 0 ? 'emerald' : 'red';
-        @endphp
         <x-common.small-box
             title="Aging Hardware (4+ Yrs)"
             icon="clock"
             :value="$assetsOlderThan4Years->count()"
-            :trend="$agingTrend"
-            :trendColor="$agingTrendColor"
-            description="Reaching replacement lifecycle"
+            description="Reached replacement lifecycle"
             color="warning"
             :url="route('assets.replacements')"
         />
 
-        @php $readyForSaleTrendColor = $readyForSaleTrend >= 0 ? 'emerald' : 'red'; @endphp
         <x-common.small-box
             title="Ready for Sale"
             icon="shopping-bag"
             :value="$readyForSale"
-            :trend="$readyForSaleTrend"
-            :trendColor="$readyForSaleTrendColor"
             description="Approved for liquidation & sale"
             color="success"
             :url="route('assets.index', ['status_id' => $readyForSaleStatusId])"
@@ -315,14 +292,11 @@
                 </div>
 
                 @if(isset($deptChartData['labels']) && count($deptChartData['labels']) > 0)
-                    @php
-                        $deptColorsList = $deptChartData['colors'] ?? ['#465fff', '#12b76a', '#f79009', '#8b5cf6', '#06b6d4', '#ec4899', '#f43f5e', '#14b8a6', '#6366f1', '#d97706'];
-                    @endphp
                     <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 dark:border-gray-800 text-xs max-h-24 overflow-y-auto">
                         @foreach($deptChartData['labels'] as $index => $label)
                             @php
                                 $count = $deptChartData['data'][$index] ?? 0;
-                                $color = $deptColorsList[$index % count($deptColorsList)];
+                                $color = $deptChartData['colors'][$index] ?? '#465fff';
                             @endphp
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color: {{ $color }}"></span>
@@ -586,7 +560,15 @@
                         <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">{{ $checkout->checked_out_at->format('M d, H:i') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No recent asset checkouts</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                <i data-lucide="inbox" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-400">No recent asset checkouts</p>
+                            <p class="text-[11px] text-gray-400">All equipment movements will appear here.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>
@@ -629,7 +611,7 @@
                                 <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ $asset->department->name }}</span>
                             @endif
                         </td>
-                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">
                             @if($asset->purchase_date)
                                 {{ $asset->purchase_date->format('M d, Y') }}
                             @else
@@ -638,13 +620,21 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400">No assets older than 4 years</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                <i data-lucide="check-circle" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-800 dark:text-gray-200">No aging assets detected</p>
+                            <p class="text-[11px] text-gray-400">All active inventory is within current lifecycle limits.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>
 
         <!-- Recent Component Installations Table -->
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900 md:col-span-2 xl:col-span-1">
+        <div class="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
             <x-common.dashboard-table
                 title="Installed Component Units"
                 description="Hardware parts (RAM, SSD, GPU) attached to assets"
@@ -671,13 +661,65 @@
                             @endif
                         </td>
                         <td class="px-4 py-2.5 whitespace-nowrap">
-                            <x-ui.badge color="brand" variant="light" size="sm" featherIcon="cpu">
+                            <x-ui.badge color="brand" variant="light" size="sm">
                                 {{ $comp->category?->name ?? 'Part' }}
                             </x-ui.badge>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="px-4 py-6 text-center text-xs text-gray-400">No components installed yet</td></tr>
+                    <tr>
+                        <td colspan="3" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                <i data-lucide="cpu" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-400">No components installed yet</p>
+                            <p class="text-[11px] text-gray-400">RAM, SSD, and upgrade parts will appear when assigned.</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-common.dashboard-table>
+        </div>
+
+        <!-- Recent Consumable Checkouts Table -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
+            <x-common.dashboard-table
+                title="Consumable Checkouts"
+                description="Latest consumable dispatches to employees"
+                :headers="['Item', 'Qty', 'To User', 'Date']"
+                :footerLink="route('consumables.index')"
+                footerText="View All Consumables"
+            >
+                @forelse($recentConsumableCheckouts as $item)
+                    <tr x-show="!search || $el.textContent.toLowerCase().includes(search.toLowerCase())">
+                        <td class="px-4 py-2.5">
+                            <span class="block font-medium text-gray-900 dark:text-white">{{ $item->consumable->name ?? 'Consumable' }}</span>
+                            <span class="block text-[11px] text-gray-400 font-mono">
+                                {{ $item->consumable->item_number ?? '-' }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2.5">
+                            <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200 tabular-nums">
+                                {{ $item->quantity ?? 1 }} pcs
+                            </span>
+                        </td>
+                        <td class="px-4 py-2.5">
+                            <span class="block text-gray-700 dark:text-gray-300 font-medium">{{ $item->checkedOutToUser->name ?? 'Unknown' }}</span>
+                            <span class="block text-[11px] text-gray-400 dark:text-gray-500">{{ optional(optional($item->checkedOutToUser)->department)->name ?? '-' }}</span>
+                        </td>
+                        <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">
+                            {{ $item->transaction_date ? $item->transaction_date->format('M d, H:i') : '-' }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center">
+                            <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+                                <i data-lucide="package" class="h-4 w-4"></i>
+                            </div>
+                            <p class="mt-2 text-xs font-medium text-gray-600 dark:text-gray-400">No recent consumable checkouts</p>
+                            <p class="text-[11px] text-gray-400">Consumable usage history will appear here.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </x-common.dashboard-table>
         </div>

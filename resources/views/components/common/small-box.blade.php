@@ -5,12 +5,13 @@
     'color' => 'brand',
     'trend' => null,
     'trendColor' => null,
+    'trendLabel' => null,
     'description' => null,
     'url' => '#',
     'urlText' => 'View details'
 ])
 
-<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 transition-all duration-200 hover:border-brand-500/30 hover:shadow-sm dark:border-gray-800 dark:bg-white/3 flex flex-col justify-between">
+<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 transition-colors duration-150 hover:border-brand-500/30 shadow-xs dark:border-gray-800 dark:bg-white/3 flex flex-col justify-between">
     <div class="mb-4 flex items-start justify-between gap-3">
         <div>
             <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 truncate">{{ $title }}</h3>
@@ -32,21 +33,15 @@
 
     <div class="flex items-end justify-between gap-3 pt-2">
         <div>
-            <h3 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white/90 sm:text-3xl">{{ $value }}</h3>
-            @isset($trend)
-                <p class="text-theme-xs mt-1 text-gray-500 dark:text-gray-400 text-xs">
-                    <span class="inline-flex items-center font-semibold text-{{ $trendColor ?? 'emerald' }}-600 dark:text-{{ $trendColor ?? 'emerald' }}-400 mr-1">
-                        @if($trend > 0)
-                            +{{ $trend }}%
-                        @elseif($trend < 0)
-                            {{ $trend }}%
-                        @else
-                            {{ $trend }}%
-                        @endif
+            <h3 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white/90 sm:text-3xl tabular-nums">{{ $value }}</h3>
+            @if($trend !== null && $trendLabel)
+                <p class="text-theme-xs mt-1 text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1">
+                    <span class="inline-flex items-center font-semibold text-{{ $trendColor ?? 'emerald' }}-600 dark:text-{{ $trendColor ?? 'emerald' }}-400">
+                        {{ $trend }}
                     </span>
-                    <span>than last period</span>
+                    <span>{{ $trendLabel }}</span>
                 </p>
-            @endisset
+            @endif
         </div>
 
         @if($url && $url !== '#')
