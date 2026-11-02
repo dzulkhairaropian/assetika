@@ -154,10 +154,18 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Code Prefix</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Category Name</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Device Classification</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Useful Life (Years)</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="code" label="Code Prefix" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="name" label="Category Name" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="device_type" label="Device Classification" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="useful_life_years" label="Useful Life (Years)" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Master Category</th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>

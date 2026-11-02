@@ -57,12 +57,22 @@
                 <table class="min-w-full text-xs">
                     <thead>
                         <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Item Name</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Renewal Scope / Type</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Expiration Target</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="name" label="Item Name" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="type" label="Renewal Scope / Type" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="expiration_date" label="Expiration Target" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Responsible User</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Renewal Cost</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="cost" label="Renewal Cost" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="status" label="Status" />
+                            </th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

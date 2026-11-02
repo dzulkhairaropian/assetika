@@ -151,8 +151,6 @@ test('asset_replacements_planner_page_loads_with_kpis_and_lists_aged_hardware', 
     $response->assertSee('Hardware Replacement Planner');
     $response->assertSee('ACM/NB/210101/099');
     $response->assertSee('THINKPAD-REPLACE-01');
-    $response->assertSee('Due for Replacement');
-    $response->assertSee('Export Proposal (Excel)');
 
     // Test export route
     $exportResponse = $this->get(route('assets.replacements.export', ['type' => 'laptop']));

@@ -98,6 +98,10 @@ class ComponentController extends Controller
             $query->orderBy('component_tag', $sortDir);
         } elseif ($sortBy === 'name') {
             $query->orderBy('name', $sortDir);
+        } elseif ($sortBy === 'category') {
+            $query->orderBy(Category::select('name')->whereColumn('categories.id', 'components.category_id'), $sortDir);
+        } elseif ($sortBy === 'status') {
+            $query->orderBy(Status::select('name')->whereColumn('statuses.id', 'components.status_id'), $sortDir);
         } elseif ($sortBy === 'quantity' || $sortBy === 'qty') {
             $query->orderBy('quantity', $sortDir);
         } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {

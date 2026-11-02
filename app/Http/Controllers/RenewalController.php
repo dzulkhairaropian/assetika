@@ -21,7 +21,24 @@ class RenewalController extends Controller
             $query->where('status', $request->status);
         }
 
-        $renewals = $query->orderBy('expiration_date')->paginate(15);
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'name') {
+            $query->orderBy('name', $sortDir);
+        } elseif ($sortBy === 'type') {
+            $query->orderBy('type', $sortDir);
+        } elseif ($sortBy === 'expiration_date' || $sortBy === 'expiration') {
+            $query->orderBy('expiration_date', $sortDir);
+        } elseif ($sortBy === 'cost') {
+            $query->orderBy('cost', $sortDir);
+        } elseif ($sortBy === 'status') {
+            $query->orderBy('status', $sortDir);
+        } else {
+            $query->orderBy('expiration_date', 'asc');
+        }
+
+        $renewals = $query->paginate(15)->withQueryString();
 
         return view('pages.renewals.index', compact('renewals'));
     }

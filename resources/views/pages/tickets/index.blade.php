@@ -388,9 +388,15 @@
                         <th class="px-4 py-2.5 text-start">
                             <x-common.sortable-header column="requester_name" label="Requester" />
                         </th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
-                        <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                        <th class="px-4 py-2.5 text-start">
+                            <x-common.sortable-header column="category" label="Category" />
+                        </th>
+                        <th class="px-4 py-2.5 text-start">
+                            <x-common.sortable-header column="priority" label="Priority" />
+                        </th>
+                        <th class="px-4 py-2.5 text-start">
+                            <x-common.sortable-header column="status" label="Status" />
+                        </th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">SLA Risk</th>
                         <th class="px-4 py-2.5 text-start font-medium text-gray-500 dark:text-gray-400">Assignee</th>
                         <th class="px-4 py-2.5 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>

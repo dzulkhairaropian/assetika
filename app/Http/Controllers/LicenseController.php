@@ -75,6 +75,8 @@ class LicenseController extends Controller
             $query->orderBy('name', $sortDir);
         } elseif ($sortBy === 'seats') {
             $query->orderBy('seats', $sortDir);
+        } elseif ($sortBy === 'manufacturer') {
+            $query->orderBy('manufacturer', $sortDir);
         } elseif ($sortBy === 'expiration_date' || $sortBy === 'expiration') {
             $query->orderBy('expiration_date', $sortDir);
         } elseif ($sortBy === 'created_at') {

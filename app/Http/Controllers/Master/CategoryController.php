@@ -32,7 +32,7 @@ class CategoryController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $sortBy = in_array($request->input('sort_by'), ['code', 'name', 'created_at']) ? $request->input('sort_by') : 'created_at';
+        $sortBy = in_array($request->input('sort_by'), ['code', 'name', 'device_type', 'useful_life_years', 'created_at']) ? $request->input('sort_by') : 'created_at';
         $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
 
         $categories = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();

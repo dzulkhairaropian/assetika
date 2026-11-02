@@ -43,7 +43,24 @@ class GaAssetController extends Controller
             $query->whereNotNull('warranty_expiry_date')->where('warranty_expiry_date', '<=', now()->addDays(30));
         }
 
-        $assets = $query->latest()->paginate(25)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'asset_code' || $sortBy === 'code') {
+            $query->orderBy('asset_code', $sortDir);
+        } elseif ($sortBy === 'name') {
+            $query->orderBy('name', $sortDir);
+        } elseif ($sortBy === 'category') {
+            $query->orderBy(GaAssetCategory::select('name')->whereColumn('ga_asset_categories.id', 'ga_assets.category_id'), $sortDir);
+        } elseif ($sortBy === 'status') {
+            $query->orderBy('status', $sortDir);
+        } elseif ($sortBy === 'purchase_price' || $sortBy === 'cost') {
+            $query->orderBy('purchase_price', $sortDir);
+        } else {
+            $query->latest();
+        }
+
+        $assets = $query->paginate(25)->withQueryString();
         $categories = GaAssetCategory::all();
 
         $taxDueVehicles = GaAssetVehicle::with('asset')

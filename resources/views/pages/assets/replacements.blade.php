@@ -166,14 +166,24 @@
                 <table class="min-w-full text-xs">
                     <thead>
                         <tr class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Asset Tag & Device</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="asset_tag" label="Asset Tag & Device" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Hardware & Specification</th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Priority</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Age & Acquisition</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Holder</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="age" label="Age & Acquisition" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="holder" label="Assigned Holder" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Company & Dept</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Est. Cost</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="status" label="Status" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="purchase_cost" label="Est. Cost" />
+                            </th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

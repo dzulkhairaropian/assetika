@@ -195,10 +195,18 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Item Model & Name</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Category & Brand</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Stock Availability</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Unit Cost & Value</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="name" label="Item Model & Name" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="category" label="Category & Brand" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="quantity" label="Stock Availability" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="purchase_cost" label="Unit Cost & Value" />
+                            </th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

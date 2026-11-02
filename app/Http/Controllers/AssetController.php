@@ -86,7 +86,28 @@ class AssetController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
-        $assets = $query->latest('release_date')->paginate($perPage)->withQueryString();
+        $sortBy = $request->input('sort_by');
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'asset_tag') {
+            $query->orderBy('assets.asset_tag', $sortDir);
+        } elseif ($sortBy === 'age' || $sortBy === 'release_date') {
+            $query->orderBy('assets.release_date', $sortDir);
+        } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
+            $query->orderBy('assets.purchase_cost', $sortDir);
+        } elseif ($sortBy === 'status') {
+            $query->orderBy(Status::select('name')->whereColumn('statuses.id', 'assets.status_id'), $sortDir);
+        } elseif ($sortBy === 'holder' || $sortBy === 'assigned_holder') {
+            $query->orderBy(
+                User::select('name')
+                    ->join('asset_checkouts', 'users.id', '=', 'asset_checkouts.checked_out_to_user_id')
+                    ->whereColumn('asset_checkouts.id', 'assets.current_checkout_id'),
+                $sortDir
+            );
+        } else {
+            $query->latest('assets.release_date');
+        }
+        $assets = $query->paginate($perPage)->withQueryString();
 
         $companies = Company::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
@@ -184,22 +205,33 @@ class AssetController extends Controller
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
         $sortBy = $request->input('sort_by');
-        $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
+        $sortDir = strtolower((string) $request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
 
         if ($sortBy === 'asset_tag') {
-            $query->orderBy('asset_tag', $sortDir);
+            $query->orderBy('assets.asset_tag', $sortDir);
         } elseif ($sortBy === 'name' || $sortBy === 'device_name') {
-            $query->orderBy('device_name', $sortDir);
+            $query->orderBy('assets.device_name', $sortDir);
         } elseif ($sortBy === 'serial_number' || $sortBy === 'serial') {
-            $query->orderBy('serial_number', $sortDir);
+            $query->orderBy('assets.serial_number', $sortDir);
+        } elseif ($sortBy === 'status' || $sortBy === 'lifecycle') {
+            $query->orderBy(Status::select('name')->whereColumn('statuses.id', 'assets.status_id'), $sortDir);
         } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
-            $query->orderBy('purchase_cost', $sortDir);
+            $query->orderBy('assets.purchase_cost', $sortDir);
+        } elseif ($sortBy === 'holder' || $sortBy === 'assigned_holder') {
+            $query->orderBy(
+                User::select('name')
+                    ->join('asset_checkouts', 'users.id', '=', 'asset_checkouts.checked_out_to_user_id')
+                    ->whereColumn('asset_checkouts.id', 'assets.current_checkout_id'),
+                $sortDir
+            );
+        } elseif ($sortBy === 'age' || $sortBy === 'acquisition') {
+            $query->orderByRaw("COALESCE(assets.release_date, assets.purchase_date, assets.created_at) {$sortDir}");
         } elseif ($sortBy === 'purchase_date') {
-            $query->orderBy('purchase_date', $sortDir);
+            $query->orderBy('assets.purchase_date', $sortDir);
         } elseif ($sortBy === 'warranty_expiry_date' || $sortBy === 'warranty') {
-            $query->orderBy('warranty_expiry_date', $sortDir);
+            $query->orderBy('assets.warranty_expiry_date', $sortDir);
         } else {
-            $query->latest();
+            $query->latest('assets.created_at');
         }
 
         $assets = $query->paginate($perPage)->withQueryString();

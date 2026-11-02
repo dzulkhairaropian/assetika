@@ -219,8 +219,12 @@
                             <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="component_tag" label="Tag / Component" />
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Category & Model</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="category" label="Category & Model" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="status" label="Status" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Host Asset</th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Location</th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>

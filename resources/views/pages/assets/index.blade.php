@@ -401,10 +401,18 @@
                             <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="serial_number" label="Hardware & Serial" />
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status & Lifecycle</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Purchase & Valuation</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Assigned Holder</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Age & Acquisition</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="status" label="Status & Lifecycle" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="purchase_cost" label="Purchase & Valuation" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="holder" label="Assigned Holder" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="age" label="Age & Acquisition" />
+                            </th>
                             <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="warranty_expiry_date" label="Warranty" />
                             </th>

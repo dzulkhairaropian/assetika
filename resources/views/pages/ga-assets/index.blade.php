@@ -225,11 +225,21 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Asset Code</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Name & Model</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Category</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Acquisition Cost</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="asset_code" label="Asset Code" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="name" label="Name & Model" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="category" label="Category" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="status" label="Status" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="purchase_price" label="Acquisition Cost" />
+                            </th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

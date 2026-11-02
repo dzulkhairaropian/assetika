@@ -196,10 +196,14 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Employee User</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="name" label="Employee User" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Role</th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Company & Department</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Status</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="is_active" label="Status" />
+                            </th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>

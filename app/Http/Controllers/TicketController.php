@@ -157,9 +157,14 @@ class TicketController extends Controller
             $query->orderBy('request_id', $sortDir);
         } elseif ($sortBy === 'requester_name' || $sortBy === 'requester') {
             $query->orderBy('requester_name', $sortDir);
+        } elseif ($sortBy === 'category') {
+            $query->orderBy(TicketCategory::select('name')->whereColumn('ticket_categories.id', 'tickets.category_id'), $sortDir);
+        } elseif ($sortBy === 'priority') {
+            $query->orderBy(Priority::select('name')->whereColumn('priorities.id', 'tickets.priority_id'), $sortDir);
+        } elseif ($sortBy === 'status') {
+            $query->orderBy(TicketStatus::select('name')->whereColumn('ticket_statuses.id', 'tickets.status_id'), $sortDir);
         } elseif ($sortBy === 'created_at') {
             $query->orderBy('created_at', $sortDir);
-        } else {
             $query->latest();
         }
 

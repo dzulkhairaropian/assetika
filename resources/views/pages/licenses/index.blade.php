@@ -140,11 +140,19 @@
                                     </div>
                                 </label>
                             </th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Software & License Name</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="name" label="Software & License Name" />
+                            </th>
                             <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Product Key & Account</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Seat Allocation</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Manufacturer</th>
-                            <th class="px-4 py-3 text-start font-medium text-gray-500 dark:text-gray-400">Expiration Date</th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="seats" label="Seat Allocation" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="manufacturer" label="Manufacturer" />
+                            </th>
+                            <th class="px-4 py-3 text-start">
+                                <x-common.sortable-header column="expiration_date" label="Expiration Date" />
+                            </th>
                             <th class="px-4 py-3 text-end font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
