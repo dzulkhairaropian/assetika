@@ -159,8 +159,9 @@
                                 @endif
                             </button>
 
-                            <div x-show="filterOpen" x-transition
-                                class="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+                            <div x-show="filterOpen"
+                                x-transition
+                                class="absolute left-0 top-full z-50 mt-2 w-80 sm:w-96 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                                 style="display: none;">
                                 <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2 dark:border-gray-800">
                                     <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-white">Filter Options</h4>
@@ -169,8 +170,8 @@
                                     </button>
                                 </div>
 
-                                <div class="space-y-3 text-left">
-                                    <div>
+                                <div class="grid grid-cols-2 gap-2.5 text-left">
+                                    <div class="col-span-2">
                                         <x-form.searchable-select name="type" label="Device Classification" :options="[
                                             ['id' => 'laptop', 'text' => 'Laptops / Notebooks'],
                                             ['id' => 'desktop', 'text' => 'Desktop PCs'],
@@ -178,25 +179,26 @@
                                         ]" :selected="request('type')" placeholder="All Hardware Types" />
                                     </div>
 
-                                    <div>
+                                    <div class="col-span-2">
                                         <x-form.searchable-select name="company_id" label="Company" :options="$companies->map(fn($cmp) => ['id' => $cmp->id, 'text' => $cmp->name])->toArray()" :selected="request('company_id')" placeholder="All Companies" />
                                     </div>
 
-                                    <div>
-                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" />
-                                    </div>
-
-                                    <div>
+                                    <div class="col-span-2 sm:col-span-1">
                                         <x-form.searchable-select name="category_id" label="Category" :options="$categories->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('category_id')" placeholder="All Categories" />
                                     </div>
 
-                                    <div>
+                                    <div class="col-span-2 sm:col-span-1">
                                         <x-form.searchable-select name="status_id" label="Status" :options="$statuses->map(fn($s) => ['id' => $s->id, 'text' => $s->name])->toArray()" :selected="request('status_id')" placeholder="All Statuses" />
                                     </div>
 
+                                    <div class="col-span-2">
+                                        <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" />
+                                    </div>
+                                </div>
+
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('assets.replacements', ['type' => $deviceType]) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
-                                        Reset
+                                    <a href="{{ route('assets.replacements', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                                        Clear All Filters
                                     </a>
                                     <button type="submit" @click="filterOpen = false"
                                         class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
@@ -207,14 +209,14 @@
                         </div>
 
                         @if(request()->filled('search') || $activeCount > 0)
-                            <a href="{{ route('assets.replacements', ['type' => $deviceType]) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
+                            <a href="{{ route('assets.replacements', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
                                 Clear
                             </a>
                         @endif
                     </form>
 
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('assets.replacements.export', request()->all()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                        <a href="{{ route('assets.replacements.export', request()->query()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                             <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
                             Export Excel
                         </a>
