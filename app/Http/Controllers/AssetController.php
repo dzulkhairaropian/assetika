@@ -35,9 +35,8 @@ class AssetController extends Controller
 
     public function replacements(Request $request)
     {
-        $deviceType = $request->input('type', 'laptop');
-        $priorityFilter = $request->input('priority');
-
+        $deviceType = $request->input('type');
+        $tab = $request->input('tab', $request->input('priority'));
         $query = Asset::with([
             'product.category',
             'product.brand',
@@ -47,7 +46,6 @@ class AssetController extends Controller
             'currentCheckout.checkedOutToUser.department',
             'assignedToUser',
         ])->dueForReplacement($deviceType);
-
         if ($request->filled('category_id')) {
             $query->whereHas('product', fn ($q) => $q->where('category_id', $request->category_id));
         }
@@ -60,6 +58,9 @@ class AssetController extends Controller
             $query->where('department_id', $request->department_id);
         }
 
+        if ($request->filled('status_id')) {
+            $query->where('status_id', $request->status_id);
+        }
         if ($request->filled('search')) {
             $like = '%'.$request->search.'%';
             $query->where(function ($q) use ($like) {
@@ -72,17 +73,33 @@ class AssetController extends Controller
         }
 
         $allAged = (clone $query)->get();
-        $totalUnits = $allAged->count();
-        $criticalUnits = $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->count();
-        $highUnits = $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->count();
-        $totalReplacementBudget = $allAged->sum(fn ($a) => (float) ($a->purchase_cost ?: 15000000));
+        $replacementSummary = [
+            'total'    => $allAged->count(),
+            'critical' => $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->count(),
+            'high'     => $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->count(),
+            'deployed' => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'deployed')->count(),
+            'broken'   => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'broken')->count(),
+            'ready'    => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['ready to deploy', 'ready']))->count(),
+            'service'  => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['service', 'service & repair', 'in repair', 'maintenance']))->count(),
+            'retired'  => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['retired', 'disposal', 'disposed']))->count(),
+        ];
 
-        if ($priorityFilter === 'critical') {
+        if ($tab === 'critical') {
             $criticalIds = $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->pluck('id')->toArray();
             $query->whereIn('assets.id', $criticalIds);
-        } elseif ($priorityFilter === 'high') {
+        } elseif ($tab === 'high') {
             $highIds = $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->pluck('id')->toArray();
             $query->whereIn('assets.id', $highIds);
+        } elseif ($tab === 'deployed') {
+            $query->whereHas('status', fn ($q) => $q->where('name', 'Deployed'));
+        } elseif ($tab === 'broken') {
+            $query->whereHas('status', fn ($q) => $q->where('name', 'Broken'));
+        } elseif ($tab === 'ready') {
+            $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Ready to Deploy', 'Ready']));
+        } elseif ($tab === 'service') {
+            $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Service & Repair', 'In Repair', 'Service', 'Maintenance']));
+        } elseif ($tab === 'retired') {
+            $query->whereHas('status', fn ($q) => $q->whereIn('name', ['Retired', 'Disposed', 'Disposal']));
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
@@ -112,18 +129,17 @@ class AssetController extends Controller
         $companies = Company::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
         $categories = Category::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))->get();
+        $statuses = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))->get();
 
         return view('pages.assets.replacements', compact(
             'assets',
-            'totalUnits',
-            'criticalUnits',
-            'highUnits',
-            'totalReplacementBudget',
             'companies',
             'departments',
             'categories',
+            'statuses',
             'deviceType',
-            'priorityFilter'
+            'tab',
+            'replacementSummary'
         ));
     }
 
