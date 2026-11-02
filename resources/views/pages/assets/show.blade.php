@@ -328,9 +328,7 @@
                             Print Label Sticker
                         </a>
                     </div>
-                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 p-1 dark:border-gray-700 dark:bg-white">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode(url('/scan/asset/' . $asset->id)) }}" alt="QR Code" class="h-full w-full object-contain">
-                    </div>
+                    <div id="asset-qr-box" class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-gray-100 bg-white p-1 dark:border-gray-700 dark:bg-white overflow-hidden [&_img]:h-full [&_img]:w-full [&_img]:object-contain [&_canvas]:h-full [&_canvas]:w-full" data-url="{{ route('assets.public-view', $asset) }}"></div>
                 </div>
             </div>
 
@@ -909,3 +907,22 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/qrcode.min.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const qrBox = document.getElementById('asset-qr-box');
+        if (qrBox && typeof QRCode !== 'undefined') {
+            new QRCode(qrBox, {
+                text: qrBox.getAttribute('data-url'),
+                width: 120,
+                height: 120,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+    });
+</script>
+@endpush

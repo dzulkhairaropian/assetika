@@ -55,9 +55,7 @@
                         </div>
 
                         <div class="flex shrink-0 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                            <div class="flex h-24 w-24 items-center justify-center rounded-2xl bg-white p-2">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ urlencode($scanTarget) }}" alt="QR Code" class="h-full w-full" />
-                            </div>
+                            <div id="public-qr-box" class="flex h-24 w-24 items-center justify-center rounded-2xl bg-white p-2 overflow-hidden [&_img]:h-full [&_img]:w-full [&_img]:object-contain [&_canvas]:h-full [&_canvas]:w-full" data-url="{{ $scanTarget }}"></div>
                             <div class="space-y-1">
                                 <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Scan</p>
                                 <p class="text-xs text-white">Public asset details</p>
@@ -184,3 +182,22 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/qrcode.min.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const qrBox = document.getElementById('public-qr-box');
+        if (qrBox && typeof QRCode !== 'undefined') {
+            new QRCode(qrBox, {
+                text: qrBox.getAttribute('data-url'),
+                width: 160,
+                height: 160,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+    });
+</script>
+@endpush
