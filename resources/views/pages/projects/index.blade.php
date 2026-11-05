@@ -328,8 +328,8 @@
     </div>
 
     <!-- Modal Create Project -->
-    <div x-show="openCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
-        <div class="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+    <div x-show="openCreateModal" class="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/50 backdrop-blur-xs p-4" x-cloak>
+        <div class="w-full max-w-lg my-auto max-h-[90vh] overflow-y-auto rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
             <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Create New Project</h3>
                 <button type="button" @click="openCreateModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">

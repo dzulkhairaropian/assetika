@@ -16,7 +16,12 @@ class ProjectService
     public function createProject(array $data): Project
     {
         return DB::transaction(function () use ($data) {
-            if (empty($data['status_id']) && ! empty($data['status'])) {
+            if (! empty($data['status_id'])) {
+                $st = Status::find($data['status_id']);
+                if ($st) {
+                    $data['status'] = strtolower(str_replace(' ', '_', $st->name));
+                }
+            } elseif (! empty($data['status'])) {
                 $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project'))
                     ->where('name', 'like', $data['status'])
                     ->first();
