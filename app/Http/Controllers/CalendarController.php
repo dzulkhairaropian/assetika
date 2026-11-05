@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalendarEvent;
+use App\Models\ProjectTask;
 use App\Models\Renewal;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -62,6 +63,30 @@ class CalendarController extends Controller
                     'calendar' => 'Danger',
                     'type' => 'ticket',
                     'real_id' => $t->id,
+                ],
+            ];
+        }
+
+        // 4. Project Tasks Due
+        $tasks = ProjectTask::with(['project', 'statusRel'])->whereNotNull('due_date')->get();
+        foreach ($tasks as $task) {
+            $isDone = in_array(strtolower($task->statusRel?->name ?? $task->status), ['done', 'completed']);
+            $isOverdue = $task->due_date->isPast() && ! $isDone;
+            $events[] = [
+                'id' => 'pt_'.$task->id,
+                'title' => '[Task] '.$task->title.($task->project ? ' ('.$task->project->name.')' : ''),
+                'start' => $task->due_date->format('Y-m-d'),
+                'allDay' => true,
+                'extendedProps' => [
+                    'calendar' => $isDone ? 'Success' : ($isOverdue ? 'Danger' : match ($task->priority) {
+                        'urgent' => 'Danger',
+                        'high' => 'Warning',
+                        'medium' => 'Primary',
+                        default => 'Info',
+                    }),
+                    'type' => 'project_task',
+                    'real_id' => $task->id,
+                    'project_id' => $task->project_id,
                 ],
             ];
         }

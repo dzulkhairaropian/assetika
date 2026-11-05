@@ -330,6 +330,7 @@ Route::middleware('auth')->group(function () {
         Route::post('projects/bulk-delete', [ProjectController::class, 'bulkDestroy'])->name('projects.bulk-delete');
         Route::resource('projects', ProjectController::class);
         Route::post('projects/{project}/tasks', [ProjectController::class, 'storeTask'])->name('projects.store-task');
+        Route::put('project-tasks/{task}', [ProjectController::class, 'updateTask'])->name('projects.update-task');
         Route::patch('project-tasks/{task}/status', [ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
         Route::delete('project-tasks/{task}', [ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
 

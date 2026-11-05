@@ -147,6 +147,25 @@ class ProjectController extends Controller
         return redirect()->back()->with('success', 'Task added to project.');
     }
 
+    public function updateTask(Request $request, ProjectTask $task): RedirectResponse
+    {
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'assigned_to_id' => ['nullable', 'exists:users,id'],
+            'status_id' => ['nullable', 'exists:statuses,id'],
+            'status' => ['nullable', 'string'],
+            'priority' => ['required', 'in:low,medium,high,urgent'],
+            'due_date' => ['nullable', 'date'],
+            'ticket_id' => ['nullable', 'exists:tickets,id'],
+            'asset_id' => ['nullable', 'exists:assets,id'],
+        ]);
+
+        $this->projectService->updateTask($task, $data);
+
+        return redirect()->back()->with('success', 'Task updated successfully.');
+    }
+
     public function updateTaskStatus(Request $request, ProjectTask $task)
     {
         $validated = $request->validate([

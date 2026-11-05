@@ -74,6 +74,47 @@ class ProjectService
         });
     }
 
+    public function updateTask(ProjectTask $task, array $data): ProjectTask
+    {
+        return DB::transaction(function () use ($task, $data) {
+            if (! empty($data['status_id'])) {
+                $st = Status::find($data['status_id']);
+                if ($st) {
+                    $data['status'] = match (strtolower($st->name)) {
+                        'to do' => 'todo',
+                        'in progress' => 'in_progress',
+                        'review' => 'review',
+                        'done' => 'done',
+                        default => strtolower(str_replace(' ', '_', $st->name)),
+                    };
+                }
+            } elseif (! empty($data['status'])) {
+                $st = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'Project Task'))
+                    ->where('name', 'like', str_replace('_', ' ', $data['status']))
+                    ->first();
+                if ($st) {
+                    $data['status_id'] = $st->id;
+                }
+            }
+
+            $task->update($data);
+
+            // Auto sync linked ticket if task is done
+            if (($task->status === 'done' || str_contains(strtolower($task->statusRel?->name ?? ''), 'done')) && $task->ticket) {
+                $closedStatus = TicketStatus::where('name', 'Closed')->first()
+                    ?? TicketStatus::where('name', 'Resolved')->first()
+                    ?? TicketStatus::where('is_closed', true)->first();
+                if ($closedStatus) {
+                    $task->ticket->update(['status_id' => $closedStatus->id]);
+                }
+            }
+
+            $task->project?->syncAutoStatus();
+
+            return $task;
+        });
+    }
+
     public function updateTaskStatus(ProjectTask $task, array $data): array
     {
         return DB::transaction(function () use ($task, $data) {

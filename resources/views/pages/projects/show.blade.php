@@ -1,7 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-4" x-data="{ openTaskModal: false }">
+<div class="space-y-4" x-data="{
+    openTaskModal: false,
+    openEditModal: false,
+    editTask: {
+        id: null,
+        title: '',
+        description: '',
+        assigned_to_id: '',
+        status_id: '',
+        priority: 'medium',
+        due_date: '',
+        ticket_id: '',
+        asset_id: '',
+        update_url: ''
+    },
+    openEdit(data) {
+        this.editTask = Object.assign({}, data);
+        this.openEditModal = true;
+    }
+}">
     <x-common.page-breadcrumb pageTitle="Project Detail" :items="[['label' => 'Projects', 'url' => route('projects.index')], ['label' => $project->code]]" />
 
     @if (session('success'))
@@ -138,14 +157,29 @@
                                  ondragstart="dragTask(event)">
                                 <div class="flex items-start justify-between gap-2">
                                     <h4 class="text-xs font-semibold text-gray-800 dark:text-white leading-snug">{{ $task->title }}</h4>
-                                    <form method="POST" action="{{ route('projects.destroy-task', $task) }}" onsubmit="return confirm('Delete task?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-gray-400 hover:text-error-500 transition">
-                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    <div class="flex items-center gap-1">
+                                        <button type="button" @click="openEdit({{ json_encode([
+                                            'id' => $task->id,
+                                            'title' => $task->title,
+                                            'description' => $task->description ?? '',
+                                            'assigned_to_id' => $task->assigned_to_id ? (string)$task->assigned_to_id : '',
+                                            'status_id' => $task->status_id ? (string)$task->status_id : '',
+                                            'priority' => $task->priority,
+                                            'due_date' => $task->due_date ? $task->due_date->format('Y-m-d') : '',
+                                            'ticket_id' => $task->ticket_id ? (string)$task->ticket_id : '',
+                                            'asset_id' => $task->asset_id ? (string)$task->asset_id : '',
+                                            'update_url' => route('projects.update-task', $task),
+                                        ]) }})" class="text-gray-400 hover:text-brand-500 transition p-0.5 rounded" title="Edit Task">
+                                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                                         </button>
-                                    </form>
-                                </div>
+                                        <form method="POST" action="{{ route('projects.destroy-task', $task) }}" onsubmit="return confirm('Delete task?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-gray-400 hover:text-error-500 transition p-0.5 rounded" title="Delete Task">
+                                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                        </form>
+                                    </div>
 
                                 @if($task->description)
                                     <p class="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 leading-tight">{{ $task->description }}</p>
@@ -164,6 +198,23 @@
                                         {{ $task->priority }}
                                     </span>
                                 </div>
+
+                                @if($task->due_date)
+                                    @php
+                                        $isDone = in_array(strtolower($task->statusRel?->name ?? $task->status), ['done', 'completed']);
+                                        $isOverdue = $task->due_date->isPast() && ! $isDone;
+                                        $isToday = $task->due_date->isToday();
+                                    @endphp
+                                    <div class="flex items-center gap-1 text-[10px] pt-1 font-medium {{ $isDone ? 'text-gray-400 dark:text-gray-500' : ($isOverdue ? 'text-red-600 dark:text-red-400 font-semibold' : ($isToday ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-gray-500 dark:text-gray-400')) }}">
+                                        <i data-lucide="calendar" class="w-2.5 h-2.5"></i>
+                                        <span>{{ $task->due_date->format('d M Y') }}</span>
+                                        @if($isOverdue)
+                                            <span class="rounded bg-red-100 px-1 text-[9px] text-red-700 dark:bg-red-900/30 dark:text-red-400">Overdue</span>
+                                        @elseif($isToday)
+                                            <span class="rounded bg-amber-100 px-1 text-[9px] text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Today</span>
+                                        @endif
+                                    </div>
+                                @endif
 
                                 @if($task->asset || $task->ticket)
                                     <div class="flex flex-wrap gap-1 text-[10px] pt-1">
@@ -212,12 +263,16 @@
                     <x-form.searchable-select name="assigned_to_id" label="Assigned To" :options="$userOpts" :selected="old('assigned_to_id')" placeholder="Unassigned" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <x-form.searchable-select name="status_id" label="Initial Status" :options="$statusOpts" :selected="old('status_id')" placeholder="Select Status" />
                     </div>
                     <div>
                         <x-form.searchable-select name="priority" label="Priority" :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Due Date</label>
+                        <input type="date" name="due_date" value="{{ old('due_date') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
                     </div>
                 </div>
 
@@ -238,6 +293,93 @@
                 <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
                     <button type="button" @click="openTaskModal = false" class="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">Cancel</button>
                     <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Edit Task -->
+    <div x-show="openEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
+        <div class="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Edit Task</h3>
+                <button type="button" @click="openEditModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form :action="editTask.update_url" method="POST" class="space-y-3.5 text-left">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Task Title <span class="text-error-500">*</span></label>
+                    <input type="text" name="title" x-model="editTask.title" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Assigned To</label>
+                    <select name="assigned_to_id" x-model="editTask.assigned_to_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                        <option value="">Unassigned</option>
+                        @foreach($users as $u)
+                            <option value="{{ $u->id }}">{{ $u->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Status</label>
+                        <select name="status_id" x-model="editTask.status_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                            <option value="">Select Status</option>
+                            @foreach($taskStatuses as $st)
+                                <option value="{{ $st->id }}">{{ $st->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Priority <span class="text-error-500">*</span></label>
+                        <select name="priority" x-model="editTask.priority" required class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Due Date</label>
+                        <input type="date" name="due_date" x-model="editTask.due_date" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Link Asset (Optional)</label>
+                        <select name="asset_id" x-model="editTask.asset_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                            <option value="">None</option>
+                            @foreach($assets as $a)
+                                <option value="{{ $a->id }}">{{ $a->asset_tag }} - {{ $a->product?->name ?? $a->device_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Link Ticket (Optional)</label>
+                        <select name="ticket_id" x-model="editTask.ticket_id" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200">
+                            <option value="">None</option>
+                            @foreach($tickets as $t)
+                                <option value="{{ $t->id }}">#{{ $t->request_id }} - {{ Str::limit($t->problem_description, 40) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Description</label>
+                    <textarea name="description" x-model="editTask.description" rows="2" class="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                    <button type="button" @click="openEditModal = false" class="rounded-lg border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition">Update Task</button>
                 </div>
             </form>
         </div>

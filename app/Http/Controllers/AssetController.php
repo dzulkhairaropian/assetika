@@ -74,14 +74,14 @@ class AssetController extends Controller
 
         $allAged = (clone $query)->get();
         $replacementSummary = [
-            'total'    => $allAged->count(),
+            'total' => $allAged->count(),
             'critical' => $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->count(),
-            'high'     => $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->count(),
+            'high' => $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->count(),
             'deployed' => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'deployed')->count(),
-            'broken'   => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'broken')->count(),
-            'ready'    => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['ready to deploy', 'ready']))->count(),
-            'service'  => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['service', 'service & repair', 'in repair', 'maintenance']))->count(),
-            'retired'  => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['retired', 'disposal', 'disposed']))->count(),
+            'broken' => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'broken')->count(),
+            'ready' => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['ready to deploy', 'ready']))->count(),
+            'service' => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['service', 'service & repair', 'in repair', 'maintenance']))->count(),
+            'retired' => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['retired', 'disposal', 'disposed']))->count(),
         ];
 
         if ($tab === 'critical') {
