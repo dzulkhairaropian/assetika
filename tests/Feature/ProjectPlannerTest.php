@@ -166,3 +166,20 @@ test('manual_actions_can_create_ticket_for_project_and_tasks', function () {
     $this->assertNotNull($task1->ticket_id);
     $this->assertNotNull($task2->ticket_id);
 });
+
+test('projects_index_and_show_pages_render_without_error', function () {
+    Role::firstOrCreate(['name' => 'it_admin']);
+    $user = User::factory()->create();
+    $user->assignRole('it_admin');
+    $this->actingAs($user);
+
+    $project = Project::create([
+        'code' => 'PRJ-202611-0005',
+        'name' => 'Page Render Verification',
+        'priority' => 'low',
+        'status' => 'planning',
+    ]);
+
+    $this->get(route('projects.index'))->assertOk();
+    $this->get(route('projects.show', $project))->assertOk();
+});
