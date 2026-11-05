@@ -26,7 +26,7 @@ class ProjectController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Project::with(['owner.department', 'statusRel', 'tasks.statusRel', 'tasks.assignedTo']);
+        $query = Project::with(['owner.department', 'statusRel', 'ticket', 'tasks.statusRel', 'tasks.assignedTo']);
 
         if ($search = $request->string('search')->trim()->toString()) {
             $query->where(function ($q) use ($search) {
@@ -62,7 +62,10 @@ class ProjectController extends Controller
         $projectStatuses = $projectMC ? Status::where('master_category_id', $projectMC->id)->get() : collect();
         $statusOpts = $projectStatuses->map(fn ($s) => ['id' => $s->id, 'text' => $s->name])->values()->all();
 
-        return view('pages.projects.index', compact('projects', 'search', 'users', 'projectStatuses', 'userOpts', 'statusOpts', 'summary'));
+        $tickets = Ticket::latest()->limit(50)->get();
+        $ticketOpts = $tickets->map(fn ($t) => ['id' => $t->id, 'text' => '#'.$t->request_id.' - '.Str::limit($t->problem_description, 40)])->values()->all();
+
+        return view('pages.projects.index', compact('projects', 'search', 'users', 'tickets', 'projectStatuses', 'userOpts', 'ticketOpts', 'statusOpts', 'summary'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -77,6 +80,8 @@ class ProjectController extends Controller
             'start_date' => ['nullable', 'date'],
             'due_date' => ['nullable', 'date'],
             'budget' => ['nullable', 'numeric'],
+            'ticket_id' => ['nullable', 'exists:tickets,id'],
+            'auto_create_ticket' => ['nullable', 'boolean'],
         ]);
 
         $this->projectService->createProject($data);
@@ -86,7 +91,7 @@ class ProjectController extends Controller
 
     public function show(Project $project): View
     {
-        $project->load(['owner', 'statusRel', 'tasks.assignedTo', 'tasks.ticket', 'tasks.asset', 'tasks.statusRel']);
+        $project->load(['owner', 'statusRel', 'ticket', 'tasks.assignedTo', 'tasks.ticket', 'tasks.asset', 'tasks.statusRel']);
         $users = User::orderBy('name')->get();
         $tickets = Ticket::latest()->limit(50)->get();
         $assets = Asset::latest()->limit(50)->get();
@@ -114,6 +119,7 @@ class ProjectController extends Controller
             'start_date' => ['nullable', 'date'],
             'due_date' => ['nullable', 'date'],
             'budget' => ['nullable', 'numeric'],
+            'ticket_id' => ['nullable', 'exists:tickets,id'],
         ]);
 
         $this->projectService->updateProject($project, $data);
@@ -140,6 +146,7 @@ class ProjectController extends Controller
             'due_date' => ['nullable', 'date'],
             'ticket_id' => ['nullable', 'exists:tickets,id'],
             'asset_id' => ['nullable', 'exists:assets,id'],
+            'auto_create_ticket' => ['nullable', 'boolean'],
         ]);
 
         $this->projectService->addTask($project, $data);
@@ -189,6 +196,31 @@ class ProjectController extends Controller
         $project?->syncAutoStatus();
 
         return redirect()->back()->with('success', 'Task deleted.');
+    }
+
+    public function createProjectTicket(Project $project): RedirectResponse
+    {
+        $ticket = $this->projectService->createTicketForProject($project);
+
+        return redirect()->back()->with('success', 'Ticket #'.$ticket->request_id.' created for project.');
+    }
+
+    public function createTaskTicket(ProjectTask $task): RedirectResponse
+    {
+        $ticket = $this->projectService->createTicketForTask($task);
+
+        return redirect()->back()->with('success', 'Ticket #'.$ticket->request_id.' created for task.');
+    }
+
+    public function bulkCreateTaskTickets(Project $project): RedirectResponse
+    {
+        $createdCount = 0;
+        foreach ($project->tasks()->whereNull('ticket_id')->get() as $task) {
+            $this->projectService->createTicketForTask($task);
+            $createdCount++;
+        }
+
+        return redirect()->back()->with('success', "{$createdCount} tickets created for project tasks.");
     }
 
     public function bulkDestroy(Request $request): RedirectResponse

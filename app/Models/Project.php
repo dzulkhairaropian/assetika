@@ -23,6 +23,7 @@ class Project extends Model
         'start_date',
         'due_date',
         'budget',
+        'ticket_id',
     ];
 
     protected $casts = [
@@ -44,6 +45,11 @@ class Project extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(ProjectTask::class);
+    }
+
+    public function ticket(): BelongsTo
+    {
+        return $this->belongsTo(Ticket::class);
     }
 
     public function getProgressPercentageAttribute(): int

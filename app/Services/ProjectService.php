@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Priority;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\Status;
+use App\Models\Ticket;
 use App\Models\TicketStatus;
+use App\Models\TicketType;
 use Illuminate\Support\Facades\DB;
 
 class ProjectService
@@ -23,8 +26,16 @@ class ProjectService
             }
 
             $data['code'] = 'PRJ-'.date('Ym').'-'.strtoupper(substr(uniqid(), -4));
+            $autoCreateTicket = ! empty($data['auto_create_ticket']);
+            unset($data['auto_create_ticket']);
 
-            return Project::create($data);
+            $project = Project::create($data);
+
+            if ($autoCreateTicket && empty($project->ticket_id)) {
+                $this->createTicketForProject($project);
+            }
+
+            return $project;
         });
     }
 
@@ -67,7 +78,15 @@ class ProjectService
                 }
             }
 
+            $autoCreateTicket = ! empty($data['auto_create_ticket']);
+            unset($data['auto_create_ticket']);
+
             $task = $project->tasks()->create($data);
+
+            if ($autoCreateTicket && empty($task->ticket_id)) {
+                $this->createTicketForTask($task);
+            }
+
             $project->syncAutoStatus();
 
             return $task;
@@ -112,6 +131,77 @@ class ProjectService
             $task->project?->syncAutoStatus();
 
             return $task;
+        });
+    }
+
+    public function mapPriorityId(?string $priority): ?int
+    {
+        return match (strtolower((string) $priority)) {
+            'urgent' => Priority::where('name', 'Critical')->orWhere('code', 'CRITICAL')->value('id')
+                ?? Priority::first()?->id,
+            'high' => Priority::where('name', 'High')->orWhere('code', 'HIGH')->value('id')
+                ?? Priority::first()?->id,
+            'medium' => Priority::where('name', 'Medium')->orWhere('code', 'MEDIUM')->value('id')
+                ?? Priority::first()?->id,
+            'low' => Priority::where('name', 'Low')->orWhere('code', 'LOW')->value('id')
+                ?? Priority::first()?->id,
+            default => Priority::where('name', 'Medium')->orWhere('code', 'MEDIUM')->value('id')
+                ?? Priority::first()?->id,
+        };
+    }
+
+    public function createTicketForProject(Project $project): Ticket
+    {
+        return DB::transaction(function () use ($project) {
+            if ($project->ticket_id && $existing = Ticket::find($project->ticket_id)) {
+                return $existing;
+            }
+
+            $ticketService = app(TicketService::class);
+            $openStatus = TicketStatus::where('name', 'Open')->first() ?? TicketStatus::first();
+            $reqType = TicketType::where('code', 'REQ')->orWhere('name', 'like', '%Request%')->first();
+
+            $ticket = $ticketService->createTicket([
+                'subject' => '[Project] '.$project->name,
+                'problem_description' => $project->description ?: ('Project initiative: '.$project->name.' ('.$project->code.')'),
+                'requester_user_id' => $project->owner_id ?: auth()->id(),
+                'ticket_type_id' => $reqType?->id,
+                'status_id' => $openStatus?->id,
+                'priority_id' => $this->mapPriorityId($project->priority),
+            ]);
+
+            $project->update(['ticket_id' => $ticket->id]);
+
+            return $ticket;
+        });
+    }
+
+    public function createTicketForTask(ProjectTask $task): Ticket
+    {
+        return DB::transaction(function () use ($task) {
+            if ($task->ticket_id && $existing = Ticket::find($task->ticket_id)) {
+                return $existing;
+            }
+
+            $ticketService = app(TicketService::class);
+            $openStatus = TicketStatus::where('name', 'Open')->first() ?? TicketStatus::first();
+            $reqType = TicketType::where('code', 'REQ')->orWhere('name', 'like', '%Request%')->first();
+
+            $project = $task->project;
+            $ticket = $ticketService->createTicket([
+                'subject' => '[Task] '.$task->title.($project ? ' ('.$project->code.')' : ''),
+                'problem_description' => $task->description ?: ('Task: '.$task->title.' under Project '.($project?->name ?? '')),
+                'requester_user_id' => $project?->owner_id ?: auth()->id(),
+                'assigned_to_id' => $task->assigned_to_id,
+                'asset_id' => $task->asset_id,
+                'ticket_type_id' => $reqType?->id,
+                'status_id' => $openStatus?->id,
+                'priority_id' => $this->mapPriorityId($task->priority),
+            ]);
+
+            $task->update(['ticket_id' => $ticket->id]);
+
+            return $ticket;
         });
     }
 

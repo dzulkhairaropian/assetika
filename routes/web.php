@@ -333,6 +333,9 @@ Route::middleware('auth')->group(function () {
         Route::put('project-tasks/{task}', [ProjectController::class, 'updateTask'])->name('projects.update-task');
         Route::patch('project-tasks/{task}/status', [ProjectController::class, 'updateTaskStatus'])->name('projects.update-task-status');
         Route::delete('project-tasks/{task}', [ProjectController::class, 'destroyTask'])->name('projects.destroy-task');
+        Route::post('projects/{project}/create-ticket', [ProjectController::class, 'createProjectTicket'])->name('projects.create-ticket');
+        Route::post('projects/{project}/tasks/bulk-create-tickets', [ProjectController::class, 'bulkCreateTaskTickets'])->name('projects.bulk-create-task-tickets');
+        Route::post('project-tasks/{task}/create-ticket', [ProjectController::class, 'createTaskTicket'])->name('projects.create-task-ticket');
 
         Route::resource('renewals', RenewalController::class);
     });

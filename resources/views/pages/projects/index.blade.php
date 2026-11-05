@@ -175,9 +175,14 @@
                                     <a href="{{ route('projects.show', $project) }}" class="font-semibold text-gray-900 hover:text-brand-600 dark:text-white transition">
                                         {{ $project->name }}
                                     </a>
-                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                    <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                         <span class="font-mono text-[10px] font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-1.5 py-0.2 rounded">{{ $project->code }}</span>
                                         <span class="text-[11px] text-gray-400 dark:text-gray-500">• {{ $project->owner?->name ?? 'Unassigned' }}</span>
+                                        @if($project->ticket)
+                                            <a href="{{ route('tickets.show', $project->ticket_id) }}" class="inline-flex items-center gap-1 rounded bg-emerald-50 text-emerald-700 px-1.5 py-0.2 text-[10px] font-medium dark:bg-emerald-500/10 dark:text-emerald-300 hover:underline">
+                                                <i data-lucide="ticket" class="w-2.5 h-2.5"></i> #{{ $project->ticket->request_id }}
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -351,6 +356,30 @@
                     <div>
                         <x-form.searchable-select name="priority" label="Priority" :options="[['id' => 'low', 'text' => 'Low'], ['id' => 'medium', 'text' => 'Medium'], ['id' => 'high', 'text' => 'High'], ['id' => 'urgent', 'text' => 'Urgent']]" :selected="old('priority', 'medium')" placeholder="Select Priority" required="true" />
                     </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Start Date</label>
+                        <input type="date" name="start_date" value="{{ old('start_date') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">Due Date</label>
+                        <input type="date" name="due_date" value="{{ old('due_date') }}" class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"/>
+                    </div>
+                </div>
+
+                <div class="space-y-2 rounded-lg border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-800/30">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-gray-800 dark:text-gray-200">Ticket Integration</label>
+                    </div>
+                    <div>
+                        <x-form.searchable-select name="ticket_id" label="Link Existing Ticket" :options="$ticketOpts" :selected="old('ticket_id')" placeholder="None (or create new below)" />
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer pt-1">
+                        <input type="checkbox" name="auto_create_ticket" value="1" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900" {{ old('auto_create_ticket', '1') ? 'checked' : '' }}>
+                        <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Auto-create Helpdesk Ticket for this Project</span>
+                    </label>
                 </div>
 
                 <div>
