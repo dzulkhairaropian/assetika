@@ -94,10 +94,16 @@
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('asset-transfers.index', request('status') ? ['status' => request('status')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
-                                        Clear
+                                    <a href="{{ route('asset-transfers.index', request('status') ? ['status' => request('status')] : []) }}" class="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400 transition">
+                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                        <span>Clear</span>
                                     </a>
                                     <button type="submit" @click="filterOpen = false"
+                                        class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 shadow-sm transition">
+                                        <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                                        <span>Apply</span>
+                                    </button>
+                                </div>
                                         class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
                                         Apply Filters
                                     </button>
@@ -232,13 +238,15 @@
                                         <div class="flex items-center justify-end gap-1.5">
                                             <form action="{{ route('asset-transfers.approve', $transfer) }}" method="POST" onsubmit="return confirm('Approve asset transfer and relocate asset?')">
                                                 @csrf
-                                                <button type="submit" class="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition">
+                                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition">
+                                                    <i data-lucide="check" class="w-3 h-3"></i>
                                                     Approve
                                                 </button>
                                             </form>
                                             <form action="{{ route('asset-transfers.reject', $transfer) }}" method="POST" onsubmit="return confirm('Reject asset transfer request?')">
                                                 @csrf
-                                                <button type="submit" class="rounded-lg bg-rose-50 border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400 transition">
+                                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-rose-50 border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400 active:scale-[0.98] transition">
+                                                    <i data-lucide="x" class="w-3 h-3"></i>
                                                     Reject
                                                 </button>
                                             </form>
