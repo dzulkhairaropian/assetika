@@ -198,7 +198,7 @@ class AssetManagementController extends Controller
         }
 
         $request->validate([
-            'service_provider' => 'required|string|max:255',
+            'service_provider' => 'required|string|max:255|exists:vendors,name',
             'description' => 'required|string',
             'cost' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',

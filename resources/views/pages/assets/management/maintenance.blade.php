@@ -40,13 +40,13 @@
                             <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-400">
                                 Service Provider / Vendor Workshop <span class="text-error-500">*</span>
                             </label>
-                            <input list="serviceProviderList" name="service_provider" value="{{ old('service_provider') }}" required placeholder="Type or select service provider..."
-                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition" />
-                            <datalist id="serviceProviderList">
+                            <select name="service_provider" required
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 transition">
+                                <option value="">Select service provider...</option>
                                 @foreach($vendors as $vendor)
-                                    <option value="{{ $vendor->name }}">
+                                    <option value="{{ $vendor->name }}" @selected(old('service_provider') === $vendor->name)>{{ $vendor->name }}</option>
                                 @endforeach
-                            </datalist>
+                            </select>
                             @error('service_provider') <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
 
