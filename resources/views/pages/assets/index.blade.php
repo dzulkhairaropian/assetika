@@ -110,19 +110,24 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 translate-y-0"
             x-transition:leave-end="opacity-0 -translate-y-2"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 shadow-xs dark:border-brand-900/50 dark:bg-brand-950/40"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-200 bg-brand-50/80 p-3 shadow-sm backdrop-blur-sm dark:border-brand-900/50 dark:bg-brand-950/40"
             style="display: none;">
-            <div class="flex items-center gap-2">
-                <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
-                <span class="text-xs font-semibold text-brand-700 dark:text-brand-400">
-                    <span x-text="selectedAssets.length"></span> assets selected.
+            <div class="flex items-center gap-2.5">
+                <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
+                    <i data-lucide="check-square" class="w-4 h-4"></i>
+                </div>
+                <span class="text-xs font-semibold text-brand-900 dark:text-brand-200">
+                    <span class="font-bold text-brand-700 dark:text-brand-400" x-text="selectedAssets.length"></span> assets selected
                 </span>
+                <button type="button" @click="selectedAssets = []; selectAll = false" class="text-[11px] font-medium text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300 hover:underline">
+                    Deselect All
+                </button>
             </div>
-            <div class="flex items-center gap-2.5 flex-wrap">
-                <div class="flex items-center gap-1.5">
-                    <label class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Copies:</label>
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-1.5 rounded-lg border border-brand-200 bg-white px-2 py-1 dark:border-brand-900/50 dark:bg-gray-900">
+                    <label for="labelCopies" class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Copies:</label>
                     <input type="number" id="labelCopies" min="1" max="10" value="1"
-                        class="w-12 rounded-lg border border-gray-300 bg-white dark:bg-gray-900 dark:border-gray-700 px-2 py-1 text-center text-xs font-semibold text-gray-800 dark:text-white focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                        class="w-10 rounded border-0 bg-transparent p-0 text-center text-xs font-bold text-gray-800 focus:outline-none focus:ring-0 dark:text-white">
                 </div>
                 <button type="button" @click="
                     const form = document.createElement('form');
@@ -141,7 +146,7 @@
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     Bulk Checkout
                 </button>
-                <button type="button" @click="bulkStatusModalOpen = true"
+                <button type="button" @click="bulkStatusModalOpen = true; $nextTick(() => { if (window.createIcons && window.lucideIcons) { window.createIcons({ icons: window.lucideIcons }); } })"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 active:scale-[0.98]">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     Change Status
@@ -152,14 +157,14 @@
                     Print Labels
                 </button>
                 <button type="button" @click="exportSelectedAssets(selectedAssets)"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600 active:scale-[0.98]">
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-xs font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50 dark:border-brand-800 dark:bg-gray-900 dark:text-brand-300 dark:hover:bg-gray-800 active:scale-[0.98]">
                     <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                    Export Selected
+                    Export
                 </button>
                 <button type="button" @click="if (confirm('Are you sure you want to delete the selected assets?')) { document.getElementById('bulkDeleteForm').submit(); }"
-                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-error-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-error-600 active:scale-[0.98]">
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-red-700 active:scale-[0.98]">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    Delete Selected
+                    Delete
                 </button>
             </div>
         </div>
@@ -202,11 +207,13 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
-                        <button type="button" @click="bulkStatusModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
-                            Cancel
+                        <button type="button" @click="bulkStatusModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            <span>Cancel</span>
                         </button>
-                        <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 transition">
-                            Apply Update
+                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 shadow-sm transition">
+                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                            <span>Apply Update</span>
                         </button>
                     </div>
                 </form>
@@ -351,12 +358,14 @@
                                 </div>
 
                                 <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
-                                    <a href="{{ route('assets.index', request('tab') ? ['tab' => request('tab')] : []) }}" class="text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 transition">
-                                        Clear All Filters
+                                    <a href="{{ route('assets.index', request('tab') ? ['tab' => request('tab')] : []) }}" class="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400 transition">
+                                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                        <span>Clear All Filters</span>
                                     </a>
                                     <button type="submit" @click="filterOpen = false"
-                                        class="rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition">
-                                        Apply Filters
+                                        class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 shadow-sm transition">
+                                        <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                                        <span>Apply Filters</span>
                                     </button>
                                 </div>
                             </div>
@@ -564,23 +573,23 @@
                                 <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($asset->warranty_expiry_date)
                                         @if($asset->warranty_expiry_date->isPast())
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-500/10 dark:text-red-400">
                                                 <i data-lucide="shield-alert" class="w-3 h-3 text-red-600 dark:text-red-400"></i>
-                                                Warranty Expired
+                                                Expired
                                             </span>
                                         @elseif(($daysLeft = (int) ceil(now()->diffInDays($asset->warranty_expiry_date, false))) <= 30)
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
-                                                <i data-lucide="shield-off" class="w-3 h-3 text-orange-600 dark:text-orange-400"></i>
-                                                Warranty Expiring in {{ max(0, $daysLeft) }}d
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                                <i data-lucide="shield-off" class="w-3 h-3 text-amber-600 dark:text-amber-400"></i>
+                                                {{ max(0, $daysLeft) }}d left
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
                                                 <i data-lucide="shield-check" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i>
-                                                Active ({{ $asset->warranty_expiry_date->format('d/m/Y') }})
+                                                {{ $asset->warranty_expiry_date->format('d/m/Y') }}
                                             </span>
                                         @endif
                                     @else
-                                        <span class="text-gray-400 italic text-[11px]">-</span>
+                                        <span class="text-gray-400 italic text-[11px]">—</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2.5 text-end">
@@ -625,7 +634,7 @@
                                             </a>
 
                                             @if($asset->isCurrentlyCheckedOut())
-                                                <a href="{{ route('assets.checkin', $asset) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-500/10 transition-colors">
+                                                <a href="{{ route('assets.checkin', $asset) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10 transition-colors">
                                                     <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
                                                     Check-in
                                                 </a>
@@ -635,6 +644,11 @@
                                                     Check-out
                                                 </a>
                                             @endif
+
+                                            <a href="{{ route('labels.print-single', $asset) }}" target="_blank" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                                                <i data-lucide="printer" class="w-3.5 h-3.5 text-gray-400"></i>
+                                                Print Label
+                                            </a>
 
                                             <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
 
