@@ -364,6 +364,24 @@
 
             <form action="{{ route('tickets.update-status', $ticket) }}" method="POST" class="mt-4 space-y-4">
                 @csrf
+
+                <!-- Ticket Summary Info -->
+                @if($ticket->display_subject || $ticket->problem_description)
+                    <div class="rounded-xl border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-800/40">
+                        <div class="flex items-start gap-2.5">
+                            <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                                <i data-lucide="file-text" class="h-3.5 w-3.5"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-semibold text-gray-900 dark:text-white line-clamp-1">{{ $ticket->display_subject }}</p>
+                                @if($ticket->problem_description)
+                                    <p class="mt-1 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 line-clamp-2">{{ $ticket->problem_description }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                         New Status <span class="text-error-500">*</span>
@@ -410,11 +428,13 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
-                    <button type="button" @click="statusModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
-                        Cancel
+                    <button type="button" @click="statusModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <span>Cancel</span>
                     </button>
-                    <button type="submit" class="rounded-lg bg-success-500 px-4 py-2 text-xs font-semibold text-white hover:bg-success-600 transition">
-                        Update Status
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-success-500 px-4 py-2 text-xs font-semibold text-white hover:bg-success-600 shadow-sm transition">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                        <span>Update Status</span>
                     </button>
                 </div>
             </form>

@@ -7,13 +7,22 @@
     statusModalOpen: false,
     activeTicketId: null,
     activeTicketKey: '',
+    activeTicketSubject: '',
+    activeTicketDescription: '',
     activeStatusId: '',
     closedIds: {{ json_encode($statuses->where('is_closed')->pluck('id')->map(fn ($id) => (int) $id)->values()) }},
-    openStatusModal(id, key, statusId) {
+    openStatusModal(id, key, statusId, subject = '', description = '') {
         this.activeTicketId = id;
         this.activeTicketKey = key;
+        this.activeTicketSubject = subject || '';
+        this.activeTicketDescription = description || '';
         this.activeStatusId = String(statusId || '');
         this.statusModalOpen = true;
+        this.$nextTick(() => {
+            if (window.createIcons && window.lucideIcons) {
+                window.createIcons({ icons: window.lucideIcons });
+            }
+        });
     },
     autoCompleteModal() {
         const sel = document.getElementById('tableUpdateStatusSelect');
@@ -563,7 +572,7 @@
                                         </a>
 
                                         @if(auth()->user()?->hasAnyRole(['super_admin', 'it_admin']))
-                                            <button type="button" @click="open = false; openStatusModal({{ $ticket->id }}, '{{ $ticket->request_id }}', {{ $ticket->status_id ?? 'null' }})" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
+                                            <button type="button" @click="open = false; openStatusModal({{ $ticket->id }}, '{{ $ticket->request_id }}', {{ $ticket->status_id ?? 'null' }}, {{ json_encode($ticket->display_subject) }}, {{ json_encode($ticket->problem_description ?? '') }})" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
                                                 <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                                                 Update Status
                                             </button>
@@ -659,6 +668,20 @@
 
             <form :action="'/tickets/' + activeTicketId + '/update-status'" method="POST" class="mt-4 space-y-4">
                 @csrf
+
+                <!-- Ticket Summary Info -->
+                <div x-show="activeTicketSubject || activeTicketDescription" class="rounded-xl border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-800/40">
+                    <div class="flex items-start gap-2.5">
+                        <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                            <i data-lucide="file-text" class="h-3.5 w-3.5"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold text-gray-900 dark:text-white line-clamp-1" x-text="activeTicketSubject"></p>
+                            <p x-show="activeTicketDescription" class="mt-1 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 line-clamp-2" x-text="activeTicketDescription"></p>
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
                         New Status <span class="text-red-500">*</span>
@@ -705,11 +728,13 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
-                    <button type="button" @click="statusModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
-                        Cancel
+                    <button type="button" @click="statusModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <span>Cancel</span>
                     </button>
-                    <button type="submit" class="rounded-lg bg-success-500 px-4 py-2 text-xs font-semibold text-white hover:bg-success-600 transition">
-                        Apply Status
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-success-500 px-4 py-2 text-xs font-semibold text-white hover:bg-success-600 shadow-sm transition">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                        <span>Apply Status</span>
                     </button>
                 </div>
             </form>
