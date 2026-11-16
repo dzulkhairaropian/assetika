@@ -136,8 +136,9 @@
                             Confirm Return to Inventory
                         </button>
 
-                        <a href="{{ route('assets.show', $asset) }}" class="inline-flex w-full items-center justify-center rounded-lg border border-transparent px-4 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">
-                            Cancel
+                        <a href="{{ route('assets.show', $asset) }}" class="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            <span>Cancel</span>
                         </a>
                     </div>
                 </div>

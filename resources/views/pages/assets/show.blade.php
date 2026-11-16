@@ -135,7 +135,7 @@
                     </a>
 
                     @if(optional($asset->status)->name !== 'Retired')
-                        <button type="button" @click="retireModalOpen = true" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400 active:scale-[0.98] transition-colors duration-150" title="Decommission & Retire Asset">
+                        <button type="button" @click="retireModalOpen = true; $nextTick(() => { if (window.createIcons && window.lucideIcons) { window.createIcons({ icons: window.lucideIcons }); } })" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400 active:scale-[0.98] transition-colors duration-150" title="Decommission & Retire Asset">
                             <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
                             Retire
                         </button>
@@ -895,11 +895,13 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
-                        <button type="button" @click="retireModalOpen = false" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-colors">
-                            Cancel
+                        <button type="button" @click="retireModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition-colors">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            <span>Cancel</span>
                         </button>
-                        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-red-700 transition-colors">
-                            Confirm Retirement
+                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-red-700 transition-colors">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <span>Confirm Retirement</span>
                         </button>
                     </div>
                 </form>
