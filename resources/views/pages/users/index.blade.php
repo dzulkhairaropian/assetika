@@ -133,7 +133,7 @@
                                         <x-form.searchable-select name="role" label="Role" :options="$roles->map(fn($r) => ['id' => $r->name, 'text' => $r->name])->toArray()" :selected="request('role')" placeholder="All Roles" />
                                     </div>
                                     <div>
-                                        <x-form.searchable-select name="company_id" label="Company" :options="$companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray()" :selected="request('company_id')" placeholder="All Companies" />
+                                        <x-form.searchable-select name="company_id" label="Company" :options="isset($companies) ? $companies->map(fn($c) => ['id' => $c->id, 'text' => $c->name])->toArray() : []" :selected="request('company_id')" placeholder="All Companies" />
                                     </div>
                                     <div>
                                         <x-form.searchable-select name="department_id" label="Department" :options="$departments->map(fn($d) => ['id' => $d->id, 'text' => $d->name])->toArray()" :selected="request('department_id')" placeholder="All Departments" />

@@ -25,7 +25,8 @@ class UserController extends Controller
         $users = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
 
         $roles = Role::all();
-        $departments = Department::all();
+        $companies = Company::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
         $summary = [
             'total' => User::count(),
             'active' => User::where('is_active', true)->count(),
@@ -33,7 +34,7 @@ class UserController extends Controller
             'today' => User::whereDate('created_at', Carbon::today())->count(),
         ];
 
-        return view('pages.users.index', compact('users', 'roles', 'departments', 'summary'));
+        return view('pages.users.index', compact('users', 'roles', 'companies', 'departments', 'summary'));
     }
 
     public function show(User $user)
