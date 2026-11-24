@@ -126,6 +126,7 @@ Route::middleware('auth')->group(function () {
 
     // Consumable, Component, License & Kit Management
     Route::middleware('role:super_admin|it_admin')->group(function () {
+        Route::get('consumables/opname-template', [ConsumableController::class, 'downloadOpnameTemplate'])->name('consumables.opname-template');
         Route::get('consumables/bulk-checkout', [ConsumableController::class, 'bulkCheckoutForm'])->name('consumables.bulk-checkout');
         Route::post('consumables/bulk-checkout', [ConsumableController::class, 'processBulkCheckout'])->name('consumables.process-bulk-checkout');
         Route::post('consumables/bulk-delete', [ConsumableController::class, 'bulkDestroy'])->name('consumables.bulk-delete');

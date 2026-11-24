@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ConsumableStockOpnameCsvExport;
+use App\Exports\ConsumableStockOpnameExport;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Consumable;
@@ -10,6 +12,7 @@ use App\Models\User;
 use App\Services\ConsumableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Excel;
 
 class ConsumableController extends Controller
 {
@@ -308,5 +311,23 @@ class ConsumableController extends Controller
         Consumable::whereIn('id', $request->ids)->delete();
 
         return redirect()->route('consumables.index')->with('success', 'Selected consumables deleted successfully.');
+    }
+
+    public function downloadOpnameTemplate(Request $request)
+    {
+        $format = strtolower((string) $request->input('format', 'excel'));
+        $dateSlug = $request->filled('opname_date') ? $request->input('opname_date') : now()->format('Y-m-d');
+
+        if ($format === 'csv') {
+            $fileName = "consumable-stock-opname-{$dateSlug}.csv";
+
+            return (new ConsumableStockOpnameCsvExport($request->all()))->download($fileName, Excel::CSV, [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        $fileName = "consumable-stock-opname-{$dateSlug}.xlsx";
+
+        return (new ConsumableStockOpnameExport($request->all()))->download($fileName);
     }
 }

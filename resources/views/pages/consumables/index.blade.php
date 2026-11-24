@@ -4,6 +4,10 @@
     <div class="space-y-4" x-data="{
         selectedConsumables: [],
         selectAll: false,
+        opnameModalOpen: false,
+        opnameDate: '{{ date('Y-m-d') }}',
+        opnameLocation: 'Central IT Storage',
+        opnameFormat: 'excel',
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -167,6 +171,11 @@
                     </form>
 
                     <div class="flex items-center gap-2">
+                        <button type="button" @click="opnameModalOpen = true; $nextTick(() => { if (window.createIcons && window.lucideIcons) { window.createIcons({ icons: window.lucideIcons }); } })"
+                            class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                            <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-brand-500"></i>
+                            Download Form Opname
+                        </button>
                         <a href="{{ route('consumables.create') }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:scale-[0.98] transition">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                             Add Consumable
@@ -330,6 +339,110 @@
                 <div class="flex-1 max-w-full overflow-x-auto flex justify-end">
                     {{ $consumables->links() }}
                 </div>
+            </div>
+        </div>
+
+        {{-- Modal: Download Form Stock Opname --}}
+        <div x-show="opnameModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-xs p-4" style="display: none;">
+            <div @click.away="opnameModalOpen = false" class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10">
+                            <i data-lucide="clipboard-list" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Download Form Stock Opname</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Export audit sheet for IT Consumables</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="opnameModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('consumables.opname-template') }}" method="GET" class="mt-4 space-y-4 text-left">
+                    {{-- Retain current active filters if applied --}}
+                    @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                    @if(request('tab')) <input type="hidden" name="status" value="{{ request('tab') }}"> @endif
+                    @if(request('category_id')) <input type="hidden" name="category_id" value="{{ is_array(request('category_id')) ? implode(',', request('category_id')) : request('category_id') }}"> @endif
+                    @if(request('product_id')) <input type="hidden" name="product_id" value="{{ is_array(request('product_id')) ? implode(',', request('product_id')) : request('product_id') }}"> @endif
+                    @if(request('brand_id')) <input type="hidden" name="brand_id" value="{{ is_array(request('brand_id')) ? implode(',', request('brand_id')) : request('brand_id') }}"> @endif
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Stock Opname Date <span class="text-brand-500">*</span>
+                        </label>
+                        <input type="date" name="opname_date" x-model="opnameDate" required
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        <p class="mt-1 text-[11px] text-gray-400">Date stated on the document header and printed form</p>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Audit Location / Storage
+                        </label>
+                        <input type="text" name="location" x-model="opnameLocation" placeholder="e.g. Central IT Storage, Floor 3 Rack B"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                            Export Format
+                        </label>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <label :class="opnameFormat === 'excel' ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-500/10 dark:border-brand-500' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950'"
+                                class="flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 transition">
+                                <input type="radio" name="format" value="excel" x-model="opnameFormat" class="sr-only">
+                                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20">
+                                    <i data-lucide="file-spreadsheet" class="h-4 w-4"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold text-gray-900 dark:text-white leading-tight">Excel (.xlsx)</p>
+                                    <p class="text-[10px] text-gray-400">Formatted & Formula</p>
+                                </div>
+                            </label>
+
+                            <label :class="opnameFormat === 'csv' ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-500/10 dark:border-brand-500' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950'"
+                                class="flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 transition">
+                                <input type="radio" name="format" value="csv" x-model="opnameFormat" class="sr-only">
+                                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/20">
+                                    <i data-lucide="file-text" class="h-4 w-4"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold text-gray-900 dark:text-white leading-tight">CSV (.csv)</p>
+                                    <p class="text-[10px] text-gray-400">Raw Data Only</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Form Highlights Preview --}}
+                    <div class="rounded-xl border border-gray-100 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-800/40 space-y-1.5 text-xs">
+                        <div class="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
+                            <span>Template Includes:</span>
+                        </div>
+                        <ul class="text-[11px] text-gray-500 dark:text-gray-400 space-y-1 pl-5 list-disc">
+                            <li>All current consumable items, category, brand & system stock</li>
+                            <li>Blank physical count column with soft blue highlighting</li>
+                            <li>Automatic difference formula & status (Match/Surplus/Shortage)</li>
+                            <li>Header info and signature sign-off section (Counted, Checked, Approved)</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <button type="button" @click="opnameModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            <span>Cancel</span>
+                        </button>
+                        <button type="submit" @click="setTimeout(() => opnameModalOpen = false, 500)"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 shadow-sm transition">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Download Template</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
