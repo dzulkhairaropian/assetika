@@ -490,7 +490,7 @@
                                         <span class="font-mono text-[11px] tracking-tight text-gray-400">S/N: {{ $asset->serial_number ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                <td class="px-4 py-2.5">
                                     <div class="flex flex-col gap-1 items-start">
                                         <x-ui.badge :color="$statusColor" variant="light" size="sm" :lucideIcon="optional($asset->status)->icon">
                                             {{ $statusName }}
@@ -504,6 +504,12 @@
                                             <x-ui.badge color="warning" variant="light" size="sm" lucideIcon="cpu">
                                                 Stripped
                                             </x-ui.badge>
+                                        @endif
+                                        @if(filled($asset->notes))
+                                            <div class="mt-0.5 flex items-start gap-1 max-w-[200px] text-[11px] leading-snug text-gray-500 dark:text-gray-400" title="{{ $asset->notes }}">
+                                                <i data-lucide="file-text" class="mt-0.5 h-3 w-3 shrink-0 text-amber-500 dark:text-amber-400"></i>
+                                                <span class="line-clamp-2 break-words">{{ $asset->notes }}</span>
+                                            </div>
                                         @endif
                                     </div>
                                 </td>
