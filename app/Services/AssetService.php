@@ -250,4 +250,57 @@ class AssetService
             return $maintenance;
         });
     }
+
+    /**
+     * Swap/replace a user's currently deployed asset with a ready-to-deploy unit atomically.
+     *
+     * @return array{old_asset: Asset, new_asset: Asset, user: User}
+     */
+    public function replaceAsset(Asset $currentAsset, Asset $replacementAsset, array $params): array
+    {
+        return DB::transaction(function () use ($currentAsset, $replacementAsset, $params) {
+            if ($currentAsset->id === $replacementAsset->id) {
+                throw new \RuntimeException('Replacement asset must be different from the current asset.');
+            }
+
+            $currentCheckout = $currentAsset->currentCheckout;
+            $targetUser = $currentCheckout?->checkedOutToUser ?? $currentAsset->assignedToUser;
+            if (! $targetUser) {
+                throw new \RuntimeException('Current asset is not assigned to any active user.');
+            }
+
+            if ($replacementAsset->isCurrentlyCheckedOut()) {
+                throw new \RuntimeException('Selected replacement unit is already checked out to another user.');
+            }
+
+            $date = $params['replacement_date'] ?? now();
+            $mode = $params['replacement_mode'] ?? 'permanent';
+            $notes = trim((string) ($params['notes'] ?? ''));
+
+            $checkinNotes = trim("Replaced with {$replacementAsset->asset_tag}".($notes ? " — {$notes}" : ''));
+            $this->processCheckin($currentAsset, [
+                'status_id' => $params['checkin_status_id'],
+                'condition_report' => $params['condition_report'] ?? 'Returned for hardware replacement',
+                'notes' => $checkinNotes,
+                'checkin_date' => $date,
+            ]);
+
+            $modeLabel = $mode === 'loaner' ? 'Loaner' : 'Permanent';
+            $checkoutNotes = trim("[{$modeLabel} Replacement for {$currentAsset->asset_tag}]".($notes ? " {$notes}" : ''));
+
+            $this->processCheckout($replacementAsset, $targetUser, [
+                'department_id' => $currentCheckout?->department_id ?? $targetUser->department_id,
+                'location_id' => $currentCheckout?->location_id ?? $targetUser->location_id,
+                'checkout_date' => $date,
+                'expected_return_date' => $mode === 'loaner' ? ($params['expected_return_date'] ?? null) : null,
+                'notes' => $checkoutNotes,
+            ]);
+
+            return [
+                'old_asset' => $currentAsset->fresh(),
+                'new_asset' => $replacementAsset->fresh(),
+                'user' => $targetUser,
+            ];
+        });
+    }
 }

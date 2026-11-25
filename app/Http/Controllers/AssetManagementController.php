@@ -285,4 +285,34 @@ class AssetManagementController extends Controller
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset retired successfully. All open tickets closed.');
     }
+
+    public function processReplacement(Request $request, $asset)
+    {
+        if (! ($asset instanceof Asset)) {
+            $asset = Asset::findOrFail($asset);
+        }
+
+        $validated = $request->validate([
+            'replacement_asset_id' => 'required|exists:assets,id',
+            'checkin_status_id' => 'required|exists:statuses,id',
+            'replacement_mode' => 'required|in:permanent,loaner',
+            'replacement_date' => 'required|date',
+            'expected_return_date' => 'nullable|required_if:replacement_mode,loaner|date',
+            'condition_report' => 'required|string|max:500',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $replacementAsset = Asset::findOrFail($validated['replacement_asset_id']);
+
+        try {
+            $result = $this->assetService->replaceAsset($asset, $replacementAsset, $validated);
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with(
+            'success',
+            "Asset {$asset->asset_tag} replaced with {$replacementAsset->asset_tag} for {$result['user']->name}."
+        );
+    }
 }

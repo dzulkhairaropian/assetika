@@ -45,7 +45,11 @@ class AssetController extends Controller
             'location',
             'currentCheckout.checkedOutToUser.department',
             'assignedToUser',
-        ])->dueForReplacement($deviceType);
+        ])
+            ->withCount(['maintenances', 'tickets'])
+            ->withSum('maintenances', 'cost')
+            ->eligibleForReplacement($deviceType);
+
         if ($request->filled('category_id')) {
             $query->whereHas('product', fn ($q) => $q->where('category_id', $request->category_id));
         }
@@ -67,29 +71,50 @@ class AssetController extends Controller
                 $q->where('asset_tag', 'like', $like)
                     ->orWhere('serial_number', 'like', $like)
                     ->orWhere('device_name', 'like', $like)
+                    ->orWhere('notes', 'like', $like)
                     ->orWhereHas('assignedToUser', fn ($u) => $u->where('name', 'like', $like))
                     ->orWhereHas('currentCheckout.checkedOutToUser', fn ($u) => $u->where('name', 'like', $like));
             });
         }
 
-        $allAged = (clone $query)->get();
+        $allEligible = (clone $query)->get();
+        $troubledStatuses = ['broken', 'service', 'service & repair', 'in repair', 'maintenance'];
+
         $replacementSummary = [
-            'total' => $allAged->count(),
-            'critical' => $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->count(),
-            'high' => $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->count(),
-            'deployed' => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'deployed')->count(),
-            'broken' => $allAged->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'broken')->count(),
-            'ready' => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['ready to deploy', 'ready']))->count(),
-            'service' => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['service', 'service & repair', 'in repair', 'maintenance']))->count(),
-            'retired' => $allAged->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['retired', 'disposal', 'disposed']))->count(),
+            'total' => $allEligible->count(),
+            'user_needs' => $allEligible->filter(fn ($a) => $a->isCurrentlyCheckedOut())->count(),
+            'troubled' => $allEligible->filter(function ($a) use ($troubledStatuses) {
+                $statusSlug = strtolower(optional($a->status)->name ?? '');
+                $eval = $a->replacement_evaluation;
+
+                return in_array($statusSlug, $troubledStatuses, true) || $eval['maint_count'] >= 2 || $eval['ticket_count'] >= 3;
+            })->count(),
+            'critical' => $allEligible->filter(fn ($a) => $a->replacement_evaluation['tier'] === 'Critical')->count(),
+            'high' => $allEligible->filter(fn ($a) => $a->replacement_evaluation['tier'] === 'High')->count(),
+            'deployed' => $allEligible->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'deployed')->count(),
+            'broken' => $allEligible->filter(fn ($a) => strtolower(optional($a->status)->name ?? '') === 'broken')->count(),
+            'ready' => $allEligible->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['ready to deploy', 'ready'], true))->count(),
+            'service' => $allEligible->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['service', 'service & repair', 'in repair', 'maintenance'], true))->count(),
+            'retired' => $allEligible->filter(fn ($a) => in_array(strtolower(optional($a->status)->name ?? ''), ['retired', 'disposal', 'disposed'], true))->count(),
         ];
 
-        if ($tab === 'critical') {
-            $criticalIds = $allAged->filter(fn ($a) => $a->replacement_priority === 'Critical')->pluck('id')->toArray();
-            $query->whereIn('assets.id', $criticalIds);
+        if ($tab === 'user_needs') {
+            $userNeedsIds = $allEligible->filter(fn ($a) => $a->isCurrentlyCheckedOut())->pluck('id')->toArray();
+            $query->whereIn('assets.id', $userNeedsIds ?: [0]);
+        } elseif ($tab === 'troubled') {
+            $troubledIds = $allEligible->filter(function ($a) use ($troubledStatuses) {
+                $statusSlug = strtolower(optional($a->status)->name ?? '');
+                $eval = $a->replacement_evaluation;
+
+                return in_array($statusSlug, $troubledStatuses, true) || $eval['maint_count'] >= 2 || $eval['ticket_count'] >= 3;
+            })->pluck('id')->toArray();
+            $query->whereIn('assets.id', $troubledIds ?: [0]);
+        } elseif ($tab === 'critical') {
+            $criticalIds = $allEligible->filter(fn ($a) => $a->replacement_evaluation['tier'] === 'Critical')->pluck('id')->toArray();
+            $query->whereIn('assets.id', $criticalIds ?: [0]);
         } elseif ($tab === 'high') {
-            $highIds = $allAged->filter(fn ($a) => $a->replacement_priority === 'High')->pluck('id')->toArray();
-            $query->whereIn('assets.id', $highIds);
+            $highIds = $allEligible->filter(fn ($a) => $a->replacement_evaluation['tier'] === 'High')->pluck('id')->toArray();
+            $query->whereIn('assets.id', $highIds ?: [0]);
         } elseif ($tab === 'deployed') {
             $query->whereHas('status', fn ($q) => $q->where('name', 'Deployed'));
         } elseif ($tab === 'broken') {
@@ -122,7 +147,18 @@ class AssetController extends Controller
                 $sortDir
             );
         } else {
-            $query->latest('assets.release_date');
+            $orderedIds = $allEligible->sortByDesc(function ($a) {
+                $eval = $a->replacement_evaluation;
+
+                return ($eval['score'] * 100) + min(99, (int) round(($a->age_years ?? 0) * 10));
+            })->pluck('id')->values();
+
+            if ($orderedIds->isNotEmpty()) {
+                $cases = $orderedIds->map(fn ($id, $idx) => "WHEN {$id} THEN {$idx}")->implode(' ');
+                $query->orderByRaw("CASE assets.id {$cases} ELSE 999999 END");
+            } else {
+                $query->latest('assets.release_date');
+            }
         }
         $assets = $query->paginate($perPage)->withQueryString();
 
@@ -130,6 +166,25 @@ class AssetController extends Controller
         $departments = Department::orderBy('name')->get();
         $categories = Category::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))->get();
         $statuses = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))->get();
+
+        $replacementStockOptions = Asset::with(['product.brand', 'product.category', 'status'])
+            ->whereNull('current_checkout_id')
+            ->whereHas('status', fn ($q) => $q->whereIn('name', ['Ready to Deploy', 'Ready']))
+            ->orderByDesc('release_date')
+            ->orderByDesc('purchase_date')
+            ->get()
+            ->map(fn ($item) => [
+                'id' => $item->id,
+                'asset_tag' => $item->asset_tag,
+                'device_name' => $item->device_name ?: 'Unnamed Device',
+                'model' => trim(($item->product?->brand?->name ?? '').' '.($item->product?->model ?? $item->product?->name ?? '')),
+                'category' => $item->product?->category?->name ?? '-',
+                'age_years' => $item->age_years ?? 0.0,
+                'useful_life_years' => $item->useful_life_years,
+                'is_aged' => $item->isDueForReplacement(),
+                'notes' => $item->notes ?? '',
+            ])
+            ->values();
 
         return view('pages.assets.replacements', compact(
             'assets',
@@ -139,7 +194,8 @@ class AssetController extends Controller
             'statuses',
             'deviceType',
             'tab',
-            'replacementSummary'
+            'replacementSummary',
+            'replacementStockOptions'
         ));
     }
 
@@ -158,7 +214,10 @@ class AssetController extends Controller
             'vendor',
             'depreciation',
             'currentCheckout.checkedOutToUser.department',
-        ])->dueForReplacement($deviceType);
+        ])
+            ->withCount(['maintenances', 'tickets'])
+            ->withSum('maintenances', 'cost')
+            ->eligibleForReplacement($deviceType);
 
         if ($request->filled('company_id')) {
             $query->whereHas('department', fn ($q) => $q->where('company_id', $request->company_id));
@@ -172,7 +231,7 @@ class AssetController extends Controller
 
         $matchingAssets = $query->get();
         if ($priorityFilter) {
-            $matchingAssets = $matchingAssets->filter(fn ($a) => strtolower($a->replacement_priority) === strtolower($priorityFilter));
+            $matchingAssets = $matchingAssets->filter(fn ($a) => strtolower($a->replacement_evaluation['tier']) === strtolower($priorityFilter));
         }
 
         $assetIds = $matchingAssets->pluck('id')->toArray();

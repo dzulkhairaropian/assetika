@@ -467,28 +467,165 @@ class Asset extends Model
         return 'Medium';
     }
 
-    public function scopeDueForReplacement($query, string|bool|null $deviceType = null)
+    public function getReplacementEvaluationAttribute(): array
     {
-        if ($deviceType === true) {
-            $deviceType = 'laptop';
-        } elseif ($deviceType === false || $deviceType === 'all') {
-            $deviceType = null;
+        $age = $this->age_years;
+        $threshold = (float) $this->useful_life_years;
+        $statusName = strtolower(optional($this->status)->name ?? '');
+        $isBroken = $statusName === 'broken';
+        $isInService = in_array($statusName, ['in repair', 'service', 'service & repair', 'maintenance'], true);
+
+        $maintCount = $this->getAttribute('maintenances_count') !== null
+            ? (int) $this->getAttribute('maintenances_count')
+            : ($this->relationLoaded('maintenances')
+                ? $this->maintenances->count()
+                : ($this->exists ? $this->maintenances()->count() : 0));
+
+        $maintCost = $this->getAttribute('maintenances_sum_cost') !== null
+            ? (float) $this->getAttribute('maintenances_sum_cost')
+            : ($this->relationLoaded('maintenances')
+                ? (float) $this->maintenances->sum('cost')
+                : ($this->exists ? (float) $this->maintenances()->sum('cost') : 0.0));
+
+        $ticketCount = $this->getAttribute('tickets_count') !== null
+            ? (int) $this->getAttribute('tickets_count')
+            : ($this->relationLoaded('tickets')
+                ? $this->tickets->count()
+                : ($this->exists ? $this->tickets()->count() : 0));
+
+        $purchaseCost = (float) ($this->purchase_cost ?? 0);
+        $costRatio = ($purchaseCost > 0 && $maintCost > 0) ? ($maintCost / $purchaseCost) : 0.0;
+
+        $score = 0;
+        $reasons = [];
+
+        if ($isBroken) {
+            $score += 45;
+            $reasons[] = 'Broken';
+        } elseif ($isInService) {
+            $score += 35;
+            $reasons[] = 'In Repair';
         }
 
+        if ($age !== null) {
+            if ($age >= ($threshold + 1.0)) {
+                $score += 35;
+                $reasons[] = "Aged {$age}y";
+            } elseif ($age >= $threshold) {
+                $score += 25;
+                $reasons[] = "Aged {$age}y";
+            } elseif ($age >= ($threshold - 1.0)) {
+                $score += 10;
+            }
+        }
+
+        if ($maintCount >= 3) {
+            $score += 20;
+            $reasons[] = "{$maintCount}x Repairs";
+        } elseif ($maintCount >= 2) {
+            $score += 12;
+            $reasons[] = "{$maintCount}x Repairs";
+        } elseif ($maintCount === 1) {
+            $score += 4;
+        }
+
+        if ($costRatio >= 0.5) {
+            $score += 20;
+            $reasons[] = 'Repair Cost '.round($costRatio * 100).'%';
+        } elseif ($costRatio >= 0.3) {
+            $score += 10;
+            $reasons[] = 'Repair Cost '.round($costRatio * 100).'%';
+        }
+
+        if ($ticketCount >= 3) {
+            $score += 15;
+            $reasons[] = "{$ticketCount} Tickets";
+        } elseif ($ticketCount >= 2) {
+            $score += 6;
+        }
+
+        $score = min(100, $score);
+        $isDeployed = $this->isCurrentlyCheckedOut();
+
+        if ($score >= 60 || ($isBroken && $isDeployed) || ($age !== null && $age >= ($threshold + 1.0))) {
+            $tier = 'Critical';
+        } elseif ($score >= 30 || ($age !== null && $age >= $threshold) || $isBroken || $isInService || $maintCount >= 2 || $ticketCount >= 3) {
+            $tier = 'High';
+        } elseif ($score >= 15) {
+            $tier = 'Medium';
+        } else {
+            $tier = 'Low';
+        }
+
+        return [
+            'score' => $score,
+            'tier' => $tier,
+            'reasons' => $reasons,
+            'is_eligible' => count($reasons) > 0,
+            'needs_user_swap' => $isDeployed && count($reasons) > 0,
+            'maint_count' => $maintCount,
+            'maint_cost' => $maintCost,
+            'ticket_count' => $ticketCount,
+            'cost_ratio' => $costRatio,
+        ];
+    }
+
+    public function scopeDueForReplacement($query, string|bool|null $deviceType = null)
+    {
+        $deviceType = $this->normalizeDeviceType($deviceType);
+
+        return $this->applyAgeThresholdFilter($query, $deviceType);
+    }
+
+    public function scopeEligibleForReplacement($query, string|bool|null $deviceType = null)
+    {
+        $deviceType = $this->normalizeDeviceType($deviceType);
+
+        if ($deviceType) {
+            $query->whereHas('product.category', fn ($catQuery) => $this->applyDeviceTypeConstraint($catQuery, $deviceType));
+        }
+
+        return $query->where(function ($q) use ($deviceType) {
+            $q->where(fn ($ageQ) => $this->applyAgeThresholdFilter($ageQ, $deviceType))
+                ->orWhereHas('status', fn ($s) => $s->whereIn('name', ['Broken', 'In Repair', 'Service', 'Service & Repair', 'Maintenance']))
+                ->orHas('maintenances', '>=', 2)
+                ->orHas('tickets', '>=', 3);
+        });
+    }
+
+    protected function normalizeDeviceType(string|bool|null $deviceType): ?string
+    {
+        if ($deviceType === true) {
+            return 'laptop';
+        }
+        if ($deviceType === false || $deviceType === 'all') {
+            return null;
+        }
+
+        return $deviceType ?: null;
+    }
+
+    protected function applyDeviceTypeConstraint($catQuery, string $deviceType): void
+    {
+        $catQuery->where(function ($dtQ) use ($deviceType) {
+            $dtQ->where('device_type', $deviceType);
+            if ($deviceType === 'laptop') {
+                $dtQ->orWhere('name', 'like', '%laptop%')
+                    ->orWhere('name', 'like', '%notebook%')
+                    ->orWhere('code', 'NB')
+                    ->orWhere('code', 'LP');
+            }
+        });
+    }
+
+    protected function applyAgeThresholdFilter($query, ?string $deviceType)
+    {
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
 
         $query->where(function ($q) use ($isSqlite, $deviceType) {
             $q->whereHas('product.category', function ($catQuery) use ($isSqlite, $deviceType) {
                 if ($deviceType) {
-                    $catQuery->where(function ($dtQ) use ($deviceType) {
-                        $dtQ->where('device_type', $deviceType);
-                        if ($deviceType === 'laptop') {
-                            $dtQ->orWhere('name', 'like', '%laptop%')
-                                ->orWhere('name', 'like', '%notebook%')
-                                ->orWhere('code', 'NB')
-                                ->orWhere('code', 'LP');
-                        }
-                    });
+                    $this->applyDeviceTypeConstraint($catQuery, $deviceType);
                 }
 
                 if ($isSqlite) {

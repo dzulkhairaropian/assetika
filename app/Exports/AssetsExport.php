@@ -39,7 +39,10 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
             'vendor',
             'depreciation',
             'currentCheckout.checkedOutToUser.department',
-        ])->filter($this->filters);
+        ])
+            ->withCount(['maintenances', 'tickets'])
+            ->withSum('maintenances', 'cost')
+            ->filter($this->filters);
 
         $sortBy = $this->filters['sort_by'] ?? null;
         $sortDir = strtolower($this->filters['sort_dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
@@ -121,8 +124,13 @@ class AssetsExport implements FromQuery, ShouldAutoSize, WithChunkReading, WithH
         $replacement = 'Optimal Lifecycle';
         if ($asset->isDueForReplacement()) {
             $replacement = 'DUE FOR REPLACEMENT ('.$asset->replacement_priority.' Priority)';
-        } elseif (($asset->age_years ?? 0) >= 3.0) {
-            $replacement = 'Approaching Lifecycle (≥3y)';
+        } else {
+            $eval = $asset->replacement_evaluation;
+            if ($eval['is_eligible']) {
+                $replacement = 'ELIGIBLE ('.implode(', ', $eval['reasons']).')';
+            } elseif (($asset->age_years ?? 0) >= 3.0) {
+                $replacement = 'Approaching Lifecycle (≥3y)';
+            }
         }
 
         return [
