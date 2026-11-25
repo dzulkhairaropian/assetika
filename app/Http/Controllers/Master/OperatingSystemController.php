@@ -24,7 +24,7 @@ class OperatingSystemController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $operatingSystems = $query->latest()->paginate($perPage)->withQueryString();
+        $operatingSystems = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         return view('pages.master.operating-systems.index', compact('operatingSystems', 'summary'));
     }

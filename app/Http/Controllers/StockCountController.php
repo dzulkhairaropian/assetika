@@ -13,7 +13,7 @@ class StockCountController extends Controller
 {
     public function index(Request $request)
     {
-        $query = StockCount::with(['location', 'createdBy'])->orderByDesc('start_date');
+        $query = StockCount::with(['location', 'createdBy'])->latest()->orderByDesc('id');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");

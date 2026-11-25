@@ -30,7 +30,7 @@ class CompanyController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $companies = $query->latest()->paginate($perPage)->withQueryString();
+        $companies = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         return view('pages.master.companies.index', compact('companies', 'summary'));
     }

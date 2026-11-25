@@ -22,7 +22,7 @@ class UserController extends Controller
         $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
 
         $query = User::with(['roles', 'department', 'company', 'position', 'location'])->filter($request->all());
-        $users = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
+        $users = $query->orderBy($sortBy, $sortDir)->orderBy('id', $sortDir)->paginate($perPage)->withQueryString();
 
         $roles = Role::all();
         $companies = Company::orderBy('name')->get();

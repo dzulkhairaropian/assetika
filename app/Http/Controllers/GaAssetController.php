@@ -57,7 +57,7 @@ class GaAssetController extends Controller
         } elseif ($sortBy === 'purchase_price' || $sortBy === 'cost') {
             $query->orderBy('purchase_price', $sortDir);
         } else {
-            $query->latest();
+            $query->latest()->orderByDesc('id');
         }
 
         $assets = $query->paginate(25)->withQueryString();

@@ -31,7 +31,7 @@ class KbController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $articles = $query->latest()->paginate($perPage)->withQueryString();
+        $articles = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
         $categories = KbCategory::where('is_active', true)->withCount('articles')->get();
 
         return view('pages.kb.index', compact('articles', 'categories', 'summary'));

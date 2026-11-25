@@ -88,9 +88,9 @@ class ConsumableController extends Controller
         } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
             $query->orderBy('purchase_cost', $sortDir);
         } elseif ($sortBy === 'created_at') {
-            $query->orderBy('created_at', $sortDir);
+            $query->orderBy('created_at', $sortDir)->orderBy('id', $sortDir);
         } else {
-            $query->latest();
+            $query->latest()->orderByDesc('id');
         }
 
         $consumables = $query->paginate($perPage)->withQueryString();

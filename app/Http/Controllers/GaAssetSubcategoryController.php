@@ -22,7 +22,7 @@ class GaAssetSubcategoryController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $subcategories = $query->latest()->paginate(25)->withQueryString();
+        $subcategories = $query->latest()->orderByDesc('id')->paginate(25)->withQueryString();
         $categories = GaAssetCategory::all();
 
         return view('pages.ga-subcategories.index', compact('subcategories', 'categories'));

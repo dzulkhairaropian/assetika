@@ -80,9 +80,9 @@ class LicenseController extends Controller
         } elseif ($sortBy === 'expiration_date' || $sortBy === 'expiration') {
             $query->orderBy('expiration_date', $sortDir);
         } elseif ($sortBy === 'created_at') {
-            $query->orderBy('created_at', $sortDir);
+            $query->orderBy('created_at', $sortDir)->orderBy('id', $sortDir);
         } else {
-            $query->latest();
+            $query->latest()->orderByDesc('id');
         }
 
         $licenses = $query->paginate($perPage)->withQueryString();

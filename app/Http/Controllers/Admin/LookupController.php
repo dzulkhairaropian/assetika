@@ -34,7 +34,7 @@ abstract class LookupController extends Controller
             $query->where('is_active', (bool) $request->input('is_active'));
         }
 
-        return $query->orderBy('sort_order')->orderBy('name');
+        return $query->latest()->orderByDesc('id');
     }
 
     public function index(Request $request): View

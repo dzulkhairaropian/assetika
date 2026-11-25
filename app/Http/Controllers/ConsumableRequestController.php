@@ -29,7 +29,7 @@ class ConsumableRequestController extends Controller
             $query->where('status', $request->status);
         }
 
-        $requests = $query->latest('requested_at')->paginate(50)->withQueryString();
+        $requests = $query->latest('requested_at')->orderByDesc('id')->paginate(50)->withQueryString();
 
         $summary = [
             'total' => (clone $query)->count(),

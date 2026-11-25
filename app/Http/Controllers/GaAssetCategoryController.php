@@ -17,7 +17,7 @@ class GaAssetCategoryController extends Controller
                 ->orWhere('code_prefix', 'like', "%$search%");
         }
 
-        $categories = $query->latest()->paginate(25)->withQueryString();
+        $categories = $query->latest()->orderByDesc('id')->paginate(25)->withQueryString();
 
         return view('pages.ga-categories.index', compact('categories'));
     }

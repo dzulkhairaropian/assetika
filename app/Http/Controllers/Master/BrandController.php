@@ -24,7 +24,7 @@ class BrandController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $brands = $query->latest()->paginate($perPage)->withQueryString();
+        $brands = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         return view('pages.master.brands.index', compact('brands', 'summary'));
     }

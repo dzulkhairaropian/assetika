@@ -23,7 +23,7 @@ class MasterCategoryController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $masterCategories = $query->latest()->paginate($perPage)->withQueryString();
+        $masterCategories = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         return view('pages.master.master-categories.index', compact('masterCategories', 'summary'));
     }

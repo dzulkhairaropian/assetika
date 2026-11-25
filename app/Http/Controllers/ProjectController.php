@@ -55,7 +55,7 @@ class ProjectController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $projects = $query->latest()->paginate($perPage)->withQueryString();
+        $projects = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
         $users = User::orderBy('name')->get();
         $userOpts = $users->map(fn ($u) => ['id' => $u->id, 'text' => $u->name])->values()->all();
 

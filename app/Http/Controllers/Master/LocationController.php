@@ -28,7 +28,7 @@ class LocationController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $locations = $query->latest()->paginate($perPage)->withQueryString();
+        $locations = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
         $companies = Company::all();
 
         return view('pages.master.locations.index', compact('locations', 'companies', 'summary'));

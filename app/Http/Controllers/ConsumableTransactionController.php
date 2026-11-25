@@ -64,7 +64,7 @@ class ConsumableTransactionController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $transactions = $query->latest('transaction_date')->paginate($perPage)->withQueryString();
+        $transactions = $query->latest('transaction_date')->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         return view('pages.consumables.transactions', compact('transactions', 'summary'));
     }

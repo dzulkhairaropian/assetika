@@ -164,8 +164,9 @@ class TicketController extends Controller
         } elseif ($sortBy === 'status') {
             $query->orderBy(TicketStatus::select('name')->whereColumn('ticket_statuses.id', 'tickets.status_id'), $sortDir);
         } elseif ($sortBy === 'created_at') {
-            $query->orderBy('created_at', $sortDir);
-            $query->latest();
+            $query->orderBy('created_at', $sortDir)->orderBy('id', $sortDir);
+        } else {
+            $query->latest('created_at')->orderByDesc('id');
         }
 
         $tickets = $query->paginate($perPage)->withQueryString();

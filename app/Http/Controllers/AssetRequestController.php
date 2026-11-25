@@ -47,7 +47,7 @@ class AssetRequestController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $requests = $query->latest()->paginate($perPage)->withQueryString();
+        $requests = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         return view('pages.requests.index', compact('requests', 'requestSummary'));
     }

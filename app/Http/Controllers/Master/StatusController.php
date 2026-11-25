@@ -29,7 +29,7 @@ class StatusController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $statuses = $query->orderBy('master_category_id')->orderBy('name')->paginate($perPage)->withQueryString();
+        $statuses = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
         $masterCategories = MasterCategory::withCount('statuses')->orderBy('name')->get();
 
         return view('pages.master.statuses.index', compact('statuses', 'masterCategories', 'summary'));

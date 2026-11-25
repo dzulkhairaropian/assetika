@@ -56,7 +56,7 @@ class AssetTransferController extends Controller
         }
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100]) ? (int) $request->input('per_page') : 25;
-        $transfers = $query->latest()->paginate($perPage)->withQueryString();
+        $transfers = $query->latest()->orderByDesc('id')->paginate($perPage)->withQueryString();
         $companies = Company::orderBy('name')->get();
 
         return view('pages.assets.transfers.index', compact('transfers', 'summary', 'companies'));

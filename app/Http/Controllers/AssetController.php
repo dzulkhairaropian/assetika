@@ -306,7 +306,7 @@ class AssetController extends Controller
         } elseif ($sortBy === 'warranty_expiry_date' || $sortBy === 'warranty') {
             $query->orderBy('assets.warranty_expiry_date', $sortDir);
         } else {
-            $query->latest('assets.created_at');
+            $query->latest('assets.created_at')->orderByDesc('assets.id');
         }
 
         $assets = $query->paginate($perPage)->withQueryString();
@@ -751,7 +751,7 @@ class AssetController extends Controller
         ];
 
         $perPage = in_array((int) $request->input('per_page'), [10, 25, 50, 100, 250, 500]) ? (int) $request->input('per_page') : 50;
-        $assets = $query->latest()->paginate($perPage)->withQueryString();
+        $assets = $query->latest('assets.created_at')->orderByDesc('assets.id')->paginate($perPage)->withQueryString();
 
         return view('pages.assets.my-assets', compact('assets', 'summary'));
     }

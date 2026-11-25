@@ -27,7 +27,7 @@ class ProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $products = $query->latest()->paginate(50)->withQueryString();
+        $products = $query->latest()->orderByDesc('id')->paginate(50)->withQueryString();
 
         $brands = Brand::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();

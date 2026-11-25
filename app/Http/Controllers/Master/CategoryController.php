@@ -35,7 +35,7 @@ class CategoryController extends Controller
         $sortBy = in_array($request->input('sort_by'), ['code', 'name', 'device_type', 'useful_life_years', 'created_at']) ? $request->input('sort_by') : 'created_at';
         $sortDir = strtolower($request->input('sort_dir')) === 'asc' ? 'asc' : 'desc';
 
-        $categories = $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
+        $categories = $query->orderBy($sortBy, $sortDir)->orderBy('id', $sortDir)->paginate($perPage)->withQueryString();
         $masterCategories = MasterCategory::all();
 
         return view('pages.master.categories.index', compact('categories', 'masterCategories', 'summary'));

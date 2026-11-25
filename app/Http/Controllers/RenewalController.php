@@ -35,7 +35,7 @@ class RenewalController extends Controller
         } elseif ($sortBy === 'status') {
             $query->orderBy('status', $sortDir);
         } else {
-            $query->orderBy('expiration_date', 'asc');
+            $query->latest()->orderByDesc('id');
         }
 
         $renewals = $query->paginate(15)->withQueryString();
