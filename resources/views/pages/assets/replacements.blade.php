@@ -715,9 +715,9 @@
 
         {{-- Modal: Replace / Swap Asset --}}
         <div x-show="replaceModalOpen" x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-gray-900/50 backdrop-blur-sm p-4" style="display: none;">
+            class="fixed inset-0 z-[999999] flex items-center justify-center overflow-y-auto bg-gray-900/50 backdrop-blur-sm p-4 sm:p-6" style="display: none;">
             <div @click.away="replaceModalOpen = false"
-                class="my-auto w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                class="my-auto max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
                 <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
                     <div class="flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
