@@ -184,6 +184,7 @@ Route::middleware('auth')->group(function () {
         Route::post('assets/bulk-edit', [AssetController::class, 'bulkEdit'])->name('assets.bulk-edit');
         Route::get('assets/bulk-checkout', [AssetController::class, 'bulkCheckoutForm'])->name('assets.bulk-checkout');
         Route::post('assets/bulk-checkout', [AssetController::class, 'bulkCheckout'])->name('assets.bulk-checkout.process');
+        Route::get('assets/loan-form/download', [AssetManagementController::class, 'downloadLoanForm'])->name('assets.loan-form.download');
         Route::post('labels/generate', [AssetLabelController::class, 'generate'])->name('labels.generate');
         Route::get('labels/{asset}/print', [AssetLabelController::class, 'generateSingle'])->name('labels.print-single');
         Route::get('assets/{asset}/print-label', [AssetController::class, 'printLabel'])->name('assets.print-label');
@@ -204,6 +205,7 @@ Route::middleware('auth')->group(function () {
             Route::get('checkin', [AssetManagementController::class, 'showCheckin'])->name('assets.checkin');
             Route::post('checkin', [AssetManagementController::class, 'processCheckin'])->name('assets.checkin.process');
             Route::get('bast/{checkout}', [AssetManagementController::class, 'showBAST'])->name('assets.bast');
+            Route::get('loan-form/{checkout}', [AssetManagementController::class, 'downloadCheckoutLoanForm'])->name('assets.loan-form.checkout');
             Route::get('bast/{checkout}/edit', [AssetManagementController::class, 'editBAST'])->name('assets.bast.edit');
             Route::put('bast/{checkout}', [AssetManagementController::class, 'updateBAST'])->name('assets.bast.update');
             Route::get('maintenance', [AssetManagementController::class, 'showMaintenance'])->name('assets.maintenance');

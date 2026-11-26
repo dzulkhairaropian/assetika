@@ -348,10 +348,16 @@
                             @endif
 
                             <div class="flex items-center justify-between gap-2 border-t border-gray-100 pt-2.5 dark:border-gray-800 text-[11px]">
-                                <a href="{{ route('assets.bast', [$asset, $lastCheckout]) }}" target="_blank" class="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline dark:text-brand-400">
-                                    <i data-lucide="file-text" class="w-3 h-3"></i>
-                                    Last BAST PDF
-                                </a>
+                                <div class="flex items-center gap-3">
+                                    <a href="{{ route('assets.bast', [$asset, $lastCheckout]) }}" target="_blank" class="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                                        <i data-lucide="file-text" class="w-3 h-3"></i>
+                                        Last BAST PDF
+                                    </a>
+                                    <a href="{{ route('assets.loan-form.checkout', [$asset, $lastCheckout]) }}" class="inline-flex items-center gap-1 font-semibold text-emerald-600 hover:underline dark:text-emerald-400">
+                                        <i data-lucide="download" class="w-3 h-3"></i>
+                                        Loan Form
+                                    </a>
+                                </div>
                                 <button type="button" @click="activeTab = 'history'" class="inline-flex items-center gap-1 font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
                                     All Movements ({{ $asset->checkoutHistory->count() }})
                                     <i data-lucide="arrow-right" class="w-3 h-3"></i>
@@ -853,10 +859,16 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-3 text-end whitespace-nowrap">
-                                                    <a href="{{ route('assets.bast', [$asset, $history]) }}" target="_blank" class="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-semibold text-brand-600 hover:bg-gray-50 dark:border-gray-800 dark:text-brand-400 dark:hover:bg-gray-800 transition-colors">
-                                                        <i data-lucide="file-text" class="h-3 w-3"></i>
-                                                        BAST PDF
-                                                    </a>
+                                                    <div class="inline-flex items-center gap-1.5">
+                                                        <a href="{{ route('assets.bast', [$asset, $history]) }}" target="_blank" class="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-semibold text-brand-600 hover:bg-gray-50 dark:border-gray-800 dark:text-brand-400 dark:hover:bg-gray-800 transition-colors">
+                                                            <i data-lucide="file-text" class="h-3 w-3"></i>
+                                                            BAST PDF
+                                                        </a>
+                                                        <a href="{{ route('assets.loan-form.checkout', [$asset, $history]) }}" class="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-gray-800 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
+                                                            <i data-lucide="download" class="h-3 w-3"></i>
+                                                            Loan Form
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty

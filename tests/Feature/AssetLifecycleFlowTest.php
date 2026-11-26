@@ -244,3 +244,59 @@ test('asset show page displays comprehensive last user details after checkin and
     $legacyResponse->assertSee('Recorded Holder');
     $legacyResponse->assertSee('Legacy Finance Staff');
 });
+
+test('equipment loan form pdf can be downloaded blank, with selected assets, and for an existing checkout', function () {
+    $holder = User::factory()->create([
+        'name' => 'Andi Borrower',
+        'email' => 'andi@example.com',
+        'company_id' => $this->company->id,
+        'department_id' => $this->dept->id,
+    ]);
+
+    $asset = Asset::create([
+        'asset_tag' => 'ACM/NB/260501/001',
+        'product_id' => $this->product->id,
+        'department_id' => $this->dept->id,
+        'location_id' => $this->location->id,
+        'status_id' => $this->statusReady->id,
+        'serial_number' => 'SN-LOAN-001',
+    ]);
+
+    // 1. Blank loan form PDF download
+    $blankResponse = $this->get(route('assets.loan-form.download'));
+    $blankResponse->assertOk();
+    $blankResponse->assertHeader('content-type', 'application/pdf');
+    expect($blankResponse->headers->get('content-disposition'))->toContain('attachment;');
+
+    // 2. Pre-filled loan form PDF download with selected asset and borrower metadata
+    $selectedResponse = $this->get(route('assets.loan-form.download', [
+        'asset_ids' => [$asset->id],
+        'borrower_name' => 'Andi Borrower',
+        'department' => 'IT',
+        'loan_date' => now()->toDateString(),
+        'return_date' => now()->addDays(7)->toDateString(),
+        'purpose' => 'Client presentation',
+    ]));
+    $selectedResponse->assertOk();
+    $selectedResponse->assertHeader('content-type', 'application/pdf');
+
+    // 3. Checkout-specific loan form PDF download
+    $this->post(route('assets.checkout.process', $asset), [
+        'checked_out_to_user_id' => $holder->id,
+        'department_id' => $this->dept->id,
+        'location_id' => $this->location->id,
+        'checked_out_at' => now()->toDateString(),
+        'expected_return_date' => now()->addDays(5)->toDateString(),
+    ])->assertRedirect(route('assets.show', $asset));
+
+    $checkout = $asset->fresh()->currentCheckout;
+    $checkoutLoanResponse = $this->get(route('assets.loan-form.checkout', [$asset, $checkout]));
+    $checkoutLoanResponse->assertOk();
+    $checkoutLoanResponse->assertHeader('content-type', 'application/pdf');
+    expect($checkoutLoanResponse->headers->get('content-disposition'))->toContain('Andi-Borrower');
+
+    // 4. Verify UI links on index, transactions, and show pages
+    $this->get(route('assets.index'))->assertOk()->assertSee('Loan Form');
+    $this->get(route('asset-transactions.index'))->assertOk()->assertSee('Download Loan Form');
+    $this->get(route('assets.show', $asset))->assertOk()->assertSee('Loan Form');
+});

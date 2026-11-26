@@ -5,6 +5,12 @@
         selectedAssets: [],
         selectAll: false,
         bulkStatusModalOpen: false,
+        loanFormModalOpen: false,
+        loanBorrower: '',
+        loanDepartment: '',
+        loanDate: '{{ date('Y-m-d') }}',
+        loanReturnDate: '',
+        loanPurpose: '',
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -156,6 +162,11 @@
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                     Print Labels
                 </button>
+                <button type="button" @click="loanFormModalOpen = true; $nextTick(() => { if (window.createIcons && window.lucideIcons) { window.createIcons({ icons: window.lucideIcons }); } })"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm transition hover:bg-indigo-50 dark:border-indigo-800 dark:bg-gray-900 dark:text-indigo-300 dark:hover:bg-gray-800 active:scale-[0.98]">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    Loan Form
+                </button>
                 <button type="button" @click="exportSelectedAssets(selectedAssets)"
                     class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-xs font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50 dark:border-brand-800 dark:bg-gray-900 dark:text-brand-300 dark:hover:bg-gray-800 active:scale-[0.98]">
                     <i data-lucide="download" class="w-3.5 h-3.5"></i>
@@ -215,6 +226,82 @@
                             <i data-lucide="check" class="w-3.5 h-3.5"></i>
                             <span>Apply Update</span>
                         </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Download Equipment Loan Form Modal -->
+        <div x-show="loanFormModalOpen" x-cloak
+            class="fixed inset-0 z-[999999] flex items-center justify-center overflow-y-auto bg-gray-900/50 backdrop-blur-sm p-4" style="display: none;">
+            <div @click.away="loanFormModalOpen = false" class="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                            <i data-lucide="file-text" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">Download Equipment Loan Form</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                <span x-show="selectedAssets.length > 0">Pre-filled with <strong x-text="selectedAssets.length"></strong> selected item(s), or leave fields blank for manual form.</span>
+                                <span x-show="selectedAssets.length === 0">Generate a printable PDF loan form (leave fields blank for manual write-in).</span>
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" @click="loanFormModalOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('assets.loan-form.download') }}" method="GET" class="mt-4 space-y-3.5 text-left" @submit="loanFormModalOpen = false">
+                    <template x-for="asset in selectedAssets" :key="asset.id">
+                        <input type="hidden" name="asset_ids[]" :value="asset.id">
+                    </template>
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Borrower Name (Optional)</label>
+                            <input type="text" name="borrower_name" x-model="loanBorrower" placeholder="Leave blank for manual fill"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Department (Optional)</label>
+                            <input type="text" name="department" x-model="loanDepartment" placeholder="e.g. Sales / Finance"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Loan Date (Optional)</label>
+                            <input type="date" name="loan_date" x-model="loanDate"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Expected Return Date (Optional)</label>
+                            <input type="date" name="return_date" x-model="loanReturnDate"
+                                class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Purpose / Location of Use (Optional)</label>
+                        <input type="text" name="purpose" x-model="loanPurpose" placeholder="e.g. Client demo / Temporary replacement unit"
+                            class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs text-gray-800 focus:border-brand-500 focus:bg-white focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:text-white" />
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <a href="{{ route('assets.loan-form.download') }}" @click="loanFormModalOpen = false"
+                            class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400 transition">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Download Blank Form</span>
+                        </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="loanFormModalOpen = false" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 transition">
+                                <span>Cancel</span>
+                            </button>
+                            <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 shadow-sm transition">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                <span>Download PDF</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -373,6 +460,11 @@
                     </form>
 
                         <div class="flex items-center gap-2">
+                            <button type="button" @click="loanFormModalOpen = true; $nextTick(() => { if (window.createIcons && window.lucideIcons) { window.createIcons({ icons: window.lucideIcons }); } })"
+                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5 text-brand-500"></i>
+                                Loan Form
+                            </button>
                             <a href="{{ route('assets.export', request()->query()) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                                 <i data-lucide="download" class="w-3.5 h-3.5 text-gray-500"></i>
                                 Export Excel

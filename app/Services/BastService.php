@@ -102,4 +102,115 @@ class BastService
 
         return $pdf->stream($fileName);
     }
+
+    public static function generateLoanFormPdf(?AssetCheckout $checkout = null, array $options = []): Response
+    {
+        $items = [];
+        $borrowerName = trim((string) ($options['borrower_name'] ?? ''));
+        $borrowerContact = trim((string) ($options['borrower_contact'] ?? ''));
+        $department = trim((string) ($options['department'] ?? ''));
+        $location = trim((string) ($options['location'] ?? ''));
+        $loanDate = trim((string) ($options['loan_date'] ?? ''));
+        $returnDate = trim((string) ($options['return_date'] ?? ''));
+        $purpose = trim((string) ($options['purpose'] ?? ''));
+        $issuedBy = trim((string) ($options['issued_by'] ?? (auth()->user()?->name ?? '')));
+        $supervisorName = '';
+        $supervisorPosition = '';
+        $returnedAt = '';
+        $returnedBy = '';
+        $returnNotes = '';
+
+        if ($checkout) {
+            $checkout->loadMissing([
+                'asset.product.brand',
+                'asset.product.category',
+                'checkedOutToUser.department',
+                'checkedOutByUser',
+                'checkedInByUser',
+                'supervisor.position',
+                'department',
+                'location',
+            ]);
+
+            $asset = $checkout->asset;
+            $toUser = $checkout->checkedOutToUser;
+
+            $borrowerName = $toUser?->name ?? '';
+            $borrowerContact = $toUser?->email ?? '';
+            $department = $checkout->department?->name ?? $toUser?->department?->name ?? '';
+            $location = $checkout->location?->name ?? '';
+            $loanDate = $checkout->checked_out_at?->format('d M Y') ?? '';
+            $returnDate = $checkout->expected_return_date?->format('d M Y') ?? '';
+            $purpose = $checkout->checkout_notes ?? '';
+            $issuedBy = $checkout->checkedOutByUser?->name ?? $issuedBy;
+            $supervisorName = $checkout->supervisor?->name ?? '';
+            $supervisorPosition = $checkout->supervisor?->position?->name ?? '';
+            $returnedAt = $checkout->checked_in_at?->format('d M Y') ?? '';
+            $returnedBy = $checkout->checkedInByUser?->name ?? '';
+            $returnNotes = trim(($checkout->condition_report ? $checkout->condition_report.' ' : '').($checkout->checkin_notes ?? ''));
+
+            if ($asset) {
+                $items[] = [
+                    'asset_tag' => $asset->asset_tag,
+                    'serial_number' => $asset->serial_number,
+                    'description' => trim(($asset->product?->brand?->name ?? '').' '.($asset->product?->model ?? $asset->product?->name ?? $asset->device_name ?? 'IT Asset')),
+                    'qty' => 1,
+                    'accessories' => $asset->accessories ?: '-',
+                    'condition' => 'Good',
+                ];
+            }
+
+            $docDate = $checkout->checked_out_at ?? now();
+            $docNumber = sprintf('LOAN-IT/%s/%04d', $docDate->format('Y/m'), $checkout->id);
+            $safeName = preg_replace('/[^A-Za-z0-9\-]/', '-', $borrowerName ?: 'User');
+            $fileName = 'Equipment-Loan-Form-'.$safeName.'-'.$docDate->format('Ymd').'.pdf';
+        } else {
+            $assetIds = array_values(array_filter(array_map('intval', (array) ($options['asset_ids'] ?? []))));
+            if (! empty($assetIds)) {
+                $selectedAssets = Asset::with(['product.brand', 'product.category', 'status'])
+                    ->whereIn('id', $assetIds)
+                    ->get();
+
+                foreach ($selectedAssets as $asset) {
+                    $items[] = [
+                        'asset_tag' => $asset->asset_tag,
+                        'serial_number' => $asset->serial_number,
+                        'description' => trim(($asset->product?->brand?->name ?? '').' '.($asset->product?->model ?? $asset->product?->name ?? $asset->device_name ?? 'IT Asset')),
+                        'qty' => 1,
+                        'accessories' => $asset->accessories ?: '-',
+                        'condition' => $asset->status?->name ?? 'Good',
+                    ];
+                }
+            }
+
+            $formattedLoanDate = $loanDate ? Carbon::parse($loanDate)->format('d M Y') : '';
+            $formattedReturnDate = $returnDate ? Carbon::parse($returnDate)->format('d M Y') : '';
+            $loanDate = $formattedLoanDate;
+            $returnDate = $formattedReturnDate;
+
+            $docNumber = sprintf('LOAN-IT/%s/_____', now()->format('Y/m'));
+            $fileName = 'Equipment-Loan-Form-'.now()->format('Y-m-d').'.pdf';
+        }
+
+        $pdf = Pdf::loadView('pdf.loan_form', [
+            'document_number' => $docNumber,
+            'borrower_name' => $borrowerName,
+            'borrower_contact' => $borrowerContact,
+            'department' => $department,
+            'location' => $location,
+            'loan_date' => $loanDate,
+            'return_date' => $returnDate,
+            'purpose' => $purpose,
+            'issued_by' => $issuedBy,
+            'supervisor_name' => $supervisorName,
+            'supervisor_position' => $supervisorPosition,
+            'it_manager_name' => 'Afrizal Rajab',
+            'returned_at' => $returnedAt,
+            'returned_by' => $returnedBy,
+            'return_notes' => $returnNotes,
+            'items' => $items,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download($fileName);
+    }
 }

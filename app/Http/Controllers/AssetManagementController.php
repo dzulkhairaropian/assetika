@@ -141,6 +141,38 @@ class AssetManagementController extends Controller
         return BastService::generateBastPdf($asset, $checkout);
     }
 
+    public function downloadLoanForm(Request $request)
+    {
+        $assetIds = $request->input('asset_ids', []);
+        if (is_string($assetIds)) {
+            $assetIds = explode(',', $assetIds);
+        }
+
+        return BastService::generateLoanFormPdf(null, [
+            'asset_ids' => $assetIds,
+            'borrower_name' => $request->input('borrower_name'),
+            'borrower_contact' => $request->input('borrower_contact'),
+            'department' => $request->input('department'),
+            'location' => $request->input('location'),
+            'loan_date' => $request->input('loan_date'),
+            'return_date' => $request->input('return_date'),
+            'purpose' => $request->input('purpose'),
+        ]);
+    }
+
+    public function downloadCheckoutLoanForm(Request $request, $asset, AssetCheckout $checkout)
+    {
+        if (! ($asset instanceof Asset)) {
+            $asset = Asset::findOrFail($asset);
+        }
+
+        if ($checkout->asset_id !== $asset->id) {
+            abort(404);
+        }
+
+        return BastService::generateLoanFormPdf($checkout);
+    }
+
     public function editBAST(Request $request, $asset, AssetCheckout $checkout)
     {
         if (! ($asset instanceof Asset)) {
