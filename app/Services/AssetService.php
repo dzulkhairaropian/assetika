@@ -57,6 +57,12 @@ class AssetService
                 throw new \RuntimeException('Asset is already checked out.');
             }
 
+            $blockedStatusNames = ['broken', 'service', 'in repair', 'service & repair', 'maintenance', 'retired', 'disposed', 'disposal', 'sold'];
+            $currentStatusName = strtolower((string) ($lockedAsset?->status?->name ?? $asset->status?->name ?? ''));
+            if (in_array($currentStatusName, $blockedStatusNames, true)) {
+                throw new \RuntimeException("Cannot check out asset while its status is {$asset->status->name}.");
+            }
+
             $deployedStatus = Status::where('name', 'Deployed')->first();
             $deptId = $params['department_id'] ?? $toUser->department_id;
             $locId = $params['location_id'] ?? $toUser->location_id;
@@ -163,7 +169,13 @@ class AssetService
     public function processMaintenance(Asset $asset, array $params, ?UploadedFile $evidence = null): AssetMaintenance
     {
         return DB::transaction(function () use ($asset, $params, $evidence) {
-            $serviceStatus = Status::where('name', 'Service')->first() ?? Status::where('name', 'In Repair')->first();
+            $serviceStatus = Status::whereIn('name', ['Service', 'In Repair', 'Service & Repair', 'Maintenance'])
+                ->whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))
+                ->first()
+                ?? Status::whereIn('name', ['Service', 'In Repair', 'Service & Repair', 'Maintenance'])->first();
+
+            // Capture affected holder BEFORE clearing checkout/assignment
+            $affectedUser = $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser;
 
             $evidencePath = $params['evidence_file_path'] ?? null;
             if ($evidence) {
@@ -175,7 +187,8 @@ class AssetService
                 'service_provider' => $params['service_provider'],
                 'cost' => $params['cost'] ?? 0,
                 'start_date' => $params['start_date'] ?? now(),
-                'notes' => $params['description'] ?? null,
+                'description' => $params['description'] ?? null,
+                'notes' => $params['notes'] ?? null,
                 'evidence_file_path' => $evidencePath,
             ]);
 
@@ -195,13 +208,13 @@ class AssetService
                 'current_checkout_id' => null,
                 'assigned_to_user_id' => null,
                 'user_name' => null,
-                'is_components_stripped' => $params['is_components_stripped'] ?? false,
+                'is_components_stripped' => ! empty($params['is_components_stripped']),
             ]);
 
-            AssetTicketService::createMaintenanceTicket($asset, $params['service_provider'], $params['description'] ?? 'Maintenance');
+            AssetTicketService::createMaintenanceTicket($asset, $params['service_provider'], $params['description'] ?? 'Maintenance', $affectedUser);
 
             try {
-                $recipientEmail = $asset->assignedToUser?->email ?? auth()->user()?->email;
+                $recipientEmail = $affectedUser?->email ?? auth()->user()?->email;
                 if ($recipientEmail) {
                     Mail::to($recipientEmail)->send(new AssetMaintenanceStartedMail($asset, $maintenance));
                 }
@@ -216,10 +229,20 @@ class AssetService
     public function processCompleteMaintenance(Asset $asset, AssetMaintenance $maintenance, array $params, ?UploadedFile $evidence = null): AssetMaintenance
     {
         return DB::transaction(function () use ($asset, $maintenance, $params, $evidence) {
-            $readyStatus = Status::where('name', 'Ready to Deploy')->first();
+            $readyStatus = Status::where('name', 'Ready to Deploy')
+                ->whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))
+                ->first()
+                ?? Status::where('name', 'Ready to Deploy')->first();
+
+            $targetStatus = ! empty($params['status_id'])
+                ? Status::find($params['status_id'])
+                : null;
+            $resultingStatus = $targetStatus ?? $readyStatus;
+            $resultingSlug = strtolower((string) ($resultingStatus?->name ?? 'ready to deploy'));
 
             $cost = isset($params['cost']) && $params['cost'] !== '' && $params['cost'] !== null ? (float) $params['cost'] : ($maintenance->cost ?? 0);
             $notes = ! empty($params['notes']) ? $params['notes'] : (! empty($params['resolution_notes']) ? $params['resolution_notes'] : $maintenance->notes);
+            $completionDate = $params['completion_date'] ?? now();
 
             $evidencePath = $maintenance->evidence_file_path;
             if ($evidence) {
@@ -227,18 +250,35 @@ class AssetService
             }
 
             $maintenance->update([
-                'completion_date' => $params['completion_date'] ?? now(),
+                'completion_date' => $completionDate,
                 'cost' => $cost,
                 'notes' => $notes,
                 'evidence_file_path' => $evidencePath,
             ]);
 
-            $asset->update([
-                'status_id' => $readyStatus?->id ?? $asset->status_id,
-                'is_components_stripped' => false,
-            ]);
+            $isRetired = in_array($resultingSlug, ['retired', 'disposed', 'disposal'], true);
+            $isBroken = $resultingSlug === 'broken';
 
-            AssetTicketService::createCompleteMaintenanceTicket($asset, $maintenance);
+            $assetUpdate = [
+                'status_id' => $resultingStatus?->id ?? $asset->status_id,
+                'is_components_stripped' => array_key_exists('is_components_stripped', $params)
+                    ? (bool) $params['is_components_stripped']
+                    : ($isBroken ? $asset->is_components_stripped : false),
+            ];
+
+            if ($isRetired) {
+                $assetUpdate['retired_at'] = $completionDate;
+                $assetUpdate['retirement_reason'] = 'Broken Beyond Repair';
+                $assetUpdate['retirement_notes'] = $notes;
+            }
+
+            $asset->update($assetUpdate);
+
+            if ($isRetired) {
+                AssetTicketService::completeOpenTicketsForRetiredAsset($asset, 'Broken Beyond Repair', $notes);
+            } else {
+                AssetTicketService::createCompleteMaintenanceTicket($asset, $maintenance, $resultingStatus);
+            }
 
             try {
                 $recipientEmail = $asset->assignedToUser?->email ?? auth()->user()?->email;

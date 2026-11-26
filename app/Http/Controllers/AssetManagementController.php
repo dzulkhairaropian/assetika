@@ -35,6 +35,11 @@ class AssetManagementController extends Controller
             return redirect()->back()->with('error', 'Asset is already checked out.');
         }
 
+        $blockedStatusNames = ['broken', 'service', 'in repair', 'service & repair', 'maintenance', 'retired', 'disposed', 'disposal', 'sold'];
+        if (in_array(strtolower((string) ($asset->status?->name ?? '')), $blockedStatusNames, true)) {
+            return redirect()->route('assets.show', $asset)->with('error', "Cannot check out asset while its status is {$asset->status->name}.");
+        }
+
         $users = User::with(['department', 'location'])->orderBy('name')->get();
         $locations = Location::all();
         $departments = Department::all();
@@ -62,14 +67,18 @@ class AssetManagementController extends Controller
 
         $toUser = User::findOrFail($request->checked_out_to_user_id);
 
-        $this->assetService->processCheckout($asset, $toUser, [
-            'location_id' => $request->location_id,
-            'department_id' => $request->department_id,
-            'supervisor_user_id' => $request->supervisor_user_id,
-            'checkout_date' => $request->checked_out_at,
-            'expected_return_date' => $request->expected_return_date,
-            'notes' => $request->checkout_notes,
-        ], $request->file('checkout_evidence'));
+        try {
+            $this->assetService->processCheckout($asset, $toUser, [
+                'location_id' => $request->location_id,
+                'department_id' => $request->department_id,
+                'supervisor_user_id' => $request->supervisor_user_id,
+                'checkout_date' => $request->checked_out_at,
+                'expected_return_date' => $request->expected_return_date,
+                'notes' => $request->checkout_notes,
+            ], $request->file('checkout_evidence'));
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset checked out successfully.');
     }
@@ -221,7 +230,14 @@ class AssetManagementController extends Controller
             abort(404);
         }
 
-        return view('pages.assets.management.complete-maintenance', compact('asset', 'maintenance'));
+        $statuses = Status::whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))
+            ->orderBy('name')
+            ->get();
+        if ($statuses->isEmpty()) {
+            $statuses = Status::orderBy('name')->get();
+        }
+
+        return view('pages.assets.management.complete-maintenance', compact('asset', 'maintenance', 'statuses'));
     }
 
     public function processCompleteMaintenance(Request $request, $asset, AssetMaintenance $maintenance)
@@ -234,15 +250,24 @@ class AssetManagementController extends Controller
             abort(404);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'completion_date' => 'required|date',
             'cost' => 'nullable|numeric|min:0',
+            'status_id' => 'required|exists:statuses,id',
             'notes' => 'nullable|string',
             'resolution_notes' => 'nullable|string',
+            'is_components_stripped' => 'nullable|boolean',
             'evidence' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        $this->assetService->processCompleteMaintenance($asset, $maintenance, $request->all(), $request->file('evidence'));
+        $this->assetService->processCompleteMaintenance($asset, $maintenance, [
+            'completion_date' => $validated['completion_date'],
+            'cost' => $validated['cost'] ?? null,
+            'status_id' => $validated['status_id'],
+            'notes' => $validated['notes'] ?? null,
+            'resolution_notes' => $validated['resolution_notes'] ?? null,
+            'is_components_stripped' => $request->boolean('is_components_stripped'),
+        ], $request->file('evidence'));
 
         return redirect()->route('assets.show', $asset)->with('success', 'Asset maintenance completed successfully.');
     }

@@ -644,7 +644,7 @@
                                                     <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
                                                     Check-in
                                                 </a>
-                                            @else
+                                            @elseif(!in_array($statusSlug, ['broken', 'service', 'in repair', 'service & repair', 'maintenance', 'retired', 'disposed', 'disposal', 'sold']))
                                                 <a href="{{ route('assets.checkout', $asset) }}" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10 transition-colors">
                                                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                                                     Check-out

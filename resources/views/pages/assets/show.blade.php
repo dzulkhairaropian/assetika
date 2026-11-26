@@ -95,6 +95,13 @@
                 </div>
 
                 <!-- Action Toolbar: Primary vs Secondary Actions -->
+                @php
+                    $actionStatusSlug = strtolower((string) ($asset->status?->name ?? ''));
+                    $isAssetRetired = in_array($actionStatusSlug, ['retired', 'disposed', 'disposal', 'sold'], true);
+                    $isAssetBroken = $actionStatusSlug === 'broken';
+                    $isAssetInService = in_array($actionStatusSlug, ['in repair', 'service', 'service & repair', 'maintenance'], true);
+                    $activeMaintenance = $asset->maintenances->whereNull('completion_date')->first();
+                @endphp
                 <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 dark:border-gray-800 lg:border-t-0 lg:pt-0">
                     {{-- Primary Operational Action --}}
                     @if($asset->isCurrentlyCheckedOut())
@@ -102,27 +109,26 @@
                             <i data-lucide="log-in" class="h-3.5 w-3.5"></i>
                             Check-in Asset
                         </a>
-                        <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-colors duration-150">
-                            <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
-                            Maintenance
-                        </a>
+                        @if(!$isAssetInService && !$isAssetRetired)
+                            <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-colors duration-150">
+                                <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
+                                Maintenance
+                            </a>
+                        @endif
                     @else
-                        <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
-                            <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
-                            Check-out Asset
-                        </a>
+                        @if(!$isAssetBroken && !$isAssetInService && !$isAssetRetired)
+                            <a href="{{ route('assets.checkout', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-600 active:scale-[0.98] transition-colors duration-150">
+                                <i data-lucide="log-out" class="h-3.5 w-3.5"></i>
+                                Check-out Asset
+                            </a>
+                        @endif
 
-                        @if($asset->status && in_array($asset->status->name, ['In Repair', 'Service']))
-                            @php
-                                $activeMaintenance = $asset->maintenances->where('completion_date', null)->first() ?? $asset->maintenances->first();
-                            @endphp
-                            @if($activeMaintenance)
-                                <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition-colors duration-150">
-                                    <i data-lucide="circle-check" class="h-3.5 w-3.5"></i>
-                                    Complete Repair
-                                </a>
-                            @endif
-                        @else
+                        @if($activeMaintenance)
+                            <a href="{{ route('assets.maintenance.complete', [$asset, $activeMaintenance]) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition-colors duration-150">
+                                <i data-lucide="circle-check" class="h-3.5 w-3.5"></i>
+                                Complete Repair
+                            </a>
+                        @elseif(!$isAssetRetired)
                             <a href="{{ route('assets.maintenance', $asset) }}" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-colors duration-150">
                                 <i data-lucide="wrench" class="h-3.5 w-3.5"></i>
                                 Maintenance

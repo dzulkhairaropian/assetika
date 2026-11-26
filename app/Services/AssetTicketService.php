@@ -7,6 +7,7 @@ use App\Models\AssetMaintenance;
 use App\Models\Priority;
 use App\Models\SlaStatus;
 use App\Models\Source;
+use App\Models\Status;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\TicketStatus;
@@ -94,7 +95,7 @@ class AssetTicketService
         ]);
     }
 
-    public static function createMaintenanceTicket(Asset $asset, string $provider, string $description): Ticket
+    public static function createMaintenanceTicket(Asset $asset, string $provider, string $description, ?User $affectedUser = null): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);
         $inProgressStatus = TicketStatus::where('name', 'In Progress')->first() ?? TicketStatus::where('is_closed', false)->first();
@@ -103,7 +104,18 @@ class AssetTicketService
         $incType = TicketType::where('code', 'INC')->first() ?? TicketType::first();
 
         $assetName = $asset->product?->name ?? $asset->device_name ?? 'Asset';
-        $user = $asset->assignedToUser ?? auth()->user();
+        $user = $affectedUser ?? $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser ?? auth()->user();
+
+        // Transition any open "Asset Broken" tickets for this asset to In Progress
+        if ($inProgressStatus) {
+            Ticket::where('asset_id', $asset->id)
+                ->where('subject', 'like', 'Asset Broken:%')
+                ->whereHas('status', fn ($q) => $q->where('is_closed', false))
+                ->update([
+                    'status_id' => $inProgressStatus->id,
+                    'assigned_to_id' => auth()->id(),
+                ]);
+        }
 
         return static::buildAndSaveTicket([
             'subject' => "Send to Service: {$asset->asset_tag} - {$assetName}",
@@ -126,7 +138,7 @@ class AssetTicketService
         ]);
     }
 
-    public static function createBrokenTicket(Asset $asset, string $description, ?string $priorityName = 'High'): Ticket
+    public static function createBrokenTicket(Asset $asset, string $description, ?string $priorityName = 'High', ?User $affectedUser = null): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);
         $openStatus = TicketStatus::where('name', 'New')->first()
@@ -139,7 +151,7 @@ class AssetTicketService
         $incType = TicketType::where('code', 'INC')->first() ?? TicketType::first();
 
         $assetName = $asset->product?->name ?? $asset->device_name ?? 'Asset';
-        $user = $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser ?? auth()->user();
+        $user = $affectedUser ?? $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser ?? auth()->user();
 
         return static::buildAndSaveTicket([
             'subject' => "Asset Broken: {$asset->asset_tag} - {$assetName}",
@@ -162,7 +174,7 @@ class AssetTicketService
         ]);
     }
 
-    public static function createCompleteMaintenanceTicket(Asset $asset, AssetMaintenance $maintenance): Ticket
+    public static function createCompleteMaintenanceTicket(Asset $asset, AssetMaintenance $maintenance, ?Status $resultingStatus = null): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);
         $completedStatus = TicketStatus::where('name', 'Resolved')->first() ?? TicketStatus::where('name', 'Closed')->first() ?? TicketStatus::where('is_closed', true)->first();
@@ -173,6 +185,10 @@ class AssetTicketService
 
         $assetName = $asset->product?->name ?? $asset->device_name ?? 'Asset';
         $user = $asset->assignedToUser ?? auth()->user();
+        $resultStatusName = $resultingStatus?->name ?? 'Ready to Deploy';
+        $resultSlug = strtolower($resultStatusName);
+        $isBrokenOutcome = $resultSlug === 'broken';
+        $isServiceOutcome = in_array($resultSlug, ['service', 'in repair', 'service & repair', 'maintenance'], true);
 
         // Close any existing open "Send to Service" tickets for this asset
         $openServiceTickets = Ticket::where('asset_id', $asset->id)
@@ -180,18 +196,57 @@ class AssetTicketService
             ->whereHas('status', fn ($q) => $q->where('is_closed', false))
             ->get();
 
+        $resolutionSummary = $isBrokenOutcome
+            ? "Maintenance failed / unrepairable ({$maintenance->notes}). Provider: {$maintenance->service_provider}. Cost: Rp ".number_format($maintenance->cost, 0, ',', '.')
+            : "Service completed ({$resultStatusName}): {$maintenance->notes}. Provider: {$maintenance->service_provider}. Cost: Rp ".number_format($maintenance->cost, 0, ',', '.');
+
         foreach ($openServiceTickets as $openTicket) {
             $openTicket->update([
                 'status_id' => $completedStatus?->id ?? $openTicket->status_id,
                 'sla_status_id' => $fulfilledSla?->id ?? $openTicket->sla_status_id,
-                'resolution_notes' => "Service completed: {$maintenance->notes}. Provider: {$maintenance->service_provider}. Cost: Rp ".number_format($maintenance->cost, 0, ',', '.'),
+                'resolution_notes' => $resolutionSummary,
                 'completed_date' => now()->toDateString(),
                 'completed_time' => now(),
             ]);
         }
 
+        // If repair succeeded (Ready to Deploy), also close open Asset Broken tickets
+        if (! $isBrokenOutcome && ! $isServiceOutcome) {
+            $openBrokenTickets = Ticket::where('asset_id', $asset->id)
+                ->where('subject', 'like', 'Asset Broken:%')
+                ->whereHas('status', fn ($q) => $q->where('is_closed', false))
+                ->get();
+
+            foreach ($openBrokenTickets as $brokenTicket) {
+                $brokenTicket->update([
+                    'status_id' => $completedStatus?->id ?? $brokenTicket->status_id,
+                    'sla_status_id' => $fulfilledSla?->id ?? $brokenTicket->sla_status_id,
+                    'resolution_notes' => $resolutionSummary,
+                    'completed_date' => now()->toDateString(),
+                    'completed_time' => now(),
+                ]);
+            }
+        }
+
+        // If repair failed (Broken), ensure an open Broken incident ticket exists for follow-up / replacement
+        if ($isBrokenOutcome) {
+            $hasOpenBrokenTicket = Ticket::where('asset_id', $asset->id)
+                ->where('subject', 'like', 'Asset Broken:%')
+                ->whereHas('status', fn ($q) => $q->where('is_closed', false))
+                ->exists();
+
+            if (! $hasOpenBrokenTicket) {
+                return static::createBrokenTicket(
+                    $asset,
+                    "Repair unsuccessful at {$maintenance->service_provider}. Outcome notes: ".($maintenance->notes ?: 'Unrepairable'),
+                    'High',
+                    $user
+                );
+            }
+        }
+
         return static::buildAndSaveTicket([
-            'subject' => "Service Completed: {$asset->asset_tag} - {$assetName}",
+            'subject' => "Service Completed ({$resultStatusName}): {$asset->asset_tag} - {$assetName}",
             'ticket_type_id' => $reqType?->id,
             'ticket_category_id' => $catResolved['category_id'],
             'ticket_subcategory_id' => $catResolved['subcategory_id'],
@@ -207,8 +262,8 @@ class AssetTicketService
             'source_id' => $portalSource?->id,
             'status_id' => $completedStatus?->id,
             'sla_status_id' => $fulfilledSla?->id,
-            'problem_description' => "[Auto-Generated] Service Completed: {$asset->asset_tag} - {$assetName}. Status: Ready/Available.",
-            'resolution_notes' => "Maintenance completed: {$maintenance->notes}. Provider: {$maintenance->service_provider}. Cost: Rp ".number_format($maintenance->cost, 0, ',', '.'),
+            'problem_description' => "[Auto-Generated] Service Completed: {$asset->asset_tag} - {$assetName}. Resulting Status: {$resultStatusName}.",
+            'resolution_notes' => $resolutionSummary,
             'is_completed' => true,
         ]);
     }
