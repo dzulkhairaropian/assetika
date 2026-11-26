@@ -126,6 +126,42 @@ class AssetTicketService
         ]);
     }
 
+    public static function createBrokenTicket(Asset $asset, string $description, ?string $priorityName = 'High'): Ticket
+    {
+        $catResolved = static::resolveTicketCategoryForAsset($asset);
+        $openStatus = TicketStatus::where('name', 'New')->first()
+            ?? TicketStatus::where('name', 'In Progress')->first()
+            ?? TicketStatus::where('is_closed', false)->first();
+        $priority = Priority::where('name', $priorityName ?: 'High')->first()
+            ?? Priority::where('name', 'High')->first()
+            ?? Priority::first();
+        $portalSource = Source::first();
+        $incType = TicketType::where('code', 'INC')->first() ?? TicketType::first();
+
+        $assetName = $asset->product?->name ?? $asset->device_name ?? 'Asset';
+        $user = $asset->currentCheckout?->checkedOutToUser ?? $asset->assignedToUser ?? auth()->user();
+
+        return static::buildAndSaveTicket([
+            'subject' => "Asset Broken: {$asset->asset_tag} - {$assetName}",
+            'ticket_type_id' => $incType?->id,
+            'ticket_category_id' => $catResolved['category_id'],
+            'ticket_subcategory_id' => $catResolved['subcategory_id'],
+            'requester_user_id' => $user?->id,
+            'requester_name' => $user?->name,
+            'requester_email' => $user?->email,
+            'requester_company_id' => $user?->company_id,
+            'requester_department_id' => $user?->department_id,
+            'assigned_to_id' => auth()->id(),
+            'created_by_id' => auth()->id(),
+            'asset_id' => $asset->id,
+            'priority_id' => $priority?->id,
+            'source_id' => $portalSource?->id,
+            'status_id' => $openStatus?->id,
+            'problem_description' => "[Auto-Generated] Asset Marked Broken: {$asset->asset_tag} - {$assetName}.\nDamage / Issue Details: {$description}",
+            'is_completed' => false,
+        ]);
+    }
+
     public static function createCompleteMaintenanceTicket(Asset $asset, AssetMaintenance $maintenance): Ticket
     {
         $catResolved = static::resolveTicketCategoryForAsset($asset);

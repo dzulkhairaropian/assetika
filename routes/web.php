@@ -211,6 +211,7 @@ Route::middleware('auth')->group(function () {
             Route::get('maintenance/{maintenance}/complete', [AssetManagementController::class, 'showCompleteMaintenance'])->name('assets.maintenance.complete');
             Route::post('maintenance/{maintenance}/complete', [AssetManagementController::class, 'processCompleteMaintenance'])->name('assets.maintenance.complete.process');
             Route::post('retire', [AssetManagementController::class, 'processRetire'])->name('assets.retire.process');
+            Route::post('broken', [AssetManagementController::class, 'processBroken'])->name('assets.broken.process');
             Route::post('replace', [AssetManagementController::class, 'processReplacement'])->name('assets.replace');
         });
 

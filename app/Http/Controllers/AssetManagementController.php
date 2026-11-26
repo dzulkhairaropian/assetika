@@ -315,4 +315,34 @@ class AssetManagementController extends Controller
             "Asset {$asset->asset_tag} replaced with {$replacementAsset->asset_tag} for {$result['user']->name}."
         );
     }
+
+    public function processBroken(Request $request, $asset)
+    {
+        if (! ($asset instanceof Asset)) {
+            $asset = Asset::findOrFail($asset);
+        }
+
+        $validated = $request->validate([
+            'broken_date' => 'nullable|date',
+            'priority' => 'nullable|in:Low,Medium,High,Critical',
+            'description' => 'required|string|max:1000',
+            'checkin_from_holder' => 'nullable|boolean',
+            'is_components_stripped' => 'nullable|boolean',
+            'save_to_notes' => 'nullable|boolean',
+        ]);
+
+        $ticket = $this->assetService->markAsBroken($asset, [
+            'broken_date' => $validated['broken_date'] ?? null,
+            'priority' => $validated['priority'] ?? 'High',
+            'description' => $validated['description'],
+            'checkin_from_holder' => $request->boolean('checkin_from_holder'),
+            'is_components_stripped' => $request->boolean('is_components_stripped'),
+            'save_to_notes' => $request->boolean('save_to_notes'),
+        ]);
+
+        return redirect()->route('assets.show', $asset)->with(
+            'success',
+            "Asset {$asset->asset_tag} marked as Broken and Ticket #{$ticket->request_id} created automatically."
+        );
+    }
 }

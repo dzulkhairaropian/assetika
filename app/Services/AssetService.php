@@ -10,8 +10,10 @@ use App\Models\Asset;
 use App\Models\AssetCheckout;
 use App\Models\AssetMaintenance;
 use App\Models\Status;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -301,6 +303,57 @@ class AssetService
                 'new_asset' => $replacementAsset->fresh(),
                 'user' => $targetUser,
             ];
+        });
+    }
+
+    /**
+     * Mark an asset as Broken and automatically create a hardware incident ticket.
+     */
+    public function markAsBroken(Asset $asset, array $params): Ticket
+    {
+        return DB::transaction(function () use ($asset, $params) {
+            $brokenStatus = Status::where('name', 'Broken')
+                ->whereHas('masterCategory', fn ($q) => $q->where('name', 'IT Asset'))
+                ->first()
+                ?? Status::where('name', 'Broken')->first()
+                ?? Status::firstOrCreate(['name' => 'Broken'], ['color' => 'danger', 'icon' => 'alert-triangle']);
+
+            $brokenDate = ! empty($params['broken_date']) ? Carbon::parse($params['broken_date']) : now();
+            $description = trim((string) $params['description']);
+            $priorityName = $params['priority'] ?? 'High';
+
+            // Create incident ticket while asset holder info is still attached
+            $ticket = AssetTicketService::createBrokenTicket($asset, $description, $priorityName);
+
+            $updateData = [
+                'status_id' => $brokenStatus->id,
+                'is_components_stripped' => ! empty($params['is_components_stripped']),
+            ];
+
+            if (! empty($params['save_to_notes'])) {
+                $noteEntry = "[Broken {$brokenDate->format('d/m/Y')}] {$description}";
+                $updateData['notes'] = filled($asset->notes)
+                    ? $asset->notes."\n".$noteEntry
+                    : $noteEntry;
+            }
+
+            if (! empty($params['checkin_from_holder']) && $asset->currentCheckout) {
+                $asset->currentCheckout->update([
+                    'checked_in_at' => $brokenDate,
+                    'checked_in_by_user_id' => auth()->id() ?? $asset->currentCheckout->checked_out_to_user_id,
+                    'checkin_status_id' => $brokenStatus->id,
+                    'checkin_notes' => "Marked Broken (Ticket #{$ticket->request_id})",
+                    'condition_report' => $description,
+                ]);
+
+                $updateData['current_checkout_id'] = null;
+                $updateData['assigned_to_user_id'] = null;
+                $updateData['user_name'] = null;
+            }
+
+            $asset->update($updateData);
+
+            return $ticket;
         });
     }
 }
