@@ -172,14 +172,28 @@
         <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
             <!-- Left Column: Contextual Sidebar (Prioritizing Assignment & Value) -->
             <div class="space-y-4 lg:col-span-1">
-                <!-- 1. Current Assignment (Top Priority Operational Card) -->
+                <!-- 1. Assignment & Last Holder (Top Priority Operational Card) -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-xs dark:border-gray-800 dark:bg-gray-900">
                     <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Current Assignment</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Assignment &amp; Holder</h3>
                         @if($asset->isCurrentlyCheckedOut())
                             <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
                                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                                 In Active Use
+                            </span>
+                        @elseif($isAssetBroken)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-500/10 dark:text-red-400">
+                                <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                Broken • Unassigned
+                            </span>
+                        @elseif($isAssetInService)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                In Service
+                            </span>
+                        @elseif($isAssetRetired)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                Decommissioned
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
@@ -191,6 +205,7 @@
                     @if($asset->isCurrentlyCheckedOut())
                         @php
                             $assignedUser = $asset->currentCheckout->checkedOutToUser;
+                            $previousCheckout = $asset->checkoutHistory->firstWhere('id', '!=', $asset->current_checkout_id);
                         @endphp
                         <div class="mt-4 space-y-4">
                             <div class="flex items-center gap-3">
@@ -204,18 +219,24 @@
                             </div>
 
                             <dl class="space-y-2.5 text-xs border-t border-gray-100 pt-3 dark:border-gray-800">
-                                <div class="flex justify-between">
+                                <div class="flex justify-between gap-2">
                                     <dt class="text-gray-500 dark:text-gray-400">Department</dt>
-                                    <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $assignedUser->department->name ?? '—' }}</dd>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $asset->currentCheckout->department->name ?? $assignedUser->department->name ?? '—' }}</dd>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between gap-2">
                                     <dt class="text-gray-500 dark:text-gray-400">Location</dt>
                                     <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $asset->currentCheckout->location->name ?? '—' }}</dd>
                                 </div>
-                                <div class="flex justify-between">
+                                <div class="flex justify-between gap-2">
                                     <dt class="text-gray-500 dark:text-gray-400">Checked Out At</dt>
                                     <dd class="font-medium text-gray-900 dark:text-white text-right tabular-nums">{{ $asset->currentCheckout->checked_out_at?->format('d M Y, H:i') ?? '—' }}</dd>
                                 </div>
+                                @if($asset->currentCheckout->checkedOutByUser)
+                                    <div class="flex justify-between gap-2">
+                                        <dt class="text-gray-500 dark:text-gray-400">Issued By</dt>
+                                        <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $asset->currentCheckout->checkedOutByUser->name }}</dd>
+                                    </div>
+                                @endif
 
                                 @if($asset->currentCheckout->expected_return_date)
                                     <div class="flex items-center justify-between border-t border-gray-100 pt-2.5 dark:border-gray-800">
@@ -233,20 +254,157 @@
                                     </div>
                                 @endif
                             </dl>
+
+                            @if($previousCheckout && $previousCheckout->checkedOutToUser)
+                                <div class="border-t border-gray-100 pt-2.5 text-[11px] text-gray-500 dark:border-gray-800 dark:text-gray-400 flex items-center justify-between gap-2">
+                                    <span>Previous user: <strong class="font-medium text-gray-700 dark:text-gray-300">{{ $previousCheckout->checkedOutToUser->name }}</strong></span>
+                                    @if($asset->checkoutHistory->count() > 1)
+                                        <button type="button" @click="activeTab = 'history'" class="text-brand-600 hover:underline dark:text-brand-400 font-medium shrink-0">
+                                            History ({{ $asset->checkoutHistory->count() }})
+                                        </button>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    @elseif($asset->lastCheckout)
+                        @php
+                            $lastCheckout = $asset->lastCheckout;
+                            $lastUser = $lastCheckout->checkedOutToUser;
+                            $lastUserName = $lastUser->name ?? $asset->user_name ?? 'Unknown User';
+                            $lastDept = $lastCheckout->department->name ?? $lastUser?->department?->name ?? $asset->department?->name ?? '—';
+                            $lastLoc = $lastCheckout->location->name ?? $asset->location?->name ?? '—';
+                        @endphp
+                        <div class="mt-4 space-y-3.5">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700 font-bold text-sm border border-amber-100 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-900/40">
+                                    {{ strtoupper(substr($lastUserName, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+                                            Last User
+                                        </span>
+                                        @if($lastCheckout->checkinStatus)
+                                            <x-ui.badge :color="$lastCheckout->checkinStatus->color ?? 'gray'" variant="light" size="xs">
+                                                {{ $lastCheckout->checkinStatus->name }}
+                                            </x-ui.badge>
+                                        @endif
+                                    </div>
+                                    <p class="mt-0.5 text-sm font-bold text-gray-900 dark:text-white truncate">{{ $lastUserName }}</p>
+                                    @if($lastUser?->email)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $lastUser->email }}</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <dl class="space-y-2 text-xs border-t border-gray-100 pt-3 dark:border-gray-800">
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Department</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $lastDept }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Location</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $lastLoc }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Checked Out</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right tabular-nums">{{ $lastCheckout->checked_out_at?->format('d M Y, H:i') ?? '—' }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Returned / Ended</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right tabular-nums">{{ $lastCheckout->checked_in_at?->format('d M Y, H:i') ?? '—' }}</dd>
+                                </div>
+                                @if($lastCheckout->checked_out_at)
+                                    <div class="flex justify-between gap-2">
+                                        <dt class="text-gray-500 dark:text-gray-400">Usage Duration</dt>
+                                        <dd class="font-semibold text-gray-900 dark:text-white text-right">
+                                            {{ $lastCheckout->checked_out_at->diffForHumans($lastCheckout->checked_in_at ?? now(), ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE, 'parts' => 2]) }}
+                                        </dd>
+                                    </div>
+                                @endif
+                                @if($lastCheckout->checkedInByUser)
+                                    <div class="flex justify-between gap-2">
+                                        <dt class="text-gray-500 dark:text-gray-400">Checked In By</dt>
+                                        <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $lastCheckout->checkedInByUser->name }}</dd>
+                                    </div>
+                                @endif
+                            </dl>
+
+                            @if($lastCheckout->condition_report || $lastCheckout->checkin_notes)
+                                <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-3 text-xs dark:border-gray-800 dark:bg-gray-950 space-y-1">
+                                    @if($lastCheckout->condition_report)
+                                        <p class="text-gray-700 dark:text-gray-300">
+                                            <span class="font-semibold text-gray-500 dark:text-gray-400">Return Condition:</span>
+                                            {{ $lastCheckout->condition_report }}
+                                        </p>
+                                    @endif
+                                    @if($lastCheckout->checkin_notes)
+                                        <p class="text-gray-600 dark:text-gray-400">
+                                            <span class="font-semibold text-gray-500 dark:text-gray-400">Check-in Notes:</span>
+                                            {{ $lastCheckout->checkin_notes }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif
+
+                            <div class="flex items-center justify-between gap-2 border-t border-gray-100 pt-2.5 dark:border-gray-800 text-[11px]">
+                                <a href="{{ route('assets.bast', [$asset, $lastCheckout]) }}" target="_blank" class="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                                    <i data-lucide="file-text" class="w-3 h-3"></i>
+                                    Last BAST PDF
+                                </a>
+                                <button type="button" @click="activeTab = 'history'" class="inline-flex items-center gap-1 font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                                    All Movements ({{ $asset->checkoutHistory->count() }})
+                                    <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    @elseif($asset->assignedToUser || filled($asset->user_name))
+                        @php
+                            $recordedUser = $asset->assignedToUser;
+                            $recordedName = $recordedUser->name ?? $asset->user_name;
+                        @endphp
+                        <div class="mt-4 space-y-3.5">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700 font-bold text-sm border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+                                    {{ strtoupper(substr($recordedName, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <span class="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                        Recorded Holder
+                                    </span>
+                                    <p class="mt-0.5 text-sm font-bold text-gray-900 dark:text-white truncate">{{ $recordedName }}</p>
+                                    @if($recordedUser?->email)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $recordedUser->email }}</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <dl class="space-y-2 text-xs border-t border-gray-100 pt-3 dark:border-gray-800">
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Department</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $recordedUser?->department?->name ?? $asset->department?->name ?? '—' }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Location</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right">{{ $asset->location?->name ?? '—' }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-2">
+                                    <dt class="text-gray-500 dark:text-gray-400">Release Date</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white text-right tabular-nums">{{ $asset->release_date?->format('d M Y') ?? '—' }}</dd>
+                                </div>
+                            </dl>
                         </div>
                     @else
                         <div class="mt-4 flex flex-col items-center justify-center py-6 text-center">
                             <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 mb-2.5">
-                                <i data-lucide="package-check" class="h-5 w-5"></i>
+                                <i data-lucide="{{ $isAssetBroken ? 'alert-triangle' : ($isAssetInService ? 'wrench' : ($isAssetRetired ? 'archive' : 'package-check')) }}" class="h-5 w-5"></i>
                             </div>
-                            <p class="text-xs font-semibold text-gray-900 dark:text-white">Ready for Allocation</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5 max-w-[200px]">Asset is unassigned and stored in inventory.</p>
-                            
-                            @if($asset->lastCheckout && $asset->lastCheckout->checkedOutToUser)
-                                <p class="text-[10px] text-gray-400 mt-3 pt-2 border-t border-gray-100 dark:border-gray-800 w-full">
-                                    Last assigned to: <strong class="text-gray-700 dark:text-gray-300 font-medium">{{ $asset->lastCheckout->checkedOutToUser->name }}</strong>
-                                </p>
-                            @endif
+                            <p class="text-xs font-semibold text-gray-900 dark:text-white">
+                                {{ $isAssetBroken ? 'Broken — Unassigned' : ($isAssetInService ? 'In Maintenance — Unassigned' : ($isAssetRetired ? 'Retired / Disposed' : 'Ready for Allocation')) }}
+                            </p>
+                            <p class="text-[11px] text-gray-400 mt-0.5 max-w-[220px]">
+                                {{ $isAssetBroken || $isAssetInService || $isAssetRetired ? 'No previous user or checkout record is recorded on this asset.' : 'Asset is unassigned and stored in inventory.' }}
+                            </p>
                         </div>
                     @endif
                 </div>
@@ -644,7 +802,15 @@
                                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
                                                 <td class="px-4 py-3">
                                                     <span class="font-semibold text-gray-900 dark:text-white block">{{ $history->checkedOutToUser->name ?? '—' }}</span>
-                                                    <span class="text-[10px] text-gray-400">{{ $history->department->name ?? '—' }}</span>
+                                                    @if($history->checkedOutToUser?->email)
+                                                        <span class="block text-[10px] text-gray-500 dark:text-gray-400">{{ $history->checkedOutToUser->email }}</span>
+                                                    @endif
+                                                    <span class="text-[10px] text-gray-400">
+                                                        {{ $history->department->name ?? $history->checkedOutToUser?->department?->name ?? '—' }}
+                                                        @if($history->location)
+                                                            • {{ $history->location->name }}
+                                                        @endif
+                                                    </span>
                                                 </td>
                                                 <td class="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap tabular-nums">
                                                     {{ $history->checked_out_at?->format('d M Y') ?? '—' }}
@@ -652,6 +818,9 @@
                                                 <td class="px-4 py-3 whitespace-nowrap">
                                                     @if($history->checked_in_at)
                                                         <span class="text-gray-600 dark:text-gray-400 tabular-nums">{{ $history->checked_in_at->format('d M Y') }}</span>
+                                                        @if($history->checkedInByUser)
+                                                            <span class="block text-[10px] text-gray-400">By {{ $history->checkedInByUser->name }}</span>
+                                                        @endif
                                                     @elseif($history->isOverdue())
                                                         <x-ui.badge color="danger" variant="solid" size="xs">Overdue ({{ $history->overdueDays() }}d)</x-ui.badge>
                                                     @elseif($history->expected_return_date)
@@ -667,7 +836,7 @@
                                                         —
                                                     @endif
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                <td class="px-4 py-3">
                                                     @if($history->checkinStatus)
                                                         <x-ui.badge :color="$history->checkinStatus->color ?? 'gray'" variant="light" size="xs">
                                                             {{ $history->checkinStatus->name }}
@@ -676,6 +845,11 @@
                                                         <x-ui.badge color="primary" variant="light" size="xs">Deployed</x-ui.badge>
                                                     @else
                                                         <span class="text-gray-400">—</span>
+                                                    @endif
+                                                    @if($history->condition_report || $history->checkin_notes)
+                                                        <p class="mt-1 max-w-[200px] text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2" title="{{ trim(($history->condition_report ? 'Condition: ' . $history->condition_report . ' ' : '') . ($history->checkin_notes ? 'Notes: ' . $history->checkin_notes : '')) }}">
+                                                            {{ $history->condition_report ?: $history->checkin_notes }}
+                                                        </p>
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-3 text-end whitespace-nowrap">

@@ -666,7 +666,7 @@ class Asset extends Model
 
     public function lastCheckout()
     {
-        return $this->hasOne(AssetCheckout::class)->latestOfMany('checked_out_at');
+        return $this->hasOne(AssetCheckout::class)->latestOfMany(['checked_out_at', 'id']);
     }
 
     public function checkouts()

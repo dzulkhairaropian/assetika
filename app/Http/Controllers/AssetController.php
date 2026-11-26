@@ -469,8 +469,11 @@ class AssetController extends Controller
     {
         $asset->load([
             'product.category', 'product.brand', 'status', 'vendor', 'operatingSystem', 'department.company', 'location',
-            'currentCheckout.checkedOutToUser.department', 'currentCheckout.location',
-            'checkoutHistory.checkedOutToUser', 'checkoutHistory.department', 'maintenances.maintenanceType',
+            'assignedToUser.department',
+            'currentCheckout.checkedOutToUser.department', 'currentCheckout.checkedOutByUser', 'currentCheckout.department', 'currentCheckout.location',
+            'lastCheckout.checkedOutToUser.department', 'lastCheckout.checkedOutByUser', 'lastCheckout.checkedInByUser', 'lastCheckout.department', 'lastCheckout.location', 'lastCheckout.checkinStatus',
+            'checkoutHistory.checkedOutToUser.department', 'checkoutHistory.department', 'checkoutHistory.location', 'checkoutHistory.checkinStatus', 'checkoutHistory.checkedInByUser',
+            'maintenances.maintenanceType',
             'tickets.status', 'tickets.priority', 'tickets.assignedTo',
             'activityLogs.user', 'installedComponents.product', 'installedComponents.vendor',
         ]);

@@ -188,3 +188,59 @@ test('failed maintenance honors chosen broken or retired status instead of forci
     expect($asset2->retired_at)->not->toBeNull();
     expect(Ticket::where('asset_id', $asset2->id)->whereHas('status', fn ($q) => $q->where('is_closed', false))->count())->toBe(0);
 });
+
+test('asset show page displays comprehensive last user details after checkin and supports legacy holder fallback', function () {
+    $holder = User::factory()->create([
+        'name' => 'Rina Accounting',
+        'email' => 'rina@example.com',
+        'company_id' => $this->company->id,
+        'department_id' => $this->dept->id,
+    ]);
+
+    $asset = Asset::create([
+        'asset_tag' => 'ACM/NB/201201/017',
+        'product_id' => $this->product->id,
+        'department_id' => $this->dept->id,
+        'location_id' => $this->location->id,
+        'status_id' => $this->statusReady->id,
+    ]);
+
+    $this->post(route('assets.checkout.process', $asset), [
+        'checked_out_to_user_id' => $holder->id,
+        'department_id' => $this->dept->id,
+        'location_id' => $this->location->id,
+        'checked_out_at' => now()->subDays(12)->toDateString(),
+    ])->assertRedirect(route('assets.show', $asset));
+
+    $this->post(route('assets.checkin.process', $asset), [
+        'checked_in_at' => now()->toDateString(),
+        'status_id' => $this->statusBroken->id,
+        'condition_report' => 'LCD flickering and hinge cracked',
+        'checkin_notes' => 'Returned by user before replacement',
+    ])->assertRedirect(route('assets.show', $asset));
+
+    $showResponse = $this->get(route('assets.show', $asset));
+    $showResponse->assertOk();
+    $showResponse->assertSee('Last User');
+    $showResponse->assertSee('Rina Accounting');
+    $showResponse->assertSee('rina@example.com');
+    $showResponse->assertSee('LCD flickering and hinge cracked');
+    $showResponse->assertSee('Returned by user before replacement');
+    $showResponse->assertSee('Last BAST PDF');
+    $showResponse->assertSee($this->admin->name);
+
+    // Fallback when asset has legacy user_name set without checkout history
+    $legacyAsset = Asset::create([
+        'asset_tag' => 'ACM/NB/201201/018',
+        'product_id' => $this->product->id,
+        'department_id' => $this->dept->id,
+        'location_id' => $this->location->id,
+        'status_id' => $this->statusBroken->id,
+        'user_name' => 'Legacy Finance Staff',
+    ]);
+
+    $legacyResponse = $this->get(route('assets.show', $legacyAsset));
+    $legacyResponse->assertOk();
+    $legacyResponse->assertSee('Recorded Holder');
+    $legacyResponse->assertSee('Legacy Finance Staff');
+});
