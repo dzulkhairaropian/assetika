@@ -414,7 +414,7 @@
                                 <x-common.sortable-header column="status" label="Status & Lifecycle" />
                             </th>
                             <th class="px-4 py-3 text-start">
-                                <x-common.sortable-header column="purchase_cost" label="Purchase & Valuation" />
+                                <x-common.sortable-header column="notes" label="Notes" />
                             </th>
                             <th class="px-4 py-3 text-start">
                                 <x-common.sortable-header column="holder" label="Assigned Holder" />
@@ -505,31 +505,17 @@
                                                 Stripped
                                             </x-ui.badge>
                                         @endif
-                                        @if(filled($asset->notes))
-                                            <div class="mt-0.5 flex items-start gap-1 max-w-[200px] text-[11px] leading-snug text-gray-500 dark:text-gray-400" title="{{ $asset->notes }}">
-                                                <i data-lucide="file-text" class="mt-0.5 h-3 w-3 shrink-0 text-amber-500 dark:text-amber-400"></i>
-                                                <span class="line-clamp-2 break-words">{{ $asset->notes }}</span>
-                                            </div>
-                                        @endif
                                     </div>
                                 </td>
-                                <td class="px-4 py-2.5 whitespace-nowrap">
-                                    <div class="flex flex-col font-mono">
-                                        @if($asset->purchase_cost)
-                                            <span class="font-semibold text-gray-900 dark:text-white tabular-nums">
-                                                Rp {{ number_format($asset->purchase_cost, 0, ',', '.') }}
-                                            </span>
-                                            <span class="text-[10px] text-gray-400 tabular-nums">
-                                                @if($asset->depreciation)
-                                                    Book: Rp {{ number_format($asset->bookValue, 0, ',', '.') }}
-                                                @else
-                                                    Cost only
-                                                @endif
-                                            </span>
-                                        @else
-                                            <span class="text-gray-400 font-sans italic">—</span>
-                                        @endif
-                                    </div>
+                                <td class="px-4 py-2.5">
+                                    @if(filled($asset->notes))
+                                        <div class="flex items-start gap-1.5 min-w-[160px] max-w-[260px] text-xs leading-relaxed text-gray-700 dark:text-gray-300" title="{{ $asset->notes }}">
+                                            <i data-lucide="file-text" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500 dark:text-amber-400"></i>
+                                            <span class="line-clamp-2 break-words">{{ $asset->notes }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-400 italic">—</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2.5 whitespace-nowrap">
                                     @if($asset->isCurrentlyCheckedOut())

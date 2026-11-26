@@ -137,6 +137,8 @@ class AssetController extends Controller
             $query->orderBy('assets.release_date', $sortDir);
         } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
             $query->orderBy('assets.purchase_cost', $sortDir);
+        } elseif ($sortBy === 'notes' || $sortBy === 'note') {
+            $query->orderBy('assets.notes', $sortDir);
         } elseif ($sortBy === 'status') {
             $query->orderBy(Status::select('name')->whereColumn('statuses.id', 'assets.status_id'), $sortDir);
         } elseif ($sortBy === 'holder' || $sortBy === 'assigned_holder') {
@@ -292,6 +294,8 @@ class AssetController extends Controller
             $query->orderBy(Status::select('name')->whereColumn('statuses.id', 'assets.status_id'), $sortDir);
         } elseif ($sortBy === 'purchase_cost' || $sortBy === 'cost') {
             $query->orderBy('assets.purchase_cost', $sortDir);
+        } elseif ($sortBy === 'notes' || $sortBy === 'note') {
+            $query->orderBy('assets.notes', $sortDir);
         } elseif ($sortBy === 'holder' || $sortBy === 'assigned_holder') {
             $query->orderBy(
                 User::select('name')

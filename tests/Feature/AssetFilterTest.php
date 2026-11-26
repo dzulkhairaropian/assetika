@@ -107,3 +107,30 @@ test('asset_index_supports_multi_year_and_preserves_tab', function () {
     $response->assertSee('TC/LP/260101/002');
     $response->assertSee('name="tab" value="ready"', false);
 });
+
+test('asset_index_displays_notes_column_instead_of_purchase_valuation', function () {
+    $company = Company::create(['name' => 'Notes Corp', 'code' => 'NC']);
+    $user = User::factory()->create(['company_id' => $company->id]);
+    $this->actingAs($user);
+
+    $dept = Department::create(['company_id' => $company->id, 'name' => 'IT Dept', 'code' => 'IT']);
+    $status = Status::create(['name' => 'Ready to Deploy', 'color' => 'success']);
+    $masterCat = MasterCategory::firstOrCreate(['name' => 'IT Asset', 'code' => 'IT']);
+    $cat = Category::firstOrCreate(['name' => 'Laptop', 'code' => 'LP', 'master_category_id' => $masterCat->id]);
+    $prod = Product::create(['name' => 'Vostro 3400', 'category_id' => $cat->id, 'master_category_id' => $masterCat->id]);
+
+    Asset::create([
+        'asset_tag' => 'NC/LP/260101/001',
+        'product_id' => $prod->id,
+        'department_id' => $dept->id,
+        'status_id' => $status->id,
+        'notes' => 'Hinge slightly lifted on left side',
+    ]);
+
+    $response = $this->get(route('assets.index', ['sort_by' => 'notes', 'sort_dir' => 'asc']));
+
+    $response->assertOk();
+    $response->assertSee('Notes');
+    $response->assertDontSee('Purchase & Valuation');
+    $response->assertSee('Hinge slightly lifted on left side');
+});
